@@ -10,7 +10,7 @@ def call(body) {
     echo "Building plugin ${config.name}"
     
     echo "updating version"
-    updateVersion(pwd())
+    //updateVersion(pwd())
     /*
     if(env.BRANCH_NAME=="master"){
         stage name: 'Deploy to Prod', concurrency: 1
