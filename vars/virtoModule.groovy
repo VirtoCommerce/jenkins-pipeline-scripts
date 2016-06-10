@@ -9,10 +9,14 @@ def call(body) {
     // you can call any valid step functions from your code, just like you can from Pipeline scripts
     echo "Building plugin ${config.name}"
     
+    echo "updating version"
+    updateVersion(pwd())
+    /*
     if(env.BRANCH_NAME=="master"){
         stage name: 'Deploy to Prod', concurrency: 1
             updateVersion(pwd())
     }
+    */
 }
 
 def updateVersion(workspace)
