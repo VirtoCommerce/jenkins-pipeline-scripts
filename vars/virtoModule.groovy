@@ -11,6 +11,8 @@ def call(body) {
     
     echo "updating version"
     updateVersion(pwd())
+    step([$class: 'GitHubCommitStatusSetter', statusResultSource: [$class: 'ConditionalStatusResultSource', results: []]])
+
     /*
     if(env.BRANCH_NAME=="master"){
         stage name: 'Deploy to Prod', concurrency: 1
