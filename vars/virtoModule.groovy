@@ -28,7 +28,7 @@ def call(body) {
 	   		bat 'Nuget\\build.bat'
 	} 
 	
-	step([$class: 'GitHubCommitStatusSetter', statusResultSource: [$class: 'ConditionalStatusResultSource', results: []]])
+	//step([$class: 'GitHubCommitStatusSetter', statusResultSource: [$class: 'ConditionalStatusResultSource', results: []]])
 }
 
 def updateVersion(workspace)
