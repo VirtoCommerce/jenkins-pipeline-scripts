@@ -9,6 +9,7 @@ def call(body) {
     // you can call any valid step functions from your code, just like you can from Pipeline scripts
     echo "Building plugin ${config.name}"
     
+    /*
     def solution = "${config.solution}"
     
 	env.WORKSPACE = pwd()
@@ -29,6 +30,7 @@ def call(body) {
 	} 
 	
 	step([$class: 'GitHubCommitStatusSetter', statusResultSource: [$class: 'ConditionalStatusResultSource', results: []]])
+*/
 }
 
 def updateVersion(workspace)
