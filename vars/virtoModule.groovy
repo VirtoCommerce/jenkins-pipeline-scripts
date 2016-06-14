@@ -9,16 +9,24 @@ def call(body) {
     // you can call any valid step functions from your code, just like you can from Pipeline scripts
     echo "Building plugin ${config.name}"
     
-    echo "updating version"
-    updateVersion(pwd())
-    step([$class: 'GitHubCommitStatusSetter', statusResultSource: [$class: 'ConditionalStatusResultSource', results: []]])
+    def solution = "${config.solution}"
+    
+	env.WORKSPACE = pwd()
+	stage 'Checkout'
+		checkout([$class: 'GitSCM', extensions: [[$class: 'PathRestriction', excludedRegions: 'CommonAssemblyInfo\\.cs', includedRegions: '']]])
 
-    /*
-    if(env.BRANCH_NAME=="master"){
-        stage name: 'Deploy to Prod', concurrency: 1
-            updateVersion(pwd())
-    }
-    */
+	stage 'Build'
+		bat "Nuget restore ${solution}"
+		bat "\"${tool 'MSBuild 12.0'}\" "${solution}" /p:Configuration=Debug /p:Platform=\"Any CPU\""
+		
+	if (env.BRANCH_NAME == 'master') {
+				
+		stage 'Publish'
+		    updateVersion(pwd())
+	   		bat 'Nuget\\build.bat'
+	} 
+	
+	step([$class: 'GitHubCommitStatusSetter', statusResultSource: [$class: 'ConditionalStatusResultSource', results: []]])
 }
 
 def updateVersion(workspace)
