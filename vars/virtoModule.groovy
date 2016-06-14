@@ -7,7 +7,7 @@ def call(body) {
     body()
     
     // you can call any valid step functions from your code, just like you can from Pipeline scripts
-    echo "Building plugin ${config.name}"
+    echo "Building plugin ${config.name} with branch ${env.BRANCH_NAME}"
 
     def solution = "${config.solution}"
     
