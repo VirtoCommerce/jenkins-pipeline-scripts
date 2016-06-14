@@ -21,14 +21,14 @@ def call(body) {
 			bat "Nuget restore ${solution}"
 			bat "\"${tool 'MSBuild 12.0'}\" "${solution}" /p:Configuration=Debug /p:Platform=\"Any CPU\""
 	}	
-	if (env.BRANCH_NAME == 'master') {
+	//if (env.BRANCH_NAME == 'master') {
 				
 		stage 'Publish'
 		    	updateVersion(pwd())
 	   		bat 'Nuget\\build.bat'
-	} 
+	//} 
 	
-	//step([$class: 'GitHubCommitStatusSetter', statusResultSource: [$class: 'ConditionalStatusResultSource', results: []]])
+	step([$class: 'GitHubCommitStatusSetter', statusResultSource: [$class: 'ConditionalStatusResultSource', results: []]])
 }
 
 def updateVersion(workspace)
