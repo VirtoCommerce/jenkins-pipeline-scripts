@@ -23,9 +23,9 @@ def call(body) {
 	}	
 	//if (env.BRANCH_NAME == 'master') {
 				
-		stage 'Publish'
-		    	updateVersion(pwd())
-	   		bat 'Nuget\\build.bat'
+		//stage 'Publish'
+		    	updateVersion(env.WORKSPACE)
+	   		//bat 'Nuget\\build.bat'
 	//} 
 	
 	step([$class: 'GitHubCommitStatusSetter', statusResultSource: [$class: 'ConditionalStatusResultSource', results: []]])
