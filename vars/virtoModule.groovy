@@ -15,22 +15,25 @@ def call(body) {
 	stage 'Checkout'
 		checkout([$class: 'GitSCM', extensions: [[$class: 'PathRestriction', excludedRegions: 'CommonAssemblyInfo\\.cs', includedRegions: '']]])
 
+	/*
 	if(solution != null)
 	{
 		stage 'Build'
 			bat "Nuget restore ${solution}"
 			bat "\"${tool 'MSBuild 12.0'}\" "${solution}" /p:Configuration=Debug /p:Platform=\"Any CPU\""
 	}	
-	//if (env.BRANCH_NAME == 'master') {
+	if (env.BRANCH_NAME == 'master') {
 				
-		//stage 'Publish'
+		stage 'Publish'
 		    	updateVersion(env.WORKSPACE)
-	   		//bat 'Nuget\\build.bat'
-	//} 
+	   		bat 'Nuget\\build.bat'
+	} 
 	
 	step([$class: 'GitHubCommitStatusSetter', statusResultSource: [$class: 'ConditionalStatusResultSource', results: []]])
+*/
 }
 
+/*
 def updateVersion(workspace)
 {
     //def scriptDir = new File(getClass().protectionDomain.codeSource.location.path).parent.toString()
@@ -43,4 +46,4 @@ def updateVersion(workspace)
     bat "\"${tool 'Git'}\" push origin HEAD:master -f"
 }
 
-
+*/
