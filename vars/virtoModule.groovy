@@ -29,7 +29,7 @@ def updateVersion(workspace)
     
     bat "\"${tool 'Git'}\" config user.email \"ci@virtocommerce.com\""
     bat "\"${tool 'Git'}\" config user.name \"Virto Jenkins\""
-    bat "\"${tool 'Git'}\" commit -am \"Updated version number\""
+    bat "\"${tool 'Git'}\" commit -am \"Updated version number ${env.BUILD_TAG}\""
     bat "\"${tool 'Git'}\" push origin HEAD:master -f"
 }
 
