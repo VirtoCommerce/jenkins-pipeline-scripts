@@ -15,7 +15,7 @@ def call(body) {
 	stage 'Checkout'
 		checkout([$class: 'GitSCM', extensions: [[$class: 'PathRestriction', excludedRegions: 'CommonAssemblyInfo\\.cs', includedRegions: '']]])
 
-	if(solution != "")
+	if(solution != null)
 	{
 		stage 'Build'
 			bat "Nuget restore ${solution}"
