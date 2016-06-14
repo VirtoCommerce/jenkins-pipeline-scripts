@@ -24,7 +24,10 @@ def call(body) {
 def updateVersion(workspace)
 {
     def scriptDir = new File(getClass().protectionDomain.codeSource.location.path).parent.toString()
-    bat "powershell.exe -File \"${scriptDir}\\version.ps1\" -solutiondir \"${workspace}\""
+    dir(scriptDir)
+    {
+        bat "powershell.exe -File \".\\version.ps1\" -solutiondir \"${workspace}\""
+    }
     bat "\"${tool 'Git'}\" config user.email \"ci@virtocommerce.com\""
     bat "\"${tool 'Git'}\" config user.name \"Virto Jenkins\""
     bat "\"${tool 'Git'}\" commit -am \"Updated version number\""
