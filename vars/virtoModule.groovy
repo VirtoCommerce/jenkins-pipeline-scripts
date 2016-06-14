@@ -17,9 +17,8 @@ def call(body) {
 
 		stage 'Build'
 			bat "Nuget restore ${solution}"
-			//bat "\"${tool 'MSBuild 12.0'}\" "${solution}" /p:Configuration=Debug /p:Platform=\"Any CPU\""
+			bat "\"${tool 'MSBuild 12.0'}\" \"${solution}\" /p:Configuration=Debug /p:Platform=\"Any CPU\""
 
-/*
 	if (env.BRANCH_NAME == 'master') {
 				
 		stage 'Publish'
@@ -28,7 +27,6 @@ def call(body) {
 	} 
 	
 	step([$class: 'GitHubCommitStatusSetter', statusResultSource: [$class: 'ConditionalStatusResultSource', results: []]])
-*/
 }
 
 /*
