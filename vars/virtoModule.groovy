@@ -31,6 +31,7 @@ def call(body) {
 */
 }
 
+/*
 def updateVersion(workspace)
 {
     bat "powershell.exe -File \"${env.JENKINS_HOME}\\workflow-libs\\vars\\version.ps1\" -solutiondir \"${workspace}\""
@@ -40,3 +41,4 @@ def updateVersion(workspace)
     bat "\"${tool 'Git'}\" commit -am \"Updated version number ${env.BUILD_TAG}\""
     bat "\"${tool 'Git'}\" push origin HEAD:master -f"
 }
+*/
