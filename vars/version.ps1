@@ -2,7 +2,12 @@
 # This script will increment the build number in an AssemblyInfo.cs file
 #
 
-$assemblyInfoPath = ".\CommonAssemblyInfo.cs"
+Param(  
+  	[parameter(Mandatory=$true)]
+        $solutiondir
+     )
+     
+$assemblyInfoPath = "$solutiondir\CommonAssemblyInfo.cs"
 
 $contents = Get-Content $assemblyInfoPath -Raw 
 
