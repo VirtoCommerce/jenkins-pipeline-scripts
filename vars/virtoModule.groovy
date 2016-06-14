@@ -26,8 +26,9 @@ def call(body) {
 		    	updateVersion(env.WORKSPACE)
 	   		bat 'Nuget\\build.bat'
 	} 
-*/	
+	
 	step([$class: 'GitHubCommitStatusSetter', statusResultSource: [$class: 'ConditionalStatusResultSource', results: []]])
+*/
 }
 
 def updateVersion(workspace)
