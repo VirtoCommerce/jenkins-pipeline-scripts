@@ -23,7 +23,8 @@ def call(body) {
 
 def updateVersion(workspace)
 {
-    bat "powershell.exe -File \"${env.VC_RES}\\script\\version3.ps1\" -solutiondir \"${workspace}\""
+    $datafolder = Split-Path -Parent $MyInvocation.MyCommand.Path
+    bat "powershell.exe -File \"$datafolder\\version.ps1\" -solutiondir \"${workspace}\""
     bat "\"${tool 'Git'}\" config user.email \"ci@virtocommerce.com\""
     bat "\"${tool 'Git'}\" config user.name \"Virto Jenkins\""
     bat "\"${tool 'Git'}\" commit -am \"Updated version number\""
