@@ -24,9 +24,13 @@ def call(body) {
 def updateVersion(workspace)
 {
     def scriptDir = new File(getClass().protectionDomain.codeSource.location.path).parent.toString()
-    dir(scriptDir)
+    
+    def j = Jenkins.getInstance();
+    def workflowLibDir = new File(j.getRootPath().toString(), "workflow-libs")
+
+    dir(workflowLibDir)
     {
-        bat "powershell.exe -File \"version.ps1\" -solutiondir \"${workspace}\""
+        bat "powershell.exe -File \".\var\\version.ps1\" -solutiondir \"${workspace}\""
     }
     bat "\"${tool 'Git'}\" config user.email \"ci@virtocommerce.com\""
     bat "\"${tool 'Git'}\" config user.name \"Virto Jenkins\""
