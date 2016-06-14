@@ -15,13 +15,10 @@ def call(body) {
 	stage 'Checkout'
 		checkout([$class: 'GitSCM', extensions: [[$class: 'PathRestriction', excludedRegions: 'CommonAssemblyInfo\\.cs', includedRegions: '']]])
 
-	/*
-	if(solution != null)
-	{
 		stage 'Build'
 			bat "Nuget restore ${solution}"
 			bat "\"${tool 'MSBuild 12.0'}\" "${solution}" /p:Configuration=Debug /p:Platform=\"Any CPU\""
-	}	
+
 	if (env.BRANCH_NAME == 'master') {
 				
 		stage 'Publish'
@@ -30,7 +27,6 @@ def call(body) {
 	} 
 	
 	step([$class: 'GitHubCommitStatusSetter', statusResultSource: [$class: 'ConditionalStatusResultSource', results: []]])
-*/
 }
 
 def updateVersion(workspace)
