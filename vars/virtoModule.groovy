@@ -30,7 +30,7 @@ def updateVersion(workspace)
 
     dir(workflowLibDir)
     {
-        bat "powershell.exe -File \".\var\\version.ps1\" -solutiondir \"${workspace}\""
+        bat "powershell.exe -File \".\\var\\version.ps1\" -solutiondir \"${workspace}\""
     }
     bat "\"${tool 'Git'}\" config user.email \"ci@virtocommerce.com\""
     bat "\"${tool 'Git'}\" config user.name \"Virto Jenkins\""
