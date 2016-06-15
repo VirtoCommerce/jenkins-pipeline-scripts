@@ -8,13 +8,19 @@ def call(body) {
     
     // you can call any valid step functions from your code, just like you can from Pipeline scripts
     echo "Building plugin ${config.name} with branch ${env.BRANCH_NAME}"
+    
+    // github-organization-plugin jobs are named as 'org/repo/branch'
+    tokens = "${env.JOB_NAME}".tokenize('/')
+    org = tokens[0]
+    repo = tokens[1]
+    branch = tokens[2]
 
     def solution = "${config.solution}"
     
 	env.WORKSPACE = pwd()
 	stage 'Checkout'
 		//checkout scm
-		checkout([$class: 'GitSCM', branches: [[name: "*/${env.BRANCH_NAME}"]], doGenerateSubmoduleConfigurations: false, extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: ''], [$class: 'CheckoutOption']], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'sasha-jenkins', url: "${GIT_URL}"]]])
+		checkout([$class: 'GitSCM', branches: [[name: "*/${env.BRANCH_NAME}"]], doGenerateSubmoduleConfigurations: false, extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: ''], [$class: 'CheckoutOption']], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'sasha-jenkins', url: "git@github.com:${org}/${repo}}.git"]]])
 		//checkout([$class: 'GitSCM', extensions: [[$class: 'PathRestriction', excludedRegions: 'CommonAssemblyInfo\\.cs']]])
 		//checkout([$class: 'GitSCM', extensions: [[$class: 'PathRestriction', excludedRegions: 'CommonAssemblyInfo\\.cs', includedRegions: '']]])
 
