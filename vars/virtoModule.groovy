@@ -13,8 +13,8 @@ def call(body) {
     
 	env.WORKSPACE = pwd()
 	stage 'Checkout'
-		checkout scm
-		//checkout([$class: 'GitSCM', branches: [[name: '${env.BRANCH_NAME}']], locations: [[clean: false, FilePath: '.']], extensions: [[$class: 'PathRestriction', excludedRegions: 'CommonAssemblyInfo\\.cs', includedRegions: '']]])
+		checkout([$class: 'GitSCM'])
+		//checkout([$class: 'GitSCM', extensions: [[$class: 'PathRestriction', excludedRegions: 'CommonAssemblyInfo\\.cs', includedRegions: '']]])
 
 		stage 'Build'
 			bat "Nuget restore ${solution}"
