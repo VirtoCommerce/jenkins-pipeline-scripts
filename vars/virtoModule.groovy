@@ -13,7 +13,7 @@ def call(body) {
     
 	env.WORKSPACE = pwd()
 	stage 'Checkout'
-		checkout([$class: 'GitSCM'])
+		checkout([$class: 'GitSCM', extensions: [[$class: 'PathRestriction', excludedRegions: 'CommonAssemblyInfo\\.cs']]])
 		//checkout([$class: 'GitSCM', extensions: [[$class: 'PathRestriction', excludedRegions: 'CommonAssemblyInfo\\.cs', includedRegions: '']]])
 
 		stage 'Build'
