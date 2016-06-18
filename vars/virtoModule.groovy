@@ -33,19 +33,9 @@ def call(body) {
 				credentialsId: 'sasha-jenkins', url: "git@github.com:VirtoCommerce/${repo}.git"
 			]]
 		]
+	
+	buildSolutions()
 		
-		def solutions = findFiles(glob: '*.sln')
-
-		if(solutions.size() > 0)
-		{
-		stage 'Build'
-			for(int i = 0; i < solutions.size(); i++)
-			{
-				def solution = solutions[i];
-				bat "Nuget restore ${it.name}"
-				bat "\"${tool 'MSBuild 12.0'}\" \"${it.name}\" /p:Configuration=Debug /p:Platform=\"Any CPU\""
-			}
-		}
 	if (env.BRANCH_NAME == 'master') {
 				
 		stage 'Publish'
@@ -54,6 +44,22 @@ def call(body) {
 	} 
 	
 	step([$class: 'GitHubCommitStatusSetter', statusResultSource: [$class: 'ConditionalStatusResultSource', results: []]])
+}
+
+def buildSolutions()
+{
+	def solutions = findFiles(glob: '*.sln')
+
+	if(solutions.size() > 0)
+	{
+		stage 'Build'
+			for(int i = 0; i < solutions.size(); i++)
+			{
+				def solution = solutions[i]
+				bat "Nuget restore ${it.name}"
+				bat "\"${tool 'MSBuild 12.0'}\" \"${it.name}\" /p:Configuration=Debug /p:Platform=\"Any CPU\""
+			}
+	}
 }
 
 def updateVersion(workspace)
