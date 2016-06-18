@@ -8,9 +8,9 @@ def call(body) {
     body.delegate = config
     body()
     
-	def solution = 'VirtoCommerce.Platform.sln'
 	node
 	{
+		def solution = 'VirtoCommerce.Platform.sln'
 		try 
 	    {
 	    	// you can call any valid step functions from your code, just like you can from Pipeline scripts
