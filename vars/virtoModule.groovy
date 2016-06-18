@@ -40,7 +40,7 @@ def call(body) {
 				
 		stage 'Publish'
 		    	updateVersion(env.WORKSPACE)
-	   		bat 'Nuget\\build.bat'
+	   		//bat 'Nuget\\build.bat'
 	} 
 	
 	step([$class: 'GitHubCommitStatusSetter', statusResultSource: [$class: 'ConditionalStatusResultSource', results: []]])
