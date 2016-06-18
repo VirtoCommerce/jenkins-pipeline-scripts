@@ -16,7 +16,7 @@ def call(body) {
     branch = tokens[2]
 
     def solution = "${config.solution}"
-    
+
 	env.WORKSPACE = pwd()
 	stage 'Checkout'
 		//checkout scm
