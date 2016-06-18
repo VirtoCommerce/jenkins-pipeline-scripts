@@ -27,10 +27,11 @@ def call(body) {
 
 	env.WORKSPACE = pwd()
 	stage 'Checkout'
-		//checkout scm
+		checkout scm
 		//checkout([$class: 'GitSCM', branches: [[name: "*/${env.BRANCH_NAME}"]], doGenerateSubmoduleConfigurations: false, extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: ''], [$class: 'CheckoutOption']], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'sasha-jenkins', url: "git@github.com:VirtoCommerce/${repo}.git"]]])
 		//checkout([$class: 'GitSCM', extensions: [[$class: 'PathRestriction', excludedRegions: 'CommonAssemblyInfo\\.cs']]])
-		checkout poll:true, scm: [
+		/*
+		checkout scm: [
 			$class: 'GitSCM', 
 			extensions: [[
 				$class: 'PathRestriction', 
@@ -41,6 +42,7 @@ def call(body) {
 				credentialsId: 'sasha-jenkins', url: "git@github.com:VirtoCommerce/${repo}.git"
 			]]
 		]
+		*/
 	
 	buildSolutions()
 	
