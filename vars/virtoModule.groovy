@@ -56,8 +56,8 @@ def buildSolutions()
 			for(int i = 0; i < solutions.size(); i++)
 			{
 				def solution = solutions[i]
-				bat "Nuget restore ${it.name}"
-				bat "\"${tool 'MSBuild 12.0'}\" \"${it.name}\" /p:Configuration=Debug /p:Platform=\"Any CPU\""
+				bat "Nuget restore ${solution.name}"
+				bat "\"${tool 'MSBuild 12.0'}\" \"${solution.name}\" /p:Configuration=Debug /p:Platform=\"Any CPU\""
 			}
 	}
 }
