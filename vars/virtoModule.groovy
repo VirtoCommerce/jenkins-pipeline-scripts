@@ -7,7 +7,7 @@ def call(body) {
     body()
     
     // you can call any valid step functions from your code, just like you can from Pipeline scripts
-    echo "Building plugin ${config.name} with branch ${env.BRANCH_NAME}, job: ${env.JOB_NAME}"
+    echo "Building ${config.name} with branch ${env.BRANCH_NAME}, job: ${env.JOB_NAME}"
     
     // github-organization-plugin jobs are named as 'org/repo/branch'
     tokens = "${env.JOB_NAME}".tokenize('/')
