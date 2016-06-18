@@ -8,6 +8,9 @@ def call(body) {
     body.delegate = config
     body()
     
+    node
+    {
+    
     // you can call any valid step functions from your code, just like you can from Pipeline scripts
     echo "Building branch ${env.BRANCH_NAME}, job: ${env.JOB_NAME}"
 
@@ -17,6 +20,7 @@ def call(body) {
 	
   	buildSolutions()
   	step([$class: 'GitHubCommitStatusSetter', statusResultSource: [$class: 'ConditionalStatusResultSource', results: []]])
+    }
 }
 
 def buildSolutions()
