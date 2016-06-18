@@ -11,24 +11,24 @@ def call(body) {
     node
     {
     	try 
-      {
-      	// you can call any valid step functions from your code, just like you can from Pipeline scripts
+      	{
+      		// you can call any valid step functions from your code, just like you can from Pipeline scripts
     		echo "Building branch ${env.BRANCH_NAME}, job: ${env.JOB_NAME}"
-				stage 'Checkout'
-  				checkout scm
+		stage 'Checkout'
+  			checkout scm
   		
-  			buildSolutions()
-  		
-      }
-	    catch (any) {
-      	currentBuild.result = 'FAILURE'
-      	throw any //rethrow exception to prevent the build from proceeding
-	    } 
+  		buildSolutions()
+  	
+      	}
+	catch (any) {
+      		currentBuild.result = 'FAILURE'
+      		throw any //rethrow exception to prevent the build from proceeding
+	} 
     	finally {
-      	step([$class: 'Mailer', notifyEveryUnstableBuild: true, recipients: 'dev@virtoway.com', sendToIndividuals: true])
+      		step([$class: 'Mailer', notifyEveryUnstableBuild: true, recipients: 'dev@virtoway.com', sendToIndividuals: true])
     	}
 
-  		step([$class: 'GitHubCommitStatusSetter', statusResultSource: [$class: 'ConditionalStatusResultSource', results: []]])
+  	step([$class: 'GitHubCommitStatusSetter', statusResultSource: [$class: 'ConditionalStatusResultSource', results: []]])
     }
 }
 
