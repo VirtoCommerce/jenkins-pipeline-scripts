@@ -43,7 +43,8 @@ def call(body) {
 		]
 	
 	buildSolutions()
-		
+	
+	/*
 	if (env.BRANCH_NAME == 'master') {
 		if(firstTimeRun == false)
 		{
@@ -52,6 +53,7 @@ def call(body) {
 	   			//bat 'Nuget\\build.bat'
 		}
 	} 
+	*/
 	
 	step([$class: 'GitHubCommitStatusSetter', statusResultSource: [$class: 'ConditionalStatusResultSource', results: []]])
 }
