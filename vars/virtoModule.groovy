@@ -9,7 +9,7 @@ def call(body) {
     // you can call any valid step functions from your code, just like you can from Pipeline scripts
     echo "Building ${config.name} with branch ${env.BRANCH_NAME}, job: ${env.JOB_NAME}"
     
-    def readmefile = findFiles(glob: 'readme.md')
+    def readmefile = findFiles(glob: '*.md')
     def firstTimeRun = false
     if(readmefile.size() == 0)
     {
