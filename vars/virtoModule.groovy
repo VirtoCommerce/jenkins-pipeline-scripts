@@ -9,7 +9,7 @@ def call(body) {
     body()
     
     // you can call any valid step functions from your code, just like you can from Pipeline scripts
-    echo "Building ${config.name} with branch ${env.BRANCH_NAME}, job: ${env.JOB_NAME}"
+    echo "Building branch ${env.BRANCH_NAME}, job: ${env.JOB_NAME}"
 
   	env.WORKSPACE = pwd()
   	stage 'Checkout'
