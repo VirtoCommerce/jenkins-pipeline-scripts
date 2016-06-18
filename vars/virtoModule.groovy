@@ -9,6 +9,14 @@ def call(body) {
     // you can call any valid step functions from your code, just like you can from Pipeline scripts
     echo "Building ${config.name} with branch ${env.BRANCH_NAME}, job: ${env.JOB_NAME}"
     
+    def readmefile = findFiles(glob: 'readme.md')
+    def firstTimeRun = false
+    if(readmefile.size() == 0)
+    {
+    	firstTimeRun = true
+    	echo "Running for the first time"
+    }	
+    
     // github-organization-plugin jobs are named as 'org/repo/branch'
     tokens = "${env.JOB_NAME}".tokenize('/')
     org = tokens[0]
@@ -37,10 +45,12 @@ def call(body) {
 	buildSolutions()
 		
 	if (env.BRANCH_NAME == 'master') {
-				
-		stage 'Publish'
-		    	updateVersion(env.WORKSPACE)
-	   		//bat 'Nuget\\build.bat'
+		if(firstTimeRun == false)
+		{
+			stage 'Publish'
+		    		updateVersion(env.WORKSPACE)
+	   			//bat 'Nuget\\build.bat'
+		}
 	} 
 	
 	step([$class: 'GitHubCommitStatusSetter', statusResultSource: [$class: 'ConditionalStatusResultSource', results: []]])
