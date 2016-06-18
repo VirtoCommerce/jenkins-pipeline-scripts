@@ -33,10 +33,14 @@ def call(body) {
 				credentialsId: 'sasha-jenkins', url: "git@github.com:VirtoCommerce/${repo}.git"
 			]]
 		]
+		
+		def solutions = findFiles(glob: '*.sln')
 
 		stage 'Build'
-			bat "Nuget restore ${solution}"
-			bat "\"${tool 'MSBuild 12.0'}\" \"${solution}\" /p:Configuration=Debug /p:Platform=\"Any CPU\""
+			solutions.each {
+				bat "Nuget restore ${it.name}"
+				bat "\"${tool 'MSBuild 12.0'}\" \"${it.name}\" /p:Configuration=Debug /p:Platform=\"Any CPU\""
+			}
 
 	if (env.BRANCH_NAME == 'master') {
 				
