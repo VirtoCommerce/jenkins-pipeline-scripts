@@ -37,9 +37,9 @@ def call(body) {
 
 def runTests()
 {
-	def xUnitExecutable = "packages\xunit.runner.console.2.1.0\tools\xunit.console.exe"
+	def xUnitExecutable = "packages\\xunit.runner.console.2.1.0\\tools\\xunit.console.exe"
 	stage 'Running tests'
-		def testDlls = findFiles(glob: '**/bin/Debug/*Test.dll')
+		def testDlls = findFiles(glob: '**\bin\Debug\*Test.dll')
 		if(testDlls.size() > 0)
 		{
 			def paths = testDlls.map { it.path }.join(" ")
