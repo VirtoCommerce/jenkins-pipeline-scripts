@@ -37,7 +37,8 @@ def call(body) {
 
 def runTests()
 {
-	def xUnitExecutable = "packages\\xunit.runner.console.2.1.0\\tools\\xunit.console.exe"
+	def xUnit = env.XUnit
+	def xUnitExecutable = "${xUnit}\\xunit.console.exe"
 	
 		def testDlls = findFiles(glob: '**\\bin\\Debug\\*Test.dll')
 		if(testDlls.size() > 0)
