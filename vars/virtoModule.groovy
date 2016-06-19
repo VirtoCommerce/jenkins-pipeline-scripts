@@ -58,9 +58,14 @@ def runTests()
 	if(testDlls.size() > 0)
 	{
 		stage 'Running tests'
-			String s = ""
-    			testDlls.collect { s += "$it.path"  }
-    			echo s
+			String paths = ""
+			for(int i = 0; i < testDlls.size(); i++)
+			{
+				def testDll = testDlls[i]
+				paths += "\"$testDll.path\""
+				
+			}
+			echo paths
 			//def paths = testDlls.path.join(", ")
 			//def paths = testDlls.map
 			//def paths = testDlls.map { it.path }.join(" ")
