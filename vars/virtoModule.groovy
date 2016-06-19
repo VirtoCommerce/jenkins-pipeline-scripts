@@ -58,7 +58,10 @@ def runTests()
 	if(testDlls.size() > 0)
 	{
 		stage 'Running tests'
-			def paths = testDlls.path.join(", ")
+			String s = ""
+    			testDlls.collect { s += "$it.path"  }
+    			echo s
+			//def paths = testDlls.path.join(", ")
 			//def paths = testDlls.map
 			//def paths = testDlls.map { it.path }.join(" ")
 			//echo "${xUnitExecutable} ${paths} -xml xUnit.Test.xml -trait `category=ci` -parallel none"
