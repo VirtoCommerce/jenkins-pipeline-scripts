@@ -58,8 +58,9 @@ def runTests()
 	if(testDlls.size() > 0)
 	{
 		stage 'Running tests'
-		def paths = testDlls.map { it.path }.join(" ")
-		echo "${xUnitExecutable} ${paths} -xml xUnit.Test.xml -trait `category=ci` -parallel none"
-		bat "${xUnitExecutable} ${paths} -xml xUnit.Test.xml -trait `category=ci` -parallel none"
+			def paths = testDlls.map
+			//def paths = testDlls.map { it.path }.join(" ")
+			//echo "${xUnitExecutable} ${paths} -xml xUnit.Test.xml -trait `category=ci` -parallel none"
+			//bat "${xUnitExecutable} ${paths} -xml xUnit.Test.xml -trait `category=ci` -parallel none"
 	}
 }
