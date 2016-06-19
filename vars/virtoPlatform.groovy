@@ -40,21 +40,18 @@ def runTests()
 	def xUnit = env.XUnit
 	def xUnitExecutable = "${xUnit}\\xunit.console.exe"
 	
-		def testDlls = findFiles(glob: '**\\bin\\Debug\\*Test.dll')
-		if(testDlls.size() > 0)
-		{
-			stage 'Running tests'
-			def paths = testDlls.map { it.path }.join(" ")
-			bat "${xUnitExecutable} ${paths} -xml xUnit.Test.xml -trait `category=ci` -parallel none"
-
-/*
+	def testDlls = findFiles(glob: '**\\bin\\Debug\\*Test.dll')
+	if(testDlls.size() > 0)
+	{
+		stage 'Running tests'
+			String paths = ""
 			for(int i = 0; i < testDlls.size(); i++)
 			{
 				def testDll = testDlls[i]
-				bat "${xUnitExecutable}" $cFiles -xml xUnit.Test.xml -trait `"category=ci`" -parallel none"
-				bat "Nuget restore ${solution.name}"
-				bat "\"${tool 'MSBuild 12.0'}\" \"${solution.name}\" /p:Configuration=Debug /p:Platform=\"Any CPU\""
+				paths += "\"$testDll.path\" "
+				
 			}
-*/
-		}
+			
+			bat "${xUnitExecutable} ${paths} -xml xUnit.Test.xml -trait 'category=ci' -parallel none"
+	}
 }
