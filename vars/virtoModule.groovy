@@ -81,6 +81,16 @@ def processManifest(def manifestPath)
     	def projectUrl = manifest.projectUrl.toString()
     	def packageUrl = manifest.packageUrl.toString()
     	def iconUrl = manifest.iconUrl.toString()
+    	
+    	// get dependencies
+    	def dependencies = []
+    	for(int i = 0; i < manifest.dependencies.size(); i++)
+	{
+		def dependency = manifest.dependencies[i]
+		def dependencyObj = [id: dependency.@id, version: dependency.@version]
+		dependencies.add(dependencyObj)
+	}
+	
     	manifest = null
     	
     	def manifestDirectory = manifestPath.substring(0, manifestPath.length() - 16)
@@ -92,12 +102,13 @@ def processManifest(def manifestPath)
     		platformVersion,
     		title,
     		description,
+    		dependencies,
     		projectUrl,
     		packageUrl,
     		iconUrl)
 }
 
-def updateModule(def id, def version, def platformVersion, def title, def description, def projectUrl, def packageUrl, def iconUrl)
+def updateModule(def id, def version, def platformVersion, def title, def description, dev dependencies, def projectUrl, def packageUrl, def iconUrl)
 {
 	// MODULES
         dir('modules') {
@@ -113,6 +124,7 @@ def updateModule(def id, def version, def platformVersion, def title, def descri
                	    rec.description = description
                	    rec.title = title
                	    rec.description = description
+               	    rec.dependencies = dependencies
                	    if (projectUrl!=null && projectUrl.length()>0)
                	    {
                	    	rec.projectUrl = projectUrl
