@@ -196,13 +196,12 @@ def buildSolutions()
 
 	if(solutions.size() > 0)
 	{
-		stage 'Build'
-			for(int i = 0; i < solutions.size(); i++)
-			{
-				def solution = solutions[i]
-				bat "Nuget restore ${solution.name}"
-				bat "\"${tool 'MSBuild 12.0'}\" \"${solution.name}\" /p:Configuration=Debug /p:Platform=\"Any CPU\""
-			}
+		for(int i = 0; i < solutions.size(); i++)
+		{
+			def solution = solutions[i]
+			bat "Nuget restore ${solution.name}"
+			bat "\"${tool 'MSBuild 12.0'}\" \"${solution.name}\" /p:Configuration=Debug /p:Platform=\"Any CPU\""
+		}
 	}
 }
 
