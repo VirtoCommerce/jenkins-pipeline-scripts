@@ -133,8 +133,12 @@ def updateModule(def id, def version, def platformVersion, def title, def descri
 
 def publishRelease(def manifestDirectory, def version)
 {
+	tokens = "${env.JOB_NAME}".tokenize('/')
+    	//org = tokens[0]
+    	def REPO_NAME = tokens[1]
+    	//branch = tokens[2]
 	def REPO_ORG = "VirtoCommerce"
-	def REPO_NAME = "vc-module-jenkinssample"
+
 	def tempFolder = pwd(tmp: true)
 	def wsFolder = pwd()
 	def tempDir = "$tempFolder\\vc-module"
