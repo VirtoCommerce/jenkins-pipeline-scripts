@@ -108,7 +108,7 @@ def processManifest(def manifestPath)
     		iconUrl)
 }
 
-def updateModule(def id, def version, def platformVersion, def title, def description, dev dependencies, def projectUrl, def packageUrl, def iconUrl)
+def updateModule(def id, def version, def platformVersion, def title, def description, def dependencies, def projectUrl, def packageUrl, def iconUrl)
 {
 	// MODULES
         dir('modules') {
