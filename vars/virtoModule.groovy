@@ -210,7 +210,7 @@ def pushModules(def directory, def module)
 	    		bat "\"${tool 'Git'}\" commit -am \"Added new module ${id}\""
 	    	}
 	    	*/
-	    	bat "\"${tool 'Git'}\" commit -am \"Updated module\""
+	    	bat "\"${tool 'Git'}\" commit -am \"Updated module ${id}\""
 	    	bat "\"${tool 'Git'}\" push origin HEAD:master -f"
 	}
 }
