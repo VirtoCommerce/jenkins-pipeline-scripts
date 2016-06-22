@@ -166,22 +166,22 @@ def updateModule(def id, def version, def platformVersion, def title, def author
                }
             }
             
-            if(!foundRecord)
-            {
-             	// create new
-               	 echo "Creating new record in modules.json"
-               	 json.add([
-               	 	id: id, 
-               	 	title: title, 
-               	 	authors: authors,
-               	 	owners: owners,
-               	 	description: description, 
-               	 	dependencies: dependencies, 
-               	 	projectUrl: projectUrl, 
-               	 	packageUrl: packageUrl,
-               	 	iconUrl: iconUrl
-               	 	])
-            }
+	            if(!foundRecord)
+	            {
+	             	// create new
+	               	 echo "Creating new record in modules.json"
+	               	 json.add([
+	               	 	id: id, 
+	               	 	title: title, 
+	               	 	authors: authors,
+	               	 	owners: owners,
+	               	 	description: description, 
+	               	 	dependencies: dependencies, 
+	               	 	projectUrl: projectUrl, 
+	               	 	packageUrl: packageUrl,
+	               	 	iconUrl: iconUrl
+	               	 	])
+	            }
             
 	        println(builder.toString())
 	        writeFile file: 'modules.json', text: builder.toString()
