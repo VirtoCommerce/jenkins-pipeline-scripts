@@ -183,8 +183,10 @@ def updateModule(def id, def version, def platformVersion, def title, def author
 	               	 	])
 	            }
             
-	        println(builder.toString())
-	        writeFile file: 'modules.json', text: builder.toString()
+            	def moduleJson = builder.toString()
+            	builder = null
+	        println(moduleJson)
+	        writeFile file: 'modules.json', text: moduleJson
 	
 		bat "\"${tool 'Git'}\" config user.email \"ci@virtocommerce.com\""
 	    	bat "\"${tool 'Git'}\" config user.name \"Virto Jenkins\""
