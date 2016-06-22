@@ -183,7 +183,22 @@ def updateModule(def id, def version, def platformVersion, def title, def author
                	 	])
             }
             
-            println(builder.toString())
+	        println(builder.toString())
+		write(modules.json, builder.toString())
+	
+		bat "\"${tool 'Git'}\" config user.email \"ci@virtocommerce.com\""
+	    	bat "\"${tool 'Git'}\" config user.name \"Virto Jenkins\""
+	    	
+	    	if(!foundRecord)
+	    	{
+	    		bat "\"${tool 'Git'}\" commit -am \"Updated module ${id}\""
+	    	}
+	    	else
+	    	{
+	    		bat "\"${tool 'Git'}\" commit -am \"Added new module ${id}\""
+	    	}
+	    	
+	    	bat "\"${tool 'Git'}\" push origin HEAD:master -f"
         }
 }
 
