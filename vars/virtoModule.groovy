@@ -143,6 +143,8 @@ def updateModule(def id, def version, def platformVersion, def title, def author
                	echo "Modifying existing record in modules.json"
                	    rec.description = description
                	    rec.title = title
+               	    rec.version = version
+               	    rec.platformVersion = platformVersion
                	    rec.description = description
                	    rec.dependencies = dependencies
                	    if (projectUrl!=null && projectUrl.length()>0)
@@ -174,6 +176,8 @@ def updateModule(def id, def version, def platformVersion, def title, def author
 	               	 json.add([
 	               	 	id: id, 
 	               	 	title: title, 
+				version: version,
+				platformVersion: platformVersion,
 	               	 	authors: authors,
 	               	 	owners: owners,
 	               	 	description: description, 
