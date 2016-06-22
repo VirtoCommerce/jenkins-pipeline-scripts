@@ -186,7 +186,7 @@ def updateModule(def id, def version, def platformVersion, def title, def author
             
             	def moduleJson = builder.toString()
             	builder = null
-            	def prettyModuleJson = JsonOutput.prettyPrint(json.toString())
+            	def prettyModuleJson = JsonOutput.prettyPrint(moduleJson.toString())
 	        //println(moduleJson)
 	        writeFile file: 'modules.json', text: prettyModuleJson
         }
