@@ -133,6 +133,7 @@ def updateModule(def id, def version, def platformVersion, def title, def author
             def inputFile = readFile file: 'modules.json', encoding: 'utf-8'
             def parser = new JsonSlurper()
             def json = parser.parseText(inputFile)
+            parser = null
             def builder = new JsonBuilder(json)
             
            def foundRecord = false
