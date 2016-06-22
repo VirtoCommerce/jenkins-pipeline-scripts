@@ -188,11 +188,19 @@ def updateModule(def id, def version, def platformVersion, def title, def author
             	builder = null
 	        //println(moduleJson)
 	        writeFile file: 'modules.json', text: moduleJson
+        }
+        
+        pushModules('modules', id)
+}
 
-		bat "\"${tool 'Git'}\" config user.email \"ci@virtocommerce.com\""
-	    	bat "\"${tool 'Git'}\" config user.name \"Virto Jenkins\""
-	    	/*
-	    	if(!foundRecord)
+def pushModules(def directory, def module)
+{
+	dir(directory)
+	{
+	bat "\"${tool 'Git'}\" config user.email \"ci@virtocommerce.com\""
+	bat "\"${tool 'Git'}\" config user.name \"Virto Jenkins\""
+	/*
+	if(!foundRecord)
 	    	{
 	    		bat "\"${tool 'Git'}\" commit -am \"Updated module ${id}\""
 	    	}
@@ -203,7 +211,7 @@ def updateModule(def id, def version, def platformVersion, def title, def author
 	    	*/
 	    	bat "\"${tool 'Git'}\" commit -am \"Updated module\""
 	    	bat "\"${tool 'Git'}\" push origin HEAD:master -f"
-        }
+	}
 }
 
 def publishRelease(def manifestDirectory, def version)
@@ -292,7 +300,6 @@ def runTests()
 			{
 				def testDll = testDlls[i]
 				paths += "\"$testDll.path\" "
-				
 			}
 			
 			bat "${xUnitExecutable} ${paths} -xml xUnit.Test.xml -trait 'category=ci' -parallel none"
