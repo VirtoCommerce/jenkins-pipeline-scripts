@@ -123,7 +123,7 @@ def processManifest(def manifestPath)
     		packageUrl,
     		iconUrl)
     		
-    	publishTweet("${title} ${version} ${projectUrl} #${id}")
+    	publishTweet("${title} ${version} ${projectUrl} #virtocommerceci")
 }
 
 def publishTweet(def status)
