@@ -13,5 +13,7 @@ $apisecret = "$env:twitter_apisecret"
 $access_token = "$env:twitter_oauth_token"
 $access_token_secret = "$env:twitter_oauth_token_secret"
 
+Write-Host "API_KEY:" $api_key
+
 $OAuth = @{'ApiKey' = $apikey; 'ApiSecret' = $apisecret;'AccessToken' = $access_token;'AccessTokenSecret' = $access_token_secret}
 Invoke-TwitterRestMethod -ResourceURL 'https://api.twitter.com/1.1/statuses/update.json' -RestVerb 'POST' -Parameters @{'status'=$status} -OAuthSettings $OAuth
