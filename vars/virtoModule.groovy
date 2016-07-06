@@ -122,6 +122,13 @@ def processManifest(def manifestPath)
     		projectUrl,
     		packageUrl,
     		iconUrl)
+    		
+    	publishTweet("${title} ${version} ${projectUrl} #{id}")
+}
+
+def publishTweet(def status)
+{
+	bat "powershell.exe -File \"${env.JENKINS_HOME}\\workflow-libs\\vars\\twitter.ps1\" -status \"${status}\""
 }
 
 def updateModule(def id, def version, def platformVersion, def title, def authors, def owners, def description, def dependencies, def projectUrl, def packageUrl, def iconUrl)
