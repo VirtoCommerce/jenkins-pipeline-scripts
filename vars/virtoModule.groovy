@@ -19,6 +19,7 @@ def call(body) {
 		
 		stage 'Build'
 			buildSolutions()
+			processManifests(false) // prepare artifacts for testing
 		
 		stage 'Testing'
 			runTests()
@@ -29,7 +30,7 @@ def call(body) {
 		if (env.BRANCH_NAME == 'master' && git_last_commit.contains('[publish]'))
 		{
 			stage 'Publishing'
-				processManifests()
+				processManifests(true) // publish artifacts to github releases
 		}
       	}
 	catch (any) {
@@ -44,7 +45,7 @@ def call(body) {
     }
 }
 
-def processManifests()
+def processManifests(publish)
 {
 	// find all manifests
 	def manifests = findFiles(glob: '**\\module.manifest')
@@ -54,7 +55,7 @@ def processManifests()
 		for(int i = 0; i < manifests.size(); i++)
 		{
 			def manifest = manifests[i]
-			processManifest(manifest.path)
+			processManifest(publish, manifest.path)
 		}
 	}
 	else
@@ -63,7 +64,7 @@ def processManifests()
 	}
 }
 
-def processManifest(def manifestPath)
+def processManifest(def publish, def manifestPath)
 {
 	echo "reading $manifestPath"
 	def manifestFile = readFile file: "$manifestPath", encoding: 'utf-8'
@@ -109,22 +110,26 @@ def processManifest(def manifestPath)
     	
     	def manifestDirectory = manifestPath.substring(0, manifestPath.length() - 16)
     	prepareRelease(manifestDirectory)
-    	packageUrl = publishRelease(version)
     	
-    	updateModule(
-    		id, 
-    		version, 
-    		platformVersion,
-    		title,
-    		authors,
-    		owners,
-    		description,
-    		dependencies,
-    		projectUrl,
-    		packageUrl,
-    		iconUrl)
-    		
-    	publishTweet("${title} ${version} ${projectUrl} #virtocommerceci")
+    	if(publish)
+    	{
+	    	packageUrl = publishRelease(version)
+	    	
+	    	updateModule(
+	    		id, 
+	    		version, 
+	    		platformVersion,
+	    		title,
+	    		authors,
+	    		owners,
+	    		description,
+	    		dependencies,
+	    		projectUrl,
+	    		packageUrl,
+	    		iconUrl)
+	    		
+	    	publishTweet("${title} ${version} ${projectUrl} #virtocommerceci")
+    	}
 }
 
 def publishTweet(def status)
@@ -177,24 +182,24 @@ def updateModule(def id, def version, def platformVersion, def title, def author
                }
             }
             
-            if(!foundRecord)
-            {
+		if(!foundRecord)
+		{
              	// create new
-               	 echo "Creating new record in modules.json"
-               	 json.add([
-               	 	id: id, 
-               	 	title: title, 
+		echo "Creating new record in modules.json"
+		json.add([
+			id: id, 
+			title: title, 
 			version: version,
 			platformVersion: platformVersion,
-               	 	authors: authors,
-               	 	owners: owners,
-               	 	description: description, 
-               	 	dependencies: dependencies, 
-               	 	projectUrl: projectUrl, 
-               	 	packageUrl: packageUrl,
-               	 	iconUrl: iconUrl
-               	 	])
-            }
+			authors: authors,
+			owners: owners,
+			description: description, 
+			dependencies: dependencies, 
+			projectUrl: projectUrl, 
+			packageUrl: packageUrl,
+			iconUrl: iconUrl
+			])
+	        }
             
 		def moduleJson = builder.toString()
             	builder = null
