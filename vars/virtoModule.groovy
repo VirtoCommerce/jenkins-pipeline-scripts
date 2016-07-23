@@ -314,6 +314,9 @@ def runTests()
 				paths += "\"$testDll.path\" "
 			}
 			
+			// add platform dll to test installs
+			paths += "\"..\\..\\..\\vc-platform\\dev\\workspace\\tests\\bin\\debug\\VirtoCommerce.Platform.Test.dll\""
+			
 			bat "${xUnitExecutable} ${paths} -xml xUnit.Test.xml -trait \"category=ci\" -parallel none"
 			step([$class: 'XUnitPublisher', testTimeMargin: '3000', thresholdMode: 1, thresholds: [[$class: 'FailedThreshold', failureNewThreshold: '', failureThreshold: '', unstableNewThreshold: '', unstableThreshold: ''], [$class: 'SkippedThreshold', failureNewThreshold: '', failureThreshold: '', unstableNewThreshold: '', unstableThreshold: '']], tools: [[$class: 'XUnitDotNetTestType', deleteOutputFiles: true, failIfNotNew: false, pattern: '*.xml', skipNoTestFiles: true, stopProcessingIfError: false]]])
 	}
