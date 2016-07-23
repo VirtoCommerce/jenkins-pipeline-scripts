@@ -108,7 +108,8 @@ def processManifest(def manifestPath)
     	manifest = null
     	
     	def manifestDirectory = manifestPath.substring(0, manifestPath.length() - 16)
-    	packageUrl = publishRelease(manifestDirectory, version)
+    	prepareRelease(manifestDirectory)
+    	packageUrl = publishRelease(version)
     	
     	updateModule(
     		id, 
@@ -209,10 +210,10 @@ def pushModules(def directory, def module)
 {
 	dir(directory)
 	{
-	bat "\"${tool 'Git'}\" config user.email \"ci@virtocommerce.com\""
-	bat "\"${tool 'Git'}\" config user.name \"Virto Jenkins\""
-	/*
-	if(!foundRecord)
+		bat "\"${tool 'Git'}\" config user.email \"ci@virtocommerce.com\""
+		bat "\"${tool 'Git'}\" config user.name \"Virto Jenkins\""
+		/*
+		if(!foundRecord)
 	    	{
 	    		bat "\"${tool 'Git'}\" commit -am \"Updated module ${id}\""
 	    	}
@@ -226,20 +227,13 @@ def pushModules(def directory, def module)
 	}
 }
 
-def publishRelease(def manifestDirectory, def version)
+def prepareRelease(def manifestDirectory)
 {
-	tokens = "${env.JOB_NAME}".tokenize('/')
-    	//org = tokens[0]
-    	def REPO_NAME = tokens[1]
-    	//branch = tokens[2]
-	def REPO_ORG = "VirtoCommerce"
-
 	def tempFolder = pwd(tmp: true)
 	def wsFolder = pwd()
 	def tempDir = "$tempFolder\\vc-module"
 	def modulesDir = "$tempDir\\_PublishedWebsites"
 	def packagesDir = "$wsFolder\\artifacts"
-	def foundProjects = false
 		    		
 	dir(packagesDir)
 	{
@@ -256,31 +250,40 @@ def publishRelease(def manifestDirectory, def version)
 				def project = projects[i]
 				bat "\"${tool 'MSBuild 12.0'}\" \"$project.name\" /nologo /verbosity:m /t:PackModule /p:Configuration=Release /p:Platform=\"Any CPU\" /p:DebugType=none /p:AllowedReferenceRelatedFileExtensions=: \"/p:OutputPath=$tempDir\" \"/p:VCModulesOutputDir=$modulesDir\" \"/p:VCModulesZipDir=$packagesDir\""			
 			}
-			
-			foundProjects = true
 		}
 	}
+}
 
-	if(foundProjects)
+def publishRelease(def version)
+{
+	tokens = "${env.JOB_NAME}".tokenize('/')
+    	def REPO_NAME = tokens[1]
+	def REPO_ORG = "VirtoCommerce"
+
+	def tempFolder = pwd(tmp: true)
+	def wsFolder = pwd()
+	def packagesDir = "$wsFolder\\artifacts"
+		    		
+	dir(packagesDir)
 	{
-		dir(packagesDir)
+		deleteDir()
+	}
+
+	dir(packagesDir)
+	{
+		def artifacts = findFiles(glob: '*.zip')
+		if(artifacts.size() > 0)
 		{
-			def artifacts = findFiles(glob: '*.zip')
-			if(artifacts.size() > 0)
+			for(int i = 0; i < artifacts.size(); i++)
 			{
-				for(int i = 0; i < artifacts.size(); i++)
-				{
-					def artifact = artifacts[i]
-					bat "${env.Utils}\\github-release release --user $REPO_ORG --repo $REPO_NAME --tag v${version}"
-					bat "${env.Utils}\\github-release upload --user $REPO_ORG --repo $REPO_NAME --tag v${version} --name \"${artifact}\" --file \"${artifact}\""
-					echo "uploaded to https://github.com/$REPO_ORG/$REPO_NAME/releases/download/v${version}/${artifact}"
-					return  "https://github.com/$REPO_ORG/$REPO_NAME/releases/download/v${version}/${artifact}"
-				}
+				def artifact = artifacts[i]
+				bat "${env.Utils}\\github-release release --user $REPO_ORG --repo $REPO_NAME --tag v${version}"
+				bat "${env.Utils}\\github-release upload --user $REPO_ORG --repo $REPO_NAME --tag v${version} --name \"${artifact}\" --file \"${artifact}\""
+				echo "uploaded to https://github.com/$REPO_ORG/$REPO_NAME/releases/download/v${version}/${artifact}"
+				return  "https://github.com/$REPO_ORG/$REPO_NAME/releases/download/v${version}/${artifact}"
 			}
 		}
 	}
-
-	//bat "${env.Utils}\\github-release info -u VirtoCommerce -r vc-module-jenkinssample"
 }
 
 def buildSolutions()
