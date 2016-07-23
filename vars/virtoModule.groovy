@@ -176,26 +176,26 @@ def updateModule(def id, def version, def platformVersion, def title, def author
                }
             }
             
-	            if(!foundRecord)
-	            {
-	             	// create new
-	               	 echo "Creating new record in modules.json"
-	               	 json.add([
-	               	 	id: id, 
-	               	 	title: title, 
-				version: version,
-				platformVersion: platformVersion,
-	               	 	authors: authors,
-	               	 	owners: owners,
-	               	 	description: description, 
-	               	 	dependencies: dependencies, 
-	               	 	projectUrl: projectUrl, 
-	               	 	packageUrl: packageUrl,
-	               	 	iconUrl: iconUrl
-	               	 	])
-	            }
+            if(!foundRecord)
+            {
+             	// create new
+               	 echo "Creating new record in modules.json"
+               	 json.add([
+               	 	id: id, 
+               	 	title: title, 
+			version: version,
+			platformVersion: platformVersion,
+               	 	authors: authors,
+               	 	owners: owners,
+               	 	description: description, 
+               	 	dependencies: dependencies, 
+               	 	projectUrl: projectUrl, 
+               	 	packageUrl: packageUrl,
+               	 	iconUrl: iconUrl
+               	 	])
+            }
             
-            	def moduleJson = builder.toString()
+		def moduleJson = builder.toString()
             	builder = null
             	def prettyModuleJson = JsonOutput.prettyPrint(moduleJson.toString())
 	        //println(moduleJson)
