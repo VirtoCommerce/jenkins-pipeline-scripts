@@ -299,23 +299,23 @@ def runTests()
 	def xUnit = env.XUnit
 	def xUnitExecutable = "${xUnit}\\xunit.console.exe"
 
+	stage 'Running tests'
 	def testDlls = findFiles(glob: '**\\bin\\Debug\\*Test.dll')
+	String paths = ""
 	if (testDlls.size() > 0) {
-		stage 'Running tests'
-		String paths = ""
 		for (int i = 0; i < testDlls.size(); i++)
 		{
 			def testDll = testDlls[i]
 			paths += "\"$testDll.path\" "
 		}
+	}
 
 		// add platform dll to test installs
-		def wsFolder = pwd()
-		def packagesDir = "$wsFolder\\artifacts"
-		env.xunit_virto_modules_folder = packagesDir
-		paths += "\"..\\..\\..\\vc-platform\\dev\\workspace\\virtocommerce.platform.tests\\bin\\debug\\VirtoCommerce.Platform.Test.dll\""
+	def wsFolder = pwd()
+	def packagesDir = "$wsFolder\\artifacts"
+	env.xunit_virto_modules_folder = packagesDir
+	paths += "\"..\\..\\..\\vc-platform\\dev\\workspace\\virtocommerce.platform.tests\\bin\\debug\\VirtoCommerce.Platform.Test.dll\""
 
-		bat "${xUnitExecutable} ${paths} -xml xUnit.Test.xml -trait \"category=ci\" -parallel none -verbose -diagnostics"
-		step([$class: 'XUnitPublisher', testTimeMargin: '3000', thresholdMode: 1, thresholds: [[$class: 'FailedThreshold', failureNewThreshold: '', failureThreshold: '', unstableNewThreshold: '', unstableThreshold: ''], [$class: 'SkippedThreshold', failureNewThreshold: '', failureThreshold: '', unstableNewThreshold: '', unstableThreshold: '']], tools: [[$class: 'XUnitDotNetTestType', deleteOutputFiles: true, failIfNotNew: false, pattern: '*.xml', skipNoTestFiles: true, stopProcessingIfError: false]]])
-	}
+	bat "${xUnitExecutable} ${paths} -xml xUnit.Test.xml -trait \"category=ci\" -parallel none -verbose -diagnostics"
+	step([$class: 'XUnitPublisher', testTimeMargin: '3000', thresholdMode: 1, thresholds: [[$class: 'FailedThreshold', failureNewThreshold: '', failureThreshold: '', unstableNewThreshold: '', unstableThreshold: ''], [$class: 'SkippedThreshold', failureNewThreshold: '', failureThreshold: '', unstableNewThreshold: '', unstableThreshold: '']], tools: [[$class: 'XUnitDotNetTestType', deleteOutputFiles: true, failIfNotNew: false, pattern: '*.xml', skipNoTestFiles: true, stopProcessingIfError: false]]])
 }
