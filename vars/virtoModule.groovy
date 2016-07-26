@@ -299,7 +299,6 @@ def runTests()
 	def xUnit = env.XUnit
 	def xUnitExecutable = "${xUnit}\\xunit.console.exe"
 
-	stage 'Running tests'
 	def testDlls = findFiles(glob: '**\\bin\\Debug\\*Test.dll')
 	String paths = ""
 	if (testDlls.size() > 0) {
