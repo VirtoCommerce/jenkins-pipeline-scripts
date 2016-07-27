@@ -261,11 +261,6 @@ def publishRelease(def version)
 
 	dir(packagesDir)
 	{
-		deleteDir()
-	}
-
-	dir(packagesDir)
-	{
 		def artifacts = findFiles(glob: '*.zip')
 		if (artifacts.size() > 0) {
 			for (int i = 0; i < artifacts.size(); i++)
