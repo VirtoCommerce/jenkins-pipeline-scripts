@@ -64,7 +64,8 @@ def processManifest(def publish, def manifestPath)
 {
 	echo "reading $manifestPath"
 	def manifestFile = readFile file: "$manifestPath", encoding: 'utf-8'
-	def manifest = new XmlSlurper().parseText(manifestFile)
+	echo "parsing $manifestPath"
+	def manifest = new XmlSlurper().parse(manifestFile)
 	manifestFile = null
 
 	//echo manifestFile
