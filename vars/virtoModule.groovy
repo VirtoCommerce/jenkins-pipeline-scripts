@@ -62,8 +62,11 @@ def processManifests(publish)
 
 def processManifest(def publish, def manifestPath)
 {
-	echo "parsing $manifestPath"
-	def manifest = new XmlSlurper().parse("$manifestPath")
+	def wsDir = pwd()
+	def fullManifestPath = "$wsDir\\$manifestPath"
+
+	echo "parsing $fullManifestPath"
+	def manifest = new XmlSlurper().parse(fullManifestPath)
 
 	echo "Upading module ${manifest.id}"
 	def id = manifest.id.toString()
