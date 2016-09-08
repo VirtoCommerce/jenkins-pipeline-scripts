@@ -236,6 +236,7 @@ def prepareRelease(def manifestDirectory)
 		deleteDir()
 	}
 
+	// create artifacts
 	dir(manifestDirectory)
 	{
 		def projects = findFiles(glob: '*.csproj')
@@ -307,7 +308,18 @@ def runTests()
 		// add platform dll to test installs
 	def wsFolder = pwd()
 	def packagesDir = "$wsFolder\\artifacts"
-	env.xunit_virto_modules_folder = packagesDir
+	def allModulesDir = "c:\\Builds\\Jenkins\\VCF\\modules"
+
+	// copy artifacts to global location that can be used by other modules, but don't do that for master branch as we need to test it with real manifest
+	if (env.BRANCH_NAME != 'master') {
+		dir(packagesDir)
+		{		
+			// copy all files to modules
+			bat "xcopy *.zip \"${allModulesDir}\" /y" 
+		}	
+	}
+
+	env.xunit_virto_modules_folder = allModulesDir //packagesDir
 	paths += "\"..\\..\\..\\vc-platform\\dev\\workspace\\virtocommerce.platform.tests\\bin\\debug\\VirtoCommerce.Platform.Test.dll\""
 
 	bat "${xUnitExecutable} ${paths} -xml xUnit.Test.xml -trait \"category=ci\" -parallel none -verbose -diagnostics"
