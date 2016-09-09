@@ -319,7 +319,7 @@ def runTests()
 		}	
 	}
 
-	env.xunit_virto_modules_folder = allModulesDir //packagesDir
+	env.xunit_virto_modules_folder = packagesDir //allModulesDir //packagesDir
 	paths += "\"..\\..\\..\\vc-platform\\dev\\workspace\\virtocommerce.platform.tests\\bin\\debug\\VirtoCommerce.Platform.Test.dll\""
 
 	bat "${xUnitExecutable} ${paths} -xml xUnit.Test.xml -trait \"category=ci\" -parallel none -verbose -diagnostics"
