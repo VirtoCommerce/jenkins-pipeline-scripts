@@ -66,8 +66,9 @@ def prepareRelease(def version)
 
 def getVersion()
 {
+	echo "getting version"
 	def assemblyInfo = readFile file: 'CommonAssemblyInfo.cs', encoding: 'utf-8'
-	println(assemblyInfo)
+	echo assemblyInfo
 	// extract version string from assembly info file
 	return assemblyInfo.find(/AssemblyFileVersion\(\"(\d+\.\d+\.\d+)/) { fullMatch, version -> return version}
 }
