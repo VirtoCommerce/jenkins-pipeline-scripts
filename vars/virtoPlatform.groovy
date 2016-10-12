@@ -11,9 +11,13 @@ def call(body) {
 	node
 	{
 		def solution = config.solution
+		def webProject = 'VirtoCommerce.Platform.Web\\VirtoCommerce.Platform.Web.csproj'
+		def zipArtifact = 'VirtoCommerce.Platform'
 		if(solution == null)
 			 solution = 'VirtoCommerce.Platform.sln'
 		try {
+			webProject = 'VirtoCommerce.Storefront\\VirtoCommerce.Storefront.csproj'
+			zipArtifact = 'VirtoCommerce.StoreFront'			
 	    		// you can call any valid step functions from your code, just like you can from Pipeline scripts
 			echo "Building branch ${env.BRANCH_NAME}"
 			stage 'Checkout'
@@ -24,7 +28,7 @@ def call(body) {
 		
 		    	runTests()
 			stage 'Prepare Release'
-				prepareRelease(getVersion())
+				prepareRelease(getVersion(), webProject, zipArtifact)
 
 			bat "\"${tool 'Git'}\" log -1 --pretty=%%B > LAST_COMMIT_MESSAGE"
 			git_last_commit = readFile('LAST_COMMIT_MESSAGE')
@@ -47,7 +51,7 @@ def call(body) {
 	}
 }
 
-def prepareRelease(def version)
+def prepareRelease(def version, def webProject, def zipArtifact)
 {
 	def tempFolder = pwd(tmp: true)
 	def wsFolder = pwd()
@@ -60,8 +64,8 @@ def prepareRelease(def version)
 	}
 
 	// create artifacts
-	bat "\"${tool 'MSBuild 12.0'}\" \"VirtoCommerce.Platform.Web\\VirtoCommerce.Platform.Web.csproj\" /nologo /verbosity:m /p:Configuration=Release /p:Platform=\"Any CPU\" /p:DebugType=none \"/p:OutputPath=$tempFolder\""
-	(new AntBuilder()).zip(destfile: "${packagesDir}\\VirtoCommerce.Platform.${version}.zip", basedir: "${websiteDir}")
+	bat "\"${tool 'MSBuild 12.0'}\" \"${webProject}\" /nologo /verbosity:m /p:Configuration=Release /p:Platform=\"Any CPU\" /p:DebugType=none \"/p:OutputPath=$tempFolder\""
+	(new AntBuilder()).zip(destfile: "${packagesDir}\\${zipArtifact}.${version}.zip", basedir: "${websiteDir}")
 }
 
 def publishRelease(def version)
@@ -119,7 +123,6 @@ def runTests()
 			{
 				def testDll = testDlls[i]
 				paths += "\"$testDll.path\" "
-				
 			}
 			
 			bat "${xUnitExecutable} ${paths} -xml xUnit.Test.xml -trait \"category=ci\" -parallel none"
