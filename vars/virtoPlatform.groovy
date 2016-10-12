@@ -23,6 +23,17 @@ def call(body) {
 				bat "\"${tool 'MSBuild 14.0'}\" \"${solution}\" /p:Configuration=Debug /p:Platform=\"Any CPU\""
 		
 		    	runTests()
+			stage 'Prepare Release'
+				prepareRelease(getVersion())
+				
+			bat "\"${tool 'Git'}\" log -1 --pretty=%%B > LAST_COMMIT_MESSAGE"
+			git_last_commit = readFile('LAST_COMMIT_MESSAGE')
+
+			if (env.BRANCH_NAME == 'master' && git_last_commit.contains('[publish]')) {
+				stage 'Publishing'
+				//processManifests(true) // publish artifacts to github releases
+			}
+				
 		}
 		catch (any) {
 			currentBuild.result = 'FAILURE'
@@ -34,6 +45,30 @@ def call(body) {
 	
 	  	step([$class: 'GitHubCommitStatusSetter', statusResultSource: [$class: 'ConditionalStatusResultSource', results: []]])
 	}
+}
+
+def prepareRelease(def version)
+{
+	def tempFolder = pwd(tmp: true)
+	def wsFolder = pwd()
+	def modulesDir = "$tempDir\\_PublishedWebsites"
+	def packagesDir = "$wsFolder\\artifacts"
+
+	dir(packagesDir)
+	{
+		deleteDir()
+	}
+
+	// create artifacts
+	bat "\"${tool 'MSBuild 12.0'}\" \"VirtoCommerce.Platform.Web\VirtoCommerce.Platform.Web.csproj\" /nologo /verbosity:m /p:Configuration=Release /p:Platform=\"Any CPU\" /p:DebugType=none \"/p:OutputPath=$tempDir\""
+	(new AntBuilder()).zip(destfile: "${packagesDir}\\virtocommerce.platform.${version}.zip", basedir: "${modulesDir}\\VirtoCommerce.Platform.Web")
+}
+
+def getVersion()
+{
+	def assemblyInfo = readFile('CommonAssemblyInfo.cs')
+	// extract version string from assembly info file
+	return assemblyInfo.find(/AssemblyFileVersion\(\"(\d+\.\d+\.\d+)/) { fullMatch, version -> return version}
 }
 
 def runTests()
