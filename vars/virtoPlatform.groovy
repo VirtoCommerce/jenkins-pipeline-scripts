@@ -51,7 +51,7 @@ def prepareRelease(def version)
 {
 	def tempFolder = pwd(tmp: true)
 	def wsFolder = pwd()
-	def modulesDir = "$tempDir\\_PublishedWebsites"
+	def websiteDir = "$tempFolder\\_PublishedWebsites"
 	def packagesDir = "$wsFolder\\artifacts"
 
 	dir(packagesDir)
@@ -60,8 +60,8 @@ def prepareRelease(def version)
 	}
 
 	// create artifacts
-	bat "\"${tool 'MSBuild 12.0'}\" \"VirtoCommerce.Platform.Web\\VirtoCommerce.Platform.Web.csproj\" /nologo /verbosity:m /p:Configuration=Release /p:Platform=\"Any CPU\" /p:DebugType=none \"/p:OutputPath=$tempDir\""
-	(new AntBuilder()).zip(destfile: "${packagesDir}\\virtocommerce.platform.${version}.zip", basedir: "${modulesDir}\\VirtoCommerce.Platform.Web")
+	bat "\"${tool 'MSBuild 12.0'}\" \"VirtoCommerce.Platform.Web\\VirtoCommerce.Platform.Web.csproj\" /nologo /verbosity:m /p:Configuration=Release /p:Platform=\"Any CPU\" /p:DebugType=none \"/p:OutputPath=$tempFolder\""
+	(new AntBuilder()).zip(destfile: "${packagesDir}\\virtocommerce.platform.${version}.zip", basedir: "${websiteDir}\\VirtoCommerce.Platform.Web")
 }
 
 def getVersion()
