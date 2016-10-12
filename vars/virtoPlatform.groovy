@@ -61,7 +61,7 @@ def prepareRelease(def version)
 
 	// create artifacts
 	bat "\"${tool 'MSBuild 12.0'}\" \"VirtoCommerce.Platform.Web\\VirtoCommerce.Platform.Web.csproj\" /nologo /verbosity:m /p:Configuration=Release /p:Platform=\"Any CPU\" /p:DebugType=none \"/p:OutputPath=$tempFolder\""
-	(new AntBuilder()).zip(destfile: "${packagesDir}\\virtocommerce.platform.${version}.zip", basedir: "${websiteDir}")
+	(new AntBuilder()).zip(destfile: "${packagesDir}\\VirtoCommerce.Platform.${version}.zip", basedir: "${websiteDir}")
 }
 
 def publishRelease(def version)
