@@ -25,7 +25,7 @@ def call(body) {
 		    	runTests()
 			stage 'Prepare Release'
 				prepareRelease(getVersion())
-				
+
 			bat "\"${tool 'Git'}\" log -1 --pretty=%%B > LAST_COMMIT_MESSAGE"
 			git_last_commit = readFile('LAST_COMMIT_MESSAGE')
 
@@ -60,7 +60,7 @@ def prepareRelease(def version)
 	}
 
 	// create artifacts
-	bat "\"${tool 'MSBuild 12.0'}\" \"VirtoCommerce.Platform.Web\VirtoCommerce.Platform.Web.csproj\" /nologo /verbosity:m /p:Configuration=Release /p:Platform=\"Any CPU\" /p:DebugType=none \"/p:OutputPath=$tempDir\""
+	bat "\"${tool 'MSBuild 12.0'}\" \"VirtoCommerce.Platform.Web\\VirtoCommerce.Platform.Web.csproj\" /nologo /verbosity:m /p:Configuration=Release /p:Platform=\"Any CPU\" /p:DebugType=none \"/p:OutputPath=$tempDir\""
 	(new AntBuilder()).zip(destfile: "${packagesDir}\\virtocommerce.platform.${version}.zip", basedir: "${modulesDir}\\VirtoCommerce.Platform.Web")
 }
 
