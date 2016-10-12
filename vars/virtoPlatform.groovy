@@ -31,7 +31,7 @@ def call(body) {
 
 			if (env.BRANCH_NAME == 'master' && git_last_commit.contains('[publish]')) {
 				stage 'Publishing'
-				//processManifests(true) // publish artifacts to github releases
+					publishRelease(getVersion())
 			}
 				
 		}
@@ -62,6 +62,32 @@ def prepareRelease(def version)
 	// create artifacts
 	bat "\"${tool 'MSBuild 12.0'}\" \"VirtoCommerce.Platform.Web\\VirtoCommerce.Platform.Web.csproj\" /nologo /verbosity:m /p:Configuration=Release /p:Platform=\"Any CPU\" /p:DebugType=none \"/p:OutputPath=$tempFolder\""
 	(new AntBuilder()).zip(destfile: "${packagesDir}\\virtocommerce.platform.${version}.zip", basedir: "${websiteDir}")
+}
+
+def publishRelease(def version)
+{
+	tokens = "${env.JOB_NAME}".tokenize('/')
+	def REPO_NAME = tokens[1]
+	def REPO_ORG = "VirtoCommerce"
+
+	def tempFolder = pwd(tmp: true)
+	def wsFolder = pwd()
+	def packagesDir = "$wsFolder\\artifacts"
+
+	dir(packagesDir)
+	{
+		def artifacts = findFiles(glob: '*.zip')
+		if (artifacts.size() > 0) {
+			for (int i = 0; i < artifacts.size(); i++)
+			{
+				def artifact = artifacts[i]
+				bat "${env.Utils}\\github-release release --user $REPO_ORG --repo $REPO_NAME --tag v${version}"
+				bat "${env.Utils}\\github-release upload --user $REPO_ORG --repo $REPO_NAME --tag v${version} --name \"${artifact}\" --file \"${artifact}\""
+				echo "uploaded to https://github.com/$REPO_ORG/$REPO_NAME/releases/download/v${version}/${artifact}"
+				return "https://github.com/$REPO_ORG/$REPO_NAME/releases/download/v${version}/${artifact}"
+			}
+		}
+	}
 }
 
 def getVersion()
