@@ -68,7 +68,9 @@ def getVersion()
 {
 	echo "getting version"
 
-  	def matcher = readFile('CommonAssemblyInfo.cs') =~ 'AssemblyFileVersion\(\"(\d+\.\d+\.\d+)'
+	def matcher = readFile('CommonAssemblyInfo.cs') =~ /AssemblyFileVersion\(\"(\d+\.\d+\.\d+)/
+	//println(matcher[0][1]);
+  	//def matcher = readFile('CommonAssemblyInfo.cs') =~ 'AssemblyFileVersion\(\"(\d+\.\d+\.\d+)'
   	if (matcher) {
     	echo "Building version ${matcher[0][1]}"
   	}
