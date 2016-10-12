@@ -14,10 +14,16 @@ def call(body) {
 		def webProject = 'VirtoCommerce.Platform.Web\\VirtoCommerce.Platform.Web.csproj'
 		def zipArtifact = 'VirtoCommerce.Platform'
 		if(solution == null)
+		{
 			 solution = 'VirtoCommerce.Platform.sln'
-		try {
+		}
+		else
+		{
 			webProject = 'VirtoCommerce.Storefront\\VirtoCommerce.Storefront.csproj'
 			zipArtifact = 'VirtoCommerce.StoreFront'			
+		}
+		
+		try {
 	    		// you can call any valid step functions from your code, just like you can from Pipeline scripts
 			echo "Building branch ${env.BRANCH_NAME}"
 			stage 'Checkout'
