@@ -61,12 +61,13 @@ def prepareRelease(def version)
 
 	// create artifacts
 	bat "\"${tool 'MSBuild 12.0'}\" \"VirtoCommerce.Platform.Web\\VirtoCommerce.Platform.Web.csproj\" /nologo /verbosity:m /p:Configuration=Release /p:Platform=\"Any CPU\" /p:DebugType=none \"/p:OutputPath=$tempFolder\""
-	(new AntBuilder()).zip(destfile: "${packagesDir}\\virtocommerce.platform.${version}.zip", basedir: "${websiteDir}\\VirtoCommerce.Platform.Web")
+	(new AntBuilder()).zip(destfile: "${packagesDir}\\virtocommerce.platform.${version}.zip", basedir: "${websiteDir}")
 }
 
 def getVersion()
 {
-	def assemblyInfo = readFile('CommonAssemblyInfo.cs')
+	def assemblyInfo = readFile file: 'CommonAssemblyInfo.cs', encoding: 'utf-8'
+	println(assemblyInfo)
 	// extract version string from assembly info file
 	return assemblyInfo.find(/AssemblyFileVersion\(\"(\d+\.\d+\.\d+)/) { fullMatch, version -> return version}
 }
