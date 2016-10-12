@@ -70,7 +70,9 @@ def getVersion()
 	def assemblyInfo = readFile file: 'CommonAssemblyInfo.cs', encoding: 'utf-8'
 	echo assemblyInfo
 	// extract version string from assembly info file
-	return assemblyInfo.find(/AssemblyFileVersion\(\"(\d+\.\d+\.\d+)/) { fullMatch, version -> return version}
+	def version = assemblyInfo.find(/AssemblyFileVersion\(\"(\d+\.\d+\.\d+)/) { fullMatch, version -> return version}
+	echo "found version ${version}"
+	return version
 }
 
 def runTests()
