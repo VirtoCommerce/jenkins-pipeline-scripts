@@ -1,6 +1,7 @@
 #!groovy
 import groovy.json.*
 import groovy.util.*
+import java.util.regex.Pattern
 
 	// module script
 	def call(body) {
@@ -10,10 +11,31 @@ import groovy.util.*
     body.delegate = config
     body()
 
-    safeNode
+    node
     {
+		// workaround for the issue https://issues.jenkins-ci.org/browse/JENKINS-38706
+        String path = pwd()
+        String branchName = env.BRANCH_NAME
+        if (branchName) {
+            path = path.split(Pattern.quote(File.separator))
+            def workspaceRoot = path[0..<-1].join(File.separator)
+            def currentWs = path[-1]
+            // Here is where we make branch names safe for directories -
+            // the most common bad character is '/' in 'feature/add_widget'
+            // which gets replaced with '%2f', so JOB_NAME will be
+            // ${PR}}OJECT_NAME}%2f${BRANCH_NAME}
+            String newWorkspace = env.JOB_NAME.replace('/', '-')
+            newWorkspace = newWorkspace.replace(File.separator, '-')
+            newWorkspace = newWorkspace.replace('%2f', '-')
+            newWorkspace = newWorkspace.replace('%2F', '-')
+            // Add on the '@n' suffix if it was there
+            if (currentWs =~ '@') {
+                newWorkspace = "${newWorkspace}@${currentWs.split('@')[-1]}"
+            }
+            path = "${workspaceRoot}${File.separator}${newWorkspace}"
+        }		
 		
-		//ws("workspace/${env.JOB_NAME}") { // workaround for the issue https://issues.jenkins-ci.org/browse/JENKINS-38706		
+		ws(path) {		
 		try {
 			stage 'Checkout'		
 			checkout scm
@@ -42,7 +64,7 @@ import groovy.util.*
 		}
 
 		step([$class: 'GitHubCommitStatusSetter', statusResultSource: [$class: 'ConditionalStatusResultSource', results: []]])
-		//}
+		}
     }
 }
 
