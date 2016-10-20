@@ -12,8 +12,9 @@ import groovy.util.*
 
     node
     {
+		ws("workspace/${env.JOB_NAME}") {		
 		try {
-			stage 'Checkout'
+			stage 'Checkout'		
 			checkout scm
 		
 			stage 'Build'
@@ -40,6 +41,7 @@ import groovy.util.*
 		}
 
 		step([$class: 'GitHubCommitStatusSetter', statusResultSource: [$class: 'ConditionalStatusResultSource', results: []]])
+		}
     }
 }
 
