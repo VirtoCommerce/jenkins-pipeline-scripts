@@ -1,7 +1,7 @@
 #!groovy
 import groovy.json.*
 import groovy.util.*
-import java.util.regex.Pattern
+//import java.util.regex.Pattern
 
 	// module script
 	def call(body) {
@@ -107,6 +107,7 @@ def processManifest(def publish, def manifestPath)
 	def iconUrl = manifest.iconUrl.toString()
 
 	// get dependencies
+	echo "parsing dependencies"
 	def dependencies = []
 	for (int i = 0; i < manifest.dependencies.dependency.size(); i++)
 	{
@@ -116,6 +117,7 @@ def processManifest(def publish, def manifestPath)
 	}
 
 	def owners = []
+	echo "parsing owners"
 	for (int i = 0; i < manifest.owners.owner.size(); i++)
 	{
 		def owner = manifest.owners.owner[i]
@@ -123,15 +125,18 @@ def processManifest(def publish, def manifestPath)
 	}
 
 	def authors = []
+	echo "parsing authors"
 	for (int i = 0; i < manifest.authors.author.size(); i++)
 	{
 		def author = manifest.authors.author[i]
 		authors.add(author.text())
 	}
 
+	echo "manifest = null"
 	manifest = null
 
 	def manifestDirectory = manifestPath.substring(0, manifestPath.length() - 16)
+	echo "prepare release $manifestDirectory"
 	prepareRelease(manifestDirectory)
 
 	if (publish) {
