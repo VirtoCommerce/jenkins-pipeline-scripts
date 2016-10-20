@@ -10,7 +10,7 @@ import groovy.util.*
     body.delegate = config
     body()
 
-    node
+    safeNode
     {
 		
 		//ws("workspace/${env.JOB_NAME}") { // workaround for the issue https://issues.jenkins-ci.org/browse/JENKINS-38706		
