@@ -1,3 +1,4 @@
+#!groovy
 import java.util.regex.Pattern
 
 def call(String label = null, Closure body) {
