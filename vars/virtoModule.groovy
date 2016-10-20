@@ -13,6 +13,7 @@ import java.util.regex.Pattern
 
     node
     {
+		/*
 		// workaround for the issue https://issues.jenkins-ci.org/browse/JENKINS-38706
         String path = pwd()
         String branchName = env.BRANCH_NAME
@@ -35,7 +36,8 @@ import java.util.regex.Pattern
             path = "${workspaceRoot}${File.separator}${newWorkspace}"
         }		
 		
-		ws(path) {		
+		ws(path) {
+			*/		
 		try {
 			stage 'Checkout'		
 			checkout scm
@@ -64,7 +66,7 @@ import java.util.regex.Pattern
 		}
 
 		step([$class: 'GitHubCommitStatusSetter', statusResultSource: [$class: 'ConditionalStatusResultSource', results: []]])
-		}
+		//}
     }
 }
 
