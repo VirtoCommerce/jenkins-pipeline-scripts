@@ -113,6 +113,7 @@ def processManifest(def publish, def manifestPath)
 	{
 		def dependency = manifest.dependencies.dependency[i]
 		def dependencyObj = [id: dependency['@id'].text(), version: dependency['@version'].text()]
+		dependency = null
 		dependencies.add(dependencyObj)
 	}
 
