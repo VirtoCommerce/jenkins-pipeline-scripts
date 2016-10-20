@@ -12,7 +12,8 @@ import groovy.util.*
 
     node
     {
-		ws("workspace/${env.JOB_NAME}") {		
+		
+		//ws("workspace/${env.JOB_NAME}") { // workaround for the issue https://issues.jenkins-ci.org/browse/JENKINS-38706		
 		try {
 			stage 'Checkout'		
 			checkout scm
@@ -41,7 +42,7 @@ import groovy.util.*
 		}
 
 		step([$class: 'GitHubCommitStatusSetter', statusResultSource: [$class: 'ConditionalStatusResultSource', results: []]])
-		}
+		//}
     }
 }
 
