@@ -30,8 +30,7 @@ def call(body) {
 				checkout scm
 			stage 'Build'
 				bat "Nuget restore ${solution}"
-				bat "\"${tool 'MSBuild 14.0'}\" \"${solution}\" /p:Configuration=Debug /p:Platform=\"Any CPU\""
-		
+				bat "\"${tool 'MSBuild 14.0'}\" \"${solution}\" /p:Configuration=Debug /p:Platform=\"Any CPU\""		
 		    	runTests()
 			stage 'Prepare Release'
 				prepareRelease(getVersion(), webProject, zipArtifact)
@@ -70,7 +69,7 @@ def prepareRelease(def version, def webProject, def zipArtifact)
 	}
 
 	// create artifacts
-	bat "\"${tool 'MSBuild 12.0'}\" \"${webProject}\" /nologo /verbosity:m /p:Configuration=Release /p:Platform=\"Any CPU\" /p:DebugType=none \"/p:OutputPath=$tempFolder\""
+	bat "\"${tool 'MSBuild 14.0'}\" \"${webProject}\" /nologo /verbosity:m /p:Configuration=Release /p:Platform=\"Any CPU\" /p:DebugType=none \"/p:OutputPath=$tempFolder\""
 	(new AntBuilder()).zip(destfile: "${packagesDir}\\${zipArtifact}.${version}.zip", basedir: "${websiteDir}")
 }
 
