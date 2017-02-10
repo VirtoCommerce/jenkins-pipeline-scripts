@@ -232,10 +232,10 @@ def updateModule(def id, def version, def platformVersion, def title, def author
 		writeFile file: 'modules.json', text: prettyModuleJson
 	}
 
-	pushModules('modules', id)
+	pushModules('modules', id, version)
 }
 
-def pushModules(def directory, def module)
+def pushModules(def directory, def module, def version)
 {
 	dir(directory)
 	{
@@ -251,7 +251,7 @@ def pushModules(def directory, def module)
 	    		bat "\"${tool 'Git'}\" commit -am \"Added new module ${id}\""
 	    	}
 	    	*/
-		bat "\"${tool 'Git'}\" commit -am \"Updated module ${module}\""
+		bat "\"${tool 'Git'}\" commit -am \"${module} ${version}\""
 		bat "\"${tool 'Git'}\" push origin HEAD:master -f"
 	}
 }
