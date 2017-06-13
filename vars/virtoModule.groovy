@@ -172,8 +172,7 @@ def updateModule(def id, def version, def platformVersion, def title, def author
 		checkout([$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'sasha-jenkins', url: 'git@github.com:VirtoCommerce/vc-modules.git']]])
 
 		def inputFile = readFile file: 'modules.json', encoding: 'utf-8'
-		def parser = new JsonSlurper()
-		def json = parser.parseText(inputFile)
+		def json = jsonParse(inputFile)
 		parser = null
 		def builder = new JsonBuilder(json)
 
@@ -363,4 +362,9 @@ def runTests()
 
 	bat "${xUnitExecutable} ${paths} -xml xUnit.Test.xml -trait \"category=ci\" -parallel none -verbose -diagnostics"
 	step([$class: 'XUnitPublisher', testTimeMargin: '3000', thresholdMode: 1, thresholds: [[$class: 'FailedThreshold', failureNewThreshold: '', failureThreshold: '', unstableNewThreshold: '', unstableThreshold: ''], [$class: 'SkippedThreshold', failureNewThreshold: '', failureThreshold: '', unstableNewThreshold: '', unstableThreshold: '']], tools: [[$class: 'XUnitDotNetTestType', deleteOutputFiles: true, failIfNotNew: false, pattern: '*.xml', skipNoTestFiles: true, stopProcessingIfError: false]]])
+}
+
+@NonCPS
+def jsonParse(def json) {
+    new groovy.json.JsonSlurperClassic().parseText(json)
 }
