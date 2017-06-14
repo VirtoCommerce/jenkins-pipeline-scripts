@@ -1,10 +1,9 @@
 #!groovy
 import groovy.json.*
 import groovy.util.*
-//import java.util.regex.Pattern
 
-	// module script
-	def call(body) {
+    // module script v1
+    def call(body) {
     // evaluate the body block, and collect configuration into the object
     def config = [:]
     body.resolveStrategy = Closure.DELEGATE_FIRST
