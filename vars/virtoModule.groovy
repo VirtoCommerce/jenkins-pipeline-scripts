@@ -250,7 +250,7 @@ def prepareRelease(def manifestDirectory)
 			for (int i = 0; i < projects.size(); i++)
 			{
 				def project = projects[i]
-				bat "\"${tool 'MSBuild 14.0'}\" \"$project.name\" /nologo /verbosity:m /t:Clean,PackModule /p:Configuration=Release /p:Platform=AnyCPU /p:DebugType=none /p:AllowedReferenceRelatedFileExtensions=.xml \"/p:OutputPath=$tempDir\" \"/p:VCModulesOutputDir=$modulesDir\" \"/p:VCModulesZipDir=$packagesDir\""			
+				bat "\"${tool 'MSBuild 15.0'}\" \"$project.name\" /nologo /verbosity:m /t:Clean,PackModule /p:Configuration=Release /p:Platform=AnyCPU /p:DebugType=none /p:AllowedReferenceRelatedFileExtensions=.xml \"/p:OutputPath=$tempDir\" \"/p:VCModulesOutputDir=$modulesDir\" \"/p:VCModulesZipDir=$packagesDir\""			
 			}
 		}
 	}
@@ -291,7 +291,7 @@ def buildSolutions()
 		{
 			def solution = solutions[i]
 			bat "Nuget restore ${solution.name}"
-			bat "\"${tool 'MSBuild 14.0'}\" \"${solution.name}\" /p:Configuration=Debug /p:Platform=\"Any CPU\""
+			bat "\"${tool 'MSBuild 15.0'}\" \"${solution.name}\" /p:Configuration=Debug /p:Platform=\"Any CPU\""
 		}
 	}
 }
