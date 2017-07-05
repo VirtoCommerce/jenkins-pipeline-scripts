@@ -13,12 +13,15 @@ def call(body) {
 		def solution = config.solution
 		def webProject = 'VirtoCommerce.Platform.Web\\VirtoCommerce.Platform.Web.csproj'
 		def zipArtifact = 'VirtoCommerce.Platform'
+		def websiteDir = 'VirtoCommerce.Platform.Web'
+		
 		if(solution == null)
 		{
 			 solution = 'VirtoCommerce.Platform.sln'
 		}
 		else
 		{
+			websiteDir = 'VirtoCommerce.Storefront'
 			webProject = 'VirtoCommerce.Storefront\\VirtoCommerce.Storefront.csproj'
 			zipArtifact = 'VirtoCommerce.StoreFront'			
 		}
@@ -33,7 +36,7 @@ def call(body) {
 				bat "\"${tool 'MSBuild 15.0'}\" \"${solution}\" /p:Configuration=Debug /p:Platform=\"Any CPU\""		
 		    	runTests()
 			stage 'Prepare Release'
-				prepareRelease(getVersion(), webProject, zipArtifact)
+				prepareRelease(getVersion(), webProject, zipArtifact, websiteDir)
 
 			bat "\"${tool 'Git'}\" log -1 --pretty=%%B > LAST_COMMIT_MESSAGE"
 			git_last_commit = readFile('LAST_COMMIT_MESSAGE')
@@ -56,11 +59,11 @@ def call(body) {
 	}
 }
 
-def prepareRelease(def version, def webProject, def zipArtifact)
+def prepareRelease(def version, def webProject, def zipArtifact, def websiteDir)
 {
 	def tempFolder = pwd(tmp: true)
 	def wsFolder = pwd()
-	def websiteDir = "$tempFolder\\_PublishedWebsites"
+	def websitePath = "$tempFolder\\_PublishedWebsites\\$websiteDir"
 	def packagesDir = "$wsFolder\\artifacts"
 
 	dir(packagesDir)
@@ -70,7 +73,7 @@ def prepareRelease(def version, def webProject, def zipArtifact)
 
 	// create artifacts
 	bat "\"${tool 'MSBuild 15.0'}\" \"${webProject}\" /nologo /verbosity:m /p:Configuration=Release /p:Platform=\"Any CPU\" /p:DebugType=none \"/p:OutputPath=$tempFolder\""
-	(new AntBuilder()).zip(destfile: "${packagesDir}\\${zipArtifact}.${version}.zip", basedir: "${websiteDir}")
+	(new AntBuilder()).zip(destfile: "${packagesDir}\\${zipArtifact}.${version}.zip", basedir: "${websitePath}")
 }
 
 def publishRelease(def version)
