@@ -11,7 +11,8 @@ import groovy.util.*
     body()
 
     node
-    {	
+    {
+	    def deployScript = 'VC-Module2Azure.ps1'
 		try {
 			stage 'Checkout'		
 			checkout scm
@@ -29,6 +30,11 @@ import groovy.util.*
 			if (env.BRANCH_NAME == 'master' && git_last_commit.contains('[publish]')) {
 				stage 'Publishing'
 				processManifests(true) // publish artifacts to github releases
+			}
+			
+			if (env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'master') {
+				stage 'DeployToAzure'
+					deployToAzure(deployScript)
 			}
 		}
 		catch (any) {
@@ -341,4 +347,9 @@ def runTests()
 @NonCPS
 def jsonParse(def json) {
     new groovy.json.JsonSlurperClassic().parseText(json)
+}
+
+def deployToAzure(def deployScript)
+{
+ 	bat "powershell.exe -File \"${env.JENKINS_HOME}\\workflow-libs\\vars\\${deployScript}\""
 }
