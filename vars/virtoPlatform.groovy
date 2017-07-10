@@ -48,7 +48,7 @@ def call(body) {
 					publishRelease(getVersion())
 			}
 			
-			if (env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'master')) {
+			if (env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'master') {
 				stage 'DeployToAzure'
 					deployToAzure(deployScript)
 			}
