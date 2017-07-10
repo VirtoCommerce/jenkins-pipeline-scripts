@@ -14,6 +14,7 @@ def call(body) {
 		def webProject = 'VirtoCommerce.Platform.Web\\VirtoCommerce.Platform.Web.csproj'
 		def zipArtifact = 'VirtoCommerce.Platform'
 		def websiteDir = 'VirtoCommerce.Platform.Web'
+		def deployScript = 'VC-Platform2Azure.ps1'
 		
 		if(solution == null)
 		{
@@ -23,7 +24,8 @@ def call(body) {
 		{
 			websiteDir = 'VirtoCommerce.Storefront'
 			webProject = 'VirtoCommerce.Storefront\\VirtoCommerce.Storefront.csproj'
-			zipArtifact = 'VirtoCommerce.StoreFront'			
+			zipArtifact = 'VirtoCommerce.StoreFront'
+			deployScript = 'VC-Storefront2Azure.ps1'
 		}
 		
 		try {
@@ -45,7 +47,12 @@ def call(body) {
 				stage 'Publishing'
 					publishRelease(getVersion())
 			}
-				
+			
+			if (env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'master')) {
+				stage 'DeployToAzure'
+					deployToAzure(deployScript)
+			}
+			
 		}
 		catch (any) {
 			currentBuild.result = 'FAILURE'
@@ -136,4 +143,9 @@ def runTests()
 			bat "${xUnitExecutable} ${paths} -xml xUnit.Test.xml -trait \"category=ci\" -parallel none"
 			step([$class: 'XUnitPublisher', testTimeMargin: '3000', thresholdMode: 1, thresholds: [[$class: 'FailedThreshold', failureNewThreshold: '', failureThreshold: '', unstableNewThreshold: '', unstableThreshold: ''], [$class: 'SkippedThreshold', failureNewThreshold: '', failureThreshold: '', unstableNewThreshold: '', unstableThreshold: '']], tools: [[$class: 'XUnitDotNetTestType', deleteOutputFiles: true, failIfNotNew: false, pattern: '*.xml', skipNoTestFiles: true, stopProcessingIfError: false]]])
 	}
+}
+
+def deployToAzure(def deployScript)
+{
+ 	bat "powershell.exe -File \"${env.JENKINS_HOME}\\workflow-libs\\vars\\${deployScript}\""
 }
