@@ -16,13 +16,13 @@ $ApplicationID ="${env:AzureAppID}"
 $APIKey = ConvertTo-SecureString "${env:AzureAPIKey}" -AsPlainText -Force
 $psCred = New-Object System.Management.Automation.PSCredential($ApplicationID, $APIKey)
 $TenantID = "${env:AzureTenantID}"
-$SubscriptionID = "${env:AzureSubscriptionID}"
+$SubscriptionID = "${env:AzureSubscriptionIDDev}"
 
 Add-AzureRmAccount -Credential $psCred -TenantId $TenantID -ServicePrincipal
 Select-AzureRmSubscription -SubscriptionId $SubscriptionID
 
-$DestResourceGroupName = "${env:AzureResourceGroupName}"
-$DestWebAppName = "${env:AzureWebAppAdminName}"
+$DestResourceGroupName = "${env:AzureResourceGroupNameDev}"
+$DestWebAppName = "${env:AzureWebAppAdminNameDev}"
 $DestKuduPath = "https://$DestWebAppName.scm.azurewebsites.net/api/zip/site/wwwroot/modules/$ModuleName/"
 
 function Get-AzureRmWebAppPublishingCredentials($DestResourceGroupName, $DestWebAppName, $slotName = $null){
@@ -49,7 +49,7 @@ Write-Host "Stop WebApp"
 
 Stop-AzureRmWebApp -ResourceGroupName $DestResourceGroupName -Name $DestWebAppName
 
-Start-Sleep -s 10
+Start-Sleep -s 5
 
 Write-Host "Uploading File"
 
@@ -59,7 +59,7 @@ Invoke-RestMethod -Uri $DestKuduPath `
                         -InFile $Path2Zip `
                         -ContentType "multipart/form-data"
 
-Start-Sleep -s 10
+Start-Sleep -s 5
 
 Write-Host "Start WebApp"
 
