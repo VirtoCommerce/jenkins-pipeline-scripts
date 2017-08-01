@@ -12,7 +12,10 @@ import groovy.util.*
 
     node
     {
-	    def deployScript = 'VC-Module2Azure.ps1'
+	    def deployScript = 'VC-Module2AzureDev.ps1'
+	    if (env.BRANCH_NAME == 'master') {
+			deployScript = 'VC-Module2AzureQA.ps1'
+		}
 		try {
 			stage 'Checkout'		
 			checkout scm
