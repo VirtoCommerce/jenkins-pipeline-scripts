@@ -14,7 +14,10 @@ def call(body) {
 		def webProject = 'VirtoCommerce.Platform.Web\\VirtoCommerce.Platform.Web.csproj'
 		def zipArtifact = 'VirtoCommerce.Platform'
 		def websiteDir = 'VirtoCommerce.Platform.Web'
-		def deployScript = 'VC-Platform2Azure.ps1'
+		def deployScript = 'VC-Platform2AzureDev.ps1'
+		if (env.BRANCH_NAME == 'master') {
+			deployScript = 'VC-Platform2AzureQA.ps1'
+		}
 		
 		if(solution == null)
 		{
@@ -25,7 +28,10 @@ def call(body) {
 			websiteDir = 'VirtoCommerce.Storefront'
 			webProject = 'VirtoCommerce.Storefront\\VirtoCommerce.Storefront.csproj'
 			zipArtifact = 'VirtoCommerce.StoreFront'
-			deployScript = 'VC-Storefront2Azure.ps1'
+			deployScript = 'VC-Storefront2AzureDev.ps1'
+			if (env.BRANCH_NAME == 'master') {
+			deployScript = 'VC-Storefront2AzureQA.ps1'
+			}
 		}
 		
 		try {
