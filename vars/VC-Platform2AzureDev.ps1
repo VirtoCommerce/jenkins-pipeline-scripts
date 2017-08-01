@@ -8,13 +8,13 @@ $ApplicationID ="${env:AzureAppID}"
 $APIKey = ConvertTo-SecureString "${env:AzureAPIKey}" -AsPlainText -Force
 $psCred = New-Object System.Management.Automation.PSCredential($ApplicationID, $APIKey)
 $TenantID = "${env:AzureTenantID}"
-$SubscriptionID = "${env:AzureSubscriptionID}"
+$SubscriptionID = "${env:AzureSubscriptionIDDev}"
 
 Add-AzureRmAccount -Credential $psCred -TenantId $TenantID -ServicePrincipal
 Select-AzureRmSubscription -SubscriptionId $SubscriptionID
 
-$DestResourceGroupName = "${env:AzureResourceGroupName}"
-$DestWebAppName = "${env:AzureWebAppAdminName}"
+$DestResourceGroupName = "${env:AzureResourceGroupNameDev}"
+$DestWebAppName = "${env:AzureWebAppAdminNameDev}"
 $DestKuduPath = "https://$DestWebAppName.scm.azurewebsites.net/api/zip/site/wwwroot/platform/"
 
 function Get-AzureRmWebAppPublishingCredentials($DestResourceGroupName, $DestWebAppName, $slotName = $null){
@@ -51,7 +51,7 @@ Invoke-RestMethod -Uri $DestKuduPath `
                         -InFile $Path2Zip `
                         -ContentType "multipart/form-data"
 
-Start-Sleep -s 30
+Start-Sleep -s 10
 
 Write-Host "Start WebApp"
 
