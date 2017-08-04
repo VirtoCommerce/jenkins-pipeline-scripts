@@ -300,7 +300,7 @@ def buildSolutions()
 		{
 			def solution = solutions[i]
 			bat "Nuget restore ${solution.name}"
-			bat "\"${tool 'MSBuild 15.0'}\" \"${solution.name}\" /p:Configuration=Debug /p:Platform=\"Any CPU\""
+			bat "\"${tool 'MSBuild 15.0'}\" \"${solution.name}\" /p:Configuration=Debug /p:Platform=\"Any CPU\" /property:RunCodeAnalysis=true"
 		}
 	}
 }
