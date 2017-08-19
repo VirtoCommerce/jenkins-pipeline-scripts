@@ -46,7 +46,7 @@ def call(body) {
 				Packaging.runBuild(this, solution)
 			}
 
-			var tests = Utilities.getTestDlls(this)
+			def tests = Utilities.getTestDlls(this)
 			if(tests.size() > 0)
 			{
 				stage('Tests') {
