@@ -38,9 +38,9 @@ class Utilities {
         def websitePath = "$tempFolder\\_PublishedWebsites\\$websiteDir"
         def packagesDir = "artifacts"
 
-        dir(packagesDir)
-        {
-            deleteDir()
+        def mainDir = new File(packagesDir)
+        if (mainDir.exists()) {
+            mainDir.deleteDir()
         }
 
         // create artifacts
