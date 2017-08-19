@@ -10,6 +10,7 @@ def call(body) {
     
 	node
 	{
+		// configuration parameters
 		def solution = config.solution
 		def webProject = 'VirtoCommerce.Platform.Web\\VirtoCommerce.Platform.Web.csproj'
 		def zipArtifact = 'VirtoCommerce.Platform'
@@ -35,28 +36,33 @@ def call(body) {
 		}
 		
 		try {
-	    		// you can call any valid step functions from your code, just like you can from Pipeline scripts
 			echo "Building branch ${env.BRANCH_NAME}"
-			stage 'Checkout'
+
+			stage('Checkout') {
 				checkout scm
-			stage 'Build'
+			}
+			stage('Build') {
 				bat "Nuget restore ${solution}"
 				bat "\"${tool 'MSBuild 15.0'}\" \"${solution}\" /p:Configuration=Debug /p:Platform=\"Any CPU\""		
 		    	runTests()
-			stage 'Prepare Release'
+			}
+			stage('Prepare Release') {
 				prepareRelease(getVersion(), webProject, zipArtifact, websiteDir)
+			}
 
 			bat "\"${tool 'Git'}\" log -1 --pretty=%%B > LAST_COMMIT_MESSAGE"
 			git_last_commit = readFile('LAST_COMMIT_MESSAGE')
 
 			if (env.BRANCH_NAME == 'master' && git_last_commit.contains('[publish]')) {
-				stage 'Publishing'
+				stage('Publishing'){
 					publishRelease(getVersion())
+				}
 			}
 			
 			if (env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'master') {
-				stage 'DeployToAzure'
+				stage('DeployToAzure'){
 					deployToAzure(deployScript)
+				}
 			}
 			
 		}
