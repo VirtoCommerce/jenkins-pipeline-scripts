@@ -23,9 +23,10 @@ class Packaging {
      * @param folder (optional) If folder is specified, project is not used as the folder name
      * @return Full job name.  If folder prefix is specified,
      */
-    def static createDockerImage(context, dockerImageName, folder) {
+    def static createDockerImage(context, dockerImageName, folder, version) {
         context.echo "Building docker image \"${dockerImageName}\" using \"${folder}\" folder"
-        def dockerImage = context.docker.build("${dockerImageName}:${context.env.BUILD_ID}")
+        dockerFingerprintFrom SOURCE: folder        
+        def dockerImage = context.docker.build("${dockerImageName}:${version}")
         return "";//getFullJobName('', jobName, isPR, folder);
     }
 
@@ -48,7 +49,7 @@ class Packaging {
         (new AntBuilder()).zip(destfile: "${packagesDir}\\${zipArtifact}.${version}.zip", basedir: "${websitePath}")
 
         // create docker image
-        Packaging.createDockerImage(context, "virtocommerce/storefront", packagesDir)
+        Packaging.createDockerImage(context, "${zipArtifact}", packagesDir, version)
     }
 
     def static runBuild(context, solution)
