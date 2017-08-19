@@ -41,7 +41,6 @@ def call(body) {
 
 			stage('Checkout') {
 				checkout scm
-				 def dbImage = docker.build('oracle', 'docker/oracle')
 			}
 			stage('Build') {
 				Packaging.runBuild(this, solution)
