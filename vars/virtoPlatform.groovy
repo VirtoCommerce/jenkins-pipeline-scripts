@@ -62,7 +62,7 @@ def call(body) {
 			}
 			
 			if (env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'master') {
-				stage('DeployToAzure'){
+				stage('Deploy Azure'){
 					Utilities.runSharedPS(this, deployScript)
 				}
 			}
