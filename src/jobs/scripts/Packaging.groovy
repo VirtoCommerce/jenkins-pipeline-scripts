@@ -24,7 +24,7 @@ class Packaging {
      * @return Full job name.  If folder prefix is specified,
      */
     def static createDockerImage(context, dockerImageName, folder) {
-        context.echo "Building docker image \"${dockerImageName}\" using \"${folder}\" folder"
+        //context.echo "Building docker image \"${dockerImageName}\" using \"${folder}\" folder"
         def dockerImage = context.docker.build("${dockerImageName}:${context.env.BUILD_ID}")
         return "";//getFullJobName('', jobName, isPR, folder);
     }
