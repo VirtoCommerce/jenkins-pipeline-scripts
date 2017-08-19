@@ -49,7 +49,7 @@ def call(body) {
 			}
 			stage('Prepare Release') {
 				//def packaging = new Packaging(this)
-				Packaging.createReleaseArtifact(this, getVersion(), webProject, zipArtifact, websiteDir)
+				Packaging.createReleaseArtifact(this, Utilities.getAssemblyVersion(this), webProject, zipArtifact, websiteDir)
 			}
 
 			bat "\"${tool 'Git'}\" log -1 --pretty=%%B > LAST_COMMIT_MESSAGE"
@@ -57,7 +57,7 @@ def call(body) {
 
 			if (env.BRANCH_NAME == 'master' && git_last_commit.contains('[publish]')) {
 				stage('Publishing'){
-					publishRelease(getVersion())
+					publishRelease(Utilities.getAssemblyVersion(this))
 				}
 			}
 			
@@ -78,24 +78,6 @@ def call(body) {
 	
 	  	step([$class: 'GitHubCommitStatusSetter', statusResultSource: [$class: 'ConditionalStatusResultSource', results: []]])
 	}
-}
-
-def prepareRelease(def version, def webProject, def zipArtifact, def websiteDir)
-{
-	echo "Preparing release for ${version}"
-	def tempFolder = pwd(tmp: true)
-	def wsFolder = pwd()
-	def websitePath = "$tempFolder\\_PublishedWebsites\\$websiteDir"
-	def packagesDir = "$wsFolder\\artifacts"
-
-	dir(packagesDir)
-	{
-		deleteDir()
-	}
-
-	// create artifacts
-	bat "\"${tool 'MSBuild 15.0'}\" \"${webProject}\" /nologo /verbosity:m /p:Configuration=Release /p:Platform=\"Any CPU\" /p:DebugType=none \"/p:OutputPath=$tempFolder\""
-	(new AntBuilder()).zip(destfile: "${packagesDir}\\${zipArtifact}.${version}.zip", basedir: "${websitePath}")
 }
 
 def publishRelease(def version)
@@ -122,21 +104,6 @@ def publishRelease(def version)
 			}
 		}
 	}
-}
-
-def getVersion()
-{
-	echo "getting version"
-
-	def matcher = readFile('CommonAssemblyInfo.cs') =~ /AssemblyFileVersion\(\"(\d+\.\d+\.\d+)/
-
-  	if (matcher) {
-    	echo "Building version ${matcher[0][1]}"
-  	}
-
-	def version = matcher[0][1]
-	echo "found version ${version}"
-	return version
 }
 
 def runTests()

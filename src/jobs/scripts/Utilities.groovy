@@ -19,4 +19,13 @@ class Utilities {
     	def wsFolder = context.pwd()
  	    context.bat "powershell.exe -File \"${wsFolder}\\..\\workspace@libs\\${DefaultSharedLibName}\\vars\\${scriptName}\""
     }
+
+    def static getAssemblyVersion(context)
+    {
+        context.echo "Searching for version inside CommonAssemblyInfo.cs file"
+        def matcher = context.readFile('CommonAssemblyInfo.cs') =~ /AssemblyFileVersion\(\"(\d+\.\d+\.\d+)/
+        def version = matcher[0][1]
+        context.echo "Found version ${version}"
+        return version
+    }
 }
