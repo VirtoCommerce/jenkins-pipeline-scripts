@@ -31,7 +31,7 @@ class Utilities {
         return "";//getFullJobName('', jobName, isPR, folder);
     }
 
-    def static createReleaseArtifact(def version, def webProject, def zipArtifact, def websiteDir)
+    def static createReleaseArtifact(script, version, webProject, zipArtifact, websiteDir)
     {
         //echo "Preparing release for ${version}"
         def tempFolder = "..\\workspace@tmp"
@@ -44,7 +44,7 @@ class Utilities {
         }
 
         // create artifacts
-        bat "\"${tool 'MSBuild 15.0'}\" \"${webProject}\" /nologo /verbosity:m /p:Configuration=Release /p:Platform=\"Any CPU\" /p:DebugType=none \"/p:OutputPath=$tempFolder\""
+        bat "\"${script.tool 'MSBuild 15.0'}\" \"${webProject}\" /nologo /verbosity:m /p:Configuration=Release /p:Platform=\"Any CPU\" /p:DebugType=none \"/p:OutputPath=$tempFolder\""
         (new AntBuilder()).zip(destfile: "${packagesDir}\\${zipArtifact}.${version}.zip", basedir: "${websitePath}")
     }
 }
