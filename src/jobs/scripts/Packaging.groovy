@@ -23,9 +23,9 @@ class Packaging {
      * @param folder (optional) If folder is specified, project is not used as the folder name
      * @return Full job name.  If folder prefix is specified,
      */
-    def static createDockerImage(context, dockerImageName, folder, version) {
+    def static createDockerImage(context, dockerImageName, dockerContextFolder, version) {
         context.echo "Building docker image \"${dockerImageName}\" using \"${folder}\" folder"
-        def dockerImage = context.docker.build("${dockerImageName}:${version}".toLowerCase(), "-f Dockerfile --build-arg SOURCE=\"${folder}\" .")
+        def dockerImage = context.docker.build("${dockerImageName}:${version}".toLowerCase(), "-f Dockerfile --build-arg SOURCE=\".\" \"${dockerContextFolder}\"")
         return "";//getFullJobName('', jobName, isPR, folder);
     }
 
