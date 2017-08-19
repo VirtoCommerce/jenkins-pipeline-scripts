@@ -59,10 +59,10 @@ class Packaging {
         def xUnitExecutable = "${xUnit}\\xunit.console.exe"
         
         String paths = ""
-        for(int i = 0; i < testDlls.size(); i++)
+        for(int i = 0; i < tests.size(); i++)
         {
-            def testDll = testDlls[i]
-            paths += "\"$testDll.path\" "
+            def test = tests[i]
+            paths += "\"$test.path\" "
         }
                 
         context.bat "${xUnitExecutable} ${paths} -xml xUnit.Test.xml -trait \"category=ci\" -parallel none"
