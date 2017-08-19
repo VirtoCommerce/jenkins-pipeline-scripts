@@ -48,7 +48,7 @@ def call(body) {
 		    	runTests()
 			}
 			stage('Prepare Release') {
-				jobs.scripts.Utilities.createReleaseArtifact(getVersion(), webProject, zipArtifact, websiteDir)
+				prepareRelease(getVersion(), webProject, zipArtifact, websiteDir)
 			}
 
 			bat "\"${tool 'Git'}\" log -1 --pretty=%%B > LAST_COMMIT_MESSAGE"
