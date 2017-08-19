@@ -144,7 +144,7 @@ def runTests()
 	def testDlls = findFiles(glob: '**\\bin\\Debug\\*Test.dll')
 	if(testDlls.size() > 0)
 	{
-		stage 'Running tests'
+		stage('Running tests'){
 			String paths = ""
 			for(int i = 0; i < testDlls.size(); i++)
 			{
@@ -154,6 +154,7 @@ def runTests()
 			
 			bat "${xUnitExecutable} ${paths} -xml xUnit.Test.xml -trait \"category=ci\" -parallel none"
 			step([$class: 'XUnitPublisher', testTimeMargin: '3000', thresholdMode: 1, thresholds: [[$class: 'FailedThreshold', failureNewThreshold: '', failureThreshold: '', unstableNewThreshold: '', unstableThreshold: ''], [$class: 'SkippedThreshold', failureNewThreshold: '', failureThreshold: '', unstableNewThreshold: '', unstableThreshold: '']], tools: [[$class: 'XUnitDotNetTestType', deleteOutputFiles: true, failIfNotNew: false, pattern: '*.xml', skipNoTestFiles: true, stopProcessingIfError: false]]])
+		}
 	}
 }
 
