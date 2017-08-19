@@ -50,7 +50,7 @@ class Packaging {
     def static runBuild(context, solution)
     {
 		context.bat "Nuget restore ${solution}"
-		context.bat "\"${tool 'MSBuild 15.0'}\" \"${solution}\" /p:Configuration=Debug /p:Platform=\"Any CPU\""        
+		context.bat "\"${context.tool DefaultMSBuild}\" \"${solution}\" /p:Configuration=Debug /p:Platform=\"Any CPU\""        
     }
     
     def static runUnitTests(context, tests)
