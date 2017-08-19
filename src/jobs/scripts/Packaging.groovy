@@ -25,7 +25,7 @@ class Packaging {
      */
     def static createDockerImage(context, dockerImageName, folder, version) {
         context.echo "Building docker image \"${dockerImageName}\" using \"${folder}\" folder"
-        def dockerImage = context.docker.build("${dockerImageName}:${version}".toLowerCase(), "SOURCE=${folder}")
+        def dockerImage = context.docker.build("${dockerImageName}:${version}".toLowerCase(), "-build-arg SOURCE=\"${folder}\"")
         return "";//getFullJobName('', jobName, isPR, folder);
     }
 
