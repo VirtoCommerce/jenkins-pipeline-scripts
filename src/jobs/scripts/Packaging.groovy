@@ -102,7 +102,7 @@ class Packaging {
     def static getShouldPublish(context)
     {
 		context.bat "\"${context.tool 'Git'}\" log -1 --pretty=%%B > LAST_COMMIT_MESSAGE"
-		git_last_commit = context.readFile('LAST_COMMIT_MESSAGE')			
+		def git_last_commit = context.readFile('LAST_COMMIT_MESSAGE')			
 
 		if (context.env.BRANCH_NAME == 'master' && git_last_commit.contains('[publish]')) {
 			return true
