@@ -28,4 +28,10 @@ class Utilities {
         context.echo "Found version ${version}"
         return version
     }
+
+    def static getTestDlls(context)
+    {
+        def testDlls = context.findFiles(glob: '**\\bin\\Debug\\*Test.dll')
+        return testDlls
+    }
 }

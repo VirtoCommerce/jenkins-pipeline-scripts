@@ -46,5 +46,26 @@ class Packaging {
         context.bat "\"${context.tool DefaultMSBuild}\" \"${webProject}\" /nologo /verbosity:m /p:Configuration=Release /p:Platform=\"Any CPU\" /p:DebugType=none \"/p:OutputPath=$tempFolder\""
         (new AntBuilder()).zip(destfile: "${packagesDir}\\${zipArtifact}.${version}.zip", basedir: "${websitePath}")
     }
+
+    def static runBuild(context, solution)
+    {
+		context.bat "Nuget restore ${solution}"
+		context.bat "\"${tool 'MSBuild 15.0'}\" \"${solution}\" /p:Configuration=Debug /p:Platform=\"Any CPU\""        
+    }
     
+    def static runUnitTests(context, tests)
+    {
+        def xUnit = context.env.XUnit
+        def xUnitExecutable = "${xUnit}\\xunit.console.exe"
+        
+        String paths = ""
+        for(int i = 0; i < testDlls.size(); i++)
+        {
+            def testDll = testDlls[i]
+            paths += "\"$testDll.path\" "
+        }
+                
+        context.bat "${xUnitExecutable} ${paths} -xml xUnit.Test.xml -trait \"category=ci\" -parallel none"
+        context.step([$class: 'XUnitPublisher', testTimeMargin: '3000', thresholdMode: 1, thresholds: [[$class: 'FailedThreshold', failureNewThreshold: '', failureThreshold: '', unstableNewThreshold: '', unstableThreshold: ''], [$class: 'SkippedThreshold', failureNewThreshold: '', failureThreshold: '', unstableNewThreshold: '', unstableThreshold: '']], tools: [[$class: 'XUnitDotNetTestType', deleteOutputFiles: true, failIfNotNew: false, pattern: '*.xml', skipNoTestFiles: true, stopProcessingIfError: false]]])
+    }
 }

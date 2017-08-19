@@ -43,9 +43,15 @@ def call(body) {
 				checkout scm
 			}
 			stage('Build') {
-				bat "Nuget restore ${solution}"
-				bat "\"${tool 'MSBuild 15.0'}\" \"${solution}\" /p:Configuration=Debug /p:Platform=\"Any CPU\""		
-		    	runTests()
+				Packaging.runBuild(this, solution)
+			}
+
+			var tests = Utilities.getTestDlls(this)
+			if(tests.size() > 0)
+			{
+				stage('Tests') {
+					Packaging.runUnitTests(this, tests)
+				}
 			}
 			stage('Prepare Release') {
 				//def packaging = new Packaging(this)
