@@ -59,7 +59,7 @@ def call(body) {
 				Packaging.createReleaseArtifact(this, version, webProject, zipArtifact, websiteDir)
 			}
 
-			if (Utilities.getShouldPublish(this)) {
+			if (Packaging.getShouldPublish(this)) {
 				stage('Publishing'){
 					Packaging.publishRelease(this,version)
 				}
@@ -69,8 +69,7 @@ def call(body) {
 				stage('Deploy Azure'){
 					Utilities.runSharedPS(this, deployScript)
 				}
-			}
-		
+			}		
 		}
 		catch (any) {
 			currentBuild.result = 'FAILURE'
