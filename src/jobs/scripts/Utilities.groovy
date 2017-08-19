@@ -34,7 +34,7 @@ class Utilities {
     def static createReleaseArtifact(def version, def webProject, def zipArtifact, def websiteDir)
     {
         //echo "Preparing release for ${version}"
-        def tempFolder = "..\workspace@tmp"
+        def tempFolder = "..\\workspace@tmp"
         def websitePath = "$tempFolder\\_PublishedWebsites\\$websiteDir"
         def packagesDir = "artifacts"
 
