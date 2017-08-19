@@ -24,9 +24,8 @@ class Packaging {
      * @return Full job name.  If folder prefix is specified,
      */
     def static createDockerImage(context, dockerImageName, folder) {
-        //context.echo "Building docker image \"${dockerImageName}\" using \"${folder}\" folder"
-        def dbImage = context.docker.build('oracle', 'docker/oracle')
-        //def dockerImage = context.docker.build("${dockerImageName}:${context.env.BUILD_ID}")
+        context.echo "Building docker image \"${dockerImageName}\" using \"${folder}\" folder"
+        def dockerImage = context.docker.build("${dockerImageName}:${context.env.BUILD_ID}")
         return "";//getFullJobName('', jobName, isPR, folder);
     }
 
@@ -49,7 +48,7 @@ class Packaging {
         (new AntBuilder()).zip(destfile: "${packagesDir}\\${zipArtifact}.${version}.zip", basedir: "${websitePath}")
 
         // create docker image
-        Packaging.createDockerImage(this, "virtocommerce/storefront", packagesDir)
+        Packaging.createDockerImage(context, "virtocommerce/storefront", packagesDir)
     }
 
     def static runBuild(context, solution)
