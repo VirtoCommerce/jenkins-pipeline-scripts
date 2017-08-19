@@ -18,15 +18,17 @@ class Packaging {
     /**
      * Creates new docker image
      *
-     * @param jobName Base name of the job
-     * @param isPR True if PR job, false otherwise
-     * @param folder (optional) If folder is specified, project is not used as the folder name
-     * @return Full job name.  If folder prefix is specified,
+     * @param context Execution Contex, typically "this"
+     * @param dockerImageName name of the docker image to create, something like virtocommerce/storefront
+     * @param dockerContextFolder folder that docker build will use for context, files from that folder can be added to the docker image
+     * @param dockerSourcePath Source of the files to be included in the docker image, can be files within contextFolder or remote source referred by http
+     * @param version current version of the build
+     * @return reference to a docker image created
      */
-    def static createDockerImage(context, dockerImageName, dockerContextFolder, version) {
+    def static createDockerImage(context, String dockerImageName, String dockerContextFolder, String dockerSourcePath, String version) {
         context.echo "Building docker image \"${dockerImageName}\" using \"${folder}\" folder"
-        def dockerImage = context.docker.build("${dockerImageName}:${version}".toLowerCase(), "-f Dockerfile --build-arg SOURCE=\".\" \"${dockerContextFolder}\"")
-        return "";//getFullJobName('', jobName, isPR, folder);
+        def dockerImage = context.docker.build("${dockerImageName}:${version}".toLowerCase(), "-f Dockerfile --build-arg SOURCE=\"${dockerSourcePath}\" \"${dockerContextFolder}\"")
+        return dockerImage
     }
 
     def static createReleaseArtifact(context, version, webProject, zipArtifact, websiteDir)
@@ -48,7 +50,7 @@ class Packaging {
         (new AntBuilder()).zip(destfile: "${packagesDir}\\${zipArtifact}.${version}.zip", basedir: "${websitePath}")
 
         // create docker image
-        Packaging.createDockerImage(context, "${zipArtifact}", websitePath, version)
+        Packaging.createDockerImage(context, "${zipArtifact}", websitePath, ".", version)
     }
 
     def static runBuild(context, solution)
