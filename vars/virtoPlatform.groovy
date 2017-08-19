@@ -31,7 +31,7 @@ def call(body) {
 			zipArtifact = 'VirtoCommerce.StoreFront'
 			deployScript = 'VC-Storefront2AzureDev.ps1'
 			if (env.BRANCH_NAME == 'master') {
-			deployScript = 'VC-Storefront2AzureQA.ps1'
+				deployScript = 'VC-Storefront2AzureQA.ps1'
 			}
 		}
 		
@@ -47,7 +47,7 @@ def call(body) {
 		    	runTests()
 			}
 			stage('Prepare Release') {
-				prepareRelease(getVersion(), webProject, zipArtifact, websiteDir)
+				Utilities.createReleaseArtifact(getVersion(), webProject, zipArtifact, websiteDir)
 			}
 
 			bat "\"${tool 'Git'}\" log -1 --pretty=%%B > LAST_COMMIT_MESSAGE"
@@ -80,6 +80,7 @@ def call(body) {
 
 def prepareRelease(def version, def webProject, def zipArtifact, def websiteDir)
 {
+	echo "Preparing release for ${version}"
 	def tempFolder = pwd(tmp: true)
 	def wsFolder = pwd()
 	def websitePath = "$tempFolder\\_PublishedWebsites\\$websiteDir"
