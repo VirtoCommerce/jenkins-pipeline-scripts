@@ -23,9 +23,9 @@ class Packaging {
      * @param folder (optional) If folder is specified, project is not used as the folder name
      * @return Full job name.  If folder prefix is specified,
      */
-    def static createDockerImage(String jobName, boolean isPR, String folder = '') {
-
-		bat "docker build -t virtocommerce/storefront:latest storefront"
+    def static createDockerImage(context, String dockerImageName, String folder) {
+        context.echo "Building docker image \"${dockerImageName}\" using \"${folder}\" folder"
+        def dockerImage = context.docker.build("${dockerImageName}:${env.BUILD_ID}")
         return "";//getFullJobName('', jobName, isPR, folder);
     }
 
@@ -44,7 +44,11 @@ class Packaging {
 
         // create artifacts
         context.bat "\"${context.tool DefaultMSBuild}\" \"${webProject}\" /nologo /verbosity:m /p:Configuration=Release /p:Platform=\"Any CPU\" /p:DebugType=none \"/p:OutputPath=$tempFolder\""
+
         (new AntBuilder()).zip(destfile: "${packagesDir}\\${zipArtifact}.${version}.zip", basedir: "${websitePath}")
+
+        // create docker image
+        Packaging.createDockerImage(this, "virtocommerce/storefront", packagesDir)
     }
 
     def static runBuild(context, solution)
