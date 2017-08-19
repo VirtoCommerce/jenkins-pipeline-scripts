@@ -1,4 +1,5 @@
 #!groovy
+import jobs.scripts.*
 
 // module script
 def call(body) {

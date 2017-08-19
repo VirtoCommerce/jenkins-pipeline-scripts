@@ -1,3 +1,5 @@
+package jobs.scripts;
+
 class Utilities {
 
     private static String DefaultBranchOrCommitPR = '${sha1}'
