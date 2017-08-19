@@ -16,4 +16,10 @@ class Utilities {
     def static getFolderName(String project) {
         return project.replace('/', '_')
     }
+
+    def static runSharedPS(context, scriptName)
+    {
+    	def wsFolder = context.pwd()
+ 	    context.bat "powershell.exe -File \"${wsFolder}\\..\\workspace@libs\virto-shared-library\\vars\\${scriptName}\""        
+    }
 }

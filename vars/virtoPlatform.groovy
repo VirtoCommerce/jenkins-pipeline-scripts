@@ -63,7 +63,7 @@ def call(body) {
 			
 			if (env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'master') {
 				stage('DeployToAzure'){
-					deployToAzure(deployScript)
+					Utilities.runSharedPS(this, deployScript)
 				}
 			}
 			
@@ -159,9 +159,4 @@ def runTests()
 			step([$class: 'XUnitPublisher', testTimeMargin: '3000', thresholdMode: 1, thresholds: [[$class: 'FailedThreshold', failureNewThreshold: '', failureThreshold: '', unstableNewThreshold: '', unstableThreshold: ''], [$class: 'SkippedThreshold', failureNewThreshold: '', failureThreshold: '', unstableNewThreshold: '', unstableThreshold: '']], tools: [[$class: 'XUnitDotNetTestType', deleteOutputFiles: true, failIfNotNew: false, pattern: '*.xml', skipNoTestFiles: true, stopProcessingIfError: false]]])
 		}
 	}
-}
-
-def deployToAzure(def deployScript)
-{
- 	bat "powershell.exe -File \"${env.JENKINS_HOME}\\workflow-libs\\vars\\${deployScript}\""
 }
