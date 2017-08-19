@@ -35,7 +35,7 @@ class Utilities {
     {
         script.echo "Preparing release for ${version}"
         def tempFolder = script.pwd(tmp: true)
-        def wsFolder = scriptpwd()
+        def wsFolder = script.pwd()
         def websitePath = "$tempFolder\\_PublishedWebsites\\$websiteDir"
         def packagesDir = "$wsFolder\\artifacts"
 
