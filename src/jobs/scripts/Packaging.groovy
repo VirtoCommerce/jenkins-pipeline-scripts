@@ -1,6 +1,6 @@
 package jobs.scripts;
 
-class Packaging {
+class Packaging : implements Serializable {
 
     private static String DefaultBranchOrCommitPR = '${sha1}'
     private static String DefaultBranchOrCommitPush = '*/master'
