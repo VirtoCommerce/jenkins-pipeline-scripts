@@ -33,14 +33,15 @@ class Utilities {
 
     def static createReleaseArtifact(script, version, webProject, zipArtifact, websiteDir)
     {
-        //echo "Preparing release for ${version}"
-        def tempFolder = "..\\workspace@tmp"
+        script.echo "Preparing release for ${version}"
+        def tempFolder = script.pwd(tmp: true)
+        def wsFolder = scriptpwd()
         def websitePath = "$tempFolder\\_PublishedWebsites\\$websiteDir"
-        def packagesDir = "artifacts"
+        def packagesDir = "$wsFolder\\artifacts"
 
-        def mainDir = new File(packagesDir)
-        if (mainDir.exists()) {
-            mainDir.deleteDir()
+        script.dir(packagesDir)
+        {
+            script.deleteDir()
         }
 
         // create artifacts
