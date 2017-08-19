@@ -29,7 +29,7 @@ class Packaging implements Serializable {
         return "";//getFullJobName('', jobName, isPR, folder);
     }
 
-    def createReleaseArtifact(context, version, webProject, zipArtifact, websiteDir)
+    def static createReleaseArtifact(context, version, webProject, zipArtifact, websiteDir)
     {
         context.echo "Preparing release for ${version}"
         def tempFolder = context.pwd(tmp: true)
