@@ -48,8 +48,8 @@ def call(body) {
 		    	runTests()
 			}
 			stage('Prepare Release') {
-				def packaging = new Packaging(this)
-				packaging.createReleaseArtifact(getVersion(), webProject, zipArtifact, websiteDir)
+				//def packaging = new Packaging(this)
+				Packaging.createReleaseArtifact(this, getVersion(), webProject, zipArtifact, websiteDir)
 			}
 
 			bat "\"${tool 'Git'}\" log -1 --pretty=%%B > LAST_COMMIT_MESSAGE"
