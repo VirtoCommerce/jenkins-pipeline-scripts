@@ -34,4 +34,16 @@ class Utilities {
         def testDlls = context.findFiles(glob: '**\\bin\\Debug\\*Test.dll')
         return testDlls
     }
+
+    def static getShouldPublish(context)
+    {
+		context.bat "\"${context.tool 'Git'}\" log -1 --pretty=%%B > LAST_COMMIT_MESSAGE"
+		git_last_commit = context.readFile('LAST_COMMIT_MESSAGE')			
+
+		if (context.env.BRANCH_NAME == 'master' && git_last_commit.contains('[publish]')) {
+			return true
+		}
+
+        return false
+    }
 }

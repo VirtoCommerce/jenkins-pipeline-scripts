@@ -68,4 +68,30 @@ class Packaging {
         context.bat "${xUnitExecutable} ${paths} -xml xUnit.Test.xml -trait \"category=ci\" -parallel none"
         context.step([$class: 'XUnitPublisher', testTimeMargin: '3000', thresholdMode: 1, thresholds: [[$class: 'FailedThreshold', failureNewThreshold: '', failureThreshold: '', unstableNewThreshold: '', unstableThreshold: ''], [$class: 'SkippedThreshold', failureNewThreshold: '', failureThreshold: '', unstableNewThreshold: '', unstableThreshold: '']], tools: [[$class: 'XUnitDotNetTestType', deleteOutputFiles: true, failIfNotNew: false, pattern: '*.xml', skipNoTestFiles: true, stopProcessingIfError: false]]])
     }
+
+    def static publishRelease(context, version)
+    {
+        tokens = "${context.env.JOB_NAME}".tokenize('/')
+        def REPO_NAME = tokens[1]
+        def REPO_ORG = "VirtoCommerce"
+
+        def tempFolder = context.pwd(tmp: true)
+        def wsFolder = context.pwd()
+        def packagesDir = "$wsFolder\\artifacts"
+
+        context.dir(packagesDir)
+        {
+            def artifacts = context.findFiles(glob: '*.zip')
+            if (artifacts.size() > 0) {
+                for (int i = 0; i < artifacts.size(); i++)
+                {
+                    def artifact = artifacts[i]
+                    context.bat "${context.env.Utils}\\github-release release --user $REPO_ORG --repo $REPO_NAME --tag v${version}"
+                    context.bat "${context.env.Utils}\\github-release upload --user $REPO_ORG --repo $REPO_NAME --tag v${version} --name \"${artifact}\" --file \"${artifact}\""
+                    context.echo "uploaded to https://github.com/$REPO_ORG/$REPO_NAME/releases/download/v${version}/${artifact}"
+                    return "https://github.com/$REPO_ORG/$REPO_NAME/releases/download/v${version}/${artifact}"
+                }
+            }
+        }
+    }    
 }
