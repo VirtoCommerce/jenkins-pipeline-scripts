@@ -75,7 +75,7 @@ class Packaging {
 
     def static publishRelease(context, version)
     {
-        tokens = "${context.env.JOB_NAME}".tokenize('/')
+        def tokens = "${context.env.JOB_NAME}".tokenize('/')
         def REPO_NAME = tokens[1]
         def REPO_ORG = "VirtoCommerce"
 
