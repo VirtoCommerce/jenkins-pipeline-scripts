@@ -27,6 +27,9 @@ class Packaging {
      */
     def static createDockerImage(context, String dockerImageName, String dockerContextFolder, String dockerSourcePath, String version) {
         context.echo "Building docker image \"${dockerImageName}\" using \"${dockerContextFolder}\" as context folder"
+        context.copy(todir:dockerContextFolder) {
+            fileset(file:"Dockerfile")
+        }
         def dockerImage = context.docker.build("${dockerImageName}:${version}".toLowerCase(), "-f Dockerfile --build-arg SOURCE=\"${dockerSourcePath}\" \"${dockerContextFolder}\"")
         return dockerImage
     }
