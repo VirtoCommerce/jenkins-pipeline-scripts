@@ -34,4 +34,19 @@ class Utilities {
         def testDlls = context.findFiles(glob: '**\\bin\\Debug\\*Test.dll')
         return testDlls
     }
+
+    def static getArtifactFolder(context)
+    {
+        def wsFolder = context.pwd()
+        def packagesDir = "$wsFolder\\artifacts"
+        return packagesDir
+    }
+
+    def static getWebPublishFolder(context)
+    {
+        def tempFolder = context.pwd(tmp: true)
+        def websitePath = "$tempFolder\\_PublishedWebsites\\Website"
+        return websitePath
+    }
+
 }

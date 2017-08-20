@@ -40,10 +40,8 @@ class Packaging {
     def static createReleaseArtifact(context, version, webProject, zipArtifact, websiteDir)
     {
         context.echo "Preparing release for ${version}"
-        def tempFolder = context.pwd(tmp: true)
-        def wsFolder = context.pwd()
-        def websitePath = "$tempFolder\\_PublishedWebsites\\$websiteDir"
-        def packagesDir = "$wsFolder\\artifacts"
+        def websitePath = Utilities.getWebPublishFolder(context)       
+        def packagesDir = Utilities.getArtifactFolder(context)
 
         context.dir(packagesDir)
         {
