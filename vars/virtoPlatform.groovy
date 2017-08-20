@@ -71,9 +71,12 @@ def call(body) {
 			if (env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'master') {
 				stage('Publish'){
 					//docker.withRegistry('', 'docker-hub-credentials') {
-					withDockerRegistry(registry: [credentialsId: 'docker-hub-credentials']) {
-						dockerImage.push(dockerTag)
+					withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: 'docker-hub-credentials', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD']]) {
+						sh "docker login --password=${PASSWORD} --username=${USERNAME} ${DOCKER_REGISTRY_URI}"
 					}
+					//withDockerRegistry(registry: [credentialsId: 'docker-hub-credentials']) {
+						dockerImage.push(dockerTag)
+					//}
 
 					if (Packaging.getShouldPublish(this)) {
 						Packaging.publishRelease(this,version)
