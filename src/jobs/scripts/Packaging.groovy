@@ -26,8 +26,9 @@ class Packaging {
      * @return reference to a docker image created
      */
     def static createDockerImage(context, String dockerImageName, String dockerContextFolder, String dockerSourcePath, String version) {
+        def dockerFileFolder = dockerImageName.replaceAll("/", ".")
         context.echo "Building docker image \"${dockerImageName}\" using \"${dockerContextFolder}\" as context folder"
-        context.bat "copy Dockerfile \"${dockerContextFolder}\" /Y"
+        context.bat "copy \"..\\workspace@libs\\virto-shared-library\\resources\\docker\\${dockerFileFolder}/Dockerfile\" \"${dockerContextFolder}\" /Y"
         def dockerImage = context.docker.build("${dockerImageName}:${version}".toLowerCase(), "-f \"${dockerContextFolder}\\Dockerfile\" --build-arg SOURCE=\"${dockerSourcePath}\" \"${dockerContextFolder}\"")
         return dockerImage
     }
@@ -51,7 +52,7 @@ class Packaging {
         (new AntBuilder()).zip(destfile: "${packagesDir}\\${zipArtifact}.${version}.zip", basedir: "${websitePath}")
 
         // create docker image
-        Packaging.createDockerImage(context, "${zipArtifact}", websitePath, ".", version)
+        Packaging.createDockerImage(context, "${zipArtifact}".replaceAll('.','/'), websitePath, ".", version)
     }
 
     def static runBuild(context, solution)
