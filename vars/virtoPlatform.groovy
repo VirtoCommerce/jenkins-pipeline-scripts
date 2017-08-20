@@ -72,7 +72,7 @@ def call(body) {
 
 			if (env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'master') {
 				stage('Publish'){
-					docker.withRegistry('https://registry.hub.docker.io', 'docker-registry') {
+					docker.withRegistry('https://registry.hub.docker.io/v2/', 'docker-registry') {
 						dockerImage.push(dockerTag)
 					}
 
