@@ -55,6 +55,7 @@ def call(body) {
 					Packaging.runUnitTests(this, tests)
 				}
 			}
+			
 			def version = Utilities.getAssemblyVersion(this)
 			stage('Prepare Release') {
 				//def packaging = new Packaging(this)

@@ -44,8 +44,6 @@ class Packaging {
         {
             context.bat "docker-compose up -d"
         }
-        
-        docker-compose up -d
     }
 
     def static createReleaseArtifact(context, version, webProject, zipArtifact, websiteDir)
