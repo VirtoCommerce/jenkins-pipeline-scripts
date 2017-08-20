@@ -45,15 +45,7 @@ def call(body) {
 				checkout scm
 				Packaging.runBuild(this, solution)
 			}
-
-			def tests = Utilities.getTestDlls(this)
-			if(tests.size() > 0)
-			{
-				stage('Tests') {
-					Packaging.runUnitTests(this, tests)
-				}
-			}
-			
+		
 			def version = Utilities.getAssemblyVersion(this)
 			def dockerImage
 
@@ -69,6 +61,14 @@ def call(body) {
 					}
 				}
 			}
+			
+			def tests = Utilities.getTestDlls(this)
+			if(tests.size() > 0)
+			{
+				stage('Tests') {
+					Packaging.runUnitTests(this, tests)
+				}
+			}			
 
 			if (env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'master') {
 				stage('Publish'){
