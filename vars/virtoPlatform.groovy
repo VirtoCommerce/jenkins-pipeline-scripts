@@ -74,7 +74,7 @@ def call(body) {
 
 			if (Packaging.getShouldPublish(this)) {
 				stage('Publishing'){
-					dockerImage.push(dockerTag)
+					//dockerImage.push(dockerTag)
 					Packaging.publishRelease(this,version)
 				}
 			}
