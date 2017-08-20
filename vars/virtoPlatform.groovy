@@ -70,7 +70,7 @@ def call(body) {
 
 			if (env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'master') {
 				stage('Publish'){
-					docker.withRegistry('', 'docker-hub-credentials') {
+					docker.withDockerRegistry('', 'docker-hub-credentials') {
 						dockerImage.push(dockerTag)
 					}
 
