@@ -62,7 +62,7 @@ class Packaging {
     def static pushDockerImage(context, dockerImage, String dockerTag)
     {
 		context.withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: 'docker-hub-credentials', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD']]) {
-			context.sh "docker login --password=${PASSWORD} --username=${USERNAME}"
+			context.sh "docker login --password=${context.PASSWORD} --username=${context.USERNAME}"
 		}
 		dockerImage.push(dockerTag)
     }
