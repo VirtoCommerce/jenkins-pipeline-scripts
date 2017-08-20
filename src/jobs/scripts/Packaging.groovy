@@ -59,6 +59,14 @@ class Packaging {
         }
     }
 
+    def static pushDockerImage(context, dockerImage, String dockerTag)
+    {
+		context.withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: 'docker-hub-credentials', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD']]) {
+			context.sh "docker login --password=${PASSWORD} --username=${USERNAME}"
+		}
+		dockerImage.push(dockerTag)
+    }
+
     def static createReleaseArtifact(context, version, webProject, zipArtifact, websiteDir)
     {
         context.echo "Preparing release for ${version}"
