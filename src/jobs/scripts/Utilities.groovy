@@ -35,6 +35,13 @@ class Utilities {
         return testDlls
     }
 
+    def static getComposeFolder(context)
+    {
+        def wsFolder = context.pwd()
+        def composeDir = "$wsFolder\\..\\workspace@libs\\${DefaultSharedLibName}\\resources\\docker"
+        return composeDir
+    }    
+
     def static getArtifactFolder(context)
     {
         def wsFolder = context.pwd()

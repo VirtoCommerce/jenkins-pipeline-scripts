@@ -37,6 +37,17 @@ class Packaging {
         return dockerImage
     }
 
+    def static startDockerTestEnvironment(context)
+    {
+        def composeFolder = Utilities.getComposeFolder(context)
+        context.dir(composeFolde)
+        {
+            context.bat "docker-compose up -d"
+        }
+        
+        docker-compose up -d
+    }
+
     def static createReleaseArtifact(context, version, webProject, zipArtifact, websiteDir)
     {
         context.echo "Preparing release for ${version}"
@@ -53,9 +64,6 @@ class Packaging {
         context.bat "\"${context.tool DefaultMSBuild}\" \"${webProject}\" /nologo /verbosity:m /p:Configuration=Release /p:Platform=\"Any CPU\" /p:DebugType=none \"/p:OutputPath=$tempFolder\""
 
         (new AntBuilder()).zip(destfile: "${packagesDir}\\${zipArtifact}.${version}.zip", basedir: "${websitePath}")
-
-        // create docker image
-        // Packaging.createDockerImage(context, "${zipArtifact}".replaceAll('\\.','/'), websitePath, ".", version)
     }
 
     def static runBuild(context, solution)
@@ -86,9 +94,8 @@ class Packaging {
         def REPO_NAME = tokens[1]
         def REPO_ORG = "VirtoCommerce"
 
-        def tempFolder = context.pwd(tmp: true)
-        def wsFolder = context.pwd()
-        def packagesDir = "$wsFolder\\artifacts"
+        def tempFolder = Utilities.getTempFolder(context)
+        def packagesDir = Utilities.getArtifactFolder(context)
 
         context.dir(packagesDir)
         {

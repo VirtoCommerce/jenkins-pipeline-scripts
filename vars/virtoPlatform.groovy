@@ -61,10 +61,12 @@ def call(body) {
 				Packaging.createReleaseArtifact(this, version, webProject, zipArtifact, websiteDir)
 			}
 
+			def dockerImage
 			if (env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'master') {
 				stage('Docker Image') {
 					def websitePath = Utilities.getWebPublishFolder(this, websiteDir)
-					Packaging.createDockerImage(this, zipArtifact.replaceAll('\\.','/'), websitePath, ".", dockerTag)
+					dockerImage = Packaging.createDockerImage(this, zipArtifact.replaceAll('\\.','/'), websitePath, ".", dockerTag)
+					//image.push()
 				}			
 			}
 
