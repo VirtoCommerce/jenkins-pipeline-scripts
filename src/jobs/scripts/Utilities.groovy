@@ -17,7 +17,7 @@ class Utilities {
     def static runSharedPS(context, scriptName)
     {
     	def wsFolder = context.pwd()
- 	    context.bat "powershell.exe -File \"${wsFolder}\\..\\workspace@libs\\${DefaultSharedLibName}\\vars\\${scriptName}\""
+ 	    context.bat "powershell.exe -File \"${wsFolder}\\..\\workspace@libs\\${DefaultSharedLibName}\\${scriptName}\""
     }
 
     def static getAssemblyVersion(context)

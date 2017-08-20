@@ -1,6 +1,7 @@
 #!groovy
 import groovy.json.*
 import groovy.util.*
+import jobs.scripts.*
 
     // module script v1
     def call(body) {
@@ -17,27 +18,34 @@ import groovy.util.*
 			deployScript = 'VC-Module2AzureQA.ps1'
 		}
 		try {
-			stage 'Checkout'		
-			checkout scm
+			stage('Checkout')
+			{	
+				checkout scm
+			}
 		
-			stage 'Build'
-			buildSolutions()
-			processManifests(false) // prepare artifacts for testing
+			stage('Build')
+			{
+				buildSolutions()
+				processManifests(false) // prepare artifacts for testing
+			}
 
-			stage 'Testing'
-			runTests()
+			stage('Testing')
+			{
+				runTests()
+			}
 
-			bat "\"${tool 'Git'}\" log -1 --pretty=%%B > LAST_COMMIT_MESSAGE"
-			git_last_commit = readFile('LAST_COMMIT_MESSAGE')
-
-			if (env.BRANCH_NAME == 'master' && git_last_commit.contains('[publish]')) {
-				stage 'Publishing'
-				processManifests(true) // publish artifacts to github releases
+			if (Packaging.getShouldPublish(this)) {
+				stage('Publishing')
+				{
+					processManifests(true) // publish artifacts to github releases
+				}
 			}
 			
 			if (env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'master') {
-				stage 'DeployToAzure'
-					deployToAzure(deployScript)
+				stage('DeployToAzure')
+				{
+					Utilities.runSharedPS(this, "resources\\azure\${deployScript}")
+				}
 			}
 		}
 		catch (any) {
@@ -145,7 +153,7 @@ def processManifest(def publish, def manifestPath)
 
 def publishTweet(def status)
 {
-	bat "powershell.exe -File \"${env.JENKINS_HOME}\\workflow-libs\\vars\\twitter.ps1\" -status \"${status}\""
+	//bat "powershell.exe -File \"${env.JENKINS_HOME}\\workflow-libs\\vars\\twitter.ps1\" -status \"${status}\""
 }
 
 def updateModule(def id, def version, def platformVersion, def title, def authors, def owners, def description, def dependencies, def projectUrl, def packageUrl, def iconUrl)
@@ -350,9 +358,4 @@ def runTests()
 @NonCPS
 def jsonParse(def json) {
     new groovy.json.JsonSlurperClassic().parseText(json)
-}
-
-def deployToAzure(def deployScript)
-{
- 	bat "powershell.exe -File \"${env.JENKINS_HOME}\\workflow-libs\\vars\\${deployScript}\""
 }
