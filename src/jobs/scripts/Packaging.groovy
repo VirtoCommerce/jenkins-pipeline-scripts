@@ -41,7 +41,7 @@ class Packaging {
     {
         context.echo "Preparing release for ${version}"
         def tempFolder = Utilities.getTempFolder(context)
-        def websitePath = Utilities.getWebPublishFolder(context, websiteDir)       
+        def websitePath = Utilities.getWebPublishFolder(context, websiteDir)     
         def packagesDir = Utilities.getArtifactFolder(context)
 
         context.dir(packagesDir)
@@ -55,7 +55,7 @@ class Packaging {
         (new AntBuilder()).zip(destfile: "${packagesDir}\\${zipArtifact}.${version}.zip", basedir: "${websitePath}")
 
         // create docker image
-        Packaging.createDockerImage(context, "${zipArtifact}".replaceAll('\\.','/'), websitePath, ".", version)
+        // Packaging.createDockerImage(context, "${zipArtifact}".replaceAll('\\.','/'), websitePath, ".", version)
     }
 
     def static runBuild(context, solution)

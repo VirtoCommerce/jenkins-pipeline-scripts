@@ -17,8 +17,10 @@ def call(body) {
 		def zipArtifact = 'VirtoCommerce.Platform'
 		def websiteDir = 'VirtoCommerce.Platform.Web'
 		def deployScript = 'VC-Platform2AzureDev.ps1'
+		def dockerTag = env.BRANCH_NAME
 		if (env.BRANCH_NAME == 'master') {
 			deployScript = 'VC-Platform2AzureQA.ps1'
+			dockerTag = "latest"
 		}
 		
 		if(solution == null)
@@ -57,6 +59,13 @@ def call(body) {
 			stage('Prepare Release') {
 				//def packaging = new Packaging(this)
 				Packaging.createReleaseArtifact(this, version, webProject, zipArtifact, websiteDir)
+			}
+
+			if (env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'master') {
+				stage('Docker Image') {
+					def websitePath = Utilities.getWebPublishFolder(this, websiteDir)
+					Packaging.createDockerImage(this, zipArtifact.replaceAll('\\.','/'), websitePath, ".", dockerTag)
+				}			
 			}
 
 			if (Packaging.getShouldPublish(this)) {
