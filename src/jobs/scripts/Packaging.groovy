@@ -52,7 +52,7 @@ class Packaging {
         (new AntBuilder()).zip(destfile: "${packagesDir}\\${zipArtifact}.${version}.zip", basedir: "${websitePath}")
 
         // create docker image
-        Packaging.createDockerImage(context, "${zipArtifact}".replaceAll('.','/'), websitePath, ".", version)
+        Packaging.createDockerImage(context, "${zipArtifact}".replaceAll('\\.','/'), websitePath, ".", version)
     }
 
     def static runBuild(context, solution)
