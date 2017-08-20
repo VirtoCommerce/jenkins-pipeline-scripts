@@ -57,17 +57,16 @@ def call(body) {
 			}
 			
 			def version = Utilities.getAssemblyVersion(this)
-			stage('Prepare Release') {
+			stage('Release') {
 				//def packaging = new Packaging(this)
 				Packaging.createReleaseArtifact(this, version, webProject, zipArtifact, websiteDir)
 			}
 
 			def dockerImage
 			if (env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'master') {
-				stage('Docker Image') {
+				stage('Docker') {
 					def websitePath = Utilities.getWebPublishFolder(this, websiteDir)
 					dockerImage = Packaging.createDockerImage(this, zipArtifact.replaceAll('\\.','/'), websitePath, ".", dockerTag)
-					//image.push()
 					Packaging.startDockerTestEnvironment(this, dockerTag)
 					Packaging.stopDockerTestEnvironment(this, dockerTag)
 				}
@@ -75,6 +74,7 @@ def call(body) {
 
 			if (Packaging.getShouldPublish(this)) {
 				stage('Publishing'){
+					//dockerImage.push(dockerTag)
 					Packaging.publishRelease(this,version)
 				}
 			}
