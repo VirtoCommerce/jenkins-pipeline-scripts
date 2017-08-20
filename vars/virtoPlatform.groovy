@@ -53,15 +53,13 @@ def call(body) {
 				//def packaging = new Packaging(this)
 				Packaging.createReleaseArtifact(this, version, webProject, zipArtifact, websiteDir)
 				if (env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'master') {
-					stage('Docker') {
-						def websitePath = Utilities.getWebPublishFolder(this, websiteDir)
-						dockerImage = Packaging.createDockerImage(this, zipArtifact.replaceAll('\\.','/'), websitePath, ".", dockerTag)
-						//Packaging.startDockerTestEnvironment(this, dockerTag)
-						//Packaging.stopDockerTestEnvironment(this, dockerTag)
-					}
+					def websitePath = Utilities.getWebPublishFolder(this, websiteDir)
+					dockerImage = Packaging.createDockerImage(this, zipArtifact.replaceAll('\\.','/'), websitePath, ".", dockerTag)
+					//Packaging.startDockerTestEnvironment(this, dockerTag)
+					//Packaging.stopDockerTestEnvironment(this, dockerTag)
 				}
 			}
-			
+
 			def tests = Utilities.getTestDlls(this)
 			if(tests.size() > 0)
 			{
