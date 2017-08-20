@@ -74,7 +74,10 @@ def call(body) {
 
 			if (Packaging.getShouldPublish(this)) {
 				stage('Publishing'){
-					//dockerImage.push(dockerTag)
+					docker.withRegistry('https://registry.hub.docker.com', 'docker-registry') {
+            			app.push(dockerTag)
+        			}
+					dockerImage.push(dockerTag)
 					Packaging.publishRelease(this,version)
 				}
 			}
