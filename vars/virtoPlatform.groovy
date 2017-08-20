@@ -68,7 +68,9 @@ def call(body) {
 					def websitePath = Utilities.getWebPublishFolder(this, websiteDir)
 					dockerImage = Packaging.createDockerImage(this, zipArtifact.replaceAll('\\.','/'), websitePath, ".", dockerTag)
 					//image.push()
-				}			
+					Packaging.startDockerTestEnvironment(this, dockerTag)
+					Packaging.stopDockerTestEnvironment(this, dockerTag)
+				}
 			}
 
 			if (Packaging.getShouldPublish(this)) {

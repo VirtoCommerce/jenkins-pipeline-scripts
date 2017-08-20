@@ -37,12 +37,25 @@ class Packaging {
         return dockerImage
     }
 
-    def static startDockerTestEnvironment(context)
+    def static startDockerTestEnvironment(context, String dockerTag)
     {
         def composeFolder = Utilities.getComposeFolder(context)
         context.dir(composeFolde)
         {
-            context.bat "docker-compose up -d"
+            withEnv(["DOCKER_TAG=${dockerTag}"]) {
+                context.bat "docker-compose up -d"
+            }
+        }
+    }
+
+    def static stopDockerTestEnvironment(context, String dockerTag)
+    {
+        def composeFolder = Utilities.getComposeFolder(context)
+        context.dir(composeFolde)
+        {
+            withEnv(["DOCKER_TAG=${dockerTag}"]) {
+                context.bat "docker-compose stop"
+            }
         }
     }
 
