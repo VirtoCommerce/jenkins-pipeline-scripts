@@ -42,10 +42,10 @@ class Utilities {
         return packagesDir
     }
 
-    def static getWebPublishFolder(context)
+    def static getWebPublishFolder(context, String websiteDir)
     {
         def tempFolder = Utilities.getTempFolder(context)
-        def websitePath = "$tempFolder\\_PublishedWebsites\\Website"
+        def websitePath = "$tempFolder\\_PublishedWebsites\\${websiteDir}"
         return websitePath
     }
 

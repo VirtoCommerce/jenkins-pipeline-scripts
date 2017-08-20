@@ -37,11 +37,11 @@ class Packaging {
         return dockerImage
     }
 
-    def static createReleaseArtifact(context, version, webProject, zipArtifact)
+    def static createReleaseArtifact(context, version, webProject, zipArtifact, websiteDir)
     {
         context.echo "Preparing release for ${version}"
         def tempFolder = Utilities.getTempFolder(context)
-        def websitePath = Utilities.getWebPublishFolder(context)       
+        def websitePath = Utilities.getWebPublishFolder(context, websiteDir)       
         def packagesDir = Utilities.getArtifactFolder(context)
 
         context.dir(packagesDir)

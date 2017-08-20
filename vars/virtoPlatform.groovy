@@ -15,6 +15,7 @@ def call(body) {
 		def solution = config.solution
 		def webProject = 'VirtoCommerce.Platform.Web\\VirtoCommerce.Platform.Web.csproj'
 		def zipArtifact = 'VirtoCommerce.Platform'
+		def websiteDir = 'VirtoCommerce.Platform.Web'
 		def deployScript = 'VC-Platform2AzureDev.ps1'
 		if (env.BRANCH_NAME == 'master') {
 			deployScript = 'VC-Platform2AzureQA.ps1'
@@ -26,6 +27,7 @@ def call(body) {
 		}
 		else
 		{
+			websiteDir = 'VirtoCommerce.Storefront'
 			webProject = 'VirtoCommerce.Storefront\\VirtoCommerce.Storefront.csproj'
 			zipArtifact = 'VirtoCommerce.StoreFront'
 			deployScript = 'VC-Storefront2AzureDev.ps1'
@@ -54,7 +56,7 @@ def call(body) {
 			def version = Utilities.getAssemblyVersion(this)
 			stage('Prepare Release') {
 				//def packaging = new Packaging(this)
-				Packaging.createReleaseArtifact(this, version, webProject, zipArtifact)
+				Packaging.createReleaseArtifact(this, version, webProject, zipArtifact, websiteDir)
 			}
 
 			if (Packaging.getShouldPublish(this)) {
