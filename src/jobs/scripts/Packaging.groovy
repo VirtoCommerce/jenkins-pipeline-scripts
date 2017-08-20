@@ -40,7 +40,7 @@ class Packaging {
     def static startDockerTestEnvironment(context, String dockerTag)
     {
         def composeFolder = Utilities.getComposeFolder(context)
-        context.dir(composeFolde)
+        context.dir(composeFolder)
         {
             withEnv(["DOCKER_TAG=${dockerTag}"]) {
                 context.bat "docker-compose up -d"
@@ -51,7 +51,7 @@ class Packaging {
     def static stopDockerTestEnvironment(context, String dockerTag)
     {
         def composeFolder = Utilities.getComposeFolder(context)
-        context.dir(composeFolde)
+        context.dir(composeFolder)
         {
             withEnv(["DOCKER_TAG=${dockerTag}"]) {
                 context.bat "docker-compose stop"
