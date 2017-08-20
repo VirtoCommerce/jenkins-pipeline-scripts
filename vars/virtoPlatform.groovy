@@ -70,7 +70,7 @@ def call(body) {
 
 			if (env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'master') {
 				stage('Publish'){
-					Utilities.pushDockerImage(this, dockerImage, dockerTag)
+					Packaging.pushDockerImage(this, dockerImage, dockerTag)
 
 					if (Packaging.getShouldPublish(this)) {
 						Packaging.publishRelease(this,version)
