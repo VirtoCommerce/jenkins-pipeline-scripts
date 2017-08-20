@@ -72,7 +72,7 @@ def call(body) {
 				stage('Publish'){
 					//docker.withRegistry('', 'docker-hub-credentials') {
 					withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: 'docker-hub-credentials', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD']]) {
-						sh "docker login --password=${PASSWORD} --username=${USERNAME} ${DOCKER_REGISTRY_URI}"
+						sh "docker login --password=${PASSWORD} --username=${USERNAME}"
 					}
 					//withDockerRegistry(registry: [credentialsId: 'docker-hub-credentials']) {
 						dockerImage.push(dockerTag)
