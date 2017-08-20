@@ -41,10 +41,8 @@ def call(body) {
 		try {
 			echo "Building branch ${env.BRANCH_NAME}"
 
-			stage('Checkout') {
-				checkout scm
-			}
 			stage('Build') {
+				checkout scm
 				Packaging.runBuild(this, solution)
 			}
 
@@ -57,36 +55,34 @@ def call(body) {
 			}
 			
 			def version = Utilities.getAssemblyVersion(this)
-			stage('Release') {
+			def dockerImage
+
+			stage('Package') {
 				//def packaging = new Packaging(this)
 				Packaging.createReleaseArtifact(this, version, webProject, zipArtifact, websiteDir)
-			}
-
-			def dockerImage
-			if (env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'master') {
-				stage('Docker') {
-					def websitePath = Utilities.getWebPublishFolder(this, websiteDir)
-					dockerImage = Packaging.createDockerImage(this, zipArtifact.replaceAll('\\.','/'), websitePath, ".", dockerTag)
-					//Packaging.startDockerTestEnvironment(this, dockerTag)
-					//Packaging.stopDockerTestEnvironment(this, dockerTag)
+				if (env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'master') {
+					stage('Docker') {
+						def websitePath = Utilities.getWebPublishFolder(this, websiteDir)
+						dockerImage = Packaging.createDockerImage(this, zipArtifact.replaceAll('\\.','/'), websitePath, ".", dockerTag)
+						//Packaging.startDockerTestEnvironment(this, dockerTag)
+						//Packaging.stopDockerTestEnvironment(this, dockerTag)
+					}
 				}
 			}
 
-			if (Packaging.getShouldPublish(this)) {
-				stage('Publishing'){
+			if (env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'master') {
+				stage('Publish'){
 					docker.withRegistry('https://registry.hub.docker.com', 'docker-registry') {
-            			app.push(dockerTag)
-        			}
-					dockerImage.push(dockerTag)
-					Packaging.publishRelease(this,version)
-				}
-			}
-			
-			if (env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'master') {
-				stage('Deploy Azure'){
+						dockerImage.push(dockerTag)
+					}
+
+					if (Packaging.getShouldPublish(this)) {
+						Packaging.publishRelease(this,version)
+					}
+
 					Utilities.runSharedPS(this, "resources\\azure\${deployScript}")
 				}
-			}		
+			}
 		}
 		catch (any) {
 			currentBuild.result = 'FAILURE'
