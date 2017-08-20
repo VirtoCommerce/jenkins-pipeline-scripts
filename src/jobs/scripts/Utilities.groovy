@@ -44,9 +44,14 @@ class Utilities {
 
     def static getWebPublishFolder(context)
     {
-        def tempFolder = context.pwd(tmp: true)
+        def tempFolder = Utilities.getTempFolder(context)
         def websitePath = "$tempFolder\\_PublishedWebsites\\Website"
         return websitePath
     }
 
+    def static getTempFolder(context)
+    {
+        def tempFolder = context.pwd(tmp: true)
+        return tempFolder
+    }
 }

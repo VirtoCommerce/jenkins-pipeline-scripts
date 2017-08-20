@@ -40,6 +40,7 @@ class Packaging {
     def static createReleaseArtifact(context, version, webProject, zipArtifact)
     {
         context.echo "Preparing release for ${version}"
+        def tempFolder = Utilities.getTempFolder(context)
         def websitePath = Utilities.getWebPublishFolder(context)       
         def packagesDir = Utilities.getArtifactFolder(context)
 
