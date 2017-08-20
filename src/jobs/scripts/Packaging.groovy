@@ -42,7 +42,7 @@ class Packaging {
         def composeFolder = Utilities.getComposeFolder(context)
         context.dir(composeFolder)
         {
-            withEnv(["DOCKER_TAG=${dockerTag}"]) {
+            context.withEnv(["DOCKER_TAG=${dockerTag}"]) {
                 context.bat "docker-compose up -d"
             }
         }
@@ -53,7 +53,7 @@ class Packaging {
         def composeFolder = Utilities.getComposeFolder(context)
         context.dir(composeFolder)
         {
-            withEnv(["DOCKER_TAG=${dockerTag}"]) {
+            context.withEnv(["DOCKER_TAG=${dockerTag}"]) {
                 context.bat "docker-compose stop"
             }
         }
