@@ -16,8 +16,6 @@ ADD https://download.microsoft.com/download/2/E/6/2E61CFA4-993B-4DD4-91DA-3737CD
 RUN C:\vc_redist.x64.exe /quiet /install
 RUN C:\vc_redist.x86.exe /quiet /install
 
-RUN Remove-Item C:\vc_redist.x86.exe -Force
-
 # Configure website
 RUN Remove-Website -Name 'Default Web Site'; `  
     New-Website -Name 'vc-storefront' `
