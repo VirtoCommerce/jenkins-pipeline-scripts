@@ -68,19 +68,23 @@ def call(body) {
 			if(tests.size() > 0)
 			{
 				stage('Tests') {
-					Packaging.runUnitTests(this, tests)
+					timestamps { 
+						Packaging.runUnitTests(this, tests)
+					}
 				}
 			}			
 
 			if (env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'master') {
 				stage('Publish'){
-					Packaging.pushDockerImage(this, dockerImage, dockerTag)
+					timestamps { 
+						Packaging.pushDockerImage(this, dockerImage, dockerTag)
 
-					if (Packaging.getShouldPublish(this)) {
-						Packaging.publishRelease(this,version)
+						if (Packaging.getShouldPublish(this)) {
+							Packaging.publishRelease(this,version)
+						}
+
+						Utilities.runSharedPS(this, "resources\\azure\\${deployScript}")
 					}
-
-					Utilities.runSharedPS(this, "resources\\azure\\${deployScript}")
 				}
 			}
 		}
