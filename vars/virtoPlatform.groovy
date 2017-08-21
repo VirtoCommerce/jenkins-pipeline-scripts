@@ -76,7 +76,7 @@ def call(body) {
 						Packaging.publishRelease(this,version)
 					}
 
-					Utilities.runSharedPS(this, "resources\\azure\${deployScript}")
+					Utilities.runSharedPS(this, "resources\\azure\\${deployScript}")
 				}
 			}
 		}
