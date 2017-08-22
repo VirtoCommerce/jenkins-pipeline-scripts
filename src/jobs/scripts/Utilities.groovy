@@ -61,4 +61,10 @@ class Utilities {
         def tempFolder = context.pwd(tmp: true)
         return tempFolder
     }
+
+    Object withDockerCredentials(Closure body) {
+        withCredentials([[$class: 'ZipFileBinding', credentialsId: 'docker-hub-credentials', variable: 'DOCKER_CONFIG']]) {
+            return body.call()
+        }
+    }    
 }

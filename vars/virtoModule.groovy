@@ -44,7 +44,7 @@ import jobs.scripts.*
 			if (env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'master') {
 				stage('DeployToAzure')
 				{
-					Utilities.runSharedPS(this, "resources\\azure\${deployScript}")
+					Utilities.runSharedPS(this, "resources\\azure\\${deployScript}")
 				}
 			}
 		}
