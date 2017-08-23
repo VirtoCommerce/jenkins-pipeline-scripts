@@ -65,7 +65,7 @@ class Packaging {
     def static createSampleData(context)
     {
     	def wsFolder = context.pwd()
- 	    context.bat "powershell.exe -File \"${wsFolder}\\..\\workspace@libs\\${DefaultSharedLibName}\\vc-setup.ps1\"-apiurl \"${DefaultAdminDockerHost}\""
+ 	    context.bat "powershell.exe -File \"${wsFolder}\\..\\workspace@libs\\${DefaultSharedLibName}\\vc-setup.ps1\" -apiurl \"${DefaultAdminDockerHost}\""
     }
 
     def static pushDockerImage(context, dockerImage, String dockerTag)
