@@ -6,6 +6,7 @@ class Packaging {
     private static String DefaultBranchOrCommitPush = '*/master'
     private static String DefaultRefSpec = '+refs/pull/*:refs/remotes/origin/pr/*'
     private static String DefaultMSBuild = 'MSBuild 15.0'
+    private static String DefaultAdminDockerHost = 'http://ci.virtocommerce.com:8090'
 
     /*
     private def Context;
@@ -46,6 +47,7 @@ class Packaging {
                 context.bat "docker-compose up -d"
             }
         }
+
     }
 
     def static stopDockerTestEnvironment(context, String dockerTag)
@@ -57,6 +59,12 @@ class Packaging {
                 context.bat "docker-compose stop"
             }
         }
+    }
+
+    def static createSampleData(context)
+    {
+    	def wsFolder = context.pwd()
+ 	    context.bat "powershell.exe -File \"${wsFolder}\\..\\workspace@libs\\${DefaultSharedLibName}\\vc-setup.ps1\"-apiurl \"${DefaultAdminDockerHost}\""
     }
 
     def static pushDockerImage(context, dockerImage, String dockerTag)

@@ -61,8 +61,12 @@ def call(body) {
 					if (env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'master') {
 						def websitePath = Utilities.getWebPublishFolder(this, websiteDir)
 						dockerImage = Packaging.createDockerImage(this, zipArtifact.replaceAll('\\.','/'), websitePath, ".", dockerTag)
-						//Packaging.startDockerTestEnvironment(this, dockerTag)
-						//Packaging.stopDockerTestEnvironment(this, dockerTag)
+						Packaging.startDockerTestEnvironment(this, dockerTag)
+				        
+						// now create sample data
+        				createSampleData(context)
+						
+						Packaging.stopDockerTestEnvironment(this, dockerTag)
 					}
 				}
 			}
