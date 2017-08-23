@@ -59,4 +59,4 @@ Param(
             Write-Output "Error: $message"
       }
       }
-      while ($sampleDataState -ne "completed" && $cycleCount <= 24)
+      while ($sampleDataState -ne "completed" && $cycleCount -lt 24)
