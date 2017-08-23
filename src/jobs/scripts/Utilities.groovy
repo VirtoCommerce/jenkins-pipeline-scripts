@@ -64,7 +64,7 @@ class Utilities {
 
     def static notifyBuildStatus(context, status)
     {
-        context.office365ConnectorSend message: "${context.env.JOB_NAME} #${context.env.BUILD_NUMBER}", status:context.currentBuild.result, webhookUrl:context.env.O365_WEBHOOK
+        context.office365ConnectorSend status:context.currentBuild.result, webhookUrl:context.env.O365_WEBHOOK
     }    
 
     Object withDockerCredentials(Closure body) {
