@@ -90,7 +90,7 @@ def call(body) {
 		}
 		catch (any) {
 			currentBuild.result = 'FAILURE'
-			//office365ConnectorSend message: "{env.JOB_NAME} - ${env.CHANGE_AUTHOR_DISPLAY_NAME}", status:currentBuild.result, webhookUrl:env.O365_WEBHOOK
+			office365ConnectorSend status:currentBuild.result, webhookUrl:env.O365_WEBHOOK
 			throw any //rethrow exception to prevent the build from proceeding
 		}
 		finally {
