@@ -84,11 +84,25 @@ class Packaging {
 
         (new AntBuilder()).zip(destfile: "${packagesDir}\\${zipArtifact}.${version}.zip", basedir: "${websitePath}")
     }
+ 
+
+    def static buildSolutions(context)
+    {
+        def solutions = context.findFiles(glob: '*.sln')
+
+        if (solutions.size() > 0) {
+            for (int i = 0; i < solutions.size(); i++)
+            {
+                def solution = solutions[i]
+                Packaging.runBuild(context, solution.name)
+            }
+        }
+    }    
 
     def static runBuild(context, solution)
     {
 		context.bat "Nuget restore ${solution}"
-		context.bat "\"${context.tool DefaultMSBuild}\" \"${solution}\" /p:Configuration=Debug /p:Platform=\"Any CPU\""        
+		context.bat "\"${context.tool DefaultMSBuild}\" \"${solution}\" /p:Configuration=Debug /p:Platform=\"Any CPU\" /property:RunCodeAnalysis=true"        
     }
     
     def static runUnitTests(context, tests)
@@ -142,5 +156,26 @@ class Packaging {
 		}
 
         return false
+    }    
+
+    def static updateModulesDefinitions(context, def directory, def module, def version)
+    {
+        context.dir(directory)
+        {
+            context.bat "\"${context.tool 'Git'}\" config user.email \"ci@virtocommerce.com\""
+            context.bat "\"${context.tool 'Git'}\" config user.name \"Virto Jenkins\""
+            /*
+            if(!foundRecord)
+                {
+                    bat "\"${tool 'Git'}\" commit -am \"Updated module ${id}\""
+                }
+                else
+                {
+                    bat "\"${tool 'Git'}\" commit -am \"Added new module ${id}\""
+                }
+                */
+            context.bat "\"${context.tool 'Git'}\" commit -am \"${module} ${version}\""
+            context.bat "\"${context.tool 'Git'}\" push origin HEAD:master -f"
+        }
     }    
 }

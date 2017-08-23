@@ -25,7 +25,7 @@ import jobs.scripts.*
 		
 			stage('Build')
 			{
-				buildSolutions()
+				Packaging.buildSolutions(this)
 				processManifests(false) // prepare artifacts for testing
 			}
 
@@ -129,10 +129,10 @@ def processManifest(def publish, def manifestPath)
 
 	def manifestDirectory = manifestPath.substring(0, manifestPath.length() - 16)
 	echo "prepare release $manifestDirectory"
-	prepareRelease(manifestDirectory)
+	Modules.createModuleArtifact(this, manifestDirectory)
 
 	if (publish) {
-		packageUrl = publishRelease(version)
+		packageUrl = Packaging.publishRelease(this, version)
 
 		updateModule(
 			id,
@@ -222,95 +222,7 @@ def updateModule(def id, def version, def platformVersion, def title, def author
 		writeFile file: 'modules.json', text: prettyModuleJson
 	}
 
-	pushModules('modules', id, version)
-}
-
-def pushModules(def directory, def module, def version)
-{
-	dir(directory)
-	{
-		bat "\"${tool 'Git'}\" config user.email \"ci@virtocommerce.com\""
-		bat "\"${tool 'Git'}\" config user.name \"Virto Jenkins\""
-		/*
-		if(!foundRecord)
-	    	{
-	    		bat "\"${tool 'Git'}\" commit -am \"Updated module ${id}\""
-	    	}
-	    	else
-	    	{
-	    		bat "\"${tool 'Git'}\" commit -am \"Added new module ${id}\""
-	    	}
-	    	*/
-		bat "\"${tool 'Git'}\" commit -am \"${module} ${version}\""
-		bat "\"${tool 'Git'}\" push origin HEAD:master -f"
-	}
-}
-
-def prepareRelease(def manifestDirectory)
-{
-	def tempFolder = pwd(tmp: true)
-	def wsFolder = pwd()
-	def tempDir = "$tempFolder\\vc-module"
-	def modulesDir = "$tempDir\\_PublishedWebsites"
-	def packagesDir = "$wsFolder\\artifacts"
-
-	dir(packagesDir)
-	{
-		deleteDir()
-	}
-
-	// create artifacts
-	dir(manifestDirectory)
-	{
-		def projects = findFiles(glob: '*.csproj')
-		if (projects.size() > 0) {
-			for (int i = 0; i < projects.size(); i++)
-			{
-				def project = projects[i]
-				bat "\"${tool 'MSBuild 15.0'}\" \"$project.name\" /nologo /verbosity:m /t:Clean,PackModule /p:Configuration=Release /p:Platform=AnyCPU /p:DebugType=none /p:AllowedReferenceRelatedFileExtensions=.xml \"/p:OutputPath=$tempDir\" \"/p:VCModulesOutputDir=$modulesDir\" \"/p:VCModulesZipDir=$packagesDir\""			
-			}
-		}
-	}
-}
-
-def publishRelease(def version)
-{
-	tokens = "${env.JOB_NAME}".tokenize('/')
-	def REPO_NAME = tokens[1]
-	def REPO_ORG = "VirtoCommerce"
-
-	def tempFolder = pwd(tmp: true)
-	def wsFolder = pwd()
-	def packagesDir = "$wsFolder\\artifacts"
-
-	dir(packagesDir)
-	{
-		def artifacts = findFiles(glob: '*.zip')
-		if (artifacts.size() > 0) {
-			for (int i = 0; i < artifacts.size(); i++)
-			{
-				def artifact = artifacts[i]
-				bat "${env.Utils}\\github-release release --user $REPO_ORG --repo $REPO_NAME --tag v${version}"
-				bat "${env.Utils}\\github-release upload --user $REPO_ORG --repo $REPO_NAME --tag v${version} --name \"${artifact}\" --file \"${artifact}\""
-				echo "uploaded to https://github.com/$REPO_ORG/$REPO_NAME/releases/download/v${version}/${artifact}"
-				return "https://github.com/$REPO_ORG/$REPO_NAME/releases/download/v${version}/${artifact}"
-			}
-		}
-	}
-}
-
-def buildSolutions()
-{
-	def solutions = findFiles(glob: '*.sln')
-
-	if (solutions.size() > 0) {
-		for (int i = 0; i < solutions.size(); i++)
-		{
-			def solution = solutions[i]
-			bat "Nuget restore ${solution.name}"
-			bat "\"${tool 'MSBuild 15.0'}\" \"${solution.name}\" /p:Configuration=Debug /p:Platform=\"Any CPU\" /property:RunCodeAnalysis=true"
-		}
-	}
+	Packaging.updateModulesDefinitions(this, 'modules', id, version)
 }
 
 def runTests()
