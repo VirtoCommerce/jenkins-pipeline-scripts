@@ -43,6 +43,7 @@ Param(
 
       # Wait until sample data have been imported
       Write-Output "Waiting for sample data import to be completed"
+      $cycleCount = 0
       do
       {
       try
@@ -50,6 +51,7 @@ Param(
             Start-Sleep -s 5
             $sampleDataState = Invoke-RestMethod $sampleDataStateUrl -ErrorAction Stop
             Write-Output "Sample data state: $sampleDataState"
+            $cycleCount = $cycleCount + 1 
       }
       catch
       {
@@ -57,4 +59,4 @@ Param(
             Write-Output "Error: $message"
       }
       }
-      while ($sampleDataState -ne "completed")
+      while ($sampleDataState -ne "completed" && $cycleCount <= 24)
