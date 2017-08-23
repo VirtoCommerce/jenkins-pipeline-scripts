@@ -64,7 +64,7 @@ def call(body) {
 						Packaging.startDockerTestEnvironment(this, dockerTag)
 				        
 						// now create sample data
-        				Packaging.createSampleData(context)
+        				Packaging.createSampleData(this)
 						
 						Packaging.stopDockerTestEnvironment(this, dockerTag)
 					}
