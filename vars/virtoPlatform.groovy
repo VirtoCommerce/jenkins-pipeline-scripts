@@ -42,7 +42,7 @@ def call(body) {
 		
 		try {
 			echo "Building branch ${env.BRANCH_NAME}"
-			Utilities.notifyBuildStatus(this, "started")
+			Utilities.notifyBuildStatus(this, "Started")
 
 			stage('Build') {
 				timestamps { 
