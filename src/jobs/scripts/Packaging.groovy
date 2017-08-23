@@ -45,10 +45,10 @@ class Packaging {
         context.dir(composeFolder)
         {
             context.withEnv(["DOCKER_TAG=${dockerTag}"]) {
+                context.bat "docker-compose stop"
                 context.bat "docker-compose up -d"
             }
         }
-
     }
 
     def static stopDockerTestEnvironment(context, String dockerTag)
