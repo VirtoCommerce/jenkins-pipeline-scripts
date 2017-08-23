@@ -40,6 +40,7 @@ def call(body) {
 		
 		try {
 			echo "Building branch ${env.BRANCH_NAME}"
+			office365ConnectorSend message: "Started {env.JOB_NAME}${env.BUILD_NUMBER} by ${env.CHANGE_AUTHOR}", status:"started", webhookUrl:env.O365_WEBHOOK
 
 			stage('Build') {
 				timestamps { 
@@ -90,7 +91,7 @@ def call(body) {
 		}
 		catch (any) {
 			currentBuild.result = 'FAILURE'
-			office365ConnectorSend status:currentBuild.result, webhookUrl:env.O365_WEBHOOK
+			office365ConnectorSend message: "Finished {env.JOB_NAME}${env.BUILD_NUMBER} by ${env.CHANGE_AUTHOR}", status:currentBuild.result, webhookUrl:env.O365_WEBHOOK
 			throw any //rethrow exception to prevent the build from proceeding
 		}
 		finally {
@@ -98,5 +99,6 @@ def call(body) {
 		}
 	
 	  	step([$class: 'GitHubCommitStatusSetter', statusResultSource: [$class: 'ConditionalStatusResultSource', results: []]])
+		office365ConnectorSend message: "Finished {env.JOB_NAME}${env.BUILD_NUMBER} by ${env.CHANGE_AUTHOR}", status:currentBuild.result, webhookUrl:env.O365_WEBHOOK
 	}
 }
