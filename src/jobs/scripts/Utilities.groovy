@@ -62,6 +62,11 @@ class Utilities {
         return tempFolder
     }
 
+    def static notifyBuildStatus(context, status)
+    {
+        context.office365ConnectorSend message: "Finished ${context.env.JOB_NAME} #${context.env.BUILD_NUMBER} by ${context.env.CHANGE_AUTHOR}", status:context.currentBuild.result, webhookUrl:context.env.O365_WEBHOOK
+    }    
+
     Object withDockerCredentials(Closure body) {
         withCredentials([[$class: 'ZipFileBinding', credentialsId: 'docker-hub-credentials', variable: 'DOCKER_CONFIG']]) {
             return body.call()
