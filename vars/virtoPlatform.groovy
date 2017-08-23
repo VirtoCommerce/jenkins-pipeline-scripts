@@ -11,6 +11,8 @@ def call(body) {
     
 	node
 	{
+		echo "Variables: ${env.getEnvironment()}"
+
 		// configuration parameters
 		def solution = config.solution
 		def webProject = 'VirtoCommerce.Platform.Web\\VirtoCommerce.Platform.Web.csproj'
@@ -98,7 +100,6 @@ def call(body) {
 	    		step([$class: 'Mailer', notifyEveryUnstableBuild: true, recipients: 'dev@virtoway.com', sendToIndividuals: true])
 		}
 	
-		echo "${env.getEnvironment()}"
 	  	step([$class: 'GitHubCommitStatusSetter', statusResultSource: [$class: 'ConditionalStatusResultSource', results: []]])
 		Utilities.notifyBuildStatus(this, currentBuild.result)
 	}
