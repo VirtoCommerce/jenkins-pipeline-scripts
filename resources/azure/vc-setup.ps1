@@ -12,8 +12,10 @@ Param(
      $sampleDataStateUrl = "$apiurl/api/platform/sampledata/state"
      $sampleDataImportUrl = "$apiurl/api/platform/sampledata/autoinstall"
 
+     <#
      # Initiate modules installation
      $moduleImportResult = Invoke-RestMethod $modulesInstallUrl -Method Post -ErrorAction Stop
+     
      Write-Output "Module install result: $moduleImportResult"
 
      # Wait until sample data have been imported
@@ -33,6 +35,7 @@ Param(
       }
      }
      while ($moduleState -ne "completed")
+     #>
           
       # Initiate sample data installation
       $sampleDataImportResult = Invoke-RestMethod $sampleDataImportUrl -Method Post -ErrorAction Stop
