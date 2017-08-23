@@ -17,15 +17,16 @@ import jobs.scripts.*
 	    if (env.BRANCH_NAME == 'master') {
 			deployScript = 'VC-Module2AzureQA.ps1'
 		}
-		try {
-			stage('Checkout')
-			{	
-				checkout scm
-			}
-		
+		try {	
+			Utilities.notifyBuildStatus(this, "started")
 			stage('Build')
 			{
+				checkout scm
 				Packaging.buildSolutions(this)
+			}
+
+			stage('Packaging')
+			{
 				processManifests(false) // prepare artifacts for testing
 			}
 
@@ -34,22 +35,19 @@ import jobs.scripts.*
 				runTests()
 			}
 
-			if (Packaging.getShouldPublish(this)) {
+			if (env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'master') {
 				stage('Publishing')
 				{
-					processManifests(true) // publish artifacts to github releases
+					Utilities.runSharedPS(this, "resources\\azure\\${deployScript}")				
+					if (Packaging.getShouldPublish(this)) {
+						processManifests(true) // publish artifacts to github releases
+					}
 				}
-			}
-			
-			if (env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'master') {
-				stage('DeployToAzure')
-				{
-					Utilities.runSharedPS(this, "resources\\azure\\${deployScript}")
-				}
-			}
+			}		
 		}
 		catch (any) {
 			currentBuild.result = 'FAILURE'
+			Utilities.notifyBuildStatus(this, currentBuild.result)
 			throw any //rethrow exception to prevent the build from proceeding
 		}
 		finally {
@@ -57,6 +55,7 @@ import jobs.scripts.*
 		}
 
 		step([$class: 'GitHubCommitStatusSetter', statusResultSource: [$class: 'ConditionalStatusResultSource', results: []]])
+		Utilities.notifyBuildStatus(this, currentBuild.result)
 		//}
     }
 }
