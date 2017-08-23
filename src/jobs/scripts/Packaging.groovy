@@ -7,6 +7,7 @@ class Packaging {
     private static String DefaultRefSpec = '+refs/pull/*:refs/remotes/origin/pr/*'
     private static String DefaultMSBuild = 'MSBuild 15.0'
     private static String DefaultAdminDockerHost = 'http://ci.virtocommerce.com:8090'
+    private static String DefaultSharedLibName = 'virto-shared-library'
 
     /*
     private def Context;
