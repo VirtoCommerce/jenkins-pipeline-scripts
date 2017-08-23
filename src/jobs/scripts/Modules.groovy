@@ -10,7 +10,7 @@ class Modules {
     def static createModuleArtifact(context, def manifestDirectory)
     {
         def tempDir = Utilities.getTempFolder(context)
-        def modulesDir = Utilities.getWebPublishFolder(context, websiteDir)    
+        def modulesDir = "$tempDir\\_PublishedWebsites"
         def packagesDir = Utilities.getArtifactFolder(context)
 
         context.dir(packagesDir)
