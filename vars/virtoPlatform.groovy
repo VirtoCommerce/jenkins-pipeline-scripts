@@ -63,6 +63,9 @@ def call(body) {
 						dockerImage = Packaging.createDockerImage(this, zipArtifact.replaceAll('\\.','/'), websitePath, ".", dockerTag)
 						Packaging.startDockerTestEnvironment(this, dockerTag)
 				        
+						// install modules
+						Packaging.installModules(this)	
+
 						// now create sample data
         				Packaging.createSampleData(this)					
 					}
