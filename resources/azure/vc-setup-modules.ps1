@@ -46,9 +46,9 @@ Param(
                   if($moduleState.NotifyEvents -ne $null -and $moduleState.NotifyEvents.Length -ne 0)
                   {
                         $notificationState = $moduleState.NotifyEvents[0]
-                        if($notificationState.progressLog.Count -gt 0)     
+                        if($notificationState.progressLog.Count -gt 0 -and $notificationState.progressLog -ne $null)
                         {
-                              Write-Output $notificationState.progressLog
+                              Write-Output $notificationState
                               for ($i = $startIndex; $i -lt $notificationState.progressLog.Count; $i++) {
                                     Write-Output $notificationState.progressLog[$i].Message 
                               }
