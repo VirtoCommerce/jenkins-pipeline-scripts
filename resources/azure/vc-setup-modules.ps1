@@ -48,11 +48,12 @@ Param(
                         $notificationState = $moduleState.NotifyEvents[0]
                         if($notificationState.progressLog.Count -gt 0)     
                         {
+                              Write-Output $notificationState.progressLog
                               for ($i = $startIndex; $i -lt $notificationState.progressLog.Count; $i++) {
                                     Write-Output $notificationState.progressLog[$i].Message 
                               }
-                        }
-                        $startIndex = $notificationState.progressLog.Count - 1
+                              $startIndex = $notificationState.progressLog.Count - 1
+                        }                        
                   }
                   else { # modules are already installed, exit the loop
                         Write-Output "Automatic module installation didn't start, possibly due to them already being installed. Quitting install."
