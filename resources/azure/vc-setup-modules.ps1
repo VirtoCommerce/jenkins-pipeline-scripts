@@ -1,10 +1,9 @@
-. .\Tools.ps1
 Param(  
   	[parameter(Mandatory=$true)]
         $apiurl
      )
 
-
+     . $PSScriptRoot\Tools.ps1
      $modulesStateUrl = "$apiurl/api/platform/pushnotifications"
      $modulesInstallUrl = "$apiurl/api/platform/modules/autoinstall"
 
