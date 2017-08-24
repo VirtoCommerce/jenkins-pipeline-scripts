@@ -11,9 +11,9 @@ def call(body) {
     
 	node
 	{
-		echo "Variables: ${env.getEnvironment()}"
-
 		// configuration parameters
+		def hmacAppId = env.HMAC_APP_ID
+		def hmacSecret = env.HMAC_SECRET
 		def solution = config.solution
 		def webProject = 'VirtoCommerce.Platform.Web\\VirtoCommerce.Platform.Web.csproj'
 		def zipArtifact = 'VirtoCommerce.Platform'
@@ -72,10 +72,10 @@ def call(body) {
 						Packaging.startDockerTestEnvironment(this, dockerTag)
 				        
 						// install modules
-						Packaging.installModules(this)	
+						Packaging.installModules(this, hmacAppId, hmacSecret)	
 
 						// now create sample data
-        				Packaging.createSampleData(this)					
+        				Packaging.createSampleData(this, hmacAppId, hmacSecret)					
 					}
 				}
 			}			

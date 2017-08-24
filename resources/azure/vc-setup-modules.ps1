@@ -1,9 +1,11 @@
 Param(  
   	[parameter(Mandatory=$true)]
-        $apiurl
+        $apiurl,
+        $hmacAppId,
+        $hmacSecret
      )
 
-     . $PSScriptRoot\utilities.ps1
+     . $PSScriptRoot\utilities.ps1   
 
      # Initialize paths used by the script
      $modulesStateUrl = "$apiurl/api/platform/pushnotifications"
@@ -18,7 +20,7 @@ Param(
      }
 
      # Initiate modules installation
-     $headerValue = Create-Authorization
+     $headerValue = Create-Authorization $hmacAppId $hmacSecret
      $headers = @{}
      $headers.Add("Authorization", $headerValue)
      $moduleImportResult = Invoke-RestMethod $modulesInstallUrl -Method Post -Headers $headers -ErrorAction Stop    
@@ -37,9 +39,6 @@ Param(
             do
             {
                   # Retrieve notification state
-                  $headers = @{}
-                  $headerValue = Create-Authorization
-                  $headers.Add("Authorization", $headerValue)
                   $moduleState = Invoke-RestMethod "$modulesStateUrl" -Body $NotificationStateJson -Method Post -ContentType "application/json" -Headers $headers
 
                   # display all statuses
@@ -55,8 +54,6 @@ Param(
             while ($notificationState.finished -eq $null -and $cycleCount -lt 60) # stop processing after 3 min or when notifications had stopped $moduleState.NotifyEvents.Length -ne 0 -and 
 
             Write-Output "Restarting website"
-            $headers = @{}
-            $headers.Add("Authorization", $headerValue)
             $moduleState = Invoke-RestMethod "$modulesRestartUrl" -Method Post -ContentType "application/json" -Headers $headers
             Write-Output $moduleState                  
       }

@@ -1,6 +1,8 @@
 Param(  
   	[parameter(Mandatory=$true)]
-        $apiurl
+        $apiurl,
+        $hmacAppId,
+        $hmacSecret
      )
 
      . $PSScriptRoot\utilities.ps1
@@ -10,7 +12,7 @@ Param(
      $sampleDataImportUrl = "$apiurl/api/platform/sampledata/autoinstall"    
          
       # Initiate sample data installation
-      $headerValue = Create-Authorization
+      $headerValue = Create-Authorization $hmacAppId $hmacSecret
       $headers = @{}
       $headers.Add("Authorization", $headerValue)      
       $sampleDataImportResult = Invoke-RestMethod $sampleDataImportUrl -Method Post -Headers $headers -ErrorAction Stop
