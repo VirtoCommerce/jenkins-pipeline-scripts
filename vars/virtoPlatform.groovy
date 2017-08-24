@@ -72,6 +72,21 @@ def call(body) {
 				}
 			}
 
+			if (env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'master') {
+				stage('Docker Sample') {
+					timestamps { 
+						// Start docker environment				
+						Packaging.startDockerTestEnvironment(this, dockerTag)
+				        
+						// install modules
+						Packaging.installModules(this)	
+
+						// now create sample data
+        				Packaging.createSampleData(this)					
+					}
+				}
+			}			
+
 			def tests = Utilities.getTestDlls(this)
 			if(tests.size() > 0)
 			{
