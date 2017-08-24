@@ -34,6 +34,7 @@ Param(
 "@
           
      $cycleCount = 0
+     $startIndex = 0
      $abort = $false
       try
       {
@@ -48,9 +49,7 @@ Param(
                         $notificationState = $moduleState.NotifyEvents[0]
                         if($notificationState.progressLog.Count -gt 0 -and $notificationState.progressLog -ne $null)
                         {
-                              Write-Output $notificationState
                               for ($i = $startIndex; $i -lt $notificationState.progressLog.Count; $i++) {
-                                    Write-Output "Getting index \"$i\" with length " + $notificationState.progressLog.Count
                                     Write-Output $notificationState.progressLog[$i].Message 
                               }
                               $startIndex = $notificationState.progressLog.Count - 1
