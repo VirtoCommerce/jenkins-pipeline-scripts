@@ -44,8 +44,12 @@ class Packaging {
         def composeFolder = Utilities.getComposeFolder(context)
         context.dir(composeFolder)
         {
+            // 1. stop containers
+            // 2. remove instances including database
+            // 3. start up new containers
             context.withEnv(["DOCKER_TAG=${dockerTag}"]) {
                 context.bat "docker-compose stop"
+                context.bat "docker-compose rm -f"
                 context.bat "docker-compose up -d"
             }
         }
