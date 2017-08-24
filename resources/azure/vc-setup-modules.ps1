@@ -50,6 +50,7 @@ Param(
                         {
                               Write-Output $notificationState
                               for ($i = $startIndex; $i -lt $notificationState.progressLog.Count; $i++) {
+                                    Write-Output "Getting index \"$i\" with length " + $notificationState.progressLog.Count
                                     Write-Output $notificationState.progressLog[$i].Message 
                               }
                               $startIndex = $notificationState.progressLog.Count - 1
