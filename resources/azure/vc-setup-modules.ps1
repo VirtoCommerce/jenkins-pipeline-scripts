@@ -42,12 +42,15 @@ Param(
                   $moduleState = Invoke-RestMethod "$modulesStateUrl" -Body $NotificationStateJson -Method Post -ContentType "application/json" -Headers $headers
 
                   # display all statuses
-                  $notificationState = $moduleState.NotifyEvents[0]       
-                  for ($i = $startIndex; $i -lt $notificationState.progressLog.Count; $i++) {
-                        Write-Output $notificationState.progressLog[$i].Message 
-                  }
+                  if($moduleState.NotifyEvents -ne $null -and $moduleState.NotifyEvents.Length -ne 0)
+                  {
+                        $notificationState = $moduleState.NotifyEvents[0]     
+                        for ($i = $startIndex; $i -lt $notificationState.progressLog.Count; $i++) {
+                              Write-Output $notificationState.progressLog[$i].Message 
+                        }
 
-                  $startIndex = $notificationState.progressLog.Count - 1
+                        $startIndex = $notificationState.progressLog.Count - 1
+                  }
                   $cycleCount = $cycleCount + 1 
                   Start-Sleep -s 3
             }
