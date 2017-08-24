@@ -45,11 +45,13 @@ Param(
                   # display all statuses
                   if($moduleState.NotifyEvents -ne $null -and $moduleState.NotifyEvents.Length -ne 0)
                   {
-                        $notificationState = $moduleState.NotifyEvents[0]     
-                        for ($i = $startIndex; $i -lt $notificationState.progressLog.Count; $i++) {
-                              Write-Output $notificationState.progressLog[$i].Message 
+                        $notificationState = $moduleState.NotifyEvents[0]
+                        if($notificationState.progressLog.Count -gt 0)     
+                        {
+                              for ($i = $startIndex; $i -lt $notificationState.progressLog.Count; $i++) {
+                                    Write-Output $notificationState.progressLog[$i].Message 
+                              }
                         }
-
                         $startIndex = $notificationState.progressLog.Count - 1
                   }
                   else { # modules are already installed, exit the loop
