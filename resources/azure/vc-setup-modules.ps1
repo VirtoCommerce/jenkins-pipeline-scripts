@@ -3,53 +3,67 @@ Param(
         $apiurl
      )
 
-     Write-Output $PSScriptRoot
      . $PSScriptRoot\utilities.ps1
+
+     # Initialize paths used by the script
      $modulesStateUrl = "$apiurl/api/platform/pushnotifications"
      $modulesInstallUrl = "$apiurl/api/platform/modules/autoinstall"
+     $modulesRestartUrl = "$apiurl/api/platform/modules/restart"
+
+     # Call homepage, to make sure site is compiled
+     $initResult = Invoke-WebRequest $apiurl
+     if($initResult.StatusCode -ne 200) # throw exception when site can't be opened
+     {
+         throw "Can't open admin site homepage"
+     }
 
      # Initiate modules installation
-     $moduleImportResult = Invoke-RestMethod $modulesInstallUrl -Method Post -ErrorAction Stop
-     
-     Write-Output "Module install result: $moduleImportResult"
+     $headerValue = Create-Authorization
+     $headers = @{}
+     $headers.Add("Authorization", $headerValue)
+     $moduleImportResult = Invoke-RestMethod $modulesInstallUrl -Method Post -Headers $headers -ErrorAction Stop    
+
+     # save notification id, so we can get status of the operation
      $notificationId = $moduleImportResult.id
 
+     # create status request json, we only need to get 1 and 1st notification
      $NotificationStateJson = @"
-     {"Ids":["$notificationId"],"start":0}     
+     {"Ids":["$notificationId"],"start":0, "count": 1}     
 "@
-
-     # Wait until sample data have been imported
-     Write-Output "Waiting for modules install to be completed"
-
-     $appId = '27e0d789f12641049bd0e939185b4fd2'
-     $secret = '34f0a3c12c9dbb59b63b5fece955b7b2b9a3b20f84370cba1524dd5c53503a2e2cb733536ecf7ea1e77319a47084a3a2c9d94d36069a432ecc73b72aeba6ea78'
           
      $cycleCount = 0
       try
       {
             do
             {
-                  Start-Sleep -s 5
-
-                  $timestampString = [System.DateTime]::UtcNow.ToString("o", [System.Globalization.CultureInfo]::InvariantCulture)
-                  $hmacsha = New-Object System.Security.Cryptography.HMACSHA256
-                  $hmacsha.key = $secret | convert-fromhex
-                        
-                  $signature = $hmacsha.ComputeHash([Text.Encoding]::UTF8.GetBytes("$appId&$timestampString"))
-                  $signature = -join ($signature | % {“{0:X2}” -f $_})
-                  $headerValue = "HMACSHA256 $appId;$timestampString;$signature"
-                        
+                  # Retrieve notification state
                   $headers = @{}
+                  $headerValue = Create-Authorization
                   $headers.Add("Authorization", $headerValue)
                   $moduleState = Invoke-RestMethod "$modulesStateUrl" -Body $NotificationStateJson -Method Post -ContentType "application/json" -Headers $headers
-                  Write-Output "Module install state: $moduleState"
 
+                  # display all statuses
+                  $notificationState = $moduleState.NotifyEvents[0]       
+                  for ($i = $startIndex; $i -lt $notificationState.progressLog.Count; $i++) {
+                        Write-Output $notificationState.progressLog[$i].Message 
+                  }
+
+                  $startIndex = $notificationState.progressLog.Count - 1
                   $cycleCount = $cycleCount + 1 
+                  Start-Sleep -s 3
             }
-            while ($cycleCount -lt 5)
+            while ($notificationState.finished -eq $null -and $cycleCount -lt 60) # stop processing after 3 min or when notifications had stopped $moduleState.NotifyEvents.Length -ne 0 -and 
+
+            Write-Output "Restarting website"
+            $headers = @{}
+            $headers.Add("Authorization", $headerValue)
+            $moduleState = Invoke-RestMethod "$modulesRestartUrl" -Method Post -ContentType "application/json" -Headers $headers
+            Write-Output $moduleState                  
       }
       catch
       {
+            $cycleCount = $cycleCount + 1 
             $message = $_.Exception.Message
             Write-Output "Error: $message"
-      }     
+            throw $_.Exception
+      }
