@@ -1,4 +1,6 @@
-. .\Tools.ps1
+. C:\Projects\GitHub\jenkins-pipeline-scripts\resources\azure\utilities.ps1
+
+Write-Output $PSScriptRoot
 
 $headers = @{}
 $apiurl = 'http://localhost/admin'

@@ -60,14 +60,7 @@ def call(body) {
 					Packaging.createReleaseArtifact(this, version, webProject, zipArtifact, websiteDir)
 					if (env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'master') {
 						def websitePath = Utilities.getWebPublishFolder(this, websiteDir)
-						dockerImage = Packaging.createDockerImage(this, zipArtifact.replaceAll('\\.','/'), websitePath, ".", dockerTag)
-						Packaging.startDockerTestEnvironment(this, dockerTag)
-				        
-						// install modules
-						Packaging.installModules(this)	
-
-						// now create sample data
-        				Packaging.createSampleData(this)					
+						dockerImage = Packaging.createDockerImage(this, zipArtifact.replaceAll('\\.','/'), websitePath, ".", dockerTag)			
 					}
 				}
 			}

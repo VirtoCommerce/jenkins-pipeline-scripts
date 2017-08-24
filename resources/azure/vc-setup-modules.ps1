@@ -3,7 +3,8 @@ Param(
         $apiurl
      )
 
-     . $PSScriptRoot\Utilities.ps1
+     Write-Output $PSScriptRoot
+     . $PSScriptRoot\utilities.ps1
      $modulesStateUrl = "$apiurl/api/platform/pushnotifications"
      $modulesInstallUrl = "$apiurl/api/platform/modules/autoinstall"
 
