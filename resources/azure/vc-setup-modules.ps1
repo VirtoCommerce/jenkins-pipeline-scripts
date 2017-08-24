@@ -11,7 +11,7 @@ Param(
      $modulesRestartUrl = "$apiurl/api/platform/modules/restart"
 
      # Call homepage, to make sure site is compiled
-     $initResult = Invoke-WebRequest $apiurl
+     $initResult = Invoke-WebRequest $apiurl -UseBasicParsing
      if($initResult.StatusCode -ne 200) # throw exception when site can't be opened
      {
          throw "Can't open admin site homepage"
