@@ -7,6 +7,16 @@ Param(
 
      . $PSScriptRoot\utilities.ps1
 
+     if ([string]::IsNullOrWhiteSpace($hmacAppId))
+     {
+           $hmacAppId = "${env:HMAC_APP_ID}"
+     }
+
+     if ([string]::IsNullOrWhiteSpace($hmacSecret))
+     {
+           $hmacSecret = "${env:HMAC_SECRET}"
+     }      
+
      # Initialize paths used by the script
      $sampleDataStateUrl = "$apiurl/api/platform/sampledata/state"
      $sampleDataImportUrl = "$apiurl/api/platform/sampledata/autoinstall"    

@@ -66,16 +66,16 @@ class Packaging {
         }
     }
 
-    def static createSampleData(context, hmacAppId, hmacSecret)
+    def static createSampleData(context)
     {
     	def wsFolder = context.pwd()
- 	    context.bat "powershell.exe -File \"${wsFolder}\\..\\workspace@libs\\${DefaultSharedLibName}\\resources\\azure\\vc-setup-sampledata.ps1\" -apiurl \"${DefaultAdminDockerHost}\" -hmacAppId \"${hmacAppId}\" -hmacSecret \"${hmacSecret}\""
+ 	    context.bat "powershell.exe -File \"${wsFolder}\\..\\workspace@libs\\${DefaultSharedLibName}\\resources\\azure\\vc-setup-sampledata.ps1\" -apiurl \"${DefaultAdminDockerHost}\""
     }
 
-    def static installModules(context, hmacAppId, hmacSecret)
+    def static installModules(context)
     {
     	def wsFolder = context.pwd()
- 	    context.bat "powershell.exe -File \"${wsFolder}\\..\\workspace@libs\\${DefaultSharedLibName}\\resources\\azure\\vc-setup-modules.ps1\" -apiurl \"${DefaultAdminDockerHost}\" -hmacAppId \"${hmacAppId}\" -hmacSecret \"${hmacSecret}\""
+ 	    context.bat "powershell.exe -File \"${wsFolder}\\..\\workspace@libs\\${DefaultSharedLibName}\\resources\\azure\\vc-setup-modules.ps1\" -apiurl \"${DefaultAdminDockerHost}\""
     }    
 
     def static pushDockerImage(context, dockerImage, String dockerTag)

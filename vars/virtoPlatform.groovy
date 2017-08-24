@@ -72,10 +72,10 @@ def call(body) {
 						Packaging.startDockerTestEnvironment(this, dockerTag)
 				        
 						// install modules
-						Packaging.installModules(this, hmacAppId, hmacSecret)	
+						Packaging.installModules(this)	
 
 						// now create sample data
-        				Packaging.createSampleData(this, hmacAppId, hmacSecret)					
+        				Packaging.createSampleData(this)					
 					}
 				}
 			}			
