@@ -39,6 +39,7 @@ Param(
                   $signature = -join ($signature | % {“{0:X2}” -f $_})
                   $headerValue = "HMACSHA256 $appId;$timestampString;$signature"
                         
+                  $headers = @{}
                   $headers.Add("Authorization", $headerValue)
                   $moduleState = Invoke-RestMethod "$modulesStateUrl" -Body $NotificationStateJson -Method Post -ContentType "application/json" -Headers $headers
                   Write-Output "Module install state: $moduleState"
