@@ -68,7 +68,7 @@ class Packaging {
  	    context.bat "powershell.exe -File \"${wsFolder}\\..\\workspace@libs\\${DefaultSharedLibName}\\resources\\azure\\vc-setup-sampledata.ps1\" -apiurl \"${DefaultAdminDockerHost}\""
     }
 
-    def static createModules(context)
+    def static installModules(context)
     {
     	def wsFolder = context.pwd()
  	    context.bat "powershell.exe -File \"${wsFolder}\\..\\workspace@libs\\${DefaultSharedLibName}\\resources\\azure\\vc-setup-modules.ps1\" -apiurl \"${DefaultAdminDockerHost}\""
