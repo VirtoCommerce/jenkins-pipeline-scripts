@@ -42,8 +42,7 @@ class Modules {
             if (packages.size() > 0) {
                 for (int i = 0; i < packages.size(); i++)
                 {
-                    def package = packages[i]
-                    Packaging.installModule(context, package.path)
+                    Packaging.installModule(context, packages[i].path)
                 }
             }
         }
