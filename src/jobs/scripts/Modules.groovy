@@ -30,5 +30,22 @@ class Modules {
                 }
             }
         }
-    }    
+    }
+
+    def static installModuleArtifacts(context)
+    {
+        def packagesDir = Utilities.getArtifactFolder(context)
+        context.dir(packagesDir)
+        {
+            def packages = context.findFiles(glob: '*.zip')
+
+            if (packages.size() > 0) {
+                for (int i = 0; i < packages.size(); i++)
+                {
+                    def package = packages[i]
+                    Packaging.installModule(context, package.path)
+                }
+            }
+        }
+    }
 }

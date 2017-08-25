@@ -14,6 +14,7 @@ import jobs.scripts.*
     node
     {
 	    def deployScript = 'VC-Module2AzureDev.ps1'
+		def dockerTag = env.BRANCH_NAME
 	    if (env.BRANCH_NAME == 'master') {
 			deployScript = 'VC-Module2AzureQA.ps1'
 		}
@@ -36,8 +37,21 @@ import jobs.scripts.*
 			}
 
 			if (env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'master') {
+				stage('Integration Tests') {
+					timestamps { 
+						// Start docker environment				
+						Packaging.startDockerTestEnvironment(this, dockerTag)
+				        
+						// install module
+						Modules.installModuleArtifacts(this)
+					}
+				}
+			}				
+
+			if (env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'master') {
 				stage('Publishing')
 				{
+					
 					Utilities.runSharedPS(this, "resources\\azure\\${deployScript}")				
 					if (Packaging.getShouldPublish(this)) {
 						processManifests(true) // publish artifacts to github releases
@@ -51,6 +65,7 @@ import jobs.scripts.*
 			throw any //rethrow exception to prevent the build from proceeding
 		}
 		finally {
+			Packaging.stopDockerTestEnvironment(this, dockerTag)
 			step([$class: 'Mailer', notifyEveryUnstableBuild: true, recipients: emailextrecipients([[$class: 'CulpritsRecipientProvider'], [$class: 'RequesterRecipientProvider']])])
 			//step([$class: 'Mailer', notifyEveryUnstableBuild: true, recipients: 'dev@virtoway.com', sendToIndividuals: true])
 		}

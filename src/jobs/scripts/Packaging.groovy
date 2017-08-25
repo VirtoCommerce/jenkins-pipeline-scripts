@@ -200,4 +200,9 @@ class Packaging {
             context.bat "\"${context.tool 'Git'}\" push origin HEAD:master -f"
         }
     }    
+
+    def static installModule(context, path)
+    {
+ 	    context.bat "powershell.exe -File \"${wsFolder}\\..\\workspace@libs\\${DefaultSharedLibName}\\resources\\azure\\vc-install-module.ps1\" -apiurl \"${DefaultAdminDockerHost}\" -moduleZipArchievePath \"${path}\""
+    }    
 }
