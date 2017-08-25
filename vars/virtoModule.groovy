@@ -19,6 +19,7 @@ import jobs.scripts.*
 			deployScript = 'VC-Module2AzureQA.ps1'
 		}
 		try {	
+			step([$class: 'GitHubCommitStatusSetter', contextSource: [$class: 'ManuallyEnteredCommitContextSource', context: 'ci.virtocommerce.com'], statusResultSource: [$class: 'ConditionalStatusResultSource', results: [[$class: 'AnyBuildResult', message: 'Building on Virto Commerce CI', state: 'PENDING']]]])			
 			Utilities.notifyBuildStatus(this, "started")
 			stage('Build')
 			{

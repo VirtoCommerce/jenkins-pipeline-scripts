@@ -47,3 +47,5 @@ Param(
             }
       }
       while ($sampleDataState -ne "completed" -and $cycleCount -lt 24)
+
+      exit $LastExitCode      

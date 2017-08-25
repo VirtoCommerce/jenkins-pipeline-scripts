@@ -29,3 +29,5 @@ Param(
      $moduleInstallResult = Invoke-RestMethod $moduleInstallUrl -Method Post -Headers $headers -InFile $moduleZipArchievePath -ContentType 'multipart/form-data' -ErrorAction Stop
 
      Write-Output $moduleInstallResult
+     
+     exit $LastExitCode
