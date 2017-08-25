@@ -42,6 +42,12 @@ import jobs.scripts.*
 						// Start docker environment				
 						Packaging.startDockerTestEnvironment(this, dockerTag)
 				        
+						// install modules
+						Packaging.installModules(this)
+
+						// now create sample data
+        				Packaging.createSampleData(this)
+
 						// install module
 						Modules.installModuleArtifacts(this)
 					}

@@ -35,16 +35,23 @@ class Modules {
     def static installModuleArtifacts(context)
     {
         def packagesDir = Utilities.getArtifactFolder(context)
+        def packages;
         context.dir(packagesDir)
         {
-            def packages = context.findFiles(glob: '*.zip')
+            packages = context.findFiles(glob: '*.zip')
+        }
 
-            if (packages.size() > 0) {
-                for (int i = 0; i < packages.size(); i++)
-                {
-                    Packaging.installModule(context, packages[i].path)
-                }
+        if (packages.size() > 0) {
+            for (int i = 0; i < packages.size(); i++)
+            {
+                Packaging.installModule(context, packages[i].path)
             }
         }
+        
+    }
+
+    def static runTests(context)
+    {
+
     }
 }
