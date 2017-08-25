@@ -26,14 +26,14 @@ import jobs.scripts.*
 				Packaging.buildSolutions(this)
 			}
 
-			stage('Packaging')
+			stage('Package Module')
 			{
 				processManifests(false) // prepare artifacts for testing
 			}
 
-			stage('Testing')
+			stage('Unit Tests')
 			{
-				runTests()
+				Modules.runUnitTests(this)
 			}
 
 			if (env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'master') {
@@ -55,7 +55,7 @@ import jobs.scripts.*
 			}				
 
 			if (env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'master') {
-				stage('Publishing')
+				stage('Publish')
 				{
 					
 					Utilities.runSharedPS(this, "resources\\azure\\${deployScript}")				
@@ -244,48 +244,6 @@ def updateModule(def id, def version, def platformVersion, def title, def author
 	}
 
 	Packaging.updateModulesDefinitions(this, 'modules', id, version)
-}
-
-def runTests()
-{
-	def xUnit = env.XUnit
-	def xUnitExecutable = "${xUnit}\\xunit.console.exe"
-
-	def testDlls = findFiles(glob: '**\\bin\\Debug\\*Test.dll')
-	String paths = ""
-	if (testDlls.size() > 0) {
-		for (int i = 0; i < testDlls.size(); i++)
-		{
-			def testDll = testDlls[i]
-			paths += "\"$testDll.path\" "
-		}
-	}
-
-		// add platform dll to test installs
-	def wsFolder = pwd()
-	def packagesDir = "$wsFolder\\artifacts"
-	def allModulesDir = "c:\\Builds\\Jenkins\\VCF\\modules"
-
-	def testFolderName = "dev"
-	// copy artifacts to global location that can be used by other modules, but don't do that for master branch as we need to test it with real manifest
-	if (env.BRANCH_NAME != 'master') {
-		dir(packagesDir)
-		{		
-			// copy all files to modules
-			bat "xcopy *.zip \"${allModulesDir}\" /y" 
-		}	
-	}
-	else
-	{
-		testFolderName = "master"
-	}
-
-	env.xunit_virto_modules_folder = packagesDir
-	env.xunit_virto_dependency_modules_folder = allModulesDir
-	paths += "\"..\\..\\..\\vc-platform\\${testFolderName}\\workspace\\virtocommerce.platform.tests\\bin\\debug\\VirtoCommerce.Platform.Test.dll\""
-
-	bat "${xUnitExecutable} ${paths} -xml xUnit.Test.xml -trait \"category=ci\" -parallel none -verbose -diagnostics"
-	step([$class: 'XUnitPublisher', testTimeMargin: '3000', thresholdMode: 1, thresholds: [[$class: 'FailedThreshold', failureNewThreshold: '', failureThreshold: '', unstableNewThreshold: '', unstableThreshold: ''], [$class: 'SkippedThreshold', failureNewThreshold: '', failureThreshold: '', unstableNewThreshold: '', unstableThreshold: '']], tools: [[$class: 'XUnitDotNetTestType', deleteOutputFiles: true, failIfNotNew: false, pattern: '*.xml', skipNoTestFiles: true, stopProcessingIfError: false]]])
 }
 
 @NonCPS

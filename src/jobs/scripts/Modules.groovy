@@ -44,14 +44,58 @@ class Modules {
         if (packages.size() > 0) {
             for (int i = 0; i < packages.size(); i++)
             {
-                Packaging.installModule(context, packages[i].path)
+                Packaging.installModule(context, "${packages[i].directory}\\${packages[i].path}")
             }
         }
-        
     }
 
-    def static runTests(context)
+    def static runUnitTests(context)
     {
+        Modules.runTests(context, "category=ci", "xUnit.UnitTests.xml")
+    }
 
+    def static runTests(context, traits, resultsFileName)
+    {
+        def xUnit = context.env.XUnit
+        def xUnitExecutable = "${xUnit}\\xunit.console.exe"
+
+        def paths = Modules.prepareTestEnvironment(context)
+        context.bat "${xUnitExecutable} ${paths} -xml \"${resultsFileName}\" -trait \"${traits}\" -parallel none -verbose -diagnostics"
+        context.step([$class: 'XUnitPublisher', testTimeMargin: '3000', thresholdMode: 1, thresholds: [[$class: 'FailedThreshold', failureNewThreshold: '', failureThreshold: '', unstableNewThreshold: '', unstableThreshold: ''], [$class: 'SkippedThreshold', failureNewThreshold: '', failureThreshold: '', unstableNewThreshold: '', unstableThreshold: '']], tools: [[$class: 'XUnitDotNetTestType', deleteOutputFiles: true, failIfNotNew: false, pattern: '${resultsFileName}', skipNoTestFiles: true, stopProcessingIfError: false]]])
+    }    
+
+    def static prepareTestEnvironment(context)
+    {
+        def testDlls = context.findFiles(glob: '**\\bin\\Debug\\*Test.dll')
+        String paths = ""
+        if (testDlls.size() > 0) {
+            for (int i = 0; i < testDlls.size(); i++)
+            {
+                def testDll = testDlls[i]
+                paths += "\"$testDll.path\" "
+            }
+        }
+
+            // add platform dll to test installs
+        def packagesDir = Utilities.getArtifactFolder(context)
+        def allModulesDir = "c:\\Builds\\Jenkins\\VCF\\modules"
+
+        context.env.xunit_virto_modules_folder = packagesDir
+        context.env.xunit_virto_dependency_modules_folder = allModulesDir
+
+        def testFolderName = "dev"
+
+        // copy artifacts to global location that can be used by other modules, but don't do that for master branch as we need to test it with real manifest
+        if (context.env.BRANCH_NAME != 'master') {
+            context.dir(packagesDir)
+            {		
+                // copy all files to modules
+                context.bat "xcopy *.zip \"${allModulesDir}\" /y" 
+            }	
+        }
+
+        paths += "\"..\\..\\..\\vc-platform\\${testFolderName}\\workspace\\virtocommerce.platform.tests\\bin\\debug\\VirtoCommerce.Platform.Test.dll\""
+
+        return paths;
     }
 }
