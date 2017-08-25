@@ -47,10 +47,13 @@ class Packaging {
             // 1. stop containers
             // 2. remove instances including database
             // 3. start up new containers
-            context.withEnv(["DOCKER_TAG=${dockerTag}"]) {
+            context.withEnv(["DOCKER_TAG=${dockerTag}", "DOCKER_PLATFORM_PORT=8090", "DOCKER_STOREFRONT_PORT=8080"]) {
                 context.bat "docker-compose stop"
                 context.bat "docker-compose rm -f"
                 context.bat "docker-compose up -d"
+                context.env.VC_PLATFORM = "http://ci.virtocommerce.com:{context.env.DOCKER_PLATFORM_PORT}"
+                context.env.VC_STOREFRONT = "http://ci.virtocommerce.com:{context.env.DOCKER_STOREFRONT_PORT}"
+                context.env.VC_DATABASE = "Data Source=http://ci.virtocommerce.com;Initial Catalog=VirtoCommerce2;Persist Security Info=True;User ID=sa;Password=v!rto_Labs!;MultipleActiveResultSets=True;Connect Timeout=30"
             }
         }
     }

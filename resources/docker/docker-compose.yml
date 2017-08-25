@@ -15,10 +15,10 @@ services:
   vc-platform-web:
     image: virtocommerce/platform:${DOCKER_TAG:-latest}
     ports:
-      - "8090:80"
+      - "${DOCKER_PLATFORM_PORT:-8090}:80"
     environment:
       - VIRTO_CONN_STR_VIRTOCOMMERCE=Data Source=vc-db;Initial Catalog=VirtoCommerce2;Persist Security Info=True;User ID=sa;Password=v!rto_Labs!;MultipleActiveResultSets=True;Connect Timeout=30;
-      - VIRTO_CONN_STR_AssetsConnectionString=provider=LocalStorage;rootPath=~/App_Data/Assets;publicUrl=http://ci.virtocommerce.com:8090/assets
+      - VIRTO_CONN_STR_AssetsConnectionString=provider=LocalStorage;rootPath=~/App_Data/Assets;publicUrl=http://ci.virtocommerce.com:${DOCKER_PLATFORM_PORT:-8090}/assets
     depends_on:
       - vc-db
     networks:
@@ -27,7 +27,7 @@ services:
   vc-storefront-web:
     image: virtocommerce/storefront:${DOCKER_TAG:-latest}
     ports:
-      - "8080:80"
+      - "${DOCKER_STOREFRONT_PORT:-8090}:80"
     environment:
       - VIRTO_CONN_STR_VirtoCommerceBaseUrl=http://vc-platform-web
     depends_on:

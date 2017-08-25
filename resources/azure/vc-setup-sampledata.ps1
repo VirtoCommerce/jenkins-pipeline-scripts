@@ -26,7 +26,6 @@ Param(
       $headers = @{}
       $headers.Add("Authorization", $headerValue)      
       $sampleDataImportResult = Invoke-RestMethod $sampleDataImportUrl -Method Post -Headers $headers -ErrorAction Stop
-      Write-Output "Sample data import result: $sampleDataImportResult"
 
       # Wait until sample data have been imported
       Write-Output "Waiting for sample data import to be completed"
