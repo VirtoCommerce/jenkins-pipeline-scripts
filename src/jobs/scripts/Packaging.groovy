@@ -203,6 +203,7 @@ class Packaging {
 
     def static installModule(context, path)
     {
+        def wsFolder = context.pwd()
  	    context.bat "powershell.exe -File \"${wsFolder}\\..\\workspace@libs\\${DefaultSharedLibName}\\resources\\azure\\vc-install-module.ps1\" -apiurl \"${DefaultAdminDockerHost}\" -moduleZipArchievePath \"${path}\""
     }    
 }
