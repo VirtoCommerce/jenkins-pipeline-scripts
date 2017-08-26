@@ -44,7 +44,7 @@ class Modules {
         if (packages.size() > 0) {
             for (int i = 0; i < packages.size(); i++)
             {
-                Packaging.installModule(context, "${packages[i].directory}\\${packages[i].path}")
+                Packaging.installModule(context, "${packagesDir}\\${packages[i].path}")
             }
         }
     }
