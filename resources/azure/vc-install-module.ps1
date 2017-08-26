@@ -27,6 +27,7 @@ Param(
      $headers = @{}
      $headers.Add("Authorization", $headerValue)
      #Write-Output Invoke-RestMethod $moduleInstallUrl -Method Post -InFile $moduleZipArchievePath -Headers $headers -ContentType 'multipart/form-data' -ErrorAction Stop
-     $moduleInstallResult = Invoke-RestMethod $moduleInstallUrl -Method Post -InFile $moduleZipArchievePath -ContentType 'multipart/form-data' -Headers $headers -ErrorAction Stop
-
+     #$moduleInstallResult = Invoke-RestMethod $moduleInstallUrl -Method Post -InFile $moduleZipArchievePath -ContentType 'multipart/form-data' -Headers $headers -ErrorAction Stop
+     $moduleInstallResult = Invoke-MultipartFormDataUpload -InFile $moduleZipArchievePath -Uri $moduleInstallUrl -Authorization $headerValue
      Write-Output $moduleInstallResult
+
