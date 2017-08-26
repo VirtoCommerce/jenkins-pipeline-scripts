@@ -69,7 +69,7 @@ class Utilities {
 
     def static getActiveBuildOrder(context)
     {
-        instance = Jenkins.getInstance()
+        instance = context.Jenkins.getInstance()
         globalNodeProperties = instance.getGlobalNodeProperties()
         envVarsNodePropertyList = globalNodeProperties.getAll(hudson.slaves.EnvironmentVariablesNodeProperty.class)
 
@@ -86,7 +86,6 @@ class Utilities {
 
         currentOrder = envVars.get("VC_BUILD_ORDER")       
 
-        def currentOrder = context.env.VC_BUILD_ORDER
         if(currentOrder) // exists
         {
             currentOrder = currentOrder + 1
