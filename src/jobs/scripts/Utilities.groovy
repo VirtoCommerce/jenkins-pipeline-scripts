@@ -84,20 +84,17 @@ class Utilities {
             envVars = envVarsNodePropertyList.get(0).getEnvVars()
         }
 
-        def currentOrder = envVars.get("VC_BUILD_ORDER")       
+        def tempCurrentOrder = envVars.get("VC_BUILD_ORDER")    
+        def currentOrder = 0
 
-        if(currentOrder) // exists
+        if(tempCurrentOrder) // exists
         {
-            currentOrder = currentOrder + 1
+            currentOrder = tempCurrentOrder.toInteger() + 1
             
             if(currentOrder >= 10) // reset, we can't have more than 10 builders at the same time
             {
                 currentOrder = 0
             }
-        }
-        else
-        {
-            currentOrder = 0
         }
 
         envVars.put("VC_BUILD_ORDER", currentOrder.toString())
