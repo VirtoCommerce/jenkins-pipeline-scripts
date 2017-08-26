@@ -6,6 +6,9 @@ class Modules {
     private static String DefaultBranchOrCommitPush = '*/master'
     private static String DefaultRefSpec = '+refs/pull/*:refs/remotes/origin/pr/*'
     private static String DefaultMSBuild = 'MSBuild 15.0'
+    private static Integer DefaultPlatformPort = 8100
+    private static Integer DefaultStorefrontPort = 8080
+    private static Integer DefaultSqlPort = 1433    
 
     def static createModuleArtifact(context, def manifestDirectory)
     {
@@ -54,9 +57,16 @@ class Modules {
         Modules.runTests(context, "-trait \"category=ci\" -trait \"category=Unit\"", "xUnit.UnitTests.xml")
     }
 
-    def static runIntegrationTests(context)
+    def static runIntegrationTests(context, Integer buildOrder)
     {
-        Modules.runTests(context, "-trait \"category=Integration\"", "xUnit.IntegrationTests.xml")
+        def platformPort = DefaultPlatformPort + buildOrder
+        def storefrontPort = DefaultStorefrontPort + buildOrder
+        def sqlPort = DefaultSqlPort + buildOrder        
+
+        // create context
+        context.withEnv(["VC_PLATFORM=http://ci.virtocommerce.com:${platformPort}", "VC_STOREFRONT=http://ci.virtocommerce.com:${storefrontPort}", "VC_DATABASE=Data Source=http://ci.virtocommerce.com,${sqlPort};Initial Catalog=VirtoCommerce2;Persist Security Info=True;User ID=sa;Password=v!rto_Labs!;MultipleActiveResultSets=True;Connect Timeout=30" ]) {
+            Modules.runTests(context, "-trait \"category=Integration\"", "xUnit.IntegrationTests.xml")
+        }
     }
 
     def static runTests(context, traits, resultsFileName)

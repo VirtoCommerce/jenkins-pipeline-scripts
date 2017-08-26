@@ -8,6 +8,9 @@ class Packaging {
     private static String DefaultMSBuild = 'MSBuild 15.0'
     private static String DefaultAdminDockerHost = 'http://ci.virtocommerce.com:8090'
     private static String DefaultSharedLibName = 'virto-shared-library'
+    private static Integer DefaultPlatformPort = 8100
+    private static Integer DefaultStorefrontPort = 8080
+    private static Integer DefaultSqlPort = 1433
 
     /*
     private def Context;
@@ -39,21 +42,21 @@ class Packaging {
         return dockerImage
     }
 
-    def static startDockerTestEnvironment(context, String dockerTag)
+    def static startDockerTestEnvironment(context, String dockerTag, Integer buildOrder)
     {
         def composeFolder = Utilities.getComposeFolder(context)
         context.dir(composeFolder)
         {
+            def platformPort = DefaultPlatformPort + buildOrder
+            def storefrontPort = DefaultStorefrontPort + buildOrder
+            def sqlPort = DefaultSqlPort + buildOrder
             // 1. stop containers
             // 2. remove instances including database
             // 3. start up new containers
-            context.withEnv(["DOCKER_TAG=${dockerTag}", "DOCKER_PLATFORM_PORT=8090", "DOCKER_STOREFRONT_PORT=8080"]) {
+            context.withEnv(["DOCKER_TAG=${dockerTag}", "DOCKER_PLATFORM_PORT=${platformPort}", "DOCKER_STOREFRONT_PORT=${storefrontPort}", "DOCKER_SQL_PORT=${sqlPort}", "COMPOSE_PROJECT_NAME=${BUILD_TAG}" ]) {
                 context.bat "docker-compose stop"
                 context.bat "docker-compose rm -f"
                 context.bat "docker-compose up -d"
-                context.env.VC_PLATFORM = "http://ci.virtocommerce.com:{context.env.DOCKER_PLATFORM_PORT}"
-                context.env.VC_STOREFRONT = "http://ci.virtocommerce.com:{context.env.DOCKER_STOREFRONT_PORT}"
-                context.env.VC_DATABASE = "Data Source=http://ci.virtocommerce.com;Initial Catalog=VirtoCommerce2;Persist Security Info=True;User ID=sa;Password=v!rto_Labs!;MultipleActiveResultSets=True;Connect Timeout=30"
             }
         }
     }
@@ -63,7 +66,7 @@ class Packaging {
         def composeFolder = Utilities.getComposeFolder(context)
         context.dir(composeFolder)
         {
-            context.withEnv(["DOCKER_TAG=${dockerTag}"]) {
+            context.withEnv(["DOCKER_TAG=${dockerTag}", "COMPOSE_PROJECT_NAME=${BUILD_TAG}"]) {
                 context.bat "docker-compose stop"
             }
         }

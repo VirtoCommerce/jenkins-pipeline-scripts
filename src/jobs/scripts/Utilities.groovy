@@ -67,6 +67,28 @@ class Utilities {
         context.office365ConnectorSend status:context.currentBuild.result, webhookUrl:context.env.O365_WEBHOOK
     }    
 
+    def static getActiveBuildOrder(context)
+    {
+        def currentOrder = context.env.VC_BUILD_ORDER
+        if(currentOrder) // exists
+        {
+            currentOrder = currentOrder + 1
+            
+            if(currentOrder >= 10) // reset, we can't have more than 10 builders at the same time
+            {
+                currentOrder = 0
+            }
+        }
+        else
+        {
+            currentOrder = 0
+        }
+
+        context.env.VC_BUILD_ORDER = currentOrder
+
+        return currentOrder
+    }
+
     Object withDockerCredentials(Closure body) {
         withCredentials([[$class: 'ZipFileBinding', credentialsId: 'docker-hub-credentials', variable: 'DOCKER_CONFIG']]) {
             return body.call()

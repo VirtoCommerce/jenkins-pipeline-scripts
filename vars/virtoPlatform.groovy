@@ -20,6 +20,7 @@ def call(body) {
 		def websiteDir = 'VirtoCommerce.Platform.Web'
 		def deployScript = 'VC-Platform2AzureDev.ps1'
 		def dockerTag = env.BRANCH_NAME
+		def buildOrder = Utilities.getActiveBuildOrder(this)
 		if (env.BRANCH_NAME == 'master') {
 			deployScript = 'VC-Platform2AzureQA.ps1'
 			dockerTag = "latest"
@@ -65,27 +66,27 @@ def call(body) {
 				}
 			}
 
-			if (env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'master') {
-				stage('Docker Sample') {
-					timestamps { 
-						// Start docker environment				
-						Packaging.startDockerTestEnvironment(this, dockerTag)
-				        
-						// install modules
-						Packaging.installModules(this)	
-
-						// now create sample data
-        				Packaging.createSampleData(this)					
-					}
-				}
-			}			
-
 			def tests = Utilities.getTestDlls(this)
 			if(tests.size() > 0)
 			{
 				stage('Tests') {
 					timestamps { 
 						Packaging.runUnitTests(this, tests)
+					}
+				}
+			}				
+
+			if (env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'master') {
+				stage('Docker Sample') {
+					timestamps { 
+						// Start docker environment				
+						Packaging.startDockerTestEnvironment(this, dockerTag, buildOrder)
+				        
+						// install modules
+						Packaging.installModules(this)	
+
+						// now create sample data
+        				Packaging.createSampleData(this)					
 					}
 				}
 			}			

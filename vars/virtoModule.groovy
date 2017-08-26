@@ -15,6 +15,7 @@ import jobs.scripts.*
     {
 	    def deployScript = 'VC-Module2AzureDev.ps1'
 		def dockerTag = env.BRANCH_NAME
+		def buildOrder = Utilities.getActiveBuildOrder(this)
 	    if (env.BRANCH_NAME == 'master') {
 			deployScript = 'VC-Module2AzureQA.ps1'
 		}
@@ -41,7 +42,7 @@ import jobs.scripts.*
 				stage('Prepare Test Environment') {
 					timestamps { 
 						// Start docker environment				
-						Packaging.startDockerTestEnvironment(this, dockerTag)
+						Packaging.startDockerTestEnvironment(this, dockerTag, buildOrder)
 				        
 						// install modules
 						Packaging.installModules(this)
@@ -56,7 +57,7 @@ import jobs.scripts.*
 
 				stage('Integration Tests')
 				{
-					Modules.runIntegrationTests(this)
+					Modules.runIntegrationTests(this, buildOrder)
 				}				
 			}				
 
