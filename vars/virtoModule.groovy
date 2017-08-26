@@ -3,8 +3,8 @@ import groovy.json.*
 import groovy.util.*
 import jobs.scripts.*
 
-    // module script v1
     def call(body) {
+
     // evaluate the body block, and collect configuration into the object
     def config = [:]
     body.resolveStrategy = Closure.DELEGATE_FIRST
@@ -38,7 +38,7 @@ import jobs.scripts.*
 			}
 
 			if (env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'master') {
-				stage('Integration Tests') {
+				stage('Prepare Test Environment') {
 					timestamps { 
 						// Start docker environment				
 						Packaging.startDockerTestEnvironment(this, dockerTag)
@@ -53,6 +53,11 @@ import jobs.scripts.*
 						Modules.installModuleArtifacts(this)
 					}
 				}
+
+				stage('Integration Tests')
+				{
+					Modules.runIntegrationTests(this)
+				}				
 			}				
 
 			if (env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'master') {
@@ -79,7 +84,6 @@ import jobs.scripts.*
 
 		step([$class: 'GitHubCommitStatusSetter', statusResultSource: [$class: 'ConditionalStatusResultSource', results: []]])
 		Utilities.notifyBuildStatus(this, currentBuild.result)
-		//}
     }
 }
 
