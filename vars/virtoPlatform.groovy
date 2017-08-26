@@ -20,7 +20,7 @@ def call(body) {
 		def websiteDir = 'VirtoCommerce.Platform.Web'
 		def deployScript = 'VC-Platform2AzureDev.ps1'
 		def dockerTag = env.BRANCH_NAME
-		def buildOrder = Utilities.getActiveBuildOrder(this)
+		def buildOrder = Utilities.getNextBuildOrder(this)
 		if (env.BRANCH_NAME == 'master') {
 			deployScript = 'VC-Platform2AzureQA.ps1'
 			dockerTag = "latest"
