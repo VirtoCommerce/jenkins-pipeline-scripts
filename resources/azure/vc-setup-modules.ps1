@@ -87,5 +87,3 @@ Param(
             Write-Output "Error: $message"
             throw $_.Exception
       }
-
-      exit $LastExitCode

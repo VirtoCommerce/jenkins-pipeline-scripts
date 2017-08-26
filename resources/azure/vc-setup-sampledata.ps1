@@ -44,8 +44,7 @@ Param(
                   $message = $_.Exception.Message
                   $cycleCount = $cycleCount + 1 
                   Write-Output "Error: $message"
+                  exit 1
             }
       }
-      while ($sampleDataState -ne "completed" -and $cycleCount -lt 24)
-
-      exit $LastExitCode      
+      while ($sampleDataState -ne "completed" -and $cycleCount -lt 24)      
