@@ -100,7 +100,7 @@ class Utilities {
             currentOrder = 0
         }
 
-        envVars.put("VC_BUILD_ORDER", currentOrder)
+        envVars.put("VC_BUILD_ORDER", "${currentOrder}")
         instance.save()
 
         return currentOrder
