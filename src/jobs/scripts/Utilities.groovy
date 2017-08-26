@@ -73,8 +73,8 @@ class Utilities {
         def globalNodeProperties = instance.getGlobalNodeProperties()
         def envVarsNodePropertyList = globalNodeProperties.getAll(hudson.slaves.EnvironmentVariablesNodeProperty.class)
 
-        newEnvVarsNodeProperty = null
-        envVars = null
+        def newEnvVarsNodeProperty = null
+        def envVars = null
 
         if ( envVarsNodePropertyList == null || envVarsNodePropertyList.size() == 0 ) {
             newEnvVarsNodeProperty = new hudson.slaves.EnvironmentVariablesNodeProperty();
