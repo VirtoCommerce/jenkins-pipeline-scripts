@@ -3,6 +3,10 @@ package jobs.scripts;
 class Utilities {
 
     private static String DefaultSharedLibName = 'virto-shared-library'
+    private static String DefaultAdminDockerPrefix = 'http://ci.virtocommerce.com'
+    private static Integer DefaultPlatformPort = 8100
+    private static Integer DefaultStorefrontPort = 8080
+    private static Integer DefaultSqlPort = 1433    
 
     /**
      * Get the folder name for a job.
@@ -56,6 +60,11 @@ class Utilities {
         return websitePath
     }
 
+    def static getPlatformHost(context)
+    {
+        return "${DefaultAdminDockerPrefix}:${getPlatformPort(context)}"
+    }
+
     def static getTempFolder(context)
     {
         def tempFolder = context.pwd(tmp: true)
@@ -67,7 +76,24 @@ class Utilities {
         context.office365ConnectorSend status:context.currentBuild.result, webhookUrl:context.env.O365_WEBHOOK
     }    
 
-    def static getActiveBuildOrder(context)
+    def static getPlatformPort(context)
+    {
+        return DefaultPlatformPort + context.env.VC_BUILD_ORDER;
+    }
+
+    def static getStorefrontPort(context)
+    {
+        return DefaultStorefrontPort + context.env.VC_BUILD_ORDER;
+    }    
+
+    def static getSqlPort(context)
+    {
+        return DefaultSqlPort + context.env.VC_BUILD_ORDER;
+    }      
+
+
+
+    def static getNextBuildOrder(context)
     {
         def instance = Jenkins.getInstance()
         def globalNodeProperties = instance.getGlobalNodeProperties()
@@ -99,6 +125,9 @@ class Utilities {
 
         envVars.put("VC_BUILD_ORDER", currentOrder.toString())
         instance.save()
+
+        // save in current context
+        context.env.VC_BUILD_ORDER = currentOrder
 
         return currentOrder
     }

@@ -57,11 +57,11 @@ class Modules {
         Modules.runTests(context, "-trait \"category=ci\" -trait \"category=Unit\"", "xUnit.UnitTests.xml")
     }
 
-    def static runIntegrationTests(context, Integer buildOrder)
+    def static runIntegrationTests(context)
     {
-        def platformPort = DefaultPlatformPort + buildOrder
-        def storefrontPort = DefaultStorefrontPort + buildOrder
-        def sqlPort = DefaultSqlPort + buildOrder        
+        def platformPort = Utilities.getPlatformPort(context)
+        def storefrontPort = Utilities.getStorefrontPort(context)
+        def sqlPort = Utilities.getSqlPort(context)
 
         // create context
         context.withEnv(["VC_PLATFORM=http://ci.virtocommerce.com:${platformPort}", "VC_STOREFRONT=http://ci.virtocommerce.com:${storefrontPort}", "VC_DATABASE=Data Source=http://ci.virtocommerce.com,${sqlPort};Initial Catalog=VirtoCommerce2;Persist Security Info=True;User ID=sa;Password=v!rto_Labs!;MultipleActiveResultSets=True;Connect Timeout=30" ]) {

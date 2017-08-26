@@ -6,11 +6,7 @@ class Packaging {
     private static String DefaultBranchOrCommitPush = '*/master'
     private static String DefaultRefSpec = '+refs/pull/*:refs/remotes/origin/pr/*'
     private static String DefaultMSBuild = 'MSBuild 15.0'
-    private static String DefaultAdminDockerHost = 'http://ci.virtocommerce.com:8100'
     private static String DefaultSharedLibName = 'virto-shared-library'
-    private static Integer DefaultPlatformPort = 8100
-    private static Integer DefaultStorefrontPort = 8080
-    private static Integer DefaultSqlPort = 1433
 
     /*
     private def Context;
@@ -42,14 +38,15 @@ class Packaging {
         return dockerImage
     }
 
-    def static startDockerTestEnvironment(context, String dockerTag, Integer buildOrder)
+    def static startDockerTestEnvironment(context, String dockerTag)
     {
         def composeFolder = Utilities.getComposeFolder(context)
         context.dir(composeFolder)
         {
-            def platformPort = DefaultPlatformPort + buildOrder
-            def storefrontPort = DefaultStorefrontPort + buildOrder
-            def sqlPort = DefaultSqlPort + buildOrder
+            def platformPort = Utilities.getPlatformPort(context)
+            def storefrontPort = Utilities.getStorefrontPort(context)
+            def sqlPort = Utilities.getSqlPort(context)
+
             context.echo "DOCKER_PLATFORM_PORT=${platformPort}"
             // 1. stop containers
             // 2. remove instances including database
@@ -76,13 +73,13 @@ class Packaging {
     def static createSampleData(context)
     {
     	def wsFolder = context.pwd()
- 	    context.bat "powershell.exe -File \"${wsFolder}\\..\\workspace@libs\\${DefaultSharedLibName}\\resources\\azure\\vc-setup-sampledata.ps1\" -apiurl \"${DefaultAdminDockerHost}\" -ErrorAction Stop"
+ 	    context.bat "powershell.exe -File \"${wsFolder}\\..\\workspace@libs\\${DefaultSharedLibName}\\resources\\azure\\vc-setup-sampledata.ps1\" -apiurl \"${Utilities.getPlatformHost(context)}\" -ErrorAction Stop"
     }
 
     def static installModules(context)
     {
     	def wsFolder = context.pwd()
- 	    context.bat "powershell.exe -File \"${wsFolder}\\..\\workspace@libs\\${DefaultSharedLibName}\\resources\\azure\\vc-setup-modules.ps1\" -apiurl \"${DefaultAdminDockerHost}\" -ErrorAction Stop"
+ 	    context.bat "powershell.exe -File \"${wsFolder}\\..\\workspace@libs\\${DefaultSharedLibName}\\resources\\azure\\vc-setup-modules.ps1\" -apiurl \"${Utilities.getPlatformHost(context)}\" -ErrorAction Stop"
     }    
 
     def static pushDockerImage(context, dockerImage, String dockerTag)
@@ -208,6 +205,6 @@ class Packaging {
     def static installModule(context, path)
     {
         def wsFolder = context.pwd()
- 	    context.bat "powershell.exe -File \"${wsFolder}\\..\\workspace@libs\\${DefaultSharedLibName}\\resources\\azure\\vc-install-module.ps1\" -apiurl \"${DefaultAdminDockerHost}\" -moduleZipArchievePath \"${path}\" -ErrorAction Stop"
+ 	    context.bat "powershell.exe -File \"${wsFolder}\\..\\workspace@libs\\${DefaultSharedLibName}\\resources\\azure\\vc-install-module.ps1\" -apiurl \"${Utilities.getPlatformHost(context)}\" -moduleZipArchievePath \"${path}\" -ErrorAction Stop"
     }    
 }
