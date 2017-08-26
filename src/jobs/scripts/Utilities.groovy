@@ -78,17 +78,17 @@ class Utilities {
 
     def static getPlatformPort(context)
     {
-        return DefaultPlatformPort + context.env.VC_BUILD_ORDER.toInteger();
+        return DefaultPlatformPort.toInteger() + context.env.VC_BUILD_ORDER.toInteger();
     }
 
     def static getStorefrontPort(context)
     {
-        return DefaultStorefrontPort + context.env.VC_BUILD_ORDER.toInteger();
+        return DefaultStorefrontPort.toInteger() + context.env.VC_BUILD_ORDER.toInteger();
     }    
 
     def static getSqlPort(context)
     {
-        return DefaultSqlPort + context.env.VC_BUILD_ORDER.toInteger();
+        return DefaultSqlPort.toInteger() + context.env.VC_BUILD_ORDER.toInteger();
     }      
 
 
