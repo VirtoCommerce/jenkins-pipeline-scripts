@@ -69,7 +69,7 @@ class Utilities {
 
     def static getActiveBuildOrder(context)
     {
-        def instance = context.Jenkins.getInstance()
+        def instance = Jenkins.getInstance()
         def globalNodeProperties = instance.getGlobalNodeProperties()
         def envVarsNodePropertyList = globalNodeProperties.getAll(hudson.slaves.EnvironmentVariablesNodeProperty.class)
 
