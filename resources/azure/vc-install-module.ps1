@@ -26,7 +26,7 @@ Param(
      $headerValue = Create-Authorization $hmacAppId $hmacSecret
      $headers = @{}
      $headers.Add("Authorization", $headerValue)
-     Write-Output Invoke-RestMethod $moduleInstallUrl -Method Post -InFile $moduleZipArchievePath -Headers $headers -ContentType 'multipart/form-data' -ErrorAction Stop
-     $moduleInstallResult = Invoke-RestMethod $moduleInstallUrl -Method Post -InFile $moduleZipArchievePath -Headers $headers -ContentType 'multipart/form-data' -ErrorAction Stop
+     #Write-Output Invoke-RestMethod $moduleInstallUrl -Method Post -InFile $moduleZipArchievePath -Headers $headers -ContentType 'multipart/form-data' -ErrorAction Stop
+     $moduleInstallResult = Invoke-RestMethod $moduleInstallUrl -Method Post -InFile $moduleZipArchievePath -Headers $headers -ErrorAction Stop
 
      Write-Output $moduleInstallResult
