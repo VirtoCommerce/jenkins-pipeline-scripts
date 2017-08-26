@@ -50,6 +50,7 @@ class Packaging {
             def platformPort = DefaultPlatformPort + buildOrder
             def storefrontPort = DefaultStorefrontPort + buildOrder
             def sqlPort = DefaultSqlPort + buildOrder
+            context.echo "DOCKER_PLATFORM_PORT=${platformPort}"
             // 1. stop containers
             // 2. remove instances including database
             // 3. start up new containers
