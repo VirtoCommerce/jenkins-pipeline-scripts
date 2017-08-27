@@ -80,7 +80,7 @@ def call(body) {
 				stage('Docker Sample') {
 					timestamps { 
 						// Start docker environment				
-						Packaging.startDockerTestEnvironment(this, dockerTag, buildOrder)
+						Packaging.startDockerTestEnvironment(this, dockerTag)
 				        
 						// install modules
 						Packaging.installModules(this)	
