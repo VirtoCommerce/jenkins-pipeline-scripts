@@ -129,7 +129,7 @@ class Packaging {
         def fullJobName = Utilities.getRepoName(context)
         context.withSonarQubeEnv('VC Sonar Server') {
             // Due to SONARMSBRU-307 value of sonar.host.url and credentials should be passed on command line
-            context.bat "\"${sqScannerMsBuildHome}\\SonarQube.Scanner.MSBuild.exe\" begin /k:\"${fullJobName}\" /d:\"sonar.branch=${context.env.BRANCH_NAME}\" /d:\"sonar.organization=virtocommerce\" /d:sonar.host.url=%SONAR_HOST_URL% /d:sonar.login=%SONAR_AUTH_TOKEN%"
+            context.bat "\"${sqScannerMsBuildHome}\\SonarQube.Scanner.MSBuild.exe\" begin /d:\"sonar.branch=${context.env.BRANCH_NAME}\" /d:\"sonar.projectname=${fullJobName}\" /k:\"${fullJobName}\" /d:\"sonar.organization=virtocommerce\" /d:sonar.host.url=%SONAR_HOST_URL% /d:sonar.login=%SONAR_AUTH_TOKEN%"
             context.bat "\"${context.tool DefaultMSBuild}\" \"${solution}\" /p:Configuration=Debug /p:Platform=\"Any CPU\" /property:RunCodeAnalysis=true"        
             context.bat "\"${sqScannerMsBuildHome}\\SonarQube.Scanner.MSBuild.exe\" end"
         }

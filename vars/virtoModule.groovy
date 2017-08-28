@@ -23,7 +23,7 @@ import jobs.scripts.*
 		try {	
 			step([$class: 'GitHubCommitStatusSetter', contextSource: [$class: 'ManuallyEnteredCommitContextSource', context: 'ci.virtocommerce.com'], statusResultSource: [$class: 'ConditionalStatusResultSource', results: [[$class: 'AnyBuildResult', message: 'Building on Virto Commerce CI', state: 'PENDING']]]])			
 			Utilities.notifyBuildStatus(this, "started")
-			stage('Build')
+			stage('Build + Analyse')
 			{
 				checkout scm
 				Packaging.buildSolutions(this)
