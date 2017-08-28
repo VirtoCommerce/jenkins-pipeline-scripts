@@ -126,7 +126,7 @@ class Packaging {
 		context.bat "Nuget restore ${solution}"
 
         def sqScannerMsBuildHome = context.tool 'Scanner for MSBuild'
-        withSonarQubeEnv('VC Sonar Server') {
+        context.withSonarQubeEnv('VC Sonar Server') {
             // Due to SONARMSBRU-307 value of sonar.host.url and credentials should be passed on command line
             context.bat "${sqScannerMsBuildHome}\\SonarQube.Scanner.MSBuild.exe begin /k:\"${context.env.JOB_NAME}-${context.env.BRANCH_NAME}\" /d:\"sonar.organization=virtocommerce\" /v:1.0 /d:sonar.host.url=%SONAR_HOST_URL% /d:sonar.login=%SONAR_AUTH_TOKEN%"
             context.bat "\"${context.tool DefaultMSBuild}\" \"${solution}\" /p:Configuration=Debug /p:Platform=\"Any CPU\" /property:RunCodeAnalysis=true"        
