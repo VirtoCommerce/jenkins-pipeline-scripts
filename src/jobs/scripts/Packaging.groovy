@@ -135,6 +135,11 @@ class Packaging {
         }
     }
 
+    def static runGulpBuild(context)
+    {
+        context.bat "gulp --color --gulpfile \"gulpfile.js\" compress"
+    }    
+
     def static runUnitTests(context, tests)
     {
         def xUnit = context.env.XUnit
