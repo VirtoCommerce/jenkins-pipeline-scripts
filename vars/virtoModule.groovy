@@ -18,6 +18,7 @@ import jobs.scripts.*
 		def buildOrder = Utilities.getNextBuildOrder(this)
 	    if (env.BRANCH_NAME == 'master') {
 			deployScript = 'VC-Module2AzureQA.ps1'
+			dockerTag = "latest"
 		}
 		try {	
 			step([$class: 'GitHubCommitStatusSetter', contextSource: [$class: 'ManuallyEnteredCommitContextSource', context: 'ci.virtocommerce.com'], statusResultSource: [$class: 'ConditionalStatusResultSource', results: [[$class: 'AnyBuildResult', message: 'Building on Virto Commerce CI', state: 'PENDING']]]])			
