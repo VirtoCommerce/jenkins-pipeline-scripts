@@ -18,6 +18,13 @@ class Utilities {
         return project.replace('/', '_')
     }
 
+    def static getRepoName(context)
+    {
+        def branchName = context.env.BRANCH_NAME
+        def fullJobName = context.env.JOB_NAME.replace("/${branchName}", "").replace("vc-2-org/", "").replace("/", "-")
+        return fullJobName
+    }
+
     def static runSharedPS(context, scriptName)
     {
     	def wsFolder = context.pwd()
@@ -89,11 +96,14 @@ class Utilities {
     def static getSqlPort(context)
     {
         return DefaultSqlPort.toInteger() + context.env.VC_BUILD_ORDER.toInteger();
-    }      
-
-
+    }
 
     def static getNextBuildOrder(context)
+    {
+        return context.env.EXECUTOR_NUMBER;
+    }
+
+    def static getNextBuildOrderFromSettings(context)
     {
         def instance = Jenkins.getInstance()
         def globalNodeProperties = instance.getGlobalNodeProperties()
