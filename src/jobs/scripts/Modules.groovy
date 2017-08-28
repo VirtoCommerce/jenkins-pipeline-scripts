@@ -5,10 +5,7 @@ class Modules {
     private static String DefaultBranchOrCommitPR = '${sha1}'
     private static String DefaultBranchOrCommitPush = '*/master'
     private static String DefaultRefSpec = '+refs/pull/*:refs/remotes/origin/pr/*'
-    private static String DefaultMSBuild = 'MSBuild 15.0'
-    private static Integer DefaultPlatformPort = 8100
-    private static Integer DefaultStorefrontPort = 8080
-    private static Integer DefaultSqlPort = 1433    
+    private static String DefaultMSBuild = 'MSBuild 15.0'  
 
     def static createModuleArtifact(context, def manifestDirectory)
     {
