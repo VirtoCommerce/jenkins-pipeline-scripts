@@ -137,6 +137,7 @@ class Packaging {
 
     def static runGulpBuild(context)
     {
+        context.bat "node install"
         context.bat "gulp --color --gulpfile \"gulpfile.js\" compress"
     }    
 
