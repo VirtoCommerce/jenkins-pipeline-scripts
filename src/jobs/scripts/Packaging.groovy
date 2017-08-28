@@ -107,7 +107,6 @@ class Packaging {
 
         (new AntBuilder()).zip(destfile: "${packagesDir}\\${zipArtifact}.${version}.zip", basedir: "${websitePath}")
     }
- 
 
     def static buildSolutions(context)
     {
@@ -125,9 +124,16 @@ class Packaging {
     def static runBuild(context, solution)
     {
 		context.bat "Nuget restore ${solution}"
-		context.bat "\"${context.tool DefaultMSBuild}\" \"${solution}\" /p:Configuration=Debug /p:Platform=\"Any CPU\" /property:RunCodeAnalysis=true"        
+
+        def sqScannerMsBuildHome = tool 'Scanner for MSBuild'
+        withSonarQubeEnv('VC Sonar Server') {
+            // Due to SONARMSBRU-307 value of sonar.host.url and credentials should be passed on command line
+            bat "${sqScannerMsBuildHome}\\SonarQube.Scanner.MSBuild.exe begin /k:myKey /n:myName /v:1.0 /d:sonar.host.url=%SONAR_HOST_URL% /d:sonar.login=%SONAR_AUTH_TOKEN%"
+            context.bat "\"${context.tool DefaultMSBuild}\" \"${solution}\" /p:Configuration=Debug /p:Platform=\"Any CPU\" /property:RunCodeAnalysis=true"        
+            bat "${sqScannerMsBuildHome}\\SonarQube.Scanner.MSBuild.exe end"
+        }
     }
-    
+
     def static runUnitTests(context, tests)
     {
         def xUnit = context.env.XUnit
