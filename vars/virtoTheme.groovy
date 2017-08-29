@@ -22,11 +22,13 @@ def call(body) {
 				}
 			}
 
-			stage('Publish') {
-				timestamps { 
-					Packaging.publishThemePackage(this)
-				}
-			}			
+			if (Packaging.getShouldPublish(this)) {
+				stage('Publish') {
+					timestamps { 
+						Packaging.publishThemePackage(this)
+					}
+				}			
+			}
 		}
 		catch (any) {
 			currentBuild.result = 'FAILURE'
