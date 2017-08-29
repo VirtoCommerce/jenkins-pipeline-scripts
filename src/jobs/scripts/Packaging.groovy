@@ -138,6 +138,12 @@ class Packaging {
 
     def static runGulpBuild(context)
     {
+        def packagesDir = Utilities.getArtifactFolder(context)
+
+        context.dir(packagesDir)
+        {
+            context.deleteDir()
+        }        
         context.bat "npm install"
         context.bat "node node_modules\\gulp\\bin\\gulp.js compress"
     }    
@@ -173,15 +179,19 @@ class Packaging {
             if (artifacts.size() > 0) {
                 for (int i = 0; i < artifacts.size(); i++)
                 {
-                    def artifact = artifacts[i]
-                    context.bat "${context.env.Utils}\\github-release release --user $REPO_ORG --repo $REPO_NAME --tag v${version}"
-                    context.bat "${context.env.Utils}\\github-release upload --user $REPO_ORG --repo $REPO_NAME --tag v${version} --name \"${artifact}\" --file \"${artifact}\""
-                    context.echo "uploaded to https://github.com/$REPO_ORG/$REPO_NAME/releases/download/v${version}/${artifact}"
-                    return "https://github.com/$REPO_ORG/$REPO_NAME/releases/download/v${version}/${artifact}"
+                    Packaging.publishGithubRelease(context, version, artifacts[i])
                 }
             }
         }
-    }    
+    } 
+
+    def static publishGithubRelease(context, version, artifact)   
+    {
+        context.bat "${context.env.Utils}\\github-release release --user $REPO_ORG --repo $REPO_NAME --tag v${version}"
+        context.bat "${context.env.Utils}\\github-release upload --user $REPO_ORG --repo $REPO_NAME --tag v${version} --name \"${artifact}\" --file \"${artifact}\""
+        context.echo "uploaded to https://github.com/$REPO_ORG/$REPO_NAME/releases/download/v${version}/${artifact}"
+        return "https://github.com/$REPO_ORG/$REPO_NAME/releases/download/v${version}/${artifact}"
+    }
 
     def static getShouldPublish(context)
     {
@@ -193,7 +203,7 @@ class Packaging {
 		}
 
         return false
-    }    
+    }
 
     def static updateModulesDefinitions(context, def directory, def module, def version)
     {
@@ -220,5 +230,28 @@ class Packaging {
     {
         def wsFolder = context.pwd()
  	    context.bat "powershell.exe -File \"${wsFolder}\\..\\workspace@libs\\${DefaultSharedLibName}\\resources\\azure\\vc-install-module.ps1\" -apiurl \"${Utilities.getPlatformHost(context)}\" -moduleZipArchievePath \"${path}\" -ErrorAction Stop"
+    }    
+
+    def static publishThemePackage(context)
+    {
+        // find all manifests
+        def inputFile = context.readFile file: 'package.json', encoding: 'utf-8'
+        def json = Utilities.jsonParse(inputFile)
+
+        def name = json.name;
+        def version = json.version;
+
+        def packagesDir = Utilities.getArtifactFolder(context)
+
+        context.dir(packagesDir)
+        {
+            def artifacts = context.findFiles(glob: '*.zip')
+            if (artifacts.size() > 0) {
+                for (int i = 0; i < artifacts.size(); i++)
+                {
+                    Packaging.publishGithubRelease(context, version, artifacts[i])
+                }
+            }	
+        }
     }    
 }

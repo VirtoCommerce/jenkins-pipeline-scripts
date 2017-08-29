@@ -147,4 +147,9 @@ class Utilities {
             return body.call()
         }
     }    
+
+    @NonCPS
+    def static jsonParse(def json) {
+        new groovy.json.JsonSlurperClassic().parseText(json)
+    }    
 }

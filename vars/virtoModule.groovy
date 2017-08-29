@@ -191,7 +191,7 @@ def updateModule(def id, def version, def platformVersion, def title, def author
 		checkout([$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'sasha-jenkins', url: 'git@github.com:VirtoCommerce/vc-modules.git']]])
 
 		def inputFile = readFile file: 'modules.json', encoding: 'utf-8'
-		def json = jsonParse(inputFile)
+		def json = Utilities.jsonParse(inputFile)
 		parser = null
 		def builder = new JsonBuilder(json)
 
@@ -251,9 +251,4 @@ def updateModule(def id, def version, def platformVersion, def title, def author
 	}
 
 	Packaging.updateModulesDefinitions(this, 'modules', id, version)
-}
-
-@NonCPS
-def jsonParse(def json) {
-    new groovy.json.JsonSlurperClassic().parseText(json)
 }

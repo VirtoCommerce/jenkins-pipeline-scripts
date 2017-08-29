@@ -15,12 +15,18 @@ def call(body) {
 			echo "Building branch ${env.BRANCH_NAME}"
 			Utilities.notifyBuildStatus(this, "Started")
 
-			stage('Build + Analysis') {
+			stage('Build') {
 				timestamps { 
 					checkout scm
 					Packaging.runGulpBuild(this)
 				}
 			}
+
+			stage('Publish') {
+				timestamps { 
+					Packaging.publishThemePackage(this)
+				}
+			}			
 		}
 		catch (any) {
 			currentBuild.result = 'FAILURE'
