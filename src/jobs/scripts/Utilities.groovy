@@ -25,7 +25,7 @@ class Utilities {
         return REPO_NAME
     }
 
-    def stat getOrgName(context)
+    def static getOrgName(context)
     {
         return "VirtoCommerce"
     }
