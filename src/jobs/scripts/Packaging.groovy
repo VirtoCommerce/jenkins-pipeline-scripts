@@ -139,7 +139,7 @@ class Packaging {
     def static runGulpBuild(context)
     {
         context.bat "npm install"
-        context.bat "gulp --color --gulpfile \"gulpfile.js\" compress"
+        context.bat "node node_modules\gulp\bin\gulp.js --color --gulpfile \"gulpfile.js\" compress"
     }    
 
     def static runUnitTests(context, tests)
