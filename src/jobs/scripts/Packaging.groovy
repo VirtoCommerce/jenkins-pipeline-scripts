@@ -166,10 +166,6 @@ class Packaging {
 
     def static publishRelease(context, version)
     {
-        def tokens = "${context.env.JOB_NAME}".tokenize('/')
-        def REPO_NAME = tokens[1]
-        def REPO_ORG = "VirtoCommerce"
-
         def tempFolder = Utilities.getTempFolder(context)
         def packagesDir = Utilities.getArtifactFolder(context)
 
@@ -187,6 +183,9 @@ class Packaging {
 
     def static publishGithubRelease(context, version, artifact)   
     {
+        def REPO_NAME = Utilities.getRepoName(context)
+        def REPO_ORG = Utilities.getOrgName(context)
+
         context.bat "${context.env.Utils}\\github-release release --user $REPO_ORG --repo $REPO_NAME --tag v${version}"
         context.bat "${context.env.Utils}\\github-release upload --user $REPO_ORG --repo $REPO_NAME --tag v${version} --name \"${artifact}\" --file \"${artifact}\""
         context.echo "uploaded to https://github.com/$REPO_ORG/$REPO_NAME/releases/download/v${version}/${artifact}"

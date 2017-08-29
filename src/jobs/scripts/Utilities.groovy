@@ -20,9 +20,14 @@ class Utilities {
 
     def static getRepoName(context)
     {
-        def branchName = context.env.BRANCH_NAME
-        def fullJobName = context.env.JOB_NAME.replace("/${branchName}", "").replace("vc-2-org/", "").replace("/", "-")
-        return fullJobName
+        def tokens = "${context.env.JOB_NAME}".tokenize('/')
+        def REPO_NAME = tokens[1]
+        return REPO_NAME
+    }
+
+    def stat getOrgName(context)
+    {
+        return "VirtoCommerce"
     }
 
     def static runSharedPS(context, scriptName)
