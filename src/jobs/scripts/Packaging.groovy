@@ -83,9 +83,9 @@ class Packaging {
     {
         def tag = context.env.BUILD_TAG.replace("-", "").toLowerCase()
         context.echo "Checking ${tag}_${containerId}_1 state ..."
-        def result = context.bat(returnStdout: true, script: "docker inspect -f {{.State.Running}} ${tag}_${containerId}_1").trim()
-        context.echo result
-        if(result == "true")
+        String result = context.bat(returnStdout: true, script: "docker inspect -f {{.State.Running}} ${tag}_${containerId}_1").trim()
+        context.echo "!${result}!"
+        if(result.equalsIgnoreCase('true'))
         {
             context.echo "Checking ${containerId} is RUNNING"
             return true
