@@ -48,6 +48,7 @@ def call(body) {
 			stage('Build + Analysis') {
 				timestamps { 
 					checkout scm
+					Packaging.startAnalyzer(this)
 					Packaging.runBuild(this, solution)
 				}
 			}
@@ -74,7 +75,13 @@ def call(body) {
 						Packaging.runUnitTests(this, tests)
 					}
 				}
-			}				
+			}		
+
+			stage('Submit Analysis') {
+				timestamps { 
+					Packaging.endAnalyzer(this)
+				}
+			}			
 
 			if (env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'master') {
 				stage('Docker Sample') {

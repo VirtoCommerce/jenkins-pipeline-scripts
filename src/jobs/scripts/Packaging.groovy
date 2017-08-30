@@ -7,6 +7,7 @@ class Packaging {
     private static String DefaultRefSpec = '+refs/pull/*:refs/remotes/origin/pr/*'
     private static String DefaultMSBuild = 'MSBuild 15.0'
     private static String DefaultSharedLibName = 'virto-shared-library'
+    private static String CoverageFolder = '.coverage'
 
     /*
     private def Context;
@@ -125,15 +126,26 @@ class Packaging {
     def static runBuild(context, solution)
     {
 		context.bat "Nuget restore ${solution}"
+        context.bat "\"${context.tool DefaultMSBuild}\" \"${solution}\" /p:Configuration=Debug /p:Platform=\"Any CPU\" /property:RunCodeAnalysis=true"        
+    }
 
+    def static startAnalyzer(context)
+    {
         def sqScannerMsBuildHome = context.tool 'Scanner for MSBuild'
         def fullJobName = Utilities.getRepoName(context)
         context.withSonarQubeEnv('VC Sonar Server') {
             // Due to SONARMSBRU-307 value of sonar.host.url and credentials should be passed on command line
-            context.bat "\"${sqScannerMsBuildHome}\\SonarQube.Scanner.MSBuild.exe\" begin /d:\"sonar.branch=${context.env.BRANCH_NAME}\" /n:\"${fullJobName}\" /k:\"${fullJobName}\" /d:\"sonar.organization=virtocommerce\" /d:sonar.host.url=%SONAR_HOST_URL% /d:sonar.login=%SONAR_AUTH_TOKEN%"
-            context.bat "\"${context.tool DefaultMSBuild}\" \"${solution}\" /p:Configuration=Debug /p:Platform=\"Any CPU\" /property:RunCodeAnalysis=true"        
+            context.bat "\"${sqScannerMsBuildHome}\\SonarQube.Scanner.MSBuild.exe\" begin /d:\"sonar.branch=${context.env.BRANCH_NAME}\" /n:\"${fullJobName}\" /k:\"${fullJobName}\" /d:\"sonar.organization=virtocommerce\" /d:sonar.host.url=%SONAR_HOST_URL% /d:sonar.login=%SONAR_AUTH_TOKEN% /d:sonar.cs.vscoveragexml.reportsPaths=\"${CoverageFolder}\VisualStudio.Unit.coveragexml\""
+        }        
+    }
+
+    def static endAnalyzer(context)
+    {
+        def sqScannerMsBuildHome = context.tool 'Scanner for MSBuild'
+        def fullJobName = Utilities.getRepoName(context)
+        context.withSonarQubeEnv('VC Sonar Server') {
             context.bat "\"${sqScannerMsBuildHome}\\SonarQube.Scanner.MSBuild.exe\" end"
-        }
+        }        
     }
 
     def static runGulpBuild(context)
@@ -150,8 +162,8 @@ class Packaging {
 
     def static runUnitTests(context, tests)
     {
-        def xUnit = context.env.XUnit
-        def xUnitExecutable = "${xUnit}\\xunit.console.exe"
+        def xUnitExecutable = "${context.env.XUnit}\\xunit.console.exe"
+        def coverageExecutable = "${context.env.CodeCoverage}\\CodeCoverage.exe"
         
         String paths = ""
         for(int i = 0; i < tests.size(); i++)
@@ -160,7 +172,8 @@ class Packaging {
             paths += "\"$test.path\" "
         }
                 
-        context.bat "${xUnitExecutable} ${paths} -xml xUnit.Test.xml -trait \"category=ci\" -parallel none"
+        context.bat "${coverageExecutable} collect /output:\"${CoverageFolder}\VisualStudio.Unit.coverage\" ${xUnitExecutable} ${paths} -xml xUnit.Test.xml -trait \"category=ci\" -parallel none"
+        context.bat "${coverageExecutable} analyze /output:\"${CoverageFolder}\VisualStudio.Unit.coveragexml\" \"${CoverageFolder}\VisualStudio.Unit.coverage\""
         context.step([$class: 'XUnitPublisher', testTimeMargin: '3000', thresholdMode: 1, thresholds: [[$class: 'FailedThreshold', failureNewThreshold: '', failureThreshold: '', unstableNewThreshold: '', unstableThreshold: ''], [$class: 'SkippedThreshold', failureNewThreshold: '', failureThreshold: '', unstableNewThreshold: '', unstableThreshold: '']], tools: [[$class: 'XUnitDotNetTestType', deleteOutputFiles: true, failIfNotNew: false, pattern: '*.Test.xml', skipNoTestFiles: true, stopProcessingIfError: false]]])
     }
 
