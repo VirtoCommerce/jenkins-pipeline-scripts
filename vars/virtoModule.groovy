@@ -26,6 +26,7 @@ import jobs.scripts.*
 			stage('Build + Analyse')
 			{
 				checkout scm
+				Packaging.startAnalyzer(this)
 				Packaging.buildSolutions(this)
 			}
 
@@ -37,6 +38,12 @@ import jobs.scripts.*
 			stage('Unit Tests')
 			{
 				Modules.runUnitTests(this)
+			}
+
+			stage('Submit Analysis') {
+				timestamps { 
+					Packaging.endAnalyzer(this)
+				}
 			}
 
 			if (env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'master') {

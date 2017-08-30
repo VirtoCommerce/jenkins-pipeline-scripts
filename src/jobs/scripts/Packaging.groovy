@@ -183,7 +183,6 @@ class Packaging {
             throw new Exception("can't create coverage folder: " + coverageFolder); 
         }         
         
-        
         String paths = ""
         for(int i = 0; i < tests.size(); i++)
         {
