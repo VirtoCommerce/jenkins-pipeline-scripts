@@ -63,11 +63,11 @@ class Packaging {
                 context.withEnv(["DOCKER_TAG=${dockerTag}", "DOCKER_PLATFORM_PORT=${platformPort}", "DOCKER_STOREFRONT_PORT=${storefrontPort}", "DOCKER_SQL_PORT=${sqlPort}", "COMPOSE_PROJECT_NAME=${context.env.BUILD_TAG}" ]) {
                     context.bat "docker-compose up -d"
                 }            
-            }
 
-            // 5. check one more time
-            if(!Packaging.checkAllDockerTestEnvironments(context)) {
-                throw new Exception("can't start one or more docker containers"); 
+                // 6. check one more time
+                if(!Packaging.checkAllDockerTestEnvironments(context)) {
+                    throw new Exception("can't start one or more docker containers"); 
+                }
             }
         }
     }
@@ -260,10 +260,12 @@ class Packaging {
 
     def static getShouldPublish(context)
     {
+        /*
 		context.bat "\"${context.tool 'Git'}\" log -1 --pretty=%%B > LAST_COMMIT_MESSAGE"
 		def git_last_commit = context.readFile('LAST_COMMIT_MESSAGE')			
+        */
 
-		if (context.env.BRANCH_NAME == 'master' && git_last_commit.contains('[publish]')) {
+		if (context.env.BRANCH_NAME == 'master' /* && git_last_commit.contains('[publish]')*/) {
 			return true
 		}
 
