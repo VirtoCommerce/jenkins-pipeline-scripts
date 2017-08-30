@@ -64,6 +64,11 @@ class Packaging {
                     context.bat "docker-compose up -d"
                 }            
             }
+
+            // 5. check one more time
+            if(!Packaging.checkAllDockerTestEnvironments(context)) {
+                throw new Exception("can't start one or more docker containers"); 
+            }
         }
     }
 
