@@ -160,6 +160,29 @@ class Utilities {
         }
     }    
 
+    def static runUnitTest(context, traits, paths, resultsFileName)
+    {
+        def xUnitExecutable = "${context.env.XUnit}\\xunit.console.exe"
+        def coverageExecutable = "${context.env.CodeCoverage}\\CodeCoverage.exe"
+        def coverageFolder = Utilities.getCoverageFolder(context)
+
+        // remove old folder
+        context.dir(coverageFolder)
+        {
+            context.deleteDir()
+        }        
+
+        // recreate it now
+        File folder = new File(coverageFolder); 
+        if (!folder.mkdir()) { 
+            throw new Exception("can't create coverage folder: " + coverageFolder); 
+        } 
+
+        context.bat "\"${coverageExecutable}\" collect /output:\"${coverageFolder}\\VisualStudio.Unit.coverage\" \"${xUnitExecutable}\" ${paths} -xml \"${resultsFileName}\" ${traits} -parallel none"
+        context.bat "\"${coverageExecutable}\" analyze /output:\"${coverageFolder}\\VisualStudio.Unit.coveragexml\" \"${coverageFolder}\\VisualStudio.Unit.coverage\""
+        context.step([$class: 'XUnitPublisher', testTimeMargin: '3000', thresholdMode: 1, thresholds: [[$class: 'FailedThreshold', failureNewThreshold: '', failureThreshold: '', unstableNewThreshold: '', unstableThreshold: ''], [$class: 'SkippedThreshold', failureNewThreshold: '', failureThreshold: '', unstableNewThreshold: '', unstableThreshold: '']], tools: [[$class: 'XUnitDotNetTestType', deleteOutputFiles: true, failIfNotNew: false, pattern: resultsFileName, skipNoTestFiles: true, stopProcessingIfError: false]]])
+    }
+
     @NonCPS
     def static jsonParse(def json) {
         new groovy.json.JsonSlurperClassic().parseText(json)

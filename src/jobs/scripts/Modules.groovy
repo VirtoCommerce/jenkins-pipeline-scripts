@@ -68,12 +68,8 @@ class Modules {
 
     def static runTests(context, traits, resultsFileName)
     {
-        def xUnit = context.env.XUnit
-        def xUnitExecutable = "${xUnit}\\xunit.console.exe"
-
         def paths = Modules.prepareTestEnvironment(context)
-        context.bat "${xUnitExecutable} ${paths} -xml \"${resultsFileName}\" ${traits} -parallel none -verbose -diagnostics"
-        context.step([$class: 'XUnitPublisher', testTimeMargin: '3000', thresholdMode: 1, thresholds: [[$class: 'FailedThreshold', failureNewThreshold: '', failureThreshold: '', unstableNewThreshold: '', unstableThreshold: ''], [$class: 'SkippedThreshold', failureNewThreshold: '', failureThreshold: '', unstableNewThreshold: '', unstableThreshold: '']], tools: [[$class: 'XUnitDotNetTestType', deleteOutputFiles: true, failIfNotNew: false, pattern: resultsFileName, skipNoTestFiles: true, stopProcessingIfError: false]]])
+        Utilities.runUnitTest(context, traits, paths, resultsFileName)
     }    
 
     def static prepareTestEnvironment(context)
