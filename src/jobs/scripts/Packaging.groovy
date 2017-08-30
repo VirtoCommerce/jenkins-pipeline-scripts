@@ -56,6 +56,37 @@ class Packaging {
                 context.bat "docker-compose rm -f"
                 context.bat "docker-compose up -d"
             }
+
+            // 4. check if all docker containers are running
+            if(!Packaging.checkAllDockerTestEnvironments(context)) {
+                // 5. try running it again
+                context.withEnv(["DOCKER_TAG=${dockerTag}", "DOCKER_PLATFORM_PORT=${platformPort}", "DOCKER_STOREFRONT_PORT=${storefrontPort}", "DOCKER_SQL_PORT=${sqlPort}", "COMPOSE_PROJECT_NAME=${context.env.BUILD_TAG}" ]) {
+                    context.bat "docker-compose up -d"
+                }            
+            }
+        }
+    }
+
+    def static checkAllDockerTestEnvironments(context)
+    {
+        if(!Packaging.checkDockerTestEnvironment(context, "vc-platform-web")) { return false }
+        if(!Packaging.checkDockerTestEnvironment(context, "vc-storefront-web")) { return false }
+        if(!Packaging.checkDockerTestEnvironment(context, "vc-db")) { return false }
+    }
+
+    def static checkDockerTestEnvironment(context, String containerId)
+    {
+        context.echo "Checking ${containerId} state ..."
+        def result = context.bat(returnStdout: true, script: "docker -f {{.State.Running}} ${context.env.BUILD_TAG}_${containerId}_1").trim()
+        if(result == "true")
+        {
+            context.echo "Checking ${containerId} is RUNNING"
+            return true
+        }
+        else
+        {
+            context.echo "Checking ${containerId} is FAILED"
+            return false
         }
     }
 
