@@ -48,17 +48,16 @@ def call(body) {
 			stage('Build + Analysis') {
 				timestamps { 
 					checkout scm
-					//Packaging.startAnalyzer(this)
+					Packaging.startAnalyzer(this)
 					Packaging.runBuild(this, solution)
 				}
 			}
 		
 			def version = Utilities.getAssemblyVersion(this)
 			def dockerImage
-/*
+
 			stage('Package') {
 				timestamps { 
-					//def packaging = new Packaging(this)
 					Packaging.createReleaseArtifact(this, version, webProject, zipArtifact, websiteDir)
 					if (env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'master') {
 						def websitePath = Utilities.getWebPublishFolder(this, websiteDir)
@@ -66,7 +65,7 @@ def call(body) {
 					}
 				}
 			}
-*/
+
 			def tests = Utilities.getTestDlls(this)
 			if(tests.size() > 0)
 			{
@@ -76,13 +75,12 @@ def call(body) {
 					}
 				}
 			}		
-/*
+
 			stage('Submit Analysis') {
 				timestamps { 
 					Packaging.endAnalyzer(this)
 				}
 			}			
-*/
 
 			if (env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'master') {
 				stage('Docker Sample') {
