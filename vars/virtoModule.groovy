@@ -82,7 +82,7 @@ import jobs.scripts.*
 
 			stage('Cleanup') {
 				timestamps { 
-					Packaging.cleanBuild(this, solution)
+					Packaging.cleanSolutions(this)
 				}
 			}				
 		}

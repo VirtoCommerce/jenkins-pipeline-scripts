@@ -128,6 +128,19 @@ class Packaging {
         context.bat "\"${context.tool DefaultMSBuild}\" \"${solution}\" /p:Configuration=Debug /p:Platform=\"Any CPU\" /m"        
     }
 
+    def static cleanSolutions(context)
+    {
+        def solutions = context.findFiles(glob: '*.sln')
+
+        if (solutions.size() > 0) {
+            for (int i = 0; i < solutions.size(); i++)
+            {
+                def solution = solutions[i]
+                Packaging.cleanBuild(context, solution.name)
+            }
+        }
+    } 
+
     def static cleanBuild(context, solution)
     {
         context.bat "\"${context.tool DefaultMSBuild}\" \"${solution}\" /t:clean /p:Configuration=Debug /p:Platform=\"Any CPU\" /m"
