@@ -77,6 +77,8 @@ class Packaging {
         if(!Packaging.checkDockerTestEnvironment(context, "vc-platform-web")) { return false }
         if(!Packaging.checkDockerTestEnvironment(context, "vc-storefront-web")) { return false }
         if(!Packaging.checkDockerTestEnvironment(context, "vc-db")) { return false }
+
+        return true
     }
 
     def static checkDockerTestEnvironment(context, String containerId)
@@ -87,12 +89,12 @@ class Packaging {
 
         if(result.endsWith('true'))
         {
-            context.echo "Checking ${containerId} is RUNNING"
+            context.echo "Docker ${containerId} is RUNNING"
             return true
         }
         else
         {
-            context.echo "Checking ${containerId} is FAILED"
+            context.echo "Docker ${containerId} FAILED"
             return false
         }
     }
