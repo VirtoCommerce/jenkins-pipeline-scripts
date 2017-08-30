@@ -45,7 +45,7 @@ def call(body) {
 			echo "Building branch ${env.BRANCH_NAME}"
 			Utilities.notifyBuildStatus(this, "Started")
 
-			stage('Build + Analysis') {
+			stage('Build + Analyze') {
 				timestamps { 
 					checkout scm
 					Packaging.startAnalyzer(this)
