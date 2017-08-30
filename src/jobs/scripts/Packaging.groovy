@@ -128,6 +128,11 @@ class Packaging {
         context.bat "\"${context.tool DefaultMSBuild}\" \"${solution}\" /p:Configuration=Debug /p:Platform=\"Any CPU\" /m"        
     }
 
+    def static cleanBuild(context, solution)
+    {
+        context.bat "\"${context.tool DefaultMSBuild}\" \"${solution}\" /t:clean /p:Configuration=Debug /p:Platform=\"Any CPU\" /m"
+    }    
+
     def static startAnalyzer(context)
     {
         def sqScannerMsBuildHome = context.tool 'Scanner for MSBuild'

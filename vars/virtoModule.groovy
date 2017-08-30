@@ -72,6 +72,12 @@ import jobs.scripts.*
 					}
 				}
 			}		
+
+			stage('Cleanup') {
+				timestamps { 
+					Packaging.cleanBuild(this, solution)
+				}
+			}				
 		}
 		catch (any) {
 			currentBuild.result = 'FAILURE'
