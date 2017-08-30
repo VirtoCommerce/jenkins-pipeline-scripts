@@ -111,11 +111,13 @@ def call(body) {
 				}
 			}
 
+/*
 			stage('Cleanup') {
 				timestamps { 
 					Packaging.cleanBuild(this, solution)
 				}
-			}			
+			}	
+*/		
 		}
 		catch (any) {
 			currentBuild.result = 'FAILURE'
