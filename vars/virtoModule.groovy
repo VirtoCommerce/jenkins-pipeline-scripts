@@ -23,9 +23,10 @@ import jobs.scripts.*
 		try {	
 			step([$class: 'GitHubCommitStatusSetter', contextSource: [$class: 'ManuallyEnteredCommitContextSource', context: 'ci.virtocommerce.com'], statusResultSource: [$class: 'ConditionalStatusResultSource', results: [[$class: 'AnyBuildResult', message: 'Building on Virto Commerce CI', state: 'PENDING']]]])			
 			Utilities.notifyBuildStatus(this, "started")
-			stage('Build + Analyse')
+			stage('Build + Analyze')
 			{
 				checkout scm
+				Packaging.startAnalyzer(this)
 				Packaging.buildSolutions(this)
 			}
 
@@ -37,6 +38,12 @@ import jobs.scripts.*
 			stage('Unit Tests')
 			{
 				Modules.runUnitTests(this)
+			}
+
+			stage('Submit Analysis') {
+				timestamps { 
+					Packaging.endAnalyzer(this)
+				}
 			}
 
 			if (env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'master') {
@@ -75,7 +82,7 @@ import jobs.scripts.*
 
 			stage('Cleanup') {
 				timestamps { 
-					Packaging.cleanBuild(this, solution)
+					Packaging.cleanSolutions(this)
 				}
 			}				
 		}

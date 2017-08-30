@@ -159,6 +159,19 @@ class Packaging {
         context.bat "\"${context.tool DefaultMSBuild}\" \"${solution}\" /p:Configuration=Debug /p:Platform=\"Any CPU\" /m"        
     }
 
+    def static cleanSolutions(context)
+    {
+        def solutions = context.findFiles(glob: '*.sln')
+
+        if (solutions.size() > 0) {
+            for (int i = 0; i < solutions.size(); i++)
+            {
+                def solution = solutions[i]
+                Packaging.cleanBuild(context, solution.name)
+            }
+        }
+    } 
+
     def static cleanBuild(context, solution)
     {
         context.bat "\"${context.tool DefaultMSBuild}\" \"${solution}\" /t:clean /p:Configuration=Debug /p:Platform=\"Any CPU\" /m"
@@ -197,24 +210,7 @@ class Packaging {
     }    
 
     def static runUnitTests(context, tests)
-    {
-        def xUnitExecutable = "${context.env.XUnit}\\xunit.console.exe"
-        def coverageExecutable = "${context.env.CodeCoverage}\\CodeCoverage.exe"
-        def coverageFolder = Utilities.getCoverageFolder(context)
-
-        // remove old folder
-        context.dir(coverageFolder)
-        {
-            context.deleteDir()
-        }        
-
-        // recreate it now
-        File folder = new File(coverageFolder); 
-        if (!folder.mkdir()) { 
-            throw new Exception("can't create coverage folder: " + coverageFolder); 
-        }         
-        
-        
+    {        
         String paths = ""
         for(int i = 0; i < tests.size(); i++)
         {
@@ -222,10 +218,8 @@ class Packaging {
             paths += "\"$test.path\" "
         }
 
-        context.bat "\"${coverageExecutable}\" collect /output:\"${coverageFolder}\\VisualStudio.Unit.coverage\" \"${xUnitExecutable}\" ${paths} -xml xUnit.Test.xml -trait \"category=ci\" -parallel none"
-        context.bat "\"${coverageExecutable}\" analyze /output:\"${coverageFolder}\\VisualStudio.Unit.coveragexml\" \"${coverageFolder}\\VisualStudio.Unit.coverage\""
-        context.step([$class: 'XUnitPublisher', testTimeMargin: '3000', thresholdMode: 1, thresholds: [[$class: 'FailedThreshold', failureNewThreshold: '', failureThreshold: '', unstableNewThreshold: '', unstableThreshold: ''], [$class: 'SkippedThreshold', failureNewThreshold: '', failureThreshold: '', unstableNewThreshold: '', unstableThreshold: '']], tools: [[$class: 'XUnitDotNetTestType', deleteOutputFiles: true, failIfNotNew: false, pattern: '*.Test.xml', skipNoTestFiles: true, stopProcessingIfError: false]]])
-    }
+        Utilities.runUnitTest(context, "-trait \"category=ci\" -trait \"category=Unit\"", paths, "xUnit.UnitTests.xml")
+   }
 
     def static publishRelease(context, version)
     {

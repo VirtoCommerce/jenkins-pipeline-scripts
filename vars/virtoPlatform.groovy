@@ -45,7 +45,7 @@ def call(body) {
 			echo "Building branch ${env.BRANCH_NAME}"
 			Utilities.notifyBuildStatus(this, "Started")
 
-			stage('Build + Analysis') {
+			stage('Build + Analyze') {
 				timestamps { 
 					checkout scm
 					Packaging.startAnalyzer(this)
@@ -111,11 +111,13 @@ def call(body) {
 				}
 			}
 
+/*
 			stage('Cleanup') {
 				timestamps { 
 					Packaging.cleanBuild(this, solution)
 				}
-			}			
+			}	
+*/		
 		}
 		catch (any) {
 			currentBuild.result = 'FAILURE'
