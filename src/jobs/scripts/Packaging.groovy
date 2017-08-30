@@ -7,7 +7,6 @@ class Packaging {
     private static String DefaultRefSpec = '+refs/pull/*:refs/remotes/origin/pr/*'
     private static String DefaultMSBuild = 'MSBuild 15.0'
     private static String DefaultSharedLibName = 'virto-shared-library'
-    private static String CoverageFolder = '.coverage'
 
     /*
     private def Context;
@@ -133,9 +132,10 @@ class Packaging {
     {
         def sqScannerMsBuildHome = context.tool 'Scanner for MSBuild'
         def fullJobName = Utilities.getRepoName(context)
+        def coverageFolder = Utilities.getCoverageFolder(context)
         context.withSonarQubeEnv('VC Sonar Server') {
             // Due to SONARMSBRU-307 value of sonar.host.url and credentials should be passed on command line
-            context.bat "\"${sqScannerMsBuildHome}\\SonarQube.Scanner.MSBuild.exe\" begin /d:\"sonar.branch=${context.env.BRANCH_NAME}\" /n:\"${fullJobName}\" /k:\"${fullJobName}\" /d:\"sonar.organization=virtocommerce\" /d:sonar.host.url=%SONAR_HOST_URL% /d:sonar.login=%SONAR_AUTH_TOKEN% /d:sonar.cs.vscoveragexml.reportsPaths=\"${CoverageFolder}\\VisualStudio.Unit.coveragexml\""
+            context.bat "\"${sqScannerMsBuildHome}\\SonarQube.Scanner.MSBuild.exe\" begin /d:\"sonar.branch=${context.env.BRANCH_NAME}\" /n:\"${fullJobName}\" /k:\"${fullJobName}\" /d:\"sonar.organization=virtocommerce\" /d:sonar.host.url=%SONAR_HOST_URL% /d:sonar.login=%SONAR_AUTH_TOKEN% /d:sonar.cs.vscoveragexml.reportsPaths=\"${coverageFolder}\\VisualStudio.Unit.coveragexml\""
         }        
     }
 
@@ -180,8 +180,8 @@ class Packaging {
                 
         context.dir(coverageFolder)
         {
-            context.bat "\"${coverageExecutable}\" collect /output:\"${CoverageFolder}\\VisualStudio.Unit.coverage\" \"${xUnitExecutable}\" ${paths} -xml xUnit.Test.xml -trait \"category=ci\" -parallel none"
-            context.bat "\"${coverageExecutable}\" analyze /output:\"${CoverageFolder}\\VisualStudio.Unit.coveragexml\" \"${CoverageFolder}\\VisualStudio.Unit.coverage\""
+            context.bat "\"${coverageExecutable}\" collect /output:\"${coverageFolder}\\VisualStudio.Unit.coverage\" \"${xUnitExecutable}\" ${paths} -xml xUnit.Test.xml -trait \"category=ci\" -parallel none"
+            context.bat "\"${coverageExecutable}\" analyze /output:\"${coverageFolder}\\VisualStudio.Unit.coveragexml\" \"${coverageFolder}\\VisualStudio.Unit.coverage\""
             context.step([$class: 'XUnitPublisher', testTimeMargin: '3000', thresholdMode: 1, thresholds: [[$class: 'FailedThreshold', failureNewThreshold: '', failureThreshold: '', unstableNewThreshold: '', unstableThreshold: ''], [$class: 'SkippedThreshold', failureNewThreshold: '', failureThreshold: '', unstableNewThreshold: '', unstableThreshold: '']], tools: [[$class: 'XUnitDotNetTestType', deleteOutputFiles: true, failIfNotNew: false, pattern: '*.Test.xml', skipNoTestFiles: true, stopProcessingIfError: false]]])
         }
     }

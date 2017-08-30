@@ -67,7 +67,7 @@ class Utilities {
 
     def static getCoverageFolder(context)
     {
-        def wsFolder = context.pwd()
+        def wsFolder = Utilities.getTempFolder(context)
         def packagesDir = "$wsFolder\\.coverage"
         return packagesDir
     }    
