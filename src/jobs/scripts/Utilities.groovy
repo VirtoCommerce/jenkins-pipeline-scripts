@@ -65,6 +65,13 @@ class Utilities {
         return packagesDir
     }
 
+    def static getCoverageFolder(context)
+    {
+        def wsFolder = context.pwd()
+        def packagesDir = "$wsFolder\\.coverage"
+        return packagesDir
+    }    
+
     def static getWebPublishFolder(context, String websiteDir)
     {
         def tempFolder = Utilities.getTempFolder(context)

@@ -164,6 +164,12 @@ class Packaging {
     {
         def xUnitExecutable = "${context.env.XUnit}\\xunit.console.exe"
         def coverageExecutable = "${context.env.CodeCoverage}\\CodeCoverage.exe"
+        def coverageFolder = Utilities.getCoverageFolder(context)
+
+        context.dir(coverageFolder)
+        {
+            context.deleteDir()
+        }        
         
         String paths = ""
         for(int i = 0; i < tests.size(); i++)
@@ -172,9 +178,12 @@ class Packaging {
             paths += "\"$test.path\" "
         }
                 
-        context.bat "\"${coverageExecutable}\" collect /output:\"${CoverageFolder}\\VisualStudio.Unit.coverage\" \"${xUnitExecutable}\" ${paths} -xml xUnit.Test.xml -trait \"category=ci\" -parallel none"
-        context.bat "\"${coverageExecutable}\" analyze /output:\"${CoverageFolder}\\VisualStudio.Unit.coveragexml\" \"${CoverageFolder}\\VisualStudio.Unit.coverage\""
-        context.step([$class: 'XUnitPublisher', testTimeMargin: '3000', thresholdMode: 1, thresholds: [[$class: 'FailedThreshold', failureNewThreshold: '', failureThreshold: '', unstableNewThreshold: '', unstableThreshold: ''], [$class: 'SkippedThreshold', failureNewThreshold: '', failureThreshold: '', unstableNewThreshold: '', unstableThreshold: '']], tools: [[$class: 'XUnitDotNetTestType', deleteOutputFiles: true, failIfNotNew: false, pattern: '*.Test.xml', skipNoTestFiles: true, stopProcessingIfError: false]]])
+        context.dir(coverageFolder)
+        {
+            context.bat "\"${coverageExecutable}\" collect /output:\"${CoverageFolder}\\VisualStudio.Unit.coverage\" \"${xUnitExecutable}\" ${paths} -xml xUnit.Test.xml -trait \"category=ci\" -parallel none"
+            context.bat "\"${coverageExecutable}\" analyze /output:\"${CoverageFolder}\\VisualStudio.Unit.coveragexml\" \"${CoverageFolder}\\VisualStudio.Unit.coverage\""
+            context.step([$class: 'XUnitPublisher', testTimeMargin: '3000', thresholdMode: 1, thresholds: [[$class: 'FailedThreshold', failureNewThreshold: '', failureThreshold: '', unstableNewThreshold: '', unstableThreshold: ''], [$class: 'SkippedThreshold', failureNewThreshold: '', failureThreshold: '', unstableNewThreshold: '', unstableThreshold: '']], tools: [[$class: 'XUnitDotNetTestType', deleteOutputFiles: true, failIfNotNew: false, pattern: '*.Test.xml', skipNoTestFiles: true, stopProcessingIfError: false]]])
+        }
     }
 
     def static publishRelease(context, version)
