@@ -103,12 +103,12 @@ class Utilities {
         return DefaultSqlPort.toInteger() + context.env.VC_BUILD_ORDER.toInteger();
     }
 
-    def static getNextBuildOrder(context)
+    def static getNextBuildOrderExecutor(context)
     {
         return context.env.EXECUTOR_NUMBER;
     }
 
-    def static getNextBuildOrderFromSettings(context)
+    def static getNextBuildOrder(context)
     {
         def instance = Jenkins.getInstance()
         def globalNodeProperties = instance.getGlobalNodeProperties()
