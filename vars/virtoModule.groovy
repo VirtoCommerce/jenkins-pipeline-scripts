@@ -25,6 +25,7 @@ import jobs.scripts.*
 			Utilities.notifyBuildStatus(this, "started")
 			stage('Build + Analyze')
 			{
+				//checkout(scm: [ extensions: [[$class: 'DisableRemotePoll'], [$class: 'PathRestriction', excludedRegions: '', includedRegions: 'foo/.*']]])
 				checkout scm
 				Packaging.startAnalyzer(this)
 				Packaging.buildSolutions(this)
