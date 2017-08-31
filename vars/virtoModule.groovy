@@ -26,16 +26,14 @@ import jobs.scripts.*
 			stage('Build + Analyze')
 			{
 				// https://support.cloudbees.com/hc/en-us/articles/226122247-How-to-Customize-Checkout-for-Pipeline-Multibranch-
-				/*
 				checkout([
 					$class: 'GitSCM',
 					branches: scm.branches,
 					doGenerateSubmoduleConfigurations: scm.doGenerateSubmoduleConfigurations,
-					extensions: scm.extensions + [[$class: 'DisableRemotePoll'], [$class: 'PathRestriction', excludedRegions: 'README\\.md', includedRegions: '']],
+					extensions: scm.extensions + [[$class: 'DisableRemotePoll'], [$class: 'PathRestriction', excludedRegions: '*', includedRegions: '']],
 					userRemoteConfigs: scm.userRemoteConfigs
 				])
-				*/		
-				checkout scm
+				//checkout scm
 				Packaging.startAnalyzer(this)
 				Packaging.buildSolutions(this)
 			}
