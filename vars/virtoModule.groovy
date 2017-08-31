@@ -25,8 +25,18 @@ import jobs.scripts.*
 			Utilities.notifyBuildStatus(this, "started")
 			stage('Build + Analyze')
 			{
-				//checkout(scm: [ extensions: [[$class: 'DisableRemotePoll'], [$class: 'PathRestriction', excludedRegions: '', includedRegions: 'foo/.*']]])
-				checkout scm
+				// checkout(scm: [ extensions: [[$class: 'DisableRemotePoll'], [$class: 'PathRestriction', excludedRegions: '', includedRegions: 'foo/.*']]])
+				// https://support.cloudbees.com/hc/en-us/articles/226122247-How-to-Customize-Checkout-for-Pipeline-Multibranch-
+				// checkout([$class: 'GitSCM', extensions: [[$class: 'PathRestriction', excludedRegions: 'CommonAssemblyInfo\\.cs', includedRegions: '']]])
+
+				checkout([
+					$class: 'GitSCM',
+					branches: scm.branches,
+					doGenerateSubmoduleConfigurations: scm.doGenerateSubmoduleConfigurations,
+					extensions: scm.extensions + [[$class: 'DisableRemotePoll'], [$class: 'PathRestriction', excludedRegions: 'README\\.md', includedRegions: '']],
+					userRemoteConfigs: scm.userRemoteConfigs
+				])		
+				//checkout scm
 				Packaging.startAnalyzer(this)
 				Packaging.buildSolutions(this)
 			}
