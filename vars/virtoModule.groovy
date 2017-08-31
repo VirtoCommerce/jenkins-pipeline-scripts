@@ -30,7 +30,7 @@ import jobs.scripts.*
 					$class: 'GitSCM',
 					branches: scm.branches,
 					doGenerateSubmoduleConfigurations: scm.doGenerateSubmoduleConfigurations,
-					extensions: scm.extensions + [[$class: 'DisableRemotePoll'], [$class: 'PathRestriction', excludedRegions: '*', includedRegions: '']],
+					extensions: scm.extensions + [[$class: 'DisableRemotePoll'], [$class: 'PathRestriction', excludedRegions: 'README\\.md', includedRegions: '']],
 					userRemoteConfigs: scm.userRemoteConfigs
 				])
 				//checkout scm
