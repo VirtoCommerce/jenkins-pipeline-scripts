@@ -1,4 +1,5 @@
 #!groovy
+@Library('virto-shared-library@dev')
 import groovy.json.*
 import groovy.util.*
 import jobs.scripts.*
