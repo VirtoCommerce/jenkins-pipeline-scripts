@@ -183,8 +183,61 @@ class Utilities {
         context.step([$class: 'XUnitPublisher', testTimeMargin: '3000', thresholdMode: 1, thresholds: [[$class: 'FailedThreshold', failureNewThreshold: '', failureThreshold: '', unstableNewThreshold: '', unstableThreshold: ''], [$class: 'SkippedThreshold', failureNewThreshold: '', failureThreshold: '', unstableNewThreshold: '', unstableThreshold: '']], tools: [[$class: 'XUnitDotNetTestType', deleteOutputFiles: true, failIfNotNew: false, pattern: resultsFileName, skipNoTestFiles: true, stopProcessingIfError: false]]])
     }
 
+    def static checkAndAbortBuild(context)
+    {
+		if(!Utilities.getShouldBuild(context))
+		{
+			Utilities.abortBuild(context)
+		}
+    }
+
+    def static getShouldBuild(context)
+    {
+		context.bat "\"${context.tool 'Git'}\" log -1 --pretty=\"format:\" --name-only > LAST_COMMIT_MESSAGE"
+		def git_last_commit = context.readFile('LAST_COMMIT_MESSAGE')
+
+		if (!git_last_commit.equalsIgnoreCase('readme.md')) {
+			return false
+		}
+
+        return true
+    }    
+
     @NonCPS
     def static jsonParse(def json) {
         new groovy.json.JsonSlurperClassic().parseText(json)
+    }    
+
+    @NonCPS
+    def abortBuildIfTriggeredByJenkins(context) {
+        def validChangeDetected = false
+        def changeLogSets = context.currentBuild.changeSets
+        for (int i = 0; i < changeLogSets.size(); i++) {
+            def entries = changeLogSets[i].items
+            for (int j = 0; j < entries.length; j++) {
+                def entry = entries[j]
+                if(!entry.msg.matches("\\[ci-skip\\].*")){
+                    validChangeDetected = true
+                    println "Found commit by ${entry.author}"
+                }
+            }
+        }
+        // We are building if there are some walid changes or if there are no changes(so the build was triggered intentionally or it is the first run.)
+        if(!validChangeDetected && changeLogSets.size() != 0) {
+            context.currentBuild.setResult(context.currentBuild.rawBuild.getPreviousBuild()?.result?.toString())
+            context.error("Stopping current build")
+        }
+    }    
+
+    @NonCPS
+    def abortBuild(context) {
+        def validChangeDetected = false
+        def changeLogSets = context.currentBuild.changeSets
+
+        // We are building if there are some walid changes or if there are no changes(so the build was triggered intentionally or it is the first run.)
+        if(changeLogSets.size() != 0) {
+            context.currentBuild.setResult(context.currentBuild.rawBuild.getPreviousBuild()?.result?.toString())
+            context.error("Stopping current build")
+        }
     }    
 }
