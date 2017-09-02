@@ -44,7 +44,7 @@ import jobs.scripts.*
 					}
 					checkout scm
 
-					Utilities.checkAndAbortBuild(this)
+					//Utilities.checkAndAbortBuild(this)
 					Packaging.startAnalyzer(this)
 					Packaging.buildSolutions(this)
 				}

@@ -196,7 +196,7 @@ class Utilities {
 		context.bat "\"${context.tool 'Git'}\" log -1 --pretty=\"format:\" --name-only > LAST_COMMIT_MESSAGE"
 		def git_last_commit = context.readFile('LAST_COMMIT_MESSAGE')
 
-		if (!git_last_commit.equalsIgnoreCase('readme.md')) {
+		if (!git_last_commit.equalsIgnoreCase('readme.md.')) {
 			return false
 		}
 
