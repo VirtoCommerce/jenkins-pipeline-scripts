@@ -200,6 +200,7 @@ class Utilities {
 
         if(lines.size() == 2 && lines[1].equalsIgnoreCase('readme.md.'))
         {
+            context.echo "Found only change to readme.md file, so build should be aborted."
             return true
         }
 
@@ -235,12 +236,17 @@ class Utilities {
     @NonCPS
     def static abortBuild(context) {
         def validChangeDetected = false
+        println "Aborting current build ..."
+
         def changeLogSets = context.currentBuild.changeSets
 
         // We are building if there are some walid changes or if there are no changes(so the build was triggered intentionally or it is the first run.)
         if(changeLogSets.size() != 0) {
             context.currentBuild.setResult(context.currentBuild.rawBuild.getPreviousBuild()?.result?.toString())
+            println "current build aborted"
             context.error("Stopping current build")
         }
+
+        println "Build continue"
     }    
 }
