@@ -243,7 +243,8 @@ class Utilities {
             context.echo "Aborting build and setting result to ${context.currentBuild.rawBuild.getPreviousBuild()?.result?.toString()}"
             context.currentBuild.setResult(context.currentBuild.rawBuild.getPreviousBuild()?.result?.toString())
             //context.echo "current build aborted"
-            context.error("Stopping current build")
+            //context.error("Stopping current build")
+            return true
         //}
     }    
 }

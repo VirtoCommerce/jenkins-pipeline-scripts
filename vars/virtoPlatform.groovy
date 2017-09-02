@@ -45,17 +45,22 @@ def call(body) {
 			echo "Building branch ${env.BRANCH_NAME}"
 			Utilities.notifyBuildStatus(this, "Started")
 
-			stage('Build + Analyze') {
+			stage('Checkout') {
 				timestamps { 
 					// clean folder for a release
 					if (Packaging.getShouldPublish(this)) {
 						deleteDir()
 					}					
 					checkout scm
-				}
-				
-				Utilities.checkAndAbortBuild(this)
-				
+				}				
+			}
+
+			if(Utilities.checkAndAbortBuild(this))
+			{
+				return true
+			}
+
+			stage('Build + Analyze') {		
 				timestamps { 					
 					Packaging.startAnalyzer(this)
 					Packaging.runBuild(this, solution)
