@@ -52,6 +52,11 @@ def call(body) {
 						deleteDir()
 					}					
 					checkout scm
+				}
+				
+				Utilities.checkAndAbortBuild(this)
+				
+				timestamps { 					
 					Packaging.startAnalyzer(this)
 					Packaging.runBuild(this, solution)
 				}
