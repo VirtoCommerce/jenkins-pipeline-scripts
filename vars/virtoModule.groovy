@@ -43,8 +43,10 @@ import jobs.scripts.*
 						deleteDir()
 					}
 					checkout scm
-
-					Utilities.checkAndAbortBuild(this)
+				}
+				
+				Utilities.checkAndAbortBuild(this)
+				timestamps { 
 					Packaging.startAnalyzer(this)
 					Packaging.buildSolutions(this)
 				}
