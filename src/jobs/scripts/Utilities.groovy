@@ -194,19 +194,14 @@ class Utilities {
     def static getShouldBuild(context)
     {
         String result = context.bat(returnStdout: true, script: "\"${context.tool 'Git'}\" log -1 --pretty=\"format:\" --name-only").trim()        
-
-        context.echo result
         def lines = result.split("\r?\n")
-
-        context.echo "size of the results is:${lines.size()}"
-        context.echo lines[1]
         if(lines.size() == 2 && lines[1].equalsIgnoreCase('readme.md.'))
         {
             context.echo "Found only change to readme.md file, so build should be aborted."
-            return true
+            return false
         }
 
-        return false
+        return true
     }    
 
     @NonCPS
@@ -238,7 +233,6 @@ class Utilities {
     @NonCPS
     def static abortBuild(context) {
         def validChangeDetected = false
-        context.echo "Aborting current build ..."
 
         def changeLogSets = context.currentBuild.changeSets
 
@@ -248,7 +242,5 @@ class Utilities {
             context.echo "current build aborted"
             context.error("Stopping current build")
         }
-
-        context.echo "Build continue"
     }    
 }
