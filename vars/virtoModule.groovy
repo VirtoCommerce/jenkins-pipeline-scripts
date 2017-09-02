@@ -23,29 +23,24 @@ import jobs.scripts.*
 		try {	
 			step([$class: 'GitHubCommitStatusSetter', contextSource: [$class: 'ManuallyEnteredCommitContextSource', context: 'ci.virtocommerce.com'], statusResultSource: [$class: 'ConditionalStatusResultSource', results: [[$class: 'AnyBuildResult', message: 'Building on Virto Commerce CI', state: 'PENDING']]]])			
 			Utilities.notifyBuildStatus(this, "started")
-			stage('Build + Analyze')
-			{
-				// https://support.cloudbees.com/hc/en-us/articles/226122247-How-to-Customize-Checkout-for-Pipeline-Multibranch-
-				/*
-				// Exclude doesn't work for multibranch: https://issues.jenkins-ci.org/browse/JENKINS-35988
-				checkout([
-					$class: 'GitSCM',
-					branches: scm.branches,
-					doGenerateSubmoduleConfigurations: scm.doGenerateSubmoduleConfigurations,
-					extensions: scm.extensions + [[$class: 'DisableRemotePoll'], [$class: 'PathRestriction', excludedRegions: 'README\\.md', includedRegions: '']],
-					userRemoteConfigs: scm.userRemoteConfigs
-				])
-				*/
 
+			stage('Checkout') {
 				timestamps { 
 					// clean folder for a release
 					if (Packaging.getShouldPublish(this)) {
 						deleteDir()
-					}
+					}					
 					checkout scm
-				}
-				
-				Utilities.checkAndAbortBuild(this)
+				}				
+			}			
+
+			if(Utilities.checkAndAbortBuild(this))
+			{
+				return true
+			}
+
+			stage('Build + Analyze')
+			{
 				timestamps { 
 					Packaging.startAnalyzer(this)
 					Packaging.buildSolutions(this)
