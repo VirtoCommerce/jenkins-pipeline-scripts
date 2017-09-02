@@ -36,22 +36,32 @@ import jobs.scripts.*
 					userRemoteConfigs: scm.userRemoteConfigs
 				])
 				*/
-				
-				checkout scm
 
-				//Utilities.checkAndAbortBuild(this)
-				Packaging.startAnalyzer(this)
-				Packaging.buildSolutions(this)
+				timestamps { 
+					// clean folder for a release
+					if (Packaging.getShouldPublish(this)) {
+						deleteDir()
+					}
+					checkout scm
+
+					//Utilities.checkAndAbortBuild(this)
+					Packaging.startAnalyzer(this)
+					Packaging.buildSolutions(this)
+				}
 			}
 
 			stage('Package Module')
 			{
-				processManifests(false) // prepare artifacts for testing
+				timestamps { 				
+					processManifests(false) // prepare artifacts for testing
+				}
 			}
 
 			stage('Unit Tests')
 			{
-				Modules.runUnitTests(this)
+				timestamps { 				
+					Modules.runUnitTests(this)
+				}
 			}
 
 			stage('Submit Analysis') {
@@ -79,17 +89,20 @@ import jobs.scripts.*
 
 				stage('Integration Tests')
 				{
-					Modules.runIntegrationTests(this)
+					timestamps { 					
+						Modules.runIntegrationTests(this)
+					}
 				}				
 			}				
 
 			if (env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'master') {
 				stage('Publish')
 				{
-					
-					Utilities.runSharedPS(this, "resources\\azure\\${deployScript}")				
-					if (Packaging.getShouldPublish(this)) {
-						processManifests(true) // publish artifacts to github releases
+					timestamps { 	
+						Utilities.runSharedPS(this, "resources\\azure\\${deployScript}")				
+						if (Packaging.getShouldPublish(this)) {
+							processManifests(true) // publish artifacts to github releases
+						}
 					}
 				}
 			}		
