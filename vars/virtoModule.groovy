@@ -26,6 +26,8 @@ import jobs.scripts.*
 			stage('Build + Analyze')
 			{
 				// https://support.cloudbees.com/hc/en-us/articles/226122247-How-to-Customize-Checkout-for-Pipeline-Multibranch-
+				/*
+				// Exclude doesn't work for multibranch: https://issues.jenkins-ci.org/browse/JENKINS-35988
 				checkout([
 					$class: 'GitSCM',
 					branches: scm.branches,
@@ -33,7 +35,11 @@ import jobs.scripts.*
 					extensions: scm.extensions + [[$class: 'DisableRemotePoll'], [$class: 'PathRestriction', excludedRegions: 'README\\.md', includedRegions: '']],
 					userRemoteConfigs: scm.userRemoteConfigs
 				])
-				//checkout scm
+				*/
+				
+				checkout scm
+
+				//Utilities.checkAndAbortBuild(this)
 				Packaging.startAnalyzer(this)
 				Packaging.buildSolutions(this)
 			}

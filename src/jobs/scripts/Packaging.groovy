@@ -268,7 +268,7 @@ class Packaging {
 		}
 
         return false
-    }
+    } 
 
     def static updateModulesDefinitions(context, def directory, def module, def version)
     {
