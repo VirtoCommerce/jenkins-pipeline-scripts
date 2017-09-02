@@ -195,6 +195,8 @@ class Utilities {
     {
         String result = context.bat(returnStdout: true, script: "\"${context.tool 'Git'}\" log -1 --pretty=\"format:\" --name-only").trim()        
         def lines = result.split("\r?\n")
+
+        context.echo "size: ${lines.size()}, 2:${lines[2]}"
         if(lines.size() == 2 && lines[1].equalsIgnoreCase('readme.md.'))
         {
             context.echo "Found only change to readme.md file, so build should be aborted."
