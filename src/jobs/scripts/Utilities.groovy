@@ -197,7 +197,7 @@ class Utilities {
         def lines = result.split("\r?\n")
 
         context.echo "size: ${lines.size()}, 2:${lines[1]}"
-        if(lines.size() == 2 && lines[1].equalsIgnoreCase('readme.md.'))
+        if(lines.size() == 2 && lines[1].equalsIgnoreCase('readme.md'))
         {
             context.echo "Found only change to readme.md file, so build should be aborted."
             return false
