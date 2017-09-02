@@ -1,5 +1,4 @@
 #!groovy
-@Library('virto-shared-library@dev')
 import groovy.json.*
 import groovy.util.*
 import jobs.scripts.*
@@ -40,7 +39,7 @@ import jobs.scripts.*
 				
 				checkout scm
 
-				Utilities.checkAndAbortBuild(this)
+				//Utilities.checkAndAbortBuild(this)
 				Packaging.startAnalyzer(this)
 				Packaging.buildSolutions(this)
 			}
