@@ -209,7 +209,7 @@ class Utilities {
     }    
 
     @NonCPS
-    def abortBuildIfTriggeredByJenkins(context) {
+    def static abortBuildIfTriggeredByJenkins(context) {
         def validChangeDetected = false
         def changeLogSets = context.currentBuild.changeSets
         for (int i = 0; i < changeLogSets.size(); i++) {
@@ -230,7 +230,7 @@ class Utilities {
     }    
 
     @NonCPS
-    def abortBuild(context) {
+    def static abortBuild(context) {
         def validChangeDetected = false
         def changeLogSets = context.currentBuild.changeSets
 
