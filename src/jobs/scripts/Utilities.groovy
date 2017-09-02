@@ -239,10 +239,11 @@ class Utilities {
         def changeLogSets = context.currentBuild.changeSets
 
         // We are building if there are some walid changes or if there are no changes(so the build was triggered intentionally or it is the first run.)
-        if(changeLogSets.size() != 0) {
+        //if(changeLogSets.size() != 0) {
+            context.echo "Aborting build and setting result to ${context.currentBuild.rawBuild.getPreviousBuild()?.result?.toString()}"
             context.currentBuild.setResult(context.currentBuild.rawBuild.getPreviousBuild()?.result?.toString())
-            context.echo "current build aborted"
+            //context.echo "current build aborted"
             context.error("Stopping current build")
-        }
+        //}
     }    
 }
