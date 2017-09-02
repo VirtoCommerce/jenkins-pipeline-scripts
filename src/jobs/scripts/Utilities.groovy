@@ -193,10 +193,11 @@ class Utilities {
 
     def static getShouldBuild(context)
     {
-		context.bat "\"${context.tool 'Git'}\" log -1 --pretty=\"format:\" --name-only > LAST_COMMIT_MESSAGE"
-		def git_last_commit = context.readFile('LAST_COMMIT_MESSAGE')
+		//context.bat "\"${context.tool 'Git'}\" log -1 --pretty=\"format:\" --name-only > LAST_COMMIT_MESSAGE"
+        String result = context.bat(returnStdout: true, script: "\"${context.tool 'Git'}\" log -1 --pretty=\"format:\" --name-only").trim()        
 
-		if (!git_last_commit.equalsIgnoreCase('readme.md.')) {
+        context.echo result
+		if (!result.equalsIgnoreCase('readme.md.')) {
 			return false
 		}
 
