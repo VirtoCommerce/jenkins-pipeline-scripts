@@ -234,6 +234,7 @@ class Packaging {
     {
         def tempFolder = Utilities.getTempFolder(context)
         def packagesDir = Utilities.getArtifactFolder(context)
+        def packageUrl
 
         context.dir(packagesDir)
         {
@@ -241,10 +242,12 @@ class Packaging {
             if (artifacts.size() > 0) {
                 for (int i = 0; i < artifacts.size(); i++)
                 {
-                    Packaging.publishGithubRelease(context, version, artifacts[i])
+                    packageUrl = Packaging.publishGithubRelease(context, version, artifacts[i])
                 }
             }
         }
+
+        return packageUrl
     } 
 
     def static publishGithubRelease(context, version, artifact)   
