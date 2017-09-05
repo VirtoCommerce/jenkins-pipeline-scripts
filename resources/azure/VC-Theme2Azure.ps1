@@ -1,13 +1,20 @@
 ﻿param([string] $StagingName, [string] $StoreName)
 
+$StagingName
+$StoreName
+
 # Get Theme Zip File
 
 $Path2Zip = Get-Childitem -Recurse -Path "${env:WORKSPACE}\artifacts\" -File -Include *.zip
+
+$Path2Zip
 
 # Unzip Theme Zip File
 $Path = "${env:WORKSPACE}\artifacts\" + [System.IO.Path]::GetFileNameWithoutExtension($Path2Zip)
 Add-Type -AssemblyName System.IO.Compression.FileSystem
 [System.IO.Compression.ZipFile]::ExtractToDirectory($Path2Zip, $Path)
+
+$Path
 
 # Upload Theme Zip File to Azure
 
@@ -18,6 +25,7 @@ if ($StagingName -eq "dev"){
 if ($StagingName -eq "qa"){
     $ConnectionString = "${env:AzureBlobConnectionStringQA}"
 }
+$ConnectionString
 $BlobContext = New-AzureStorageContext -ConnectionString $ConnectionString
 
 $AzureBlobName = "Themes/" + $StoreName
