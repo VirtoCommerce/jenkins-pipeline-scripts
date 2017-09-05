@@ -29,10 +29,24 @@ def call(body) {
 				return true
 			}
 
-			stage('Build') {
+			stage('Build + Analyze') {
 				timestamps { 
+				    // clean folder for a release
+					if (Packaging.getShouldPublish(this)) {
+						deleteDir()
+						checkout scm
+					}
+					Packaging.startAnalyzer(this)
 					Packaging.runGulpBuild(this)
 				}
+			}
+
+			if (Packaging.getShouldStage(this)) {
+				stage('Stage') {
+					timestamps {
+						//Utilities.runSharedPS(this, "resources\\azure\\${deployScript}")
+					}
+				}			
 			}
 
 			if (Packaging.getShouldPublish(this)) {
@@ -40,7 +54,7 @@ def call(body) {
 					timestamps { 
 						Packaging.publishThemePackage(this)
 					}
-				}			
+				}
 			}
 		}
 		catch (any) {
