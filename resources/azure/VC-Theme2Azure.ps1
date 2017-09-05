@@ -18,15 +18,13 @@ $Path
 
 # Upload Theme Zip File to Azure
 
-$ConnectionString = ""
+$ConnectionString = "DefaultEndpointsProtocol=https;AccountName={0};AccountKey={1};EndpointSuffix=core.windows.net"
 if ($StagingName -eq "dev"){
-    $ConnectionString = "${env:AzureBlobConnectionStringDev}"
+    $ConnectionString = $ConnectionString -f ${env:AzureBlobNameDev}, ${env:AzureBlobKeyDev}
 }
 if ($StagingName -eq "qa"){
-    $ConnectionString = "${env:AzureBlobConnectionStringQA}"
+    $ConnectionString = $ConnectionString -f ${env:AzureBlobNameQA}, ${env:AzureBlobKeyQA}
 }
-"devconn: ${env:AzureBlobConnectionStringDev}"
-"qaconn: ${env:AzureBlobConnectionStringQA}"
 $ConnectionString
 $BlobContext = New-AzureStorageContext -ConnectionString $ConnectionString
 
