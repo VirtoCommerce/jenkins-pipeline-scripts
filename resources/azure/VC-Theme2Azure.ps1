@@ -12,10 +12,10 @@ Add-Type -AssemblyName System.IO.Compression.FileSystem
 # Upload Theme Zip File to Azure
 
 $ConnectionString = ""
-if ([string] $StagingName -eq "dev"){
+if ($StagingName -eq "dev"){
     $ConnectionString = "${env:AzureBlobConnectionStringDev}"
 }
-if ([string] $StagingName -eq "qa"){
+if ($StagingName -eq "qa"){
     $ConnectionString = "${env:AzureBlobConnectionStringQA}"
 }
 $BlobContext = New-AzureStorageContext -ConnectionString $ConnectionString
