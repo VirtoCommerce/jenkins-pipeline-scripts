@@ -9,11 +9,7 @@ def call(body) {
 	body.delegate = config
 	body()
     
-	node {	
-	    def deployScript = 'VC-Theme2AzureDev.ps1'
-		if (env.BRANCH_NAME == 'master') {
-			deployScript = 'VC-Theme2AzureQA.ps1'
-		}
+	node {
 		try {
 			echo "Building branch ${env.BRANCH_NAME}"
 			Utilities.notifyBuildStatus(this, "Started")
@@ -21,7 +17,14 @@ def call(body) {
 			stage('Checkout') {
 				timestamps { 
 					checkout scm
-				}				
+				}
+				// clean folder for a release
+				// we need keep first checkout to get latest info from GitHub before checking
+				// we can't return from try block here, it's reason why Utilities.checkAndAbortBuild may be called twice 
+				if(Packaging.getShouldPublish(this) && !Utilities.checkAndAbortBuild(this)) {
+					deleteDir()
+					checkout scm
+				}
 			}
 
 			if(Utilities.checkAndAbortBuild(this))
@@ -31,11 +34,6 @@ def call(body) {
 
 			stage('Build + Analyze') {
 				timestamps { 
-				    // clean folder for a release
-					if (Packaging.getShouldPublish(this)) {
-						deleteDir()
-						checkout scm
-					}
 					Packaging.startAnalyzer(this)
 					Packaging.runGulpBuild(this)
 				}
@@ -44,7 +42,8 @@ def call(body) {
 			if (Packaging.getShouldStage(this)) {
 				stage('Stage') {
 					timestamps {
-						//Utilities.runSharedPS(this, "resources\\azure\\${deployScript}")
+					    def stagingName = Utilities.getStagingNameFromBranchName(this)
+						Utilities.runSharedPS(this, "resources\\azure\\VC-Theme2Azure.ps1", "StagingName=${stagingName}, StoreName=${storeName}")
 					}
 				}			
 			}
