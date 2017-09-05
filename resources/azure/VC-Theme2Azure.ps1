@@ -25,6 +25,8 @@ if ($StagingName -eq "dev"){
 if ($StagingName -eq "qa"){
     $ConnectionString = "${env:AzureBlobConnectionStringQA}"
 }
+"devconn: ${env:AzureBlobConnectionStringDev}"
+"qaconn: ${env:AzureBlobConnectionStringQA}"
 $ConnectionString
 $BlobContext = New-AzureStorageContext -ConnectionString $ConnectionString
 
