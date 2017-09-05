@@ -10,6 +10,7 @@ def call(body) {
 	body()
     
 	node {
+	    def storeName = config.sampleStore
 		try {
 			echo "Building branch ${env.BRANCH_NAME}"
 			Utilities.notifyBuildStatus(this, "Started")
