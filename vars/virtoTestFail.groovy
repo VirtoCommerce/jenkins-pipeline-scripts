@@ -14,7 +14,7 @@ def call(body) {
 			stage('Test') {
 				Utilities.notifyBuildStatus(this, "Started")
 				def wsFolder = pwd()
-				bat "powershell.exe -File \"${wsFolder}\\..\\workspace@libs\\virto-shared-library\\resources\\jenkins\\VC-TestFail.ps1\""
+				bat "powershell.exe -File \"${wsFolder}\\..\\workspace@libs\\virto-shared-library\\resources\\jenkins\\VC-TestFail.ps1\" -ErrorAction Stop"
 			}
 		}
 		catch (any) {
