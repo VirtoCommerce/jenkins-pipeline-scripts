@@ -12,8 +12,9 @@ def call(body) {
 	node {
 		try {
 			stage('Test') {
-        Utilities.notifyBuildStatus(this, "Started")
-        Utilities.runSharedPS(this, "resources\\jenkins\\VC-TestFail.ps1")
+				Utilities.notifyBuildStatus(this, "Started")
+				def wsFolder = pwd()
+				bat "powershell.exe -File \"${wsFolder}\\..\\workspace@libs\\virto-shared-library\\resources\\jenkins\\VC-TestFail.ps1\"
 			}
 		}
 		catch (any) {
