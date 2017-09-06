@@ -1,1 +1,1 @@
-Get-Content "non-existing path"
+Get-Content "non-existing path" -ErrorAction Stop
