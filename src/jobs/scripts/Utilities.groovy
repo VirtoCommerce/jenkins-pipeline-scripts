@@ -30,10 +30,10 @@ class Utilities {
         return "VirtoCommerce"
     }
 
-    def static runSharedPS(context, scriptName)
+    def static runSharedPS(context, scriptName, args = '')
     {
     	def wsFolder = context.pwd()
- 	    context.bat "powershell.exe -File \"${wsFolder}\\..\\workspace@libs\\${DefaultSharedLibName}\\${scriptName}\""
+ 	    context.bat "powershell.exe -File \"${wsFolder}\\..\\workspace@libs\\${DefaultSharedLibName}\\${scriptName}\" ${args} -ErrorAction Stop"
     }
 
     def static getAssemblyVersion(context)
@@ -205,6 +205,19 @@ class Utilities {
 
         return true
     }    
+
+	def static getStagingNameFromBranchName(context){
+	    def stagingName = ""
+		if (context.env.BRANCH_NAME == 'dev')
+		{
+			stagingName = "dev"
+		}
+		if (context.env.BRANCH_NAME == 'master')
+		{
+			stagingName = "qa"
+		}
+		return stagingName
+	}
 
     @NonCPS
     def static jsonParse(def json) {

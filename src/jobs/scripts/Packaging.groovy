@@ -228,95 +228,111 @@ class Packaging {
         }
 
         Utilities.runUnitTest(context, "-trait \"category=ci\" -trait \"category=Unit\"", paths, "xUnit.UnitTests.xml")
-   }
-
-    def static publishRelease(context, version)
-    {
-        def tempFolder = Utilities.getTempFolder(context)
-        def packagesDir = Utilities.getArtifactFolder(context)
-
-        context.dir(packagesDir)
-        {
-            def artifacts = context.findFiles(glob: '*.zip')
-            if (artifacts.size() > 0) {
-                for (int i = 0; i < artifacts.size(); i++)
-                {
-                    Packaging.publishGithubRelease(context, version, artifacts[i])
-                }
-            }
-        }
-    } 
-
-    def static publishGithubRelease(context, version, artifact)   
-    {
-        def REPO_NAME = Utilities.getRepoName(context)
-        def REPO_ORG = Utilities.getOrgName(context)
-
-        context.bat "${context.env.Utils}\\github-release release --user $REPO_ORG --repo $REPO_NAME --tag v${version}"
-        context.bat "${context.env.Utils}\\github-release upload --user $REPO_ORG --repo $REPO_NAME --tag v${version} --name \"${artifact}\" --file \"${artifact}\""
-        context.echo "uploaded to https://github.com/$REPO_ORG/$REPO_NAME/releases/download/v${version}/${artifact}"
-        return "https://github.com/$REPO_ORG/$REPO_NAME/releases/download/v${version}/${artifact}"
     }
 
-    def static getShouldPublish(context)
-    {
-		context.bat "\"${context.tool 'Git'}\" log -1 --pretty=%%B > LAST_COMMIT_MESSAGE"
-		def git_last_commit = context.readFile('LAST_COMMIT_MESSAGE')			
+	def static publishRelease(context, version)
+	{
+		def tempFolder = Utilities.getTempFolder(context)
+		def packagesDir = Utilities.getArtifactFolder(context)
+		def packageUrl
 
-		if (context.env.BRANCH_NAME == 'master' && !git_last_commit.contains('[draft]')) {
+		context.dir(packagesDir)
+		{
+			def artifacts = context.findFiles(glob: '*.zip')
+			if (artifacts.size() > 0) {
+				for (int i = 0; i < artifacts.size(); i++)
+				{
+					packageUrl = Packaging.publishGithubRelease(context, version, artifacts[i])
+				}
+			}
+		}
+
+		return packageUrl
+	} 
+
+	def static publishGithubRelease(context, version, artifact)   
+	{
+		def REPO_NAME = Utilities.getRepoName(context)
+		def REPO_ORG = Utilities.getOrgName(context)
+
+		context.bat "${context.env.Utils}\\github-release release --user $REPO_ORG --repo $REPO_NAME --tag v${version}"
+		context.bat "${context.env.Utils}\\github-release upload --user $REPO_ORG --repo $REPO_NAME --tag v${version} --name \"${artifact}\" --file \"${artifact}\""
+		context.echo "uploaded to https://github.com/$REPO_ORG/$REPO_NAME/releases/download/v${version}/${artifact}"
+		return "https://github.com/$REPO_ORG/$REPO_NAME/releases/download/v${version}/${artifact}"
+	}
+
+	def static getShouldPublish(context)
+	{
+		if (context.env.BRANCH_NAME == 'master' && !isDraft(context)) {
 			return true
 		}
 
-        return false
-    } 
+		return false
+	}
 
-    def static updateModulesDefinitions(context, def directory, def module, def version)
-    {
-        context.dir(directory)
-        {
-            context.bat "\"${context.tool 'Git'}\" config user.email \"ci@virtocommerce.com\""
-            context.bat "\"${context.tool 'Git'}\" config user.name \"Virto Jenkins\""
-            /*
-            if(!foundRecord)
-                {
-                    bat "\"${tool 'Git'}\" commit -am \"Updated module ${id}\""
-                }
-                else
-                {
-                    bat "\"${tool 'Git'}\" commit -am \"Added new module ${id}\""
-                }
-                */
-            context.bat "\"${context.tool 'Git'}\" commit -am \"${module} ${version}\""
-            context.bat "\"${context.tool 'Git'}\" push origin HEAD:master -f"
-        }
-    }    
+	def static getShouldStage(context)
+	{
+		if ((context.env.BRANCH_NAME == 'master' || context.env.BRANCH_NAME == 'dev') && !isDraft(context)) {
+			return true
+		}
 
-    def static installModule(context, path)
-    {
-        def wsFolder = context.pwd()
- 	    context.bat "powershell.exe -File \"${wsFolder}\\..\\workspace@libs\\${DefaultSharedLibName}\\resources\\azure\\vc-install-module.ps1\" -apiurl \"${Utilities.getPlatformHost(context)}\" -moduleZipArchievePath \"${path}\" -ErrorAction Stop"
-    }    
+		return false
+	}
 
-    def static publishThemePackage(context)
-    {
-        // find all manifests
-        def inputFile = context.readFile file: 'package.json', encoding: 'utf-8'
-        def json = Utilities.jsonParse(inputFile)
+	def static isDraft(context)
+	{
+	    context.bat "\"${context.tool 'Git'}\" log -1 --pretty=%%B > LAST_COMMIT_MESSAGE"
+		def git_last_commit = context.readFile('LAST_COMMIT_MESSAGE')
+	    return git_last_commit.contains('[draft]')
+	}
 
-        def name = json.name;
-        def version = json.version;
+	def static updateModulesDefinitions(context, def directory, def module, def version)
+	{
+		context.dir(directory)
+		{
+			context.bat "\"${context.tool 'Git'}\" config user.email \"ci@virtocommerce.com\""
+			context.bat "\"${context.tool 'Git'}\" config user.name \"Virto Jenkins\""
+			/*
+			if(!foundRecord)
+				{
+					bat "\"${tool 'Git'}\" commit -am \"Updated module ${id}\""
+				}
+				else
+				{
+					bat "\"${tool 'Git'}\" commit -am \"Added new module ${id}\""
+				}
+				*/
+			context.bat "\"${context.tool 'Git'}\" commit -am \"${module} ${version}\""
+			context.bat "\"${context.tool 'Git'}\" push origin HEAD:master -f"
+		}
+	}    
 
-        def packagesDir = Utilities.getArtifactFolder(context)
+	def static installModule(context, path)
+	{
+		def wsFolder = context.pwd()
+ 		context.bat "powershell.exe -File \"${wsFolder}\\..\\workspace@libs\\${DefaultSharedLibName}\\resources\\azure\\vc-install-module.ps1\" -apiurl \"${Utilities.getPlatformHost(context)}\" -moduleZipArchievePath \"${path}\" -ErrorAction Stop"
+	}    
 
-        context.dir(packagesDir)
-        {
-            def artifacts = context.findFiles(glob: '*.zip')
-            if (artifacts.size() > 0) {
-                for (int i = 0; i < artifacts.size(); i++)
-                {
-                    Packaging.publishGithubRelease(context, version, artifacts[i])
-                }
-            }	
-        }
-    }    
+	def static publishThemePackage(context)
+	{
+		// find all manifests
+		def inputFile = context.readFile file: 'package.json', encoding: 'utf-8'
+		def json = Utilities.jsonParse(inputFile)
+
+		def name = json.name;
+		def version = json.version;
+
+		def packagesDir = Utilities.getArtifactFolder(context)
+
+		context.dir(packagesDir)
+		{
+			def artifacts = context.findFiles(glob: '*.zip')
+			if (artifacts.size() > 0) {
+				for (int i = 0; i < artifacts.size(); i++)
+				{
+					Packaging.publishGithubRelease(context, version, artifacts[i])
+				}
+			}	
+		}
+	}    
 }
