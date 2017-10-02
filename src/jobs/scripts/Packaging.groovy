@@ -159,7 +159,7 @@ class Packaging {
                 def solution = solutions[i]
                 Packaging.runBuild(context, solution.name)
             }
-        }
+        } 
     }    
 
     def static runBuild(context, solution)
@@ -210,7 +210,7 @@ class Packaging {
     {
 		context.timeout(time: 1, unit: 'HOURS') { // Just in case something goes wrong, pipeline will be killed after a timeout
 			def qg = context.waitForQualityGate() // Reuse taskId previously collected by withSonarQubeEnv
-			if (qg.status != 'OK') {
+			if (qg.status != 'OK' && qg.status != 'WARN') {
 			    context.error "Pipeline aborted due to quality gate failure: ${qg.status}"
 			}
 		}        
