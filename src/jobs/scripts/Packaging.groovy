@@ -206,6 +206,16 @@ class Packaging {
         }        
     }
 
+    def static checkAnalyzerGate(context)
+    {
+		context.timeout(time: 1, unit: 'HOURS') { // Just in case something goes wrong, pipeline will be killed after a timeout
+			def qg = context.waitForQualityGate() // Reuse taskId previously collected by withSonarQubeEnv
+			if (qg.status != 'OK') {
+			    context.error "Pipeline aborted due to quality gate failure: ${qg.status}"
+			}
+		}        
+    }
+
     def static runGulpBuild(context)
     {
         def packagesDir = Utilities.getArtifactFolder(context)
