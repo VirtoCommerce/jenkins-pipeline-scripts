@@ -99,11 +99,9 @@ def call(body) {
 			}			
 
 			// No need to occupy a node
-			/*
 			stage("Quality Gate"){
 				Packaging.checkAnalyzerGate(this)
 			}
-			*/				
 
 			if (env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'master') {
 				stage('Docker Sample') {
