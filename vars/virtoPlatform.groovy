@@ -68,11 +68,6 @@ def call(body) {
 					Packaging.runBuild(this, solution)
 				}
 			}
-
-			// No need to occupy a node
-			stage("Quality Gate"){
-				Packaging.checkAnalyzerGate(this)
-			}			
 		
 			def version = Utilities.getAssemblyVersion(this)
 			def dockerImage
@@ -102,6 +97,11 @@ def call(body) {
 					Packaging.endAnalyzer(this)
 				}
 			}			
+
+			// No need to occupy a node
+			stage("Quality Gate"){
+				Packaging.checkAnalyzerGate(this)
+			}				
 
 			if (env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'master') {
 				stage('Docker Sample') {
