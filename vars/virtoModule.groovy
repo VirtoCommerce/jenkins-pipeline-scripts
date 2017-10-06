@@ -167,6 +167,7 @@ def processManifest(def publish, def manifestPath)
 	def projectUrl = manifest.projectUrl.toString()
 	def packageUrl = manifest.packageUrl.toString()
 	def iconUrl = manifest.iconUrl.toString()
+	def releaseNotes = manifest.releaseNotes.toString()
 
 	// get dependencies
 	echo "parsing dependencies"
@@ -203,7 +204,7 @@ def processManifest(def publish, def manifestPath)
 	Modules.createModuleArtifact(this, manifestDirectory)
 
 	if (publish) {
-		packageUrl = Packaging.publishRelease(this, version, description)
+		packageUrl = Packaging.publishRelease(this, version, releaseNotes)
 
 		updateModule(
 			id,
