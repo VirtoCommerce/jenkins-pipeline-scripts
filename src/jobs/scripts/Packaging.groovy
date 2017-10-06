@@ -240,7 +240,7 @@ class Packaging {
         Utilities.runUnitTest(context, "-trait \"category=ci\" -trait \"category=Unit\"", paths, "xUnit.UnitTests.xml")
     }
 
-	def static publishRelease(context, version)
+	def static publishRelease(context, version, description)
 	{
 		def tempFolder = Utilities.getTempFolder(context)
 		def packagesDir = Utilities.getArtifactFolder(context)
@@ -252,7 +252,7 @@ class Packaging {
 			if (artifacts.size() > 0) {
 				for (int i = 0; i < artifacts.size(); i++)
 				{
-					packageUrl = Packaging.publishGithubRelease(context, version, artifacts[i])
+					packageUrl = Packaging.publishGithubRelease(context, version, description, artifacts[i])
 				}
 			}
 		}
@@ -260,12 +260,12 @@ class Packaging {
 		return packageUrl
 	} 
 
-	def static publishGithubRelease(context, version, artifact)   
+	def static publishGithubRelease(context, version, description, artifact)   
 	{
 		def REPO_NAME = Utilities.getRepoName(context)
 		def REPO_ORG = Utilities.getOrgName(context)
 
-		context.bat "${context.env.Utils}\\github-release release --user $REPO_ORG --repo $REPO_NAME --tag v${version}"
+		context.bat "${context.env.Utils}\\github-release release --user $REPO_ORG --repo $REPO_NAME --tag v${version} --description \"${description}\""
 		context.bat "${context.env.Utils}\\github-release upload --user $REPO_ORG --repo $REPO_NAME --tag v${version} --name \"${artifact}\" --file \"${artifact}\""
 		context.echo "uploaded to https://github.com/$REPO_ORG/$REPO_NAME/releases/download/v${version}/${artifact}"
 		return "https://github.com/$REPO_ORG/$REPO_NAME/releases/download/v${version}/${artifact}"
