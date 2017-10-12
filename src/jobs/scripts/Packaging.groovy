@@ -167,7 +167,7 @@ class Packaging {
         if(context.projectType = 'NETCORE2')
         {
             context.bat "dotent restore"
-            context.bat "dontnet msbuild" \"${solution}\" /p:Configuration=Debug /p:Platform=\"Any CPU\" /m"
+            context.bat "dontnet msbuild \"${solution}\" /p:Configuration=Debug /p:Platform=\"Any CPU\" /m"
         }
         else
         {
