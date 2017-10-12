@@ -164,8 +164,16 @@ class Packaging {
 
     def static runBuild(context, solution)
     {
-		context.bat "Nuget restore ${solution}"
-        context.bat "\"${context.tool DefaultMSBuild}\" \"${solution}\" /p:Configuration=Debug /p:Platform=\"Any CPU\" /m"        
+        if(context.projectType = 'NETCORE2')
+        {
+            context.bat "dotent restore"
+            context.bat "dontnet msbuild" \"${solution}\" /p:Configuration=Debug /p:Platform=\"Any CPU\" /m"
+        }
+        else
+        {
+		    context.bat "Nuget restore ${solution}"
+            context.bat "\"${context.tool DefaultMSBuild}\" \"${solution}\" /p:Configuration=Debug /p:Platform=\"Any CPU\" /m"
+        }
     }
 
     def static cleanSolutions(context)
