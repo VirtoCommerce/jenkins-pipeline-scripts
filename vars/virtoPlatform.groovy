@@ -15,6 +15,7 @@ def call(body) {
 		def hmacAppId = env.HMAC_APP_ID
 		def hmacSecret = env.HMAC_SECRET
 		def solution = config.solution
+		def projectType = config.projectType
 		def webProject = 'VirtoCommerce.Platform.Web\\VirtoCommerce.Platform.Web.csproj'
 		def zipArtifact = 'VirtoCommerce.Platform'
 		def websiteDir = 'VirtoCommerce.Platform.Web'
