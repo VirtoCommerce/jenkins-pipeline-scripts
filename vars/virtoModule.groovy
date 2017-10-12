@@ -16,6 +16,7 @@ import jobs.scripts.*
 	    def deployScript = 'VC-Module2AzureDev.ps1'
 		def dockerTag = env.BRANCH_NAME
 		def buildOrder = Utilities.getNextBuildOrder(this)
+		projectType = config.projectType
 	    if (env.BRANCH_NAME == 'master') {
 			deployScript = 'VC-Module2AzureQA.ps1'
 			dockerTag = "latest"
