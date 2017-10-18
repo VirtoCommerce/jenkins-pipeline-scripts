@@ -146,11 +146,11 @@ class Packaging {
         // create artifacts
         if(context.projectType == 'NETCORE2')
         {
-            context.bat "dotnet publish \"${webProject}\" -o \"$tempFolder\""
+            context.bat "dotnet publish \"${webProject}\" -o \"$tempFolder\\_PublishedWebsites\\${websiteDir}\""
         }
         else
         {
-            context.bat "\"${context.tool DefaultMSBuild}\" \"${webProject}\" /nologo /verbosity:m /p:Configuration=Release /p:Platform=\"Any CPU\" /p:DebugType=none \"/p:OutputPath=$tempFolder\\_PublishedWebsites\\${websiteDir}\""
+            context.bat "\"${context.tool DefaultMSBuild}\" \"${webProject}\" /nologo /verbosity:m /p:Configuration=Release /p:Platform=\"Any CPU\" /p:DebugType=none \"/p:OutputPath=$tempFolder\""
         }
 
         (new AntBuilder()).zip(destfile: "${packagesDir}\\${zipArtifact}.${version}.zip", basedir: "${websitePath}")
