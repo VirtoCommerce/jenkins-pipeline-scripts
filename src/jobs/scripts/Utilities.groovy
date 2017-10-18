@@ -41,12 +41,12 @@ class Utilities {
         if(context.projectType == 'NETCORE2')
         {
             context.echo "Reading $projectFile file"
-            
+
             def wsDir = context.pwd()
             def fullManifestPath = "$wsDir\\$projectFile"
             def manifest = new XmlSlurper().parse(fullManifestPath)
 
-            def version = manifest.Project.PropertyGroup.Version.toString()
+            def version = manifest.PropertyGroup.Version.toString()
             context.echo "Found version ${version}"
             return version
         }
