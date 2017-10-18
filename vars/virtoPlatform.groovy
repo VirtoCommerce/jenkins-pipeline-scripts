@@ -76,7 +76,7 @@ def call(body) {
 				}
 			}
 		
-			def version = Utilities.getAssemblyVersion(this)
+			def version = Utilities.getAssemblyVersion(this, webProject)
 			def dockerImage
 
 			stage('Package') {

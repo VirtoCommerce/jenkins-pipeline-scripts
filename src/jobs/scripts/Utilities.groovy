@@ -36,13 +36,28 @@ class Utilities {
  	    context.bat "powershell.exe -File \"${wsFolder}\\..\\workspace@libs\\${DefaultSharedLibName}\\${scriptName}\" ${args} -ErrorAction Stop"
     }
 
-    def static getAssemblyVersion(context)
+    def static getAssemblyVersion(context, projectFile)
     {
-        context.echo "Searching for version inside CommonAssemblyInfo.cs file"
-        def matcher = context.readFile('CommonAssemblyInfo.cs') =~ /AssemblyFileVersion\(\"(\d+\.\d+\.\d+)/
-        def version = matcher[0][1]
-        context.echo "Found version ${version}"
-        return version
+        if(context.projectType == 'NETCORE2')
+        {
+            context.echo "Reading $projectFile file"
+            
+            def wsDir = context.pwd()
+            def fullManifestPath = "$wsDir\\$projectFile"
+            def manifest = new XmlSlurper().parse(fullManifestPath)
+
+            def version = manifest.Project.PropertyGroup.Version.toString()
+            context.echo "Found version ${version}"
+            return version
+        }
+        else
+        {
+            context.echo "Searching for version inside CommonAssemblyInfo.cs file"
+            def matcher = context.readFile('CommonAssemblyInfo.cs') =~ /AssemblyFileVersion\(\"(\d+\.\d+\.\d+)/
+            def version = matcher[0][1]
+            context.echo "Found version ${version}"
+            return version
+        }
     }
 
     def static getTestDlls(context)
