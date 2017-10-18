@@ -89,9 +89,18 @@ class Utilities {
 
     def static getWebPublishFolder(context, String websiteDir)
     {
-        def tempFolder = Utilities.getTempFolder(context)
-        def websitePath = "$tempFolder\\_PublishedWebsites\\${websiteDir}"
-        return websitePath
+        if(context.projectType == 'NETCORE2')
+        {
+            def tempFolder = Utilities.getTempFolder(context)
+            def websitePath = "$tempFolder\\_PublishedWebsites\\${websiteDir}"
+            return websitePath           
+        }
+        else
+        {
+            def tempFolder = Utilities.getTempFolder(context)
+            def websitePath = "$tempFolder\\_PublishedWebsites\\${websiteDir}"
+            return websitePath
+        }
     }
 
     def static getPlatformHost(context)
