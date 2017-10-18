@@ -131,7 +131,7 @@ def call(body) {
 						Packaging.pushDockerImage(this, dockerImage, dockerTag)
 
 						if (Packaging.getShouldPublish(this)) {
-							Packaging.publishRelease(this, "", version)
+							Packaging.publishRelease(this, version, "")
 						}
 
 						Utilities.runSharedPS(this, "resources\\azure\\${deployScript}")
