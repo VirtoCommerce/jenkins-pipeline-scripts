@@ -21,6 +21,7 @@ class Packaging {
      *
      * @param context Execution Contex, typically "this"
      * @param dockerImageName name of the docker image to create, something like virtocommerce/storefront
+     * @param dockerFileName name of the docker file name, something like Dockerfile
      * @param dockerContextFolder folder that docker build will use for context, files from that folder can be added to the docker image
      * @param dockerSourcePath Source of the files to be included in the docker image, can be files within contextFolder or remote source referred by http
      * @param version current version of the build
