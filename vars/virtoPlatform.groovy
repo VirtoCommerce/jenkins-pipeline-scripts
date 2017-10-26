@@ -110,31 +110,34 @@ def call(body) {
 				Packaging.checkAnalyzerGate(this)
 			}
 
-			if (env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'master') {
-				stage('Docker Sample') {
-					timestamps { 
-						// Start docker environment				
-						Packaging.startDockerTestEnvironment(this, dockerTag)
-				        
-						// install modules
-						Packaging.installModules(this)	
+			if(context.projectType != 'NETCORE2') // skip docker and publishing for dotnetcore
+			{
+				if (env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'master') {
+					stage('Docker Sample') {
+						timestamps { 
+							// Start docker environment				
+							Packaging.startDockerTestEnvironment(this, dockerTag)
+							
+							// install modules
+							Packaging.installModules(this)	
 
-						// now create sample data
-        				Packaging.createSampleData(this)					
-					}
-				}
-			}			
-
-			if (env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'master') {
-				stage('Publish'){
-					timestamps { 
-						Packaging.pushDockerImage(this, dockerImage, dockerTag)
-
-						if (Packaging.getShouldPublish(this)) {
-							Packaging.publishRelease(this, version, "")
+							// now create sample data
+							Packaging.createSampleData(this)					
 						}
+					}
+				}			
 
-						Utilities.runSharedPS(this, "resources\\azure\\${deployScript}")
+				if (env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'master') {
+					stage('Publish'){
+						timestamps { 
+							Packaging.pushDockerImage(this, dockerImage, dockerTag)
+
+							if (Packaging.getShouldPublish(this)) {
+								Packaging.publishRelease(this, version, "")
+							}
+
+							Utilities.runSharedPS(this, "resources\\azure\\${deployScript}")
+						}
 					}
 				}
 			}
