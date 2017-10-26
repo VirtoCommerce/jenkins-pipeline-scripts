@@ -126,21 +126,26 @@ def call(body) {
 						}
 					}
 				}			
-
-				if (env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'master') {
-					stage('Publish'){
-						timestamps { 
+			}
+			if (env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'master') {
+				stage('Publish'){
+					timestamps { 
+						if(context.projectType != 'NETCORE2')
+						{
 							Packaging.pushDockerImage(this, dockerImage, dockerTag)
+						}
+						if (Packaging.getShouldPublish(this)) {
+							Packaging.publishRelease(this, version, "")
+						}
 
-							if (Packaging.getShouldPublish(this)) {
-								Packaging.publishRelease(this, version, "")
-							}
-
+						if(context.projectType != 'NETCORE2')
+						{
 							Utilities.runSharedPS(this, "resources\\azure\\${deployScript}")
 						}
 					}
 				}
 			}
+
 
 /*
 			stage('Cleanup') {
