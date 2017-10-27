@@ -71,7 +71,7 @@ class Utilities {
             def manifest = new XmlSlurper().parse(fullManifestPath)
 
             def notes = manifest.PropertyGroup.PackageReleaseNotes.toString()
-            context.echo "Found notes ${version}"
+            context.echo "Found notes ${notes}"
             return notes
         }
         else
