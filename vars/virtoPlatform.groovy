@@ -110,7 +110,7 @@ def call(body) {
 				Packaging.checkAnalyzerGate(this)
 			}
 
-			if(context.projectType != 'NETCORE2') // skip docker and publishing for dotnetcore
+			if(projectType != 'NETCORE2') // skip docker and publishing for dotnetcore
 			{
 				if (env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'master') {
 					stage('Docker Sample') {
@@ -127,11 +127,11 @@ def call(body) {
 					}
 				}			
 			}
-			
+
 			if (env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'master') {
 				stage('Publish'){
 					timestamps { 
-						if(context.projectType != 'NETCORE2')
+						if(projectType != 'NETCORE2')
 						{
 							Packaging.pushDockerImage(this, dockerImage, dockerTag)
 						}
@@ -139,7 +139,7 @@ def call(body) {
 							Packaging.publishRelease(this, version, "")
 						}
 
-						if(context.projectType != 'NETCORE2')
+						if(projectType != 'NETCORE2')
 						{
 							Utilities.runSharedPS(this, "resources\\azure\\${deployScript}")
 						}
