@@ -60,6 +60,26 @@ class Utilities {
         }
     }
 
+    def static getReleaseNotes(context, projectFile)
+    {
+        if(context.projectType == 'NETCORE2')
+        {
+            context.echo "Reading $projectFile file"
+
+            def wsDir = context.pwd()
+            def fullManifestPath = "$wsDir\\$projectFile"
+            def manifest = new XmlSlurper().parse(fullManifestPath)
+
+            def notes = manifest.PropertyGroup.PackageReleaseNotes.toString()
+            context.echo "Found notes ${version}"
+            return notes
+        }
+        else
+        {
+            return ""
+        }
+    }    
+
     def static getTestDlls(context)
     {
         def testDlls = context.findFiles(glob: '**\\bin\\Debug\\*Test.dll')
