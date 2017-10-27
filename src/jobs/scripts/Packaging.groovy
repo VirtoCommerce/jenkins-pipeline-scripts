@@ -174,7 +174,7 @@ class Packaging {
     {
         if(context.projectType == 'NETCORE2')
         {
-            //context.bat "dotnet restore" // no need to run it in .net core 2.0, it should run as part of dotnet msbuild
+            context.bat "dotnet restore" // no need to run it in .net core 2.0, it should run as part of dotnet msbuild
             //context.bat "dotnet msbuild \"${solution}\" -c Debug"
             // we need to use MSBuild directly to allow sonar analysis to work
             context.bat "\"${context.tool DefaultMSBuild}\" \"${solution}\" /p:Configuration=Debug /p:Platform=\"Any CPU\" /t:restore /t:rebuild /m"
