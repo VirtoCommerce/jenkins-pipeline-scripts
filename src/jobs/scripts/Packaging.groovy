@@ -174,7 +174,7 @@ class Packaging {
     {
         if(context.projectType == 'NETCORE2')
         {
-            context.bat "dotnet restore" // no need to run it in .net core 2.0, it should run as part of dotnet msbuild
+            //context.bat "dotnet restore" // no need to run it in .net core 2.0, it should run as part of dotnet msbuild
             //context.bat "dotnet msbuild \"${solution}\" -c Debug"
             // we need to use MSBuild directly to allow sonar analysis to work
             context.bat "\"${context.tool DefaultMSBuild}\" \"${solution}\" /p:Configuration=Debug /p:Platform=\"Any CPU\" /t:restore /t:rebuild /m"
@@ -282,6 +282,9 @@ class Packaging {
 	{
 		def REPO_NAME = Utilities.getRepoName(context)
 		def REPO_ORG = Utilities.getOrgName(context)
+
+        def platformLineSeparator = System.properties['line.separator']
+        rreleaseNotes = eleaseNotes.replace(platformLineSeparator, '<br>')
 
 		context.bat "${context.env.Utils}\\github-release release --user $REPO_ORG --repo $REPO_NAME --tag v${version} --description \"${releaseNotes}\""
 		context.bat "${context.env.Utils}\\github-release upload --user $REPO_ORG --repo $REPO_NAME --tag v${version} --name \"${artifact}\" --file \"${artifact}\""
