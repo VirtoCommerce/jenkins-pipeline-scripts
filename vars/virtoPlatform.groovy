@@ -71,7 +71,7 @@ def call(body) {
 						checkout scm
 					}		
 					
-					//Packaging.startAnalyzer(this)
+					Packaging.startAnalyzer(this)
 					Packaging.runBuild(this, solution)
 				}
 			}
