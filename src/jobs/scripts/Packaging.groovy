@@ -284,7 +284,7 @@ class Packaging {
 		def REPO_ORG = Utilities.getOrgName(context)
 
         def platformLineSeparator = System.properties['line.separator']
-        rreleaseNotes = eleaseNotes.replace(platformLineSeparator, '<br>')
+        releaseNotes = releaseNotes.replace(platformLineSeparator, '<br>')
 
 		context.bat "${context.env.Utils}\\github-release release --user $REPO_ORG --repo $REPO_NAME --tag v${version} --description \"${releaseNotes}\""
 		context.bat "${context.env.Utils}\\github-release upload --user $REPO_ORG --repo $REPO_NAME --tag v${version} --name \"${artifact}\" --file \"${artifact}\""
