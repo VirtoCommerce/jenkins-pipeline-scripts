@@ -60,6 +60,17 @@ class Utilities {
         }
     }
 
+    def static getPackageVersion(context)
+    {
+        context.echo "Searching for version inside package.json file"
+        def inputFile = context.readFile('package.json')
+        def json = Utilities.jsonParse(inputFile)
+
+        def version = json.version
+        context.echo "Found version ${version}"
+        return version
+    }
+
     def static getReleaseNotes(context, projectFile)
     {
         if(context.projectType == 'NETCORE2')
