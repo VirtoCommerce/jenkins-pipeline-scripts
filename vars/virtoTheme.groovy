@@ -53,7 +53,7 @@ def call(body) {
 			if (Packaging.getShouldPublish(this)) {
 				stage('Publish') {
 					timestamps { 
-						Packaging.publishRelease(this, version, ")
+						Packaging.publishRelease(this, version, "")
 					}
 				}
 			}
