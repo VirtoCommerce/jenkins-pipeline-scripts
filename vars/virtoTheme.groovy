@@ -38,6 +38,8 @@ def call(body) {
 					Packaging.runGulpBuild(this)
 				}
 			}
+			
+			def version = Utilities.getPackageVersion(this)
 
 			if (Packaging.getShouldStage(this)) {
 				stage('Stage') {
@@ -51,7 +53,7 @@ def call(body) {
 			if (Packaging.getShouldPublish(this)) {
 				stage('Publish') {
 					timestamps { 
-						Packaging.publishThemePackage(this)
+						Packaging.publishRelease(this, version, ")
 					}
 				}
 			}
