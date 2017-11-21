@@ -107,7 +107,7 @@ class Packaging {
         {
             context.withEnv(["DOCKER_TAG=${dockerTag}", "COMPOSE_PROJECT_NAME=${context.env.BUILD_TAG}"]) {
                 context.bat "docker-compose stop"
-                context.bat "docker-compose rm -f"
+                context.bat "docker-compose rm -f -v"
             }
         }
     }
