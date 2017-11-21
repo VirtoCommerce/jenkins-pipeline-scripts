@@ -61,7 +61,7 @@ class Modules {
         def sqlPort = Utilities.getSqlPort(context)
 
         // create context
-        context.withEnv(["VC_PLATFORM=http://ci.virtocommerce.com:${platformPort}", "VC_STOREFRONT=http://ci.virtocommerce.com:${storefrontPort}", "VC_DATABASE=Data Source=http://ci.virtocommerce.com,${sqlPort};Initial Catalog=VirtoCommerce2;Persist Security Info=True;User ID=sa;Password=v!rto_Labs!;MultipleActiveResultSets=True;Connect Timeout=30" ]) {
+        context.withEnv(["VC_PLATFORM=http://ci.virtocommerce.com:${platformPort}", "VC_STOREFRONT=http://ci.virtocommerce.com:${storefrontPort}", "VIRTO_CONN_STR_VirtoCommerce=Data Source=http://ci.virtocommerce.com,${sqlPort};Initial Catalog=VirtoCommerce2;Persist Security Info=True;User ID=sa;Password=v!rto_Labs!;MultipleActiveResultSets=True;Connect Timeout=30" ]) {
             Modules.runTests(context, "-trait \"category=Integration\"", "xUnit.IntegrationTests.xml")
         }
     }
