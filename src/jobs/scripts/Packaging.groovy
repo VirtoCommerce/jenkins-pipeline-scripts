@@ -54,7 +54,7 @@ class Packaging {
             // 3. start up new containers
             context.withEnv(["DOCKER_TAG=${dockerTag}", "DOCKER_PLATFORM_PORT=${platformPort}", "DOCKER_STOREFRONT_PORT=${storefrontPort}", "DOCKER_SQL_PORT=${sqlPort}", "COMPOSE_PROJECT_NAME=${context.env.BUILD_TAG}" ]) {
                 context.bat "docker-compose stop"
-                context.bat "docker-compose rm -f"
+                context.bat "docker-compose rm -f -v"
                 context.bat "docker-compose up -d"
             }
 
