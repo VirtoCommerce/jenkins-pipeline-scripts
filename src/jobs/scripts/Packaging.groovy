@@ -242,7 +242,7 @@ class Packaging {
         {
             context.deleteDir()
         }        
-        context.bat "npm install"
+        context.bat "npm install --dev"
         context.bat "node node_modules\\gulp\\bin\\gulp.js compress"
     }    
 
