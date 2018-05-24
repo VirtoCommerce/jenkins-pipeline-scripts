@@ -35,19 +35,9 @@ def call(body) {
 			stage('Build + Analyze') {
 				timestamps { 
 					Packaging.startAnalyzer(this)
+					Packaging.checkAnalyzerGate(this)
 					Packaging.runGulpBuild(this)
 				}
-			}
-			
-			stage('Submit Analysis') {
-				timestamps { 
-					Packaging.endAnalyzer(this)
-				}
-			}			
-
-			// No need to occupy a node
-			stage("Quality Gate"){
-				Packaging.checkAnalyzerGate(this)
 			}
 			
 			def version = Utilities.getPackageVersion(this)
