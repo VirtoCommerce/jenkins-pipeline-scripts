@@ -39,6 +39,17 @@ def call(body) {
 				}
 			}
 			
+			stage('Submit Analysis') {
+				timestamps { 
+					Packaging.endAnalyzer(this)
+				}
+			}			
+
+			// No need to occupy a node
+			stage("Quality Gate"){
+				Packaging.checkAnalyzerGate(this)
+			}
+			
 			def version = Utilities.getPackageVersion(this)
 
 			if (Packaging.getShouldStage(this)) {
