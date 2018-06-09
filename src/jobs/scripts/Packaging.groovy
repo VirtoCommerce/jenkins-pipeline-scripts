@@ -30,7 +30,7 @@ class Packaging {
         def dockerFileFolder = dockerImageName.replaceAll("/", ".")
 		def dockerFolder = ""
         if(context.projectType == 'NETCORE2') {
-		    dockerFolder = "docker.core"
+		    dockerFolder = "docker.core\\windowsnano"
         }
         else {
 		    dockerFolder = "docker"
