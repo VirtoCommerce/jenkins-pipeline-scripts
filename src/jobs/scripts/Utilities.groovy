@@ -102,9 +102,9 @@ class Utilities {
         def wsFolder = context.pwd()
 		def composeDir = "$wsFolder\\..\\workspace@libs\\${DefaultSharedLibName}\\resources"
 		if(context.projectType == 'NETCORE2') {
-		    composeDir = "$composeDir\\docker"
-        } else {		   
 		    composeDir = "$composeDir\\docker.core"
+        } else {		   
+		    composeDir = "$composeDir\\docker"
 		}
         return composeDir
     }    
