@@ -24,7 +24,9 @@ RUN powershell.exe -Command `
 #     Expand-Archive vc-theme-material.zip -DestinationPath C:\vc-storefront\wwwroot\cms-content\themes\clothing; `
 #     Remove-Item c:\vc-theme-material.zip -Force
 
+RUN pwd
 WORKDIR /vc-storefront
+RUN pwd
 COPY libs\x64\msvcp140.dll c:\windows\system32
 COPY libs\x64\vcruntime140.dll c:\windows\system32
 ENTRYPOINT ["dotnet", "VirtoCommerce.Storefront.dll"]
