@@ -21,16 +21,22 @@ class Packaging {
      *
      * @param context Execution Contex, typically "this"
      * @param dockerImageName name of the docker image to create, something like virtocommerce/storefront
-     * @param dockerFileName name of the docker file name, something like Dockerfile
      * @param dockerContextFolder folder that docker build will use for context, files from that folder can be added to the docker image
      * @param dockerSourcePath Source of the files to be included in the docker image, can be files within contextFolder or remote source referred by http
+     * @param projectType type of project: NETCORE2 or NET4
      * @param version current version of the build
      * @return reference to a docker image created
      */
-    def static createDockerImage(context, String dockerImageName, String dockerContextFolder, String dockerSourcePath, String version) {
+    def static createDockerImage(context, String dockerImageName, String dockerContextFolder, String dockerSourcePath, String projectType, String version) {
         def dockerFileFolder = dockerImageName.replaceAll("/", ".")
+        if(context.projectType == 'NETCORE2') {
+		    def dockerFolder = "docker.core"
+        }
+        else {
+		    def dockerFolder = "docker"
+        }
         context.echo "Building docker image \"${dockerImageName}\" using \"${dockerContextFolder}\" as context folder"
-        context.bat "copy \"..\\workspace@libs\\virto-shared-library\\resources\\docker\\${dockerFileFolder}\\Dockerfile\" \"${dockerContextFolder}\" /Y"
+        context.bat "copy \"..\\workspace@libs\\virto-shared-library\\resources\\${dockerFolder}\\${dockerFileFolder}\\Dockerfile\" \"${dockerContextFolder}\" /Y"
         def dockerImage
         context.dir(dockerContextFolder)
         {
