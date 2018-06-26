@@ -27,15 +27,15 @@ services:
       - virto
 
   vc-storefront-web:
-    image: virtocommerce/storefront:${DOCKER_TAG:-latest}
+    image: virtocommerce/storefront-core:${DOCKER_TAG:-latest}
     ports:
       - "${DOCKER_STOREFRONT_PORT:-8090}:80"
     environment:
-      - VIRTO_CONN_STR_VirtoCommerceBaseUrl=http://vc-platform-web
+      - VirtoCommerce:Endpoint:Url=http://vc-platform-web
     depends_on:
       - vc-platform-web
     volumes:
-      - cms-content-volume:c:\vc-storefront\App_Data\cms-content     
+      - cms-content-volume:C:\vc-storefront-core\wwwroot\cms-content
     networks:
       - virto
 
