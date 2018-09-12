@@ -107,7 +107,9 @@ def call(body) {
 
 			// No need to occupy a node
 			stage("Quality Gate"){
-				Packaging.checkAnalyzerGate(this)
+				if(projectType == 'NETCORE2') {
+					Packaging.checkAnalyzerGate(this)
+				}
 			}
 
 			if(solution == 'VirtoCommerce.Platform.sln' || projectType == 'NETCORE2') // skip docker and publishing for NET4
