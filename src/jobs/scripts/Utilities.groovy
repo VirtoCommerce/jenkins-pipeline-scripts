@@ -93,7 +93,10 @@ class Utilities {
 
     def static getTestDlls(context)
     {
-        def testDlls = context.findFiles(glob: '**\\bin\\Debug\\*Test.dll')
+        String pattern = '**\\bin\\Debug\\*Test.dll'
+        if(isNetCore(context.projectType))
+            pattern = '**\\bin\\Debug\\*\\*Tests.dll'
+        def testDlls = context.findFiles(glob: pattern)
         return testDlls
     }
 
@@ -238,8 +241,15 @@ class Utilities {
             throw new Exception("can't create coverage folder: " + coverageFolder); 
         } 
 
-        context.bat "\"${coverageExecutable}\" collect /output:\"${coverageFolder}\\VisualStudio.Unit.coverage\" \"${xUnitExecutable}\" ${paths} -xml \"${resultsFileName}\" ${traits} -parallel none"
-        context.bat "\"${coverageExecutable}\" analyze /output:\"${coverageFolder}\\VisualStudio.Unit.coveragexml\" \"${coverageFolder}\\VisualStudio.Unit.coverage\""
+        if(isNetCore(context.projectType)){
+            
+            def pdbDirs = getPDBDirsStr(context)
+            context.bat "\"${context.env.OPENCOVER}\\opencover.console.exe\" -oldStyle -searchdirs:\"${pdbDirs}\" -register:user -filter:\"+[Virto*]* -[xunit*]*\" -output:\"${coverageFolder}\\VisualStudio.Unit.coveragexml\" -target:\"${context.env.VSTEST_DIR}\\vstest.console.exe\" -targetargs:\"${paths} /TestCaseFilter:(Category=Unit|Category=ci)\""
+        }
+        else{
+            context.bat "\"${coverageExecutable}\" collect /output:\"${coverageFolder}\\VisualStudio.Unit.coverage\" \"${xUnitExecutable}\" ${paths} -xml \"${resultsFileName}\" ${traits} -parallel none"
+            context.bat "\"${coverageExecutable}\" analyze /output:\"${coverageFolder}\\VisualStudio.Unit.coveragexml\" \"${coverageFolder}\\VisualStudio.Unit.coverage\""
+        }
         context.step([$class: 'XUnitPublisher', testTimeMargin: '3000', thresholdMode: 1, thresholds: [[$class: 'FailedThreshold', failureNewThreshold: '', failureThreshold: '', unstableNewThreshold: '', unstableThreshold: ''], [$class: 'SkippedThreshold', failureNewThreshold: '', failureThreshold: '', unstableNewThreshold: '', unstableThreshold: '']], tools: [[$class: 'XUnitDotNetTestType', deleteOutputFiles: true, failIfNotNew: false, pattern: resultsFileName, skipNoTestFiles: true, stopProcessingIfError: false]]])
     }
 
@@ -320,4 +330,21 @@ class Utilities {
             return true
         }
     }    
+
+    @NonCPS
+    def static getPDBDirs(context){
+        def pdbDirs = []
+        def currentDir = new File(context.pwd())
+        currentDir.eachDirRecurse(){ dir->
+            if(dir.getPath() =~ /.*\\bin/)
+                pdbDirs << dir.path
+        }
+        return pdbDirs
+    }
+    def static getPDBDirsStr(context){
+        return getPDBDirs(context).join(';')
+    }
+    def static isNetCore(projectType){
+        return projectType == 'NETCORE2'
+    }
 }
