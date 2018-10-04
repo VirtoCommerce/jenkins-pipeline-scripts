@@ -117,6 +117,8 @@ def call(body) {
 						def tempFolder = Utilities.getTempFolder(this)
 						def schemaPath = "${tempFolder}\\swagger.json"
 
+						apiPaths = "\"${env.WORKSPACE}\\VirtoCommerce.Platform.Web\\bin\\VirtoCommerce.Platform.Web.dll\"" //temporarily
+
 						bat "node.exe ${env.NODE_MODULES}\\nswag\\bin\\nswag.js webapi2swagger /assembly:${apiPaths} /output:${schemaPath}"
 						bat "node.exe ${env.NODE_MODULES}\\swagger-cli\\bin\\swagger-cli.js validate ${schemaPath}"
 					}
