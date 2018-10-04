@@ -4,7 +4,7 @@ FROM microsoft/dotnet:2.1-aspnetcore-runtime
 
 ARG SOURCE=VirtoCommerce.Storefront
 
-ADD $SOURCE c:\vc-storefront-core
+ADD $SOURCE c:\vc-storefront
 
 WORKDIR /vc-storefront
 #Nano server doesn't support installs, need to copy DLLs manually
