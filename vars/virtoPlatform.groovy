@@ -118,7 +118,7 @@ def call(body) {
 						def schemaPath = "${tempFolder}\\swagger.json"
 
 						bat "node.exe ${env.NODE_MODULES}\\nswag\\bin\\nswag.js webapi2swagger /assembly:${apiPaths} /output:${schemaPath}"
-						bat "node.exe ${env.NODE_MODULES}\\swagger-cli\bin\swagger-cli.js validate ${schemaPath}"
+						bat "node.exe ${env.NODE_MODULES}\\swagger-cli\\bin\\swagger-cli.js validate ${schemaPath}"
 					}
 				}
 			}
