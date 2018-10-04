@@ -347,4 +347,17 @@ class Utilities {
     def static isNetCore(projectType){
         return projectType == 'NETCORE2'
     }
+
+    def static getWebApiDll(context){
+        String swagPaths = ""
+        def swagDlls = context.findFiles(glob: "**\\bin\\*.Web.dll")
+        if(swagDlls.size() > 0)
+        {
+            for(swagDll in swagDlls){
+                if(!swagDll.path.contains("VirtoCommerce.Platform.Core.Web.dll"))
+                    swagPaths += "\"$swagDll.path\""
+            }
+        }
+        return swagPaths
+    }
 }

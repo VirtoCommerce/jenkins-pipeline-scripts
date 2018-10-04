@@ -72,7 +72,18 @@ import jobs.scripts.*
 			// No need to occupy a node
 			stage("Quality Gate"){
 				Packaging.checkAnalyzerGate(this)
-			}		
+			}	
+
+			stage("Swagger schema validation"){
+				timestamps{
+					def apiPaths = Utilities.getWebApiDll(this)
+					def tempFolder = Utilities.getTempFolder(this)
+					def schemaPath = "${tempFolder}\\swagger.json"
+
+					bat "node.exe ${env.NODE_MODULES}\\nswag\\bin\\nswag.js webapi2swagger /assembly:${apiPaths} /output:${schemaPath}"
+					bat "node.exe ${env.NODE_MODULES}\\swagger-cli\bin\swagger-cli.js validate ${schemaPath}"
+				}
+			}	
 
 			if (env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'master') {
 				stage('Prepare Test Environment') {
