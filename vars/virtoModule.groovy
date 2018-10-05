@@ -84,7 +84,7 @@ import jobs.scripts.*
 				}
 			}	
 
-			if (false & env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'master') {
+			if (false & env.BRANCH_NAME == 'dev' || false && env.BRANCH_NAME == 'master') {
 				stage('Prepare Test Environment') {
 					timestamps { 
 						// Start docker environment				
