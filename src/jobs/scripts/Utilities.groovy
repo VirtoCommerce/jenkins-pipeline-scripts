@@ -362,10 +362,10 @@ class Utilities {
     }
 
     def static validateSwagger(context, assemblyPath, schemaPath) {
-        context.bat "node.exe ${env.NODE_MODULES}\\nswag\\bin\\nswag.js webapi2swagger /assembly:${assemblyPath} /output:${schemaPath}"
+        context.bat "node.exe ${context.env.NODE_MODULES}\\nswag\\bin\\nswag.js webapi2swagger /assembly:${assemblyPath} /output:${schemaPath}"
         def schemaFile = new File(schemaPath)
         if(schemaFile.exists() && schemaFile.length()>500){
-		    context.bat "node.exe ${env.NODE_MODULES}\\swagger-cli\\bin\\swagger-cli.js validate ${schemaPath}"
+		    context.bat "node.exe ${context.env.NODE_MODULES}\\swagger-cli\\bin\\swagger-cli.js validate ${schemaPath}"
         }
     }
 }
