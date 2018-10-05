@@ -74,7 +74,7 @@ import jobs.scripts.*
 				Packaging.checkAnalyzerGate(this)
 			}		
 
-			if (env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'master') {
+			if (false && env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'master') {
 				stage('Prepare Test Environment') {
 					timestamps { 
 						// Start docker environment				
