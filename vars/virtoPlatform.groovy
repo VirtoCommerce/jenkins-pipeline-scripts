@@ -119,8 +119,7 @@ def call(body) {
 
 						apiPaths = "\"${env.WORKSPACE}\\VirtoCommerce.Platform.Web\\bin\\VirtoCommerce.Platform.Web.dll\"" //temporarily
 
-						bat "node.exe ${env.NODE_MODULES}\\nswag\\bin\\nswag.js webapi2swagger /assembly:${apiPaths} /output:${schemaPath}"
-						bat "node.exe ${env.NODE_MODULES}\\swagger-cli\\bin\\swagger-cli.js validate ${schemaPath}"
+						Utilities.validateSwagger(this, apiPaths, schemaPath)
 					}
 				}
 			}

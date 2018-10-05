@@ -80,8 +80,7 @@ import jobs.scripts.*
 					def tempFolder = Utilities.getTempFolder(this)
 					def schemaPath = "${tempFolder}\\swagger.json"
 
-					bat "node.exe ${env.NODE_MODULES}\\nswag\\bin\\nswag.js webapi2swagger /assembly:${apiPaths} /output:${schemaPath}"
-					bat "node.exe ${env.NODE_MODULES}\\swagger-cli\\bin\\swagger-cli.js validate ${schemaPath}"
+					Utilities.validateSwagger(this, apiPaths, schemaPath)
 				}
 			}	
 
