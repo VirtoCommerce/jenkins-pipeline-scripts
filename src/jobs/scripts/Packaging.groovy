@@ -37,7 +37,7 @@ class Packaging {
 		    dockerFolder = "docker"
         }
         context.echo "Building docker image \"${dockerImageName}\" using \"${dockerContextFolder}\" as context folder"
-        context.bat "copy \"..\\workspace@libs\\virto-shared-library\\resources\\${dockerFolder}\\${dockerFileFolder}\\Dockerfile\" \"${dockerContextFolder}\" /Y"
+        context.bat "xcopy \"..\\workspace@libs\\virto-shared-library\\resources\\${dockerFolder}\\${dockerFileFolder}\\*\" \"${dockerContextFolder}\\\" /Y /E"
         def dockerImage
         context.dir(dockerContextFolder)
         {

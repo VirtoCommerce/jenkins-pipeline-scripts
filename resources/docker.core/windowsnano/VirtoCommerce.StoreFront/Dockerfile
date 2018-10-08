@@ -1,16 +1,13 @@
 # escape=`
 
 FROM microsoft/dotnet:2.1-aspnetcore-runtime
-MAINTAINER Alexander Siniouguine <support@virtocommerce.com>
 
 ARG SOURCE=VirtoCommerce.Storefront
 
-ADD $SOURCE c:\vc-storefront-core
+ADD $SOURCE c:\vc-storefront
 
-# Install Visual C++ 2017 Redistributable Packages
-RUN Invoke-WebRequest "https://go.microsoft.com/fwlink/?LinkId=746572" -OutFile "c:\vc_redist.x64.exe"
-
-RUN powershell start-process C:\vc_redist.x64.exe -ArgumentList '/quiet' -Wait
-
-WORKDIR /vc-storefront-core
+WORKDIR /vc-storefront
+#Nano server doesn't support installs, need to copy DLLs manually
+COPY libs\x64\*.dll c:\windows\SysWOW64\
+COPY libs\x86\*.dll c:\windows\System32\
 ENTRYPOINT ["dotnet", "VirtoCommerce.Storefront.dll"]
