@@ -11,6 +11,10 @@ def call(body) {
     
 	node {
 	    def storeName = config.sampleStore
+		projectType = config.projectType
+		if(projectType==null){
+			projectType = 'Theme'
+		}
 		try {
 			echo "Building branch ${env.BRANCH_NAME}"
 			Utilities.notifyBuildStatus(this, "Started")
