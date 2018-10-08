@@ -186,7 +186,7 @@ def call(body) {
 				def log = currentBuild.rawBuild.getLog(100)
 				def failedStageLog = Utilities.getFailedStageStr(log)
 				def failedStageName = Utilities.getFailedStageName(failedStageLog)
-				def mailBody = "Failed Stage: ${failedStageName}\n${env.JOB_URL}\n\n\n${failedStageLog}"
+				def mailBody = Utilities.getMailBody(this, failedStageName, failedStageLog)
 				step([$class: 'Mailer', notifyEveryUnstableBuild: true, body: mailBody, recipients: emailextrecipients([[$class: 'CulpritsRecipientProvider'], [$class: 'RequesterRecipientProvider']])])
 			}
 	    	//step([$class: 'Mailer', notifyEveryUnstableBuild: true, recipients: 'dev@virtoway.com', sendToIndividuals: true])

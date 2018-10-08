@@ -387,4 +387,8 @@ class Utilities {
         def res = logText =~ /\{\s+\((.+)\)/
         return res.group(1)
     }
+    def static getMailBody(context, stageName, stageLog) {
+        def result = "Failed Stage: ${stageName}\n${context.env.JOB_URL}\n\n\n${stageLog}"
+        return result
+    }
 }
