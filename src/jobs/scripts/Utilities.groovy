@@ -368,4 +368,23 @@ class Utilities {
 		    context.bat "node.exe ${context.env.NODE_MODULES}\\swagger-cli\\bin\\swagger-cli.js validate ${schemaPath}"
         }
     }
+
+    def static getFailedStageStr(logArray) {
+        def log = logArray
+        def startIndex = 150
+        def i = 1
+        for(logRow in log.reverse()){
+            if(logRow =~ /\{\s\(.*\)/) {
+                startIndex = i
+                break
+            }
+            ++i
+        }
+        def result = logArray[logArray.size() - startIndex..-1].join("\n")
+        return result
+    }
+    def static getFailedStageName(logText){
+        def res = logText =~ /\{\s+\((.+)\)/
+        return res.group(1)
+    }
 }

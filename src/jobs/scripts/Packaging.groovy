@@ -91,7 +91,8 @@ class Packaging {
 
     def static checkDockerTestEnvironment(context, String containerId)
     {
-        def tag = context.env.BUILD_TAG.replace("-", "").toLowerCase()
+        //def tag = context.env.BUILD_TAG.replace("-", "").toLowerCase()
+        def tag = context.env.BUILD_TAG.toLowerCase()
         context.echo "Checking ${tag}_${containerId}_1 state ..."
         String result = context.bat(returnStdout: true, script: "docker inspect -f {{.State.Running}} ${tag}_${containerId}_1").trim()
 
