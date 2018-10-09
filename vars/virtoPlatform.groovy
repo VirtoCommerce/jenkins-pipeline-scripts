@@ -187,7 +187,7 @@ def call(body) {
 				def failedStageLog = Utilities.getFailedStageStr(log)
 				def failedStageName = Utilities.getFailedStageName(failedStageLog)
 				def mailBody = Utilities.getMailBody(this, failedStageName, failedStageLog)
-				step([$class: 'Mailer', notifyEveryUnstableBuild: true, body: mailBody, recipients: emailextrecipients([[$class: 'CulpritsRecipientProvider'], [$class: 'RequesterRecipientProvider']])])
+				emailext body:mailBody, subject: "${env.JOB_NAME}:${env.BUILD_NUMBER} - ${currentBuild.currentResult}", recipientProviders: [[$class: 'CulpritsRecipientProvider'], [$class: 'RequesterRecipientProvider']]
 			}
 	    	//step([$class: 'Mailer', notifyEveryUnstableBuild: true, recipients: 'dev@virtoway.com', sendToIndividuals: true])
 		}
