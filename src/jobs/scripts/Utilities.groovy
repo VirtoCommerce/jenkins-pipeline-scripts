@@ -371,7 +371,7 @@ class Utilities {
 
     def static getFailedStageStr(logArray) {
         def log = logArray
-        def startIndex = 150
+        def startIndex = 300
         def i = 1
         for(logRow in log.reverse()){
             if(logRow =~ /\{\s\(.*\)/) {
