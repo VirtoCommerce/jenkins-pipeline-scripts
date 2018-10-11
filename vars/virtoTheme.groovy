@@ -72,7 +72,7 @@ def call(body) {
 				step([$class: 'Mailer', notifyEveryUnstableBuild: true, recipients: emailextrecipients([[$class: 'CulpritsRecipientProvider'], [$class: 'RequesterRecipientProvider']])])
 			}
 			else {
-				def log = currentBuild.rawBuild.getLog(100)
+				def log = currentBuild.rawBuild.getLog(300)
 				def failedStageLog = Utilities.getFailedStageStr(log)
 				def failedStageName = Utilities.getFailedStageName(failedStageLog)
 				def mailBody = Utilities.getMailBody(this, failedStageName, failedStageLog)
