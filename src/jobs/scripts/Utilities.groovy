@@ -93,7 +93,10 @@ class Utilities {
 
     def static getTestDlls(context)
     {
-        def testDlls = context.findFiles(glob: '**\\bin\\Debug\\*Test.dll')
+        String pattern = '**\\bin\\Debug\\*Test.dll'
+        if(isNetCore(context.projectType))
+            pattern = '**\\bin\\Debug\\*\\*Tests.dll'
+        def testDlls = context.findFiles(glob: pattern)
         return testDlls
     }
 
@@ -238,8 +241,15 @@ class Utilities {
             throw new Exception("can't create coverage folder: " + coverageFolder); 
         } 
 
-        context.bat "\"${coverageExecutable}\" collect /output:\"${coverageFolder}\\VisualStudio.Unit.coverage\" \"${xUnitExecutable}\" ${paths} -xml \"${resultsFileName}\" ${traits} -parallel none"
-        context.bat "\"${coverageExecutable}\" analyze /output:\"${coverageFolder}\\VisualStudio.Unit.coveragexml\" \"${coverageFolder}\\VisualStudio.Unit.coverage\""
+        if(isNetCore(context.projectType)){
+            
+            def pdbDirs = getPDBDirsStr(context)
+            context.bat "\"${context.env.OPENCOVER}\\opencover.console.exe\" -oldStyle -searchdirs:\"${pdbDirs}\" -register:user -filter:\"+[Virto*]* -[xunit*]*\" -output:\"${coverageFolder}\\VisualStudio.Unit.coveragexml\" -target:\"${context.env.VSTEST_DIR}\\vstest.console.exe\" -targetargs:\"${paths} /TestCaseFilter:(Category=Unit|Category=ci)\""
+        }
+        else{
+            context.bat "\"${coverageExecutable}\" collect /output:\"${coverageFolder}\\VisualStudio.Unit.coverage\" \"${xUnitExecutable}\" ${paths} -xml \"${resultsFileName}\" ${traits} -parallel none"
+            context.bat "\"${coverageExecutable}\" analyze /output:\"${coverageFolder}\\VisualStudio.Unit.coveragexml\" \"${coverageFolder}\\VisualStudio.Unit.coverage\""
+        }
         context.step([$class: 'XUnitPublisher', testTimeMargin: '3000', thresholdMode: 1, thresholds: [[$class: 'FailedThreshold', failureNewThreshold: '', failureThreshold: '', unstableNewThreshold: '', unstableThreshold: ''], [$class: 'SkippedThreshold', failureNewThreshold: '', failureThreshold: '', unstableNewThreshold: '', unstableThreshold: '']], tools: [[$class: 'XUnitDotNetTestType', deleteOutputFiles: true, failIfNotNew: false, pattern: resultsFileName, skipNoTestFiles: true, stopProcessingIfError: false]]])
     }
 
@@ -320,4 +330,70 @@ class Utilities {
             return true
         }
     }    
+
+    @NonCPS
+    def static getPDBDirs(context){
+        def pdbDirs = []
+        def currentDir = new File(context.pwd())
+        currentDir.eachDirRecurse(){ dir->
+            if(dir.getPath() =~ /.*\\bin/)
+                pdbDirs << dir.path
+        }
+        return pdbDirs
+    }
+    def static getPDBDirsStr(context){
+        return getPDBDirs(context).join(';')
+    }
+    def static isNetCore(projectType){
+        return projectType == 'NETCORE2'
+    }
+
+    def static getWebApiDll(context){
+        String swagPaths = ""
+        def swagDlls = context.findFiles(glob: "**\\bin\\*.Web.dll")
+        if(swagDlls.size() > 0)
+        {
+            for(swagDll in swagDlls){
+                if(!swagDll.path.contains("VirtoCommerce.Platform.Core.Web.dll"))
+                    swagPaths += "\"$swagDll.path\""
+            }
+        }
+        return swagPaths
+    }
+
+    def static validateSwagger(context, assemblyPath, schemaPath) {
+        context.bat "node.exe ${context.env.NODE_MODULES}\\nswag\\bin\\nswag.js webapi2swagger /assembly:${assemblyPath} /output:${schemaPath}"
+        def schemaFile = new File(schemaPath)
+        if(schemaFile.exists() && schemaFile.length()>500){
+		    context.bat "node.exe ${context.env.NODE_MODULES}\\swagger-cli\\bin\\swagger-cli.js validate ${schemaPath}"
+        }
+    }
+
+    def static getFailedStageStr(logArray) {
+        def log = logArray
+        def startIndex = 30
+        def i = 1
+        for(logRow in log.reverse()){
+            if(logRow =~ /\{\s\(.*\)/) {
+                startIndex = i
+                break
+            }
+            ++i
+        }
+        def result = logArray[logArray.size() - startIndex..-1].join("\n")
+        return result
+    }
+    def static getFailedStageName(logText){
+        def res = logText =~/(?ms).*\{\s\((.*)\).*/
+        def name = ''
+		if(res.matches())
+			name = res.group(1)
+		else
+			name = 'Not found'
+        return name
+    }
+    def static getMailBody(context, stageName, stageLog) {
+        def result = "Failed Stage: ${stageName}\n${context.env.JOB_URL}\n\n\n${stageLog}"
+        return result
+    }
 }

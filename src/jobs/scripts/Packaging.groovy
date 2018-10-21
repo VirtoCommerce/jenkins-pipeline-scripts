@@ -91,7 +91,8 @@ class Packaging {
 
     def static checkDockerTestEnvironment(context, String containerId)
     {
-        def tag = context.env.BUILD_TAG.replace("-", "").toLowerCase()
+        //def tag = context.env.BUILD_TAG.replace("-", "").toLowerCase()
+        def tag = context.env.BUILD_TAG.toLowerCase()
         context.echo "Checking ${tag}_${containerId}_1 state ..."
         String result = context.bat(returnStdout: true, script: "docker inspect -f {{.State.Running}} ${tag}_${containerId}_1").trim()
 
@@ -184,7 +185,8 @@ class Packaging {
             //context.bat "dotnet restore" // no need to run it in .net core 2.0, it should run as part of dotnet msbuild
             //context.bat "dotnet msbuild \"${solution}\" -c Debug"
             // we need to use MSBuild directly to allow sonar analysis to work
-            context.bat "\"${context.tool DefaultMSBuild}\" \"${solution}\" /p:Configuration=Debug /p:Platform=\"Any CPU\" /t:restore /t:rebuild /m"
+            // DebugType=Full is for OpenCover
+            context.bat "\"${context.tool DefaultMSBuild}\" \"${solution}\" /p:Configuration=Debug /p:Platform=\"Any CPU\" /t:restore /t:rebuild /m /p:DebugType=Full"
         }
         else
         {
@@ -216,9 +218,13 @@ class Packaging {
         def sqScannerMsBuildHome = context.tool 'Scanner for MSBuild'
         def fullJobName = Utilities.getRepoName(context)
         def coverageFolder = Utilities.getCoverageFolder(context)
+        def coverageReportType = 'vscoveragexml'
+        if(Utilities.isNetCore(context.projectType)){
+            coverageReportType = 'opencover'
+        }
         context.withSonarQubeEnv('VC Sonar Server') {
             // Due to SONARMSBRU-307 value of sonar.host.url and credentials should be passed on command line
-            context.bat "\"${sqScannerMsBuildHome}\\SonarQube.Scanner.MSBuild.exe\" begin /d:\"sonar.branch=${context.env.BRANCH_NAME}\" /n:\"${fullJobName}\" /k:\"${fullJobName}\" /d:\"sonar.organization=virtocommerce\" /d:sonar.host.url=%SONAR_HOST_URL% /d:sonar.login=%SONAR_AUTH_TOKEN% /d:sonar.cs.vscoveragexml.reportsPaths=\"${coverageFolder}\\VisualStudio.Unit.coveragexml\""
+            context.bat "\"${sqScannerMsBuildHome}\\SonarQube.Scanner.MSBuild.exe\" begin /d:\"sonar.branch=${context.env.BRANCH_NAME}\" /n:\"${fullJobName}\" /k:\"${fullJobName}\" /d:\"sonar.organization=virtocommerce\" /d:sonar.host.url=%SONAR_HOST_URL% /d:sonar.login=%SONAR_AUTH_TOKEN% /d:sonar.cs.${coverageReportType}.reportsPaths=\"${coverageFolder}\\VisualStudio.Unit.coveragexml\""
         }        
     }
 
@@ -227,7 +233,7 @@ class Packaging {
         def sqScannerMsBuildHome = context.tool 'Scanner for MSBuild'
         def fullJobName = Utilities.getRepoName(context)
         context.withSonarQubeEnv('VC Sonar Server') {
-            context.bat "\"${sqScannerMsBuildHome}\\SonarQube.Scanner.MSBuild.exe\" end"
+            context.bat "\"${sqScannerMsBuildHome}\\SonarQube.Scanner.MSBuild.exe\" end "
         }        
     }
 

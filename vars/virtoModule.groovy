@@ -72,7 +72,17 @@ import jobs.scripts.*
 			// No need to occupy a node
 			stage("Quality Gate"){
 				Packaging.checkAnalyzerGate(this)
-			}		
+			}	
+
+			stage("Swagger schema validation"){
+				timestamps{
+					def apiPaths = Utilities.getWebApiDll(this)
+					def tempFolder = Utilities.getTempFolder(this)
+					def schemaPath = "${tempFolder}\\swagger.json"
+
+					Utilities.validateSwagger(this, apiPaths, schemaPath)
+				}
+			}	
 
 			if (env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'master') {
 				stage('Prepare Test Environment') {
@@ -124,7 +134,16 @@ import jobs.scripts.*
 		}
 		finally {
 			Packaging.stopDockerTestEnvironment(this, dockerTag)
-			step([$class: 'Mailer', notifyEveryUnstableBuild: true, recipients: emailextrecipients([[$class: 'CulpritsRecipientProvider'], [$class: 'RequesterRecipientProvider']])])
+			if(currentBuild.result != 'FAILURE') {
+				step([$class: 'Mailer', notifyEveryUnstableBuild: true, recipients: emailextrecipients([[$class: 'CulpritsRecipientProvider'], [$class: 'RequesterRecipientProvider']])])
+			}
+			else {
+				def log = currentBuild.rawBuild.getLog(300)
+				def failedStageLog = Utilities.getFailedStageStr(log)
+				def failedStageName = Utilities.getFailedStageName(failedStageLog)
+				def mailBody = Utilities.getMailBody(this, failedStageName, failedStageLog)
+				emailext body:mailBody, subject: "${env.JOB_NAME}:${env.BUILD_NUMBER} - ${currentBuild.currentResult}", recipientProviders: [[$class: 'CulpritsRecipientProvider'], [$class: 'RequesterRecipientProvider']]
+			}
 			//step([$class: 'Mailer', notifyEveryUnstableBuild: true, recipients: 'dev@virtoway.com', sendToIndividuals: true])
 		}
 

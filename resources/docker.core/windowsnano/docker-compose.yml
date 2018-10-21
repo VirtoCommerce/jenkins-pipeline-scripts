@@ -1,4 +1,4 @@
-version: '3'
+version: '3.2'
 
 services:
 
@@ -29,7 +29,7 @@ services:
   vc-storefront-web:
     image: virtocommerce/storefront:${DOCKER_TAG:-latest}
     ports:
-      - "${DOCKER_STOREFRONT_PORT:-8090}:80"
+      - "${DOCKER_STOREFRONT_PORT:-8080}:80"
     environment:
       - VirtoCommerce:Endpoint:Url=http://vc-platform-web
     depends_on:
