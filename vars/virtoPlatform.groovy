@@ -21,7 +21,7 @@ def call(body) {
 		def zipArtifact = 'VirtoCommerce.Platform'
 		def websiteDir = 'VirtoCommerce.Platform.Web'
 		def deployScript = 'VC-Platform2AzureDev.ps1'
-		def dockerTag = env.BRANCH_NAME
+		def dockerTag = "${env.BRANCH_NAME}-branch"
 		def buildOrder = Utilities.getNextBuildOrder(this)
 		if (env.BRANCH_NAME == 'master') {
 			deployScript = 'VC-Platform2AzureQA.ps1'
