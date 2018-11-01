@@ -140,6 +140,14 @@ class Packaging {
 		dockerImage.push(dockerTag)
     }
 
+    def static checkInstalledModules(context){
+        context.bat "powershell.exe -File \"${context.env.WORKSPACE}@libs\\${DefaultSharedLibName}\\resources\\azure\\vc-check-installed-modules.ps1\" -apiurl \"${Utilities.getPlatformHost(context)}\" -ErrorAction Stop"
+    }
+
+    def static createSwaggerSchema(context, swaggerFile) {
+        context.bat "powershell.exe -File \"${context.env.WORKSPACE}@libs\\${DefaultSharedLibName}\\resources\\azure\\vc-get-swagger.ps1\" -apiurl \"${Utilities.getPlatformHost(context)}\" -swaggerFile \"${swaggerFile}\" -ErrorAction Stop"
+    }
+
     def static createReleaseArtifact(context, version, webProject, zipArtifact, websiteDir)
     {
         context.echo "Preparing release for ${version}"

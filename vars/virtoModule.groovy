@@ -74,32 +74,34 @@ import jobs.scripts.*
 				Packaging.checkAnalyzerGate(this)
 			}	
 
-			stage("Swagger schema validation"){
-				timestamps{
-					def apiPaths = Utilities.getWebApiDll(this)
-					def tempFolder = Utilities.getTempFolder(this)
-					def schemaPath = "${tempFolder}\\swagger.json"
-
-					Utilities.validateSwagger(this, apiPaths, schemaPath)
-				}
-			}	
-
 			if (env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'master') {
 				stage('Prepare Test Environment') {
 					timestamps { 
-						// Start docker environment				
+						// Start docker environment
 						Packaging.startDockerTestEnvironment(this, dockerTag)
-				        
+
+                        // install module
+                        Modules.installModuleArtifacts(this)
+
 						// install modules
 						Packaging.installModules(this)
 
-						// now create sample data
-        				Packaging.createSampleData(this)
+						//check installed modules
+						Packaging.checkInstalledModules(this)
 
-						// install module
-						Modules.installModuleArtifacts(this)
+						// now create sample data
+						Packaging.createSampleData(this)
 					}
 				}
+
+				stage("Swagger schema validation"){
+					timestamps{
+						def tempFolder = Utilities.getTempFolder(this)
+						def schemaPath = "${tempFolder}\\swagger.json"
+
+						Utilities.validateSwagger(this, schemaPath)
+					}
+				}	
 
 				stage('Integration Tests')
 				{

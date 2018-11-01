@@ -110,21 +110,6 @@ def call(body) {
 				Packaging.checkAnalyzerGate(this)
 			}
 
-			if(!Utilities.isNetCore(projectType)) {
-				stage("Swagger schema validation"){
-					timestamps{
-						def apiPaths = Utilities.getWebApiDll(this)
-						def tempFolder = Utilities.getTempFolder(this)
-						def schemaPath = "${tempFolder}\\swagger.json"
-
-						apiPaths = "\"${env.WORKSPACE}\\VirtoCommerce.Platform.Web\\bin\\VirtoCommerce.Platform.Web.dll\"" //temporarily
-
-						Utilities.validateSwagger(this, apiPaths, schemaPath)
-					}
-				}
-			}
-			
-
 			if(solution == 'VirtoCommerce.Platform.sln' || projectType == 'NETCORE2') // skip docker and publishing for NET4
 			{
 				if (env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'master') {
@@ -136,8 +121,22 @@ def call(body) {
 							// install modules
 							Packaging.installModules(this)	
 
+							// check installed modules
+							Packaging.checkInstalledModules(this)
+
 							// now create sample data
 							Packaging.createSampleData(this)					
+						}
+					}
+				}
+
+				if(!Utilities.isNetCore(projectType)) {
+					stage("Swagger schema validation"){
+						timestamps{
+							def tempFolder = Utilities.getTempFolder(this)
+							def schemaPath = "${tempFolder}\\swagger.json"
+
+							Utilities.validateSwagger(this, schemaPath)
 						}
 					}
 				}			

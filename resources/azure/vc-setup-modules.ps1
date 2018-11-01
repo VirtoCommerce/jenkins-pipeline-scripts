@@ -33,7 +33,8 @@ Param(
      $headerValue = Create-Authorization $hmacAppId $hmacSecret
      $headers = @{}
      $headers.Add("Authorization", $headerValue)
-     $moduleImportResult = Invoke-RestMethod $modulesInstallUrl -Method Post -Headers $headers -ErrorAction Stop    
+     $moduleImportResult = Invoke-RestMethod $modulesInstallUrl -Method Post -Headers $headers -ErrorAction Stop  
+     Start-Sleep -s 1  
 
      # save notification id, so we can get status of the operation
      $notificationId = $moduleImportResult.id
