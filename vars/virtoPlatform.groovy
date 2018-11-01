@@ -128,18 +128,18 @@ def call(body) {
 							Packaging.createSampleData(this)					
 						}
 					}
-				}
 
-				if(!Utilities.isNetCore(projectType)) {
-					stage("Swagger schema validation"){
-						timestamps{
-							def tempFolder = Utilities.getTempFolder(this)
-							def schemaPath = "${tempFolder}\\swagger.json"
+					if(!Utilities.isNetCore(projectType)) {
+						stage("Swagger schema validation"){
+							timestamps{
+								def tempFolder = Utilities.getTempFolder(this)
+								def schemaPath = "${tempFolder}\\swagger.json"
 
-							Utilities.validateSwagger(this, schemaPath)
+								Utilities.validateSwagger(this, schemaPath)
+							}
 						}
 					}
-				}			
+				}		
 			}
 
 			if (env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'master') {
