@@ -114,7 +114,7 @@ class Packaging {
         context.dir(composeFolder)
         {
             context.withEnv(["DOCKER_TAG=${dockerTag}", "COMPOSE_PROJECT_NAME=${context.env.BUILD_TAG}"]) {
-                context.bat "docker-compose stop"
+                context.bat "docker-compose down -v"
                 context.bat "docker-compose rm -f -v"
             }
         }
