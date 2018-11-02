@@ -94,14 +94,14 @@ import jobs.scripts.*
 					}
 				}
 
-				stage("Swagger schema validation"){
-					timestamps{
-						def tempFolder = Utilities.getTempFolder(this)
-						def schemaPath = "${tempFolder}\\swagger.json"
+				// stage("Swagger schema validation"){
+				// 	timestamps{
+				// 		def tempFolder = Utilities.getTempFolder(this)
+				// 		def schemaPath = "${tempFolder}\\swagger.json"
 
-						Utilities.validateSwagger(this, schemaPath)
-					}
-				}	
+				// 		Utilities.validateSwagger(this, schemaPath)
+				// 	}
+				// }	
 
 				stage('Integration Tests')
 				{

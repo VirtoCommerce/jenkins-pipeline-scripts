@@ -129,7 +129,7 @@ def call(body) {
 						}
 					}
 
-					if(!Utilities.isNetCore(projectType)) {
+					if(false && !Utilities.isNetCore(projectType)) {
 						stage("Swagger schema validation"){
 							timestamps{
 								def tempFolder = Utilities.getTempFolder(this)
