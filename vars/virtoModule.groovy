@@ -74,7 +74,7 @@ import jobs.scripts.*
 				Packaging.checkAnalyzerGate(this)
 			}	
 
-			if (env.BRANCH_NAME == 'master') {
+			if (false && env.BRANCH_NAME == 'master') {
 				stage('Build platform and storefront') {
 					timestamps{
 						build("../vc-platform/${env.BRANCH_NAME}")
