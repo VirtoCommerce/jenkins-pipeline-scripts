@@ -74,6 +74,16 @@ import jobs.scripts.*
 				Packaging.checkAnalyzerGate(this)
 			}	
 
+			if (env.BRANCH_NAME == 'master') {
+				stage('Build platform and storefront') {
+					timestamps{
+						build("../vc-platform/${env.BRANCH_NAME}")
+						build("../vc-storefront-core/${env.BRANCH_NAME}")
+					}
+				}
+			}
+			
+
 			if (env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'master') {
 				stage('Prepare Test Environment') {
 					timestamps { 
