@@ -37,6 +37,7 @@ $notify = @{}
 do {
     Start-Sleep -s 3
     $state = Invoke-RestMethod "$sdStateUrl" -Body $NotificationStateJson -Method Post -ContentType "application/json" -Headers $headers
+    Write-Output $state
     if ($state.notifyEvents -ne $null ) {
         $notify = $state.notifyEvents
         if ($notify.errorCount -gt 0) {
@@ -45,5 +46,5 @@ do {
         }
     }
 }
-while ($notify.finished -eq $null -and $cycleCount -lt 180)
+while (([string]::IsNullOrEmpty($notify.finished)) -and $cycleCount -lt 180)
 Write-Output "Sample data installation complete"
