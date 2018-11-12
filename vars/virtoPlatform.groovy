@@ -119,7 +119,7 @@ def call(body) {
 							Packaging.startDockerTestEnvironment(this, dockerTag)
 							
 							// install modules
-							Packaging.installModules(this)	
+							Packaging.installModules(this, 1)	
 
 							// check installed modules
 							Packaging.checkInstalledModules(this)

@@ -2,7 +2,8 @@ Param(
     [parameter(Mandatory = $true)]
     $apiurl,
     $hmacAppId,
-    $hmacSecret
+    $hmacSecret,
+    $needRestart
 )
 
 . $PSScriptRoot\utilities.ps1   
@@ -18,10 +19,12 @@ if ([string]::IsNullOrWhiteSpace($hmacSecret)) {
 # Initialize paths used by the script
 $modulesStateUrl = "$apiurl/api/platform/pushnotifications"
 $modulesInstallUrl = "$apiurl/api/platform/modules/autoinstall"
+$restartUrl = "$apiurl/api/platform/modules/restart"
 
 # Call homepage, to make sure site is compiled
 $initResult = Invoke-WebRequest $apiurl -UseBasicParsing
-if ($initResult.StatusCode -ne 200) { # throw exception when site can't be opened
+if ($initResult.StatusCode -ne 200) {
+    # throw exception when site can't be opened
     throw "Can't open admin site homepage"
 }
 
@@ -70,6 +73,10 @@ try {
     }
     while (!$abort -and $notificationState.finished -eq $null -and $cycleCount -lt 180) # stop processing after 9 min or when notifications had stopped $moduleState.NotifyEvents.Length -ne 0 -and
 
+    if($null -ne $needRestart -and $needRestart -gt 0){
+      Write-Output "Restarting website"
+      $moduleState = Invoke-RestMethod "$restartUrl" -Method Post -ContentType "application/json" -Headers $headers
+    }
 }
 catch {
     $cycleCount = $cycleCount + 1 
