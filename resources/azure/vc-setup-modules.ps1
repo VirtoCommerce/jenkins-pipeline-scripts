@@ -68,7 +68,7 @@ try {
         $cycleCount = $cycleCount + 1 
         Start-Sleep -s 3
     }
-    while (!$abort -and ([string]::IsNullOrEmpty($notify.finished)) -and $cycleCount -lt 180) # stop processing after 9 min or when notifications had stopped $moduleState.NotifyEvents.Length -ne 0 -and
+    while (!$abort -and $notificationState.finished -eq $null -and $cycleCount -lt 180) # stop processing after 9 min or when notifications had stopped $moduleState.NotifyEvents.Length -ne 0 -and
 
 }
 catch {
