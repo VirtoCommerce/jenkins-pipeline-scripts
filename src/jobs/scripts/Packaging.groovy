@@ -361,9 +361,10 @@ class Packaging {
 
 	def static installModule(context, path)
 	{
-		def wsFolder = context.pwd()
- 		context.bat "powershell.exe -File \"${wsFolder}\\..\\workspace@libs\\${DefaultSharedLibName}\\resources\\azure\\vc-install-module.ps1\" -apiurl \"${Utilities.getPlatformHost(context)}\" -moduleZipArchievePath \"${path}\" -ErrorAction Stop"
-	}    
+        def moduleId = Modules.getModuleId(context)
+        def platformContainer = Utilities.getPlatformContainer(context)
+ 		context.bat "powershell.exe -File \"${context.env.WORKSPACE}@libs\\${DefaultSharedLibName}\\resources\\azure\\vc-install-module.ps1\" -apiurl \"${Utilities.getPlatformHost(context)}\" -moduleZipArchievePath \"${path}\" -moduleId \"${moduleId}\" -platformContainer ${platformContainer} -ErrorAction Stop"
+	}     
 
 	def static publishThemePackage(context)
 	{

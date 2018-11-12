@@ -106,4 +106,29 @@ class Modules {
 
         return paths;
     }
+
+    def static getModuleId(context){
+        def manifests = context.findFiles(glob: '**\\module.manifest')
+        def manifestPath = ""
+        if (manifests.size() > 0) {
+            for (int i = 0; i < manifests.size(); i++)
+            {
+                manifestPath = manifests[i].path
+            }
+        }
+        else {
+            echo "no module.manifest files found"
+            return null
+        }
+
+        def wsDir = context.env.WORKSPACE
+        def fullManifestPath = "$wsDir\\$manifestPath"
+
+        context.echo "parsing $fullManifestPath"
+        def manifest = new XmlSlurper().parse(fullManifestPath)
+
+        def id = manifest.id.toString()
+
+        return id
+    }
 }

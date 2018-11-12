@@ -397,4 +397,10 @@ class Utilities {
         def result = "Failed Stage: ${stageName}\n${context.env.JOB_URL}\n\n\n${stageLog}"
         return result
     }
+
+    def static getPlatformContainer(context){
+        def tag = context.env.BUILD_TAG.toLowerCase()
+        def containerId = 'vc-platform-web'
+        return "${tag}_${containerId}_1"
+    }
 }
