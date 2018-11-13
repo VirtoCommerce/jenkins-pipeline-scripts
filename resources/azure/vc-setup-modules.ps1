@@ -63,15 +63,10 @@ try {
                 $startIndex = $notificationState.progressLog.Count - 1
             }                        
         }
-        else {
-            # modules are already installed, exit the loop
-            Write-Output "Automatic module installation didn't start, possibly due to them already being installed. Quitting install."
-            $abort = $true
-        }
         $cycleCount = $cycleCount + 1 
         Start-Sleep -s 3
     }
-    while (!$abort -and $notificationState.finished -eq $null -and $cycleCount -lt 180) # stop processing after 9 min or when notifications had stopped $moduleState.NotifyEvents.Length -ne 0 -and
+    while ($notificationState.finished -eq $null -and $cycleCount -lt 60) # stop processing after 3 min or when notifications had stopped $moduleState.NotifyEvents.Length -ne 0 -and
 
     if($null -ne $needRestart -and $needRestart -gt 0){
       Write-Output "Restarting website"
