@@ -20,7 +20,12 @@ if ([string]::IsNullOrWhiteSpace($sampleDataSrc)) {
 }
 
 $sdStateUrl = "$apiurl/api/platform/pushnotifications"
-$sdInstallUrl = "$apiurl/api/platform/sampledata/import?url=$sampleDataSrc"
+if([string]::IsNullOrWhiteSpace($sampleDataSrc)){
+    $sdInstallUrl = "$apiurl/api/platform/sampledata/autoinstall"
+} else {
+    $sdInstallUrl = "$apiurl/api/platform/sampledata/import?url=$sampleDataSrc"
+}
+
 
 $headerValue = Create-Authorization $hmacAppId $hmacSecret
 $headers = @{}
