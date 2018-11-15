@@ -155,6 +155,9 @@ class Packaging {
         def websitePath = Utilities.getWebPublishFolder(context, websiteDir)     
         def packagesDir = Utilities.getArtifactFolder(context)
 
+        tempFolder = Utilities.escapeSymbolsForCMD(tempFolder)
+        webProject = Utilities.escapeSymbolsForCMD(webProject)
+
         context.dir(packagesDir)
         {
             context.deleteDir()
@@ -188,6 +191,7 @@ class Packaging {
 
     def static runBuild(context, solution)
     {
+        solution = Utilities.escapeSymbolsForCMD(solution)
         if(context.projectType == 'NETCORE2')
         {
             //context.bat "dotnet restore" // no need to run it in .net core 2.0, it should run as part of dotnet msbuild
@@ -218,6 +222,7 @@ class Packaging {
 
     def static cleanBuild(context, solution)
     {
+        solution = Utilities.escapeSymbolsForCMD(solution)
         context.bat "\"${context.tool DefaultMSBuild}\" \"${solution}\" /t:clean /p:Configuration=Debug /p:Platform=\"Any CPU\" /m"
     }    
 

@@ -403,4 +403,8 @@ class Utilities {
         def containerId = 'vc-platform-web'
         return "${tag}_${containerId}_1"
     }
+
+    def static escapeSymbolsForCMD(path){
+        return path.replace('%', '%%')
+    }
 }
