@@ -9,9 +9,9 @@ class Modules {
 
     def static createModuleArtifact(context, def manifestDirectory)
     {
-        def tempDir = Utilities.escapeSymbolsForCMD(Utilities.getTempFolder(context))
+        def tempDir = Utilities.getTempFolder(context)
         def modulesDir = "$tempDir\\_PublishedWebsites"
-        def packagesDir = Utilities.escapeSymbolsForCMD(Utilities.getArtifactFolder(context))
+        def packagesDir = Utilities.getArtifactFolder(context)
 
         context.dir(packagesDir)
         {
@@ -26,7 +26,7 @@ class Modules {
                 for (int i = 0; i < projects.size(); i++)
                 {
                     def project = projects[i]
-                    def path = Utilities.escapeSymbolsForCMD(project.name)
+                    def path = project.name
                     context.bat "\"${context.tool DefaultMSBuild}\" \"${path}\" /nologo /verbosity:m /t:Clean,PackModule /p:Configuration=Release /p:Platform=AnyCPU /p:DebugType=none /p:AllowedReferenceRelatedFileExtensions=.xml \"/p:OutputPath=$tempDir\" \"/p:VCModulesOutputDir=$modulesDir\" \"/p:VCModulesZipDir=$packagesDir\""
                 }
             }
