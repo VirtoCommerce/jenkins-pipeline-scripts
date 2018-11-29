@@ -87,7 +87,8 @@ def call(body) {
 						dockerImage = Packaging.createDockerImage(this, zipArtifact.replaceAll('\\.','/'), websitePath, ".", dockerTag)			
 					}
 
-					Packaging.createNugetPackages(this)
+					if(env.BRANCH_NAME == 'master')
+						Packaging.createNugetPackages(this)
 				}
 			}
 

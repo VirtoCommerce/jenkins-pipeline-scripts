@@ -54,7 +54,8 @@ import jobs.scripts.*
 				timestamps { 				
 					processManifests(false) // prepare artifacts for testing
 
-					Packaging.createNugetPackages(this)
+					if(env.BRANCH_NAME == 'master')
+						Packaging.createNugetPackages(this)
 				}
 			}
 
