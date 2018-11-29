@@ -53,6 +53,8 @@ import jobs.scripts.*
 			{
 				timestamps { 				
 					processManifests(false) // prepare artifacts for testing
+
+					Packaging.createNugetPackages(this)
 				}
 			}
 

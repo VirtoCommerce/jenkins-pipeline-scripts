@@ -388,4 +388,39 @@ class Packaging {
 			}	
 		}
 	}    
+
+    def static createNugetPackages(context){
+        String nugetFolder = "${context.env.WORKSPACE}\\NuGet"
+        if(!(new File(nugetFolder).exists()))
+            return
+
+        def solutions = context.findFiles(glob: "**\\*.sln")
+        for(solution in solutions){
+            context.bat "\"${context.tool 'DefaultMSBuild'}\\msbuild.exe\" \"${solution.path}\" /nologo /verbosity:n /t:Build /p:Configuration=Release;Platform=\"Any CPU\""
+        }
+
+        Utilities.cleanNugetFolder(context)
+        def nuspecs = context.findFiles glob: "**\\*.nuspec"
+        def csprojs = []
+        for (nuspec in nuspecs){
+            def nuspecParent = new File(nuspec.path).getParent()
+            def found = context.findFiles(glob: "**\\${nuspecParent}\\*.csproj")
+            if(found){
+                csprojs.addAll(found)
+            }
+
+        }
+        context.dir(nugetFolder){
+            for(csproj in csprojs){
+                context.bat "${context.env.NUGET}\\nuget pack \"${context.env.WORKSPACE}\\${csproj.path}\" -IncludeReferencedProjects -Symbols -Properties Configuration=Release"
+            }
+            def nugets = context.findFiles(glob: "**\\*.nupkg")
+            for(nuget in nugets){
+                if(!nuget.name.contains("symbols")){
+                    context.echo "publish nupkg: ${nuget.name}"
+                    context.bat "${context.env.NUGET}\\nuget push ${nuget.name} -Source nuget.org -ApiKey ${context.env.NUGET_KEY}"
+                }
+            }
+        }
+    }
 }

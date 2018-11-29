@@ -403,4 +403,16 @@ class Utilities {
         def containerId = 'vc-platform-web'
         return "${tag}_${containerId}_1"
     }
+
+    @NonCPS
+    def static cleanNugetFolder(context){
+        String folderPath = "${context.env.WORKSPACE}\\NuGet"
+        new File(folderPath).eachFile (FileType.FILES) { file ->
+            context.echo "found file: ${file.name}"
+            if (file.name.contains('nupkg')) {
+                context.echo "remove ${file.name}"
+                file.delete()
+            }
+        }
+    }
 }
