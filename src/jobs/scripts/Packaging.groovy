@@ -41,7 +41,7 @@ class Packaging {
         def dockerImage
         context.dir(dockerContextFolder)
         {
-            dockerImage = context.docker.build("${dockerImageName}:${version}".toLowerCase(), "--build-arg SOURCE=\"${dockerSourcePath}\" .")
+            dockerImage = context.docker.build("${dockerImageName}:${version}".toLowerCase(), "--pull --build-arg SOURCE=\"${dockerSourcePath}\" .")
         }
         return dockerImage
     }
