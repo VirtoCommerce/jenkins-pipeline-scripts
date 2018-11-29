@@ -53,9 +53,6 @@ import jobs.scripts.*
 			{
 				timestamps { 				
 					processManifests(false) // prepare artifacts for testing
-
-					if(env.BRANCH_NAME == 'master')
-						Packaging.createNugetPackages(this)
 				}
 			}
 
@@ -132,6 +129,8 @@ import jobs.scripts.*
 						if (Packaging.getShouldPublish(this)) {
 							processManifests(true) // publish artifacts to github releases
 						}
+						if(env.BRANCH_NAME == 'master')
+							Packaging.createNugetPackages(this)
 					}
 				}
 			}		

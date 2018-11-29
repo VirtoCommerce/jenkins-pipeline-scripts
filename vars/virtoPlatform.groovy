@@ -86,9 +86,6 @@ def call(body) {
 						def websitePath = Utilities.getWebPublishFolder(this, websiteDir)
 						dockerImage = Packaging.createDockerImage(this, zipArtifact.replaceAll('\\.','/'), websitePath, ".", dockerTag)			
 					}
-
-					if(env.BRANCH_NAME == 'master')
-						Packaging.createNugetPackages(this)
 				}
 			}
 
@@ -161,6 +158,9 @@ def call(body) {
 						{
 							Utilities.runSharedPS(this, "resources\\azure\\${deployScript}")
 						}
+
+						if(env.BRANCH_NAME == 'master')
+							Packaging.createNugetPackages(this)
 					}
 				}
 			}
