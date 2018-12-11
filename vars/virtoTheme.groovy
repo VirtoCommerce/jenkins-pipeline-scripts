@@ -19,29 +19,25 @@ def call(body) {
 			echo "Building branch ${env.BRANCH_NAME}"
 			Utilities.notifyBuildStatus(this, "Started")
 
-			def checkAndAbortBuild = false
 			stage('Checkout') {
 				timestamps { 
-					checkout scm
-				}
-				checkAndAbortBuild = Utilities.checkAndAbortBuild(this)
-				// clean folder for a release
-				if(Packaging.getShouldPublish(this) && !checkAndAbortBuild) {
 					deleteDir()
 					checkout scm
 				}
 			}
 
-			if(checkAndAbortBuild) {
-				return true
-			}
-
 			stage('Build + Analyze') {
 				timestamps { 
-					Packaging.startAnalyzer(this)
+                    Packaging.startSonarJS(this)
 					Packaging.runGulpBuild(this)
 				}
 			}
+
+			stage('Quality Gate'){
+                timestamps{
+                    Packaging.checkAnalyzerGate(this)
+                }
+            }
 			
 			def version = Utilities.getPackageVersion(this)
 

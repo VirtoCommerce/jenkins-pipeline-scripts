@@ -236,6 +236,16 @@ class Packaging {
         }        
     }
 
+    def static startSonarJS(context){
+        context.echo "Packaging.startSonarJS"
+        def sqScannerMsBuildHome = context.tool 'Scanner for MSBuild'
+        def fullJobName = Utilities.getRepoName(context)
+
+        context.withSonarQubeEnv('VC Sonar Server') {
+            context.bat "\"${sqScannerMsBuildHome}\\sonar-scanner-3.2.0.1227\\bin\\sonar-scanner.bat\" scan -Dsonar.projectKey=theme_default_${context.env.BRANCH_NAME} -Dsonar.sources=./assets -Dsonar.branch=${context.env.BRANCH_NAME} -Dsonar.projectName=\"${fullJobName}\" -Dsonar.host.url=%SONAR_HOST_URL% -Dsonar.login=%SONAR_AUTH_TOKEN%"
+        }
+    }
+
     def static endAnalyzer(context)
     {
         def sqScannerMsBuildHome = context.tool 'Scanner for MSBuild'
@@ -263,7 +273,11 @@ class Packaging {
         {
             context.deleteDir()
         }        
-        context.bat "npm install --dev"
+        context.bat "npm install"
+        def bowerjs = new File("${context.env.WORKSPACE}\\bower.json")
+        if(bowerjs.exists()){
+            context.bat "node node_modules\bower\bin\\bower install --force-latest"
+        }
         context.bat "node node_modules\\gulp\\bin\\gulp.js compress"
     }    
 
