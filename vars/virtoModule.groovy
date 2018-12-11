@@ -74,14 +74,14 @@ import jobs.scripts.*
 				Packaging.checkAnalyzerGate(this)
 			}	
 
-			if (env.BRANCH_NAME == 'master') {
+			/*if (env.BRANCH_NAME == 'master') {
 				stage('Build platform and storefront') {
 					timestamps{
 						build(job: "../vc-platform/${env.BRANCH_NAME}", parameters: [booleanParam(name: 'isCaused', value: true)])
                         build(job: "../vc-storefront-core/${env.BRANCH_NAME}", parameters: [booleanParam(name: 'isCaused', value: true)])
 					}
 				}
-			}
+			}*/
 			
 
 			if (env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'master') {

@@ -23,10 +23,6 @@ def call(body) {
 		def deployScript = 'VC-Platform2AzureDev.ps1'
 		def dockerTag = "${env.BRANCH_NAME}-branch"
 		def buildOrder = Utilities.getNextBuildOrder(this)
-		def isCaused = params.isCaused;
-		if(isCaused == null){
-			isCaused = false
-		}
 		if (env.BRANCH_NAME == 'master') {
 			deployScript = 'VC-Platform2AzureQA.ps1'
 			dockerTag = "latest"
@@ -146,7 +142,7 @@ def call(body) {
 				}		
 			}
 
-			if ((env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'master') && !isCaused) {
+			if (env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'master') {
 				stage('Publish'){
 					timestamps { 
 						if(solution == 'VirtoCommerce.Platform.sln' || projectType == 'NETCORE2')
