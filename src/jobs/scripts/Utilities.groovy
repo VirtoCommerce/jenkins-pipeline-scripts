@@ -235,7 +235,12 @@ class Utilities {
         context.dir(coverageFolder)
         {
             context.deleteDir()
-        }        
+        }     
+
+        if(paths.size() < 1)
+        {
+            return
+        }       
 
         // recreate it now
         File folder = new File(coverageFolder); 
