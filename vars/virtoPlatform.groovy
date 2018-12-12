@@ -166,13 +166,14 @@ def call(body) {
 			}
 
 
-/*
+
 			stage('Cleanup') {
 				timestamps { 
-					Packaging.cleanBuild(this, solution)
+					//Packaging.cleanBuild(this, solution)
+					bat "docker image prune --force"
 				}
 			}	
-*/		
+		
 		}
 		catch (any) {
 			currentBuild.result = 'FAILURE'
