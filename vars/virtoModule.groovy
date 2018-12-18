@@ -123,7 +123,6 @@ import jobs.scripts.*
 				stage('E2E') {
 					timestamps {
 						Utilities.runE2E(this)
-						Utilities.generateAllureReport(this)
 					}
 				}				
 			}				
@@ -155,6 +154,7 @@ import jobs.scripts.*
 		}
 		finally {
 			Packaging.stopDockerTestEnvironment(this, dockerTag)
+			Utilities.generateAllureReport(this)
 			if(currentBuild.result != 'FAILURE') {
 				step([$class: 'Mailer', notifyEveryUnstableBuild: true, recipients: emailextrecipients([[$class: 'CulpritsRecipientProvider'], [$class: 'RequesterRecipientProvider']])])
 			}
