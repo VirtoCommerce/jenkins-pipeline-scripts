@@ -446,7 +446,7 @@ class Utilities {
             }
             def allureResultsEsc = allureResultsPath.replace("\\", "\\\\")
             def jsonConf = "{\\\"output\\\":\\\"${allureResultsEsc}\\\",\\\"helpers\\\":{\\\"Protractor\\\":{\\\"url\\\":\\\"${DefaultAdminDockerPrefix}:${sfPort}\\\"}}}"
-            context.bat "${context.env.NODE_MODULES}\\.bin\\codeceptjs.cmd run -o \"${jsonConf}\""
+            def res = context.bat(returnStdout: true, script: "${context.env.NODE_MODULES}\\.bin\\codeceptjs.cmd run -o \"${jsonConf}\"").trim()
         }
     }
     def static generateAllureReport(context){
