@@ -118,6 +118,13 @@ import jobs.scripts.*
 					timestamps { 					
 						Modules.runIntegrationTests(this)
 					}
+				}
+
+				stage('E2E') {
+					timestamps {
+						Utilities.runE2E(this)
+						Utilities.generateAllureReport(this)
+					}
 				}				
 			}				
 
@@ -148,6 +155,7 @@ import jobs.scripts.*
 		}
 		finally {
 			Packaging.stopDockerTestEnvironment(this, dockerTag)
+			allure includeProperties: false, jdk: '', results: [[path: 'allure-results']]
 			if(currentBuild.result != 'FAILURE') {
 				step([$class: 'Mailer', notifyEveryUnstableBuild: true, recipients: emailextrecipients([[$class: 'CulpritsRecipientProvider'], [$class: 'RequesterRecipientProvider']])])
 			}
@@ -158,7 +166,6 @@ import jobs.scripts.*
 				def mailBody = Utilities.getMailBody(this, failedStageName, failedStageLog)
 				emailext body:mailBody, subject: "${env.JOB_NAME}:${env.BUILD_NUMBER} - ${currentBuild.currentResult}", recipientProviders: [[$class: 'CulpritsRecipientProvider'], [$class: 'RequesterRecipientProvider']]
 			}
-			//step([$class: 'Mailer', notifyEveryUnstableBuild: true, recipients: 'dev@virtoway.com', sendToIndividuals: true])
 		}
 
 		step([$class: 'GitHubCommitStatusSetter', statusResultSource: [$class: 'ConditionalStatusResultSource', results: []]])

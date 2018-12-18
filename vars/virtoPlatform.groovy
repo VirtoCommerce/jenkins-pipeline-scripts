@@ -139,7 +139,14 @@ def call(body) {
 							}
 						}
 					}
-				}		
+
+					stage('E2E') {
+						timestamps {
+							Utilities.runE2E(this)
+							Utilities.generateAllureReport(this)
+						}
+					}
+				}	
 			}
 
 			if (env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'master') {

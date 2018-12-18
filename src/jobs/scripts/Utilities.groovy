@@ -422,4 +422,34 @@ class Utilities {
             }
         }
     }
+
+    def static getE2EDir(context){
+        def tmp = Utilities.getTempFolder(context)
+		return "${tmp}\\e2e"
+    }
+
+
+    def static getE2ETests(context){
+        context.git credentialsId: 'github', url: 'https://github.com/VirtoCommerce/vc-platform-qg.git'
+    }
+
+    def static runE2E(context){
+        def e2eDir = Utilities.getE2EDir(context)
+        context.dir(e2eDir) {
+            context.deleteDir()
+            getE2ETests(context)
+            def sfPort = Utilities.getStorefrontPort(context)
+            def allureResultsPath = "${context.env.WORKSPACE}\\allure-results"
+            def allureReportPath = "${context.env.WORKSPACE}\\allure-report"
+            context.dir(allureReportPath){
+                context.deleteDir()
+            }
+            def allureResultsEsc = allureResultsPath.replace("\\", "\\\\")
+            def jsonConf = "{\\\"output\\\":\\\"${allureResultsEsc}\\\",\\\"helpers\\\":{\\\"Protractor\\\":{\\\"url\\\":\\\"http://localhost:${sfPort}\\\"}}}"
+            context.bat "${context.env.NODE_MODULES}\\.bin\\codeceptjs.cmd run -o \"${jsonConf}\""
+        }
+    }
+    def static generateAllureReport(context){
+        context.allure includeProperties: false, jdk: '', results: [[path: "./../workspace@tmp/output"]]
+    }
 }
