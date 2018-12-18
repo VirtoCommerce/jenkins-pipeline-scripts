@@ -155,7 +155,6 @@ import jobs.scripts.*
 		}
 		finally {
 			Packaging.stopDockerTestEnvironment(this, dockerTag)
-			allure includeProperties: false, jdk: '', results: [[path: 'allure-results']]
 			if(currentBuild.result != 'FAILURE') {
 				step([$class: 'Mailer', notifyEveryUnstableBuild: true, recipients: emailextrecipients([[$class: 'CulpritsRecipientProvider'], [$class: 'RequesterRecipientProvider']])])
 			}
