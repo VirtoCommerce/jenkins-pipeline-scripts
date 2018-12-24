@@ -38,6 +38,13 @@ def call(body) {
                     Packaging.checkAnalyzerGate(this)
                 }
             }
+
+			if(params.themeResultZip != null){
+                def artifacts = findFiles(glob: 'artifacts/*.zip')
+                for(artifact in artifacts){
+                    bat "copy /Y \"${artifact.path}\" \"${params.themeResultZip}\""
+                }
+            }
 			
 			def version = Utilities.getPackageVersion(this)
 
