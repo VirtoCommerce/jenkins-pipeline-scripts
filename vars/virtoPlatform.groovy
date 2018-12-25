@@ -146,11 +146,11 @@ def call(body) {
 						}
 					}
 
-					// stage('E2E') {
-					// 	timestamps {
-					// 		Utilities.runE2E(this)
-					// 	}
-					// }
+					stage('E2E') {
+						timestamps {
+							Utilities.runE2E(this)
+						}
+					}
 				}	
 			}
 
