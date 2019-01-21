@@ -48,19 +48,22 @@ def call(body) {
 			
 			def version = Utilities.getPackageVersion(this)
 
-			if (Packaging.getShouldStage(this)) {
-				stage('Stage') {
-					timestamps {
-					    def stagingName = Utilities.getStagingNameFromBranchName(this)
-						Utilities.runSharedPS(this, "resources\\azure\\VC-Theme2Azure.ps1", /-StagingName "${stagingName}" -StoreName "${storeName}"/)
-					}
-				}			
-			}
+			if(params.themeResultZip == null)
+			{
+				if (Packaging.getShouldStage(this)) {
+					stage('Stage') {
+						timestamps {
+							def stagingName = Utilities.getStagingNameFromBranchName(this)
+							Utilities.runSharedPS(this, "resources\\azure\\VC-Theme2Azure.ps1", /-StagingName "${stagingName}" -StoreName "${storeName}"/)
+						}
+					}			
+				}
 
-			if (Packaging.getShouldPublish(this)) {
-				stage('Publish') {
-					timestamps { 
-						Packaging.publishRelease(this, version, "")
+				if (Packaging.getShouldPublish(this)) {
+					stage('Publish') {
+						timestamps { 
+							Packaging.publishRelease(this, version, "")
+						}
 					}
 				}
 			}
