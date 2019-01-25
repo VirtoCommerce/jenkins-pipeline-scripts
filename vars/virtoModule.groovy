@@ -36,7 +36,7 @@ import jobs.scripts.*
 				return true
 			}
 
-			stage('Build + Analyze')
+			stage('Build')
 			{
 				timestamps { 
 					// clean folder for a release
@@ -63,32 +63,23 @@ import jobs.scripts.*
 				}
 			}
 
-			stage('Submit Analysis') {
+			stage('Code Analyse') {
 				timestamps { 
 					Packaging.endAnalyzer(this)
+					Packaging.checkAnalyzerGate(this)
 				}
-			}
-
-			// No need to occupy a node
-			stage("Quality Gate"){
-				Packaging.checkAnalyzerGate(this)
-			}	
-
-			/*if (env.BRANCH_NAME == 'master') {
-				stage('Build platform and storefront') {
-					timestamps{
-						build(job: "../vc-platform/${env.BRANCH_NAME}", parameters: [booleanParam(name: 'isCaused', value: true)])
-                        build(job: "../vc-storefront-core/${env.BRANCH_NAME}", parameters: [booleanParam(name: 'isCaused', value: true)])
-					}
-				}
-			}*/
-			
+			}			
 
 			if (env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'master') {
-				stage('Prepare Test Environment') {
+				stage('Create Test Environment') {
 					timestamps { 
 						// Start docker environment
 						Packaging.startDockerTestEnvironment(this, dockerTag)
+					}
+				}
+
+				stage('Install VC Modules'){
+					timestamps{
 
 						// install modules
 						Packaging.installModules(this, 0)
@@ -99,18 +90,25 @@ import jobs.scripts.*
 						//check installed modules
 						Packaging.checkInstalledModules(this)
 
+					}
+				}
+
+				stage('Install Sample Data'){
+					timestamps{
 						// now create sample data
 						Packaging.createSampleData(this)
 					}
 				}
 
-				stage('Theme build and deploy'){
-					def themePath = "${env.WORKSPACE}@tmp\\theme.zip"
-					build(job: "../vc-theme-default/${env.BRANCH_NAME}", parameters: [string(name: 'themeResultZip', value: themePath)])
-					Packaging.installTheme(this, themePath)
+				stage('Theme Build and Deploy'){
+					timestamps {
+						def themePath = "${env.WORKSPACE}@tmp\\theme.zip"
+						build(job: "../vc-theme-default/${env.BRANCH_NAME}", parameters: [string(name: 'themeResultZip', value: themePath)])
+						Packaging.installTheme(this, themePath)
+					}
 				}
 
-				stage("Swagger schema validation"){
+				stage("Swagger Schema Validation"){
 					timestamps{
 						def tempFolder = Utilities.getTempFolder(this)
 						def schemaPath = "${tempFolder}\\swagger.json"

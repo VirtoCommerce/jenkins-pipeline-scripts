@@ -49,7 +49,6 @@ def call(body) {
 		}
 		
 		try {
-			echo "Building branch ${env.BRANCH_NAME}"
 			Utilities.notifyBuildStatus(this, "Started")
 
 			stage('Checkout') {
@@ -63,7 +62,7 @@ def call(body) {
 				return true
 			}
 
-			stage('Build + Analyze') {		
+			stage('Build') {		
 				timestamps { 					
 					// clean folder for a release
 					if (Packaging.getShouldPublish(this)) {
@@ -79,7 +78,7 @@ def call(body) {
 			def version = Utilities.getAssemblyVersion(this, webProject)
 			def dockerImage
 
-			stage('Package') {
+			stage('Packaging') {
 				timestamps { 
 					Packaging.createReleaseArtifact(this, version, webProject, zipArtifact, websiteDir)
 					if (env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'master') {
@@ -92,51 +91,55 @@ def call(body) {
 			def tests = Utilities.getTestDlls(this)
 			if(tests.size() > 0)
 			{
-				stage('Tests') {
+				stage('Unit Tests') {
 					timestamps { 
 						Packaging.runUnitTests(this, tests)
 					}
 				}
 			}		
 
-			stage('Submit Analysis') {
+			stage('Code Analyse') {
 				timestamps { 
 					Packaging.endAnalyzer(this)
+					Packaging.checkAnalyzerGate(this)
 				}
-			}			
-
-			// No need to occupy a node
-			stage("Quality Gate"){
-				Packaging.checkAnalyzerGate(this)
 			}
 
 			if(solution == 'VirtoCommerce.Platform.sln' || projectType == 'NETCORE2') // skip docker and publishing for NET4
 			{
 				if (env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'master') {
-					stage('Docker Sample') {
+					stage('Create Test Environment') {
 						timestamps { 
 							// Start docker environment				
 							Packaging.startDockerTestEnvironment(this, dockerTag)
-							
+						}
+					}
+					stage('Install VC Modules'){
+						timestamps{
 							// install modules
-							Packaging.installModules(this, 1)	
-
+							Packaging.installModules(this, 1)
 							// check installed modules
 							Packaging.checkInstalledModules(this)
-
-							// now create sample data
-							Packaging.createSampleData(this)					
 						}
 					}
 
-					stage('Theme build and deploy'){
-						def themePath = "${env.WORKSPACE}@tmp\\theme.zip"
-						build(job: "../vc-theme-default/${env.BRANCH_NAME}", parameters: [string(name: 'themeResultZip', value: themePath)])
-						Packaging.installTheme(this, themePath)
+					stage('Install Sample Data'){
+						timestamps{
+							// now create sample data
+							Packaging.createSampleData(this)	
+						}
+					}
+
+					stage('Theme Build and Deploy'){
+						timestamps{
+							def themePath = "${env.WORKSPACE}@tmp\\theme.zip"
+							build(job: "../vc-theme-default/${env.BRANCH_NAME}", parameters: [string(name: 'themeResultZip', value: themePath)])
+							Packaging.installTheme(this, themePath)
+						}
 					}
 
 					if(!Utilities.isNetCore(projectType)) {
-						stage("Swagger schema validation"){
+						stage("Swagger Schema Validation"){
 							timestamps{
 								def tempFolder = Utilities.getTempFolder(this)
 								def schemaPath = "${tempFolder}\\swagger.json"
@@ -170,21 +173,12 @@ def call(body) {
 						{
 							Utilities.runSharedPS(this, "resources\\azure\\${deployScript}")
 						}
-
-						if(env.BRANCH_NAME == 'master')
-							Packaging.createNugetPackages(this)
 					}
 				}
 			}
 
 
 
-			stage('Cleanup') {
-				timestamps { 
-					//Packaging.cleanBuild(this, solution)
-					bat "docker image prune --force"
-				}
-			}	
 		
 		}
 		catch (any) {
@@ -195,6 +189,7 @@ def call(body) {
 		finally {
 			Packaging.stopDockerTestEnvironment(this, dockerTag)
 			Utilities.generateAllureReport(this)
+			bat "docker image prune --force"
 			if(currentBuild.result != 'FAILURE') {
 				step([$class: 'Mailer', notifyEveryUnstableBuild: true, recipients: emailextrecipients([[$class: 'CulpritsRecipientProvider'], [$class: 'RequesterRecipientProvider']])])
 			}
