@@ -63,7 +63,7 @@ import jobs.scripts.*
 				}
 			}
 
-			stage('Code Analyse') {
+			stage('Code Analysis') {
 				timestamps { 
 					Packaging.endAnalyzer(this)
 					Packaging.checkAnalyzerGate(this)
