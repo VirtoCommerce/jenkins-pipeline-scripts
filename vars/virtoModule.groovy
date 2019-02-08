@@ -162,7 +162,7 @@ import jobs.scripts.*
 			Packaging.stopDockerTestEnvironment(this, dockerTag)
 			Utilities.generateAllureReport(this)
 			step([$class: 'LogParserPublisher',
-				  failBuildOnError: true,
+				  failBuildOnError: false,
 				  parsingRulesPath: env.LOG_PARSER_RULES,
 				  useProjectRule: false])
 			if(currentBuild.result != 'FAILURE') {

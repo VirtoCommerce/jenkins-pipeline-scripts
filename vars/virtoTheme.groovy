@@ -75,7 +75,7 @@ def call(body) {
 		}
 		finally {
 			step([$class: 'LogParserPublisher',
-				  failBuildOnError: true,
+				  failBuildOnError: false,
 				  parsingRulesPath: env.LOG_PARSER_RULES,
 				  useProjectRule: false])
 			if(currentBuild.result != 'FAILURE') {

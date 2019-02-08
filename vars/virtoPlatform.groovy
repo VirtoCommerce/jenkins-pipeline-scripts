@@ -187,7 +187,7 @@ def call(body) {
 			Packaging.stopDockerTestEnvironment(this, dockerTag)
 			Utilities.generateAllureReport(this)
 			step([$class: 'LogParserPublisher',
-				  failBuildOnError: true,
+				  failBuildOnError: false,
 				  parsingRulesPath: env.LOG_PARSER_RULES,
 				  useProjectRule: false])
 			bat "docker image prune --force"
