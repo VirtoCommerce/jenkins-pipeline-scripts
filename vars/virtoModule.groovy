@@ -26,7 +26,11 @@ import jobs.scripts.*
 			Utilities.notifyBuildStatus(this, "started")
 
 			stage('Checkout') {
-				timestamps { 		
+				timestamps { 	
+					// clean folder for a release
+					if (Packaging.getShouldPublish(this)) {
+						deleteDir()
+					}	
 					checkout scm
 				}				
 			}			
@@ -39,11 +43,7 @@ import jobs.scripts.*
 			stage('Build')
 			{
 				timestamps { 
-					// clean folder for a release
-					if (Packaging.getShouldPublish(this)) {
-						deleteDir()
-						checkout scm
-					}							
+												
 					Packaging.startAnalyzer(this)
 					Packaging.buildSolutions(this)
 				}

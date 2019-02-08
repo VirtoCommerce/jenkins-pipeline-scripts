@@ -53,6 +53,9 @@ def call(body) {
 
 			stage('Checkout') {
 				timestamps { 
+					if (Packaging.getShouldPublish(this)) {
+						deleteDir()
+					}
 					checkout scm
 				}				
 			}
@@ -63,13 +66,7 @@ def call(body) {
 			}
 
 			stage('Build') {		
-				timestamps { 					
-					// clean folder for a release
-					if (Packaging.getShouldPublish(this)) {
-						deleteDir()
-						checkout scm
-					}		
-					
+				timestamps { 						
 					Packaging.startAnalyzer(this)
 					Packaging.runBuild(this, solution)
 				}
