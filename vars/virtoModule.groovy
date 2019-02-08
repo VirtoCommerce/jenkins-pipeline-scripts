@@ -161,6 +161,10 @@ import jobs.scripts.*
 		finally {
 			Packaging.stopDockerTestEnvironment(this, dockerTag)
 			Utilities.generateAllureReport(this)
+			step([$class: 'LogParserPublisher',
+				  failBuildOnError: true,
+				  parsingRulesPath: env.LOG_PARSER_RULES,
+				  useProjectRule: false])
 			if(currentBuild.result != 'FAILURE') {
 				step([$class: 'Mailer', notifyEveryUnstableBuild: true, recipients: emailextrecipients([[$class: 'CulpritsRecipientProvider'], [$class: 'RequesterRecipientProvider']])])
 			}

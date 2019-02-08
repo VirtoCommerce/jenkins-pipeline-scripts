@@ -74,6 +74,10 @@ def call(body) {
 			throw any //rethrow exception to prevent the build from proceeding
 		}
 		finally {
+			step([$class: 'LogParserPublisher',
+				  failBuildOnError: true,
+				  parsingRulesPath: env.LOG_PARSER_RULES,
+				  useProjectRule: false])
 			if(currentBuild.result != 'FAILURE') {
 				step([$class: 'Mailer', notifyEveryUnstableBuild: true, recipients: emailextrecipients([[$class: 'CulpritsRecipientProvider'], [$class: 'RequesterRecipientProvider']])])
 			}
