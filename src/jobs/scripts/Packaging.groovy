@@ -439,7 +439,7 @@ class Packaging {
                 if(!nuget.name.contains("symbols")){
                     context.echo "publish nupkg: ${nuget.name}"
                     //context.bat "${context.env.NUGET}\\nuget push ${nuget.name} -Source nuget.org -ApiKey ${context.env.NUGET_KEY}"
-                    context.bat "powershell.exe -File \"${context.env.WORKSPACE}@libs\\${DefaultSharedLibName}\\resources\\azure\\vc-publish-nuget.ps1\" -path \"${nuget.name}\" -ErrorAction Stop"
+                    Utilities.runSharedPS(context, "vc-publish-nuget.ps1", "-path \"${nuget.name}\"")
                 }
             }
         }

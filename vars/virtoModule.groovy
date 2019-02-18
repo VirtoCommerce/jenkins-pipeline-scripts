@@ -137,7 +137,7 @@ import jobs.scripts.*
 				stage('Publish')
 				{
 					timestamps { 	
-						Utilities.runSharedPS(this, "resources\\azure\\${deployScript}")				
+						Utilities.runSharedPS(this, "${deployScript}")				
 						if (Packaging.getShouldPublish(this)) {
 							processManifests(true) // publish artifacts to github releases
 						}
