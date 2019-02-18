@@ -34,7 +34,7 @@ class Utilities {
 
     def static runSharedPS(context, scriptName, args = '')
     {
-    	def wsFolder = context.pwd()
+    	def wsFolder = context.pwd().replace("@2", "")
  	    context.bat "powershell.exe -File \"${wsFolder}\\..\\workspace@libs\\${DefaultSharedLibName}\\resources\\azure\\${scriptName}\" ${args} -ErrorAction Stop"
     }
 
