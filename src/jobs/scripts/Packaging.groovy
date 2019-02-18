@@ -123,13 +123,13 @@ class Packaging {
     def static createSampleData(context)
     {
     	def wsFolder = context.pwd()
- 	    context.bat "powershell.exe -File \"${wsFolder}\\..\\workspace@libs\\${DefaultSharedLibName}\\resources\\azure\\vc-setup-sampledata.ps1\" -apiurl \"${Utilities.getPlatformHost(context)}\" -ErrorAction Stop"
+         Utilities.runSharedPS(context, "vc-setup-sampledata.ps1", "-apiurl \"${Utilities.getPlatformHost(context)}\"")
     }
 
     def static installModules(context, needRestart)
     {
     	def wsFolder = context.pwd()
- 	    context.bat "powershell.exe -File \"${wsFolder}\\..\\workspace@libs\\${DefaultSharedLibName}\\resources\\azure\\vc-setup-modules.ps1\" -apiurl \"${Utilities.getPlatformHost(context)}\" -needRestart ${needRestart} -ErrorAction Stop"
+        Utilities.runSharedPS(context, 'vc-setup-modules.ps1', "-apiurl \"${Utilities.getPlatformHost(context)}\" -needRestart ${needRestart}")
     }    
 
     def static pushDockerImage(context, dockerImage, String dockerTag)
@@ -141,11 +141,11 @@ class Packaging {
     }
 
     def static checkInstalledModules(context){
-        context.bat "powershell.exe -File \"${context.env.WORKSPACE}@libs\\${DefaultSharedLibName}\\resources\\azure\\vc-check-installed-modules.ps1\" -apiurl \"${Utilities.getPlatformHost(context)}\" -ErrorAction Stop"
+        Utilities.runSharedPS(context, "vc-check-installed-modules.ps1", "-apiurl \"${Utilities.getPlatformHost(context)}\"")
     }
 
     def static createSwaggerSchema(context, swaggerFile) {
-        context.bat "powershell.exe -File \"${context.env.WORKSPACE}@libs\\${DefaultSharedLibName}\\resources\\azure\\vc-get-swagger.ps1\" -apiurl \"${Utilities.getPlatformHost(context)}\" -swaggerFile \"${swaggerFile}\" -ErrorAction Stop"
+        Utilities.runSharedPS(context, "vc-get-swagger.ps1", "-apiurl \"${Utilities.getPlatformHost(context)}\" -swaggerFile \"${swaggerFile}\"")
     }
 
     def static createReleaseArtifact(context, version, webProject, zipArtifact, websiteDir)
@@ -378,12 +378,12 @@ class Packaging {
 	{
         def moduleId = Modules.getModuleId(context)
         def platformContainer = Utilities.getPlatformContainer(context)
- 		context.bat "powershell.exe -File \"${context.env.WORKSPACE}@libs\\${DefaultSharedLibName}\\resources\\azure\\vc-install-module.ps1\" -apiurl \"${Utilities.getPlatformHost(context)}\" -moduleZipArchievePath \"${path}\" -moduleId \"${moduleId}\" -platformContainer ${platformContainer} -ErrorAction Stop"
+        Utilities.runSharedPS(context, "vc-install-module.ps1", "-apiurl \"${Utilities.getPlatformHost(context)}\" -moduleZipArchievePath \"${path}\" -moduleId \"${moduleId}\" -platformContainer ${platformContainer}")
 	}   
 
     def static installTheme(context, path){
         def platformContainer = Utilities.getPlatformContainer(context)
-        context.bat "powershell.exe -File \"${context.env.WORKSPACE}@libs\\${DefaultSharedLibName}\\resources\\azure\\vc-install-theme.ps1\" -themeZip \"${path}\" -platformContainer ${platformContainer} -ErrorAction Stop"
+        Utilities.runSharedPS(context, "vc-install-theme.ps1", "-themeZip \"${path}\" -platformContainer ${platformContainer}")
     }  
 
 	def static publishThemePackage(context)

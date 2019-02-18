@@ -35,7 +35,7 @@ class Utilities {
     def static runSharedPS(context, scriptName, args = '')
     {
     	def wsFolder = context.pwd()
- 	    context.bat "powershell.exe -File \"${wsFolder}\\..\\workspace@libs\\${DefaultSharedLibName}\\${scriptName}\" ${args} -ErrorAction Stop"
+ 	    context.bat "powershell.exe -File \"${wsFolder}\\..\\workspace@libs\\${DefaultSharedLibName}\\resources\\azure\\${scriptName}\" ${args} -ErrorAction Stop"
     }
 
     def static getAssemblyVersion(context, projectFile)
@@ -130,18 +130,9 @@ class Utilities {
 
     def static getWebPublishFolder(context, String websiteDir)
     {
-        if(context.projectType == 'NETCORE2')
-        {
-            def tempFolder = Utilities.getTempFolder(context)
-            def websitePath = "$tempFolder\\_PublishedWebsites\\${websiteDir}"
-            return websitePath           
-        }
-        else
-        {
-            def tempFolder = Utilities.getTempFolder(context)
-            def websitePath = "$tempFolder\\_PublishedWebsites\\${websiteDir}"
-            return websitePath
-        }
+        def tempFolder = Utilities.getTempFolder(context)
+        def websitePath = "$tempFolder\\_PublishedWebsites\\${websiteDir}"
+        return websitePath 
     }
 
     def static getPlatformHost(context)

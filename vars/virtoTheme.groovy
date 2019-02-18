@@ -54,7 +54,7 @@ def call(body) {
 					stage('Stage') {
 						timestamps {
 							def stagingName = Utilities.getStagingNameFromBranchName(this)
-							Utilities.runSharedPS(this, "resources\\azure\\VC-Theme2Azure.ps1", /-StagingName "${stagingName}" -StoreName "${storeName}"/)
+							Utilities.runSharedPS(this, "VC-Theme2Azure.ps1", /-StagingName "${stagingName}" -StoreName "${storeName}"/)
 						}
 					}			
 				}
