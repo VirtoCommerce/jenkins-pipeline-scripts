@@ -13,6 +13,7 @@ import jobs.scripts.*
 
     node
     {
+		properties([disableConcurrentBuilds()])
 	    def deployScript = 'VC-Module2AzureDev.ps1'
 		def dockerTag = "${env.BRANCH_NAME}-branch"
 		def buildOrder = Utilities.getNextBuildOrder(this)

@@ -11,6 +11,7 @@ def call(body) {
     
 	node
 	{
+		properties([disableConcurrentBuilds()])
 		// configuration parameters
 		def hmacAppId = env.HMAC_APP_ID
 		def hmacSecret = env.HMAC_SECRET

@@ -10,6 +10,7 @@ def call(body) {
 	body()
     
 	node {
+		properties([disableConcurrentBuilds()])
 	    def storeName = config.sampleStore
 		projectType = config.projectType
 		if(projectType==null){
