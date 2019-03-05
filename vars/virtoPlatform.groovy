@@ -55,7 +55,7 @@ def call(body) {
 			stage('Checkout') {
 				timestamps { 
 					if (Packaging.getShouldPublish(this)) {
-						deleteDir()
+						powershell "Remove-Item * -Recurse -Force"
 					}
 					checkout scm
 				}				
