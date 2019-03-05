@@ -55,7 +55,7 @@ def call(body) {
 			stage('Checkout') {
 				timestamps { 
 					if (Packaging.getShouldPublish(this)) {
-						powershell "Remove-Item * -Recurse -Force"
+						powershell "Remove-Item ${env.WORKSPACE}\\* -Recurse -Force"
 					}
 					checkout scm
 				}				
