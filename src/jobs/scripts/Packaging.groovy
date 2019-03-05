@@ -330,7 +330,7 @@ class Packaging {
 
 	def static getShouldPublish(context)
 	{
-		if (context.env.BRANCH_NAME == 'master' && !isDraft(context)) {
+		if (context.env.BRANCH_NAME == 'master') {
 			return true
 		}
 
