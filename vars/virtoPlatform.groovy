@@ -163,6 +163,7 @@ def call(body) {
 							Packaging.pushDockerImage(this, dockerImage, dockerTag)
 						}
 						if (Packaging.getShouldPublish(this)) {
+							Packaging.createNugetPackages(this)
 							def notes = Utilities.getReleaseNotes(this, webProject)
 							Packaging.publishRelease(this, version, notes)
 						}
