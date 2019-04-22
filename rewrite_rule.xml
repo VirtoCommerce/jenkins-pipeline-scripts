@@ -1,0 +1,13 @@
+<configuration>
+	<system.webServer>
+		<rewrite>
+			<rules>
+				<rule name="Redirect admin" stopProcessing="true">
+					<match url="^admin(.*)" />
+					<conditions trackAllCaptures="true" />
+					<action type="Redirect" url="http://admin-demo.virtocommerce.com" />
+				</rule>
+			</rules>
+		</rewrite>
+	</system.webServer>
+</configuration>
