@@ -52,7 +52,6 @@
     "RedisCacheSKUName": "Basic",
     "RedisCacheSKUFamily": "C",
     "RedisCacheSKUCapacity": 0,
-    "RedisCacheRedisVersion": "2.8",
     "AppServicePlanBackendSkuName": "B1",
     "AppServicePlanStorefrontSkuName": "B1",
     "AzureSQLsrvAdminLoginPassword": "[concat('P', uniqueString(resourceGroup().id, '224F5A8B-51DB-46A3-A7C8-59B0DD584A41'), 'x', '!')]"
@@ -61,7 +60,7 @@
     {
       "type": "Microsoft.Sql/servers",
       "name": "[parameters('AzureSQLsrvName')]",
-      "apiVersion": "2014-04-01-preview",
+      "apiVersion": "2018-06-01-preview",
       "location": "[resourceGroup().location]",
       "tags": {
         "displayName": "AzureSQLserver"
@@ -74,7 +73,7 @@
         {
           "type": "firewallrules",
           "name": "AllowAllWindowsAzureIps",
-          "apiVersion": "2014-04-01-preview",
+          "apiVersion": "2018-06-01-preview",
           "location": "[resourceGroup().location]",
           "properties": {
             "startIpAddress": "0.0.0.0",
@@ -87,7 +86,7 @@
         {
           "type": "databases",
           "name": "[parameters('AzureSQLdbName')]",
-          "apiVersion": "2014-04-01-preview",
+          "apiVersion": "2018-06-01-preview",
           "location": "[resourceGroup().location]",
           "tags": {
             "displayName": "AzureSQLdatabase"
@@ -112,7 +111,7 @@
       },
       "kind": "Storage",
       "name": "[parameters('StorageAccountName')]",
-      "apiVersion": "2016-01-01",
+      "apiVersion": "2018-02-01",
       "location": "[resourceGroup().location]",
       "tags": {
         "displayName": "StorageAccount"
@@ -122,7 +121,7 @@
     {
       "type": "Microsoft.Cache/Redis",
       "name": "[parameters('RedisCacheName')]",
-      "apiVersion": "2016-04-01",
+      "apiVersion": "2018-03-01",
       "location": "[resourceGroup().location]",
       "tags": {
         "displayName": "RedisCache"
@@ -132,8 +131,7 @@
           "name": "[variables('RedisCacheSKUName')]",
           "family": "[variables('RedisCacheSKUFamily')]",
           "capacity": "[variables('RedisCacheSKUCapacity')]"
-        },
-        "redisVersion": "[variables('RedisCacheRedisVersion')]"
+        } 
       },
       "dependsOn": []
     },
@@ -141,7 +139,7 @@
       "type": "Microsoft.Insights/components",
       "kind": "web",
       "name": "[parameters('AppInsights')]",
-      "apiVersion": "2015-05-01",
+      "apiVersion": "2018-03-01",
       "location": "[resourceGroup().location]",
       "tags": {
         "displayName": "ApplicationInsights"
@@ -160,7 +158,7 @@
         "name": "[variables('AppServicePlanBackendSkuName')]"
       },
       "name": "[parameters('AppServicePlanBackendName')]",
-      "apiVersion": "2015-08-01",
+      "apiVersion": "2018-02-01",
       "location": "[resourceGroup().location]",
       "tags": {
         "displayName": "AppServicePlanBackend"
@@ -174,7 +172,7 @@
     {
       "type": "Microsoft.Web/sites",
       "name": "[parameters('WebAppBackendName')]",
-      "apiVersion": "2015-08-01",
+      "apiVersion": "2018-02-01",
       "location": "[resourceGroup().location]",
       "tags": {
         "[concat('hidden-related:', resourceId('Microsoft.Web/serverfarms', parameters('AppServicePlanBackendName')))]": "Resource",
@@ -188,7 +186,7 @@
         {
           "type": "config",
           "name": "web",
-          "apiVersion": "2015-08-01",
+          "apiVersion": "2018-02-01",
           "tags": {
             "displayName": "WebConfigBackend"
           },
@@ -218,7 +216,7 @@
         {
           "type": "config",
           "name": "appsettings",
-          "apiVersion": "2015-08-01",
+          "apiVersion": "2018-02-01",
           "tags": {
             "displayName": "AppSettingsBackend"
           },
@@ -233,7 +231,7 @@
         {
           "type": "config",
           "name": "connectionstrings",
-          "apiVersion": "2015-08-01",
+          "apiVersion": "2018-02-01",
           "tags": {
             "displayName": "ConnectionStringsBackend"
           },
@@ -277,7 +275,7 @@
         "name": "[variables('AppServicePlanStorefrontSkuName')]"
       },
       "name": "[parameters('AppServicePlanStorefrontName')]",
-      "apiVersion": "2015-08-01",
+      "apiVersion": "2018-02-01",
       "location": "[resourceGroup().location]",
       "tags": {
         "displayName": "AppServicePlanStorefront"
@@ -291,7 +289,7 @@
     {
       "type": "Microsoft.Web/sites",
       "name": "[parameters('WebAppStorefrontName')]",
-      "apiVersion": "2015-08-01",
+      "apiVersion": "2018-02-01",
       "location": "[resourceGroup().location]",
       "tags": {
         "[concat('hidden-related:', resourceId('Microsoft.Web/serverfarms', parameters('AppServicePlanStorefrontName')))]": "Resource",
@@ -305,7 +303,7 @@
         {
           "type": "config",
           "name": "web",
-          "apiVersion": "2015-08-01",
+          "apiVersion": "2018-02-01",
           "tags": {
             "displayName": "WebConfigStorefront"
           },
@@ -322,7 +320,7 @@
         {
           "type": "config",
           "name": "appsettings",
-          "apiVersion": "2015-08-01",
+          "apiVersion": "2018-02-01",
           "tags": {
             "displayName": "AppSettingsStorefront"
           },
@@ -339,7 +337,7 @@
         {
           "type": "config",
           "name": "connectionstrings",
-          "apiVersion": "2015-08-01",
+          "apiVersion": "2018-02-01",
           "tags": {
             "displayName": "ConnectionStringsStorefront"
           },
