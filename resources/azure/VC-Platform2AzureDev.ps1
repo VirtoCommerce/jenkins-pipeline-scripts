@@ -1,4 +1,4 @@
-﻿$ResourceGroupLocation = "East US"
+﻿$ResourceGroupLocation = @(Get-AzureRmLocation | Where-Object Providers -like "*vm*" | Select-Object -ExpandProperty Location)
 $TemplateFile = 'azuredeploy.json'
 $TemplateParametersFile = 'parameters.json'
 
