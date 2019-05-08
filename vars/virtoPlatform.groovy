@@ -128,12 +128,6 @@ def call(body) {
 						}
 					}
 
-					stage('Infrastructure Check and Deploy'){
-						timestamps{
-							Utilities.createInfrastructure()
-						}
-					}
-
 					stage('Theme Build and Deploy'){
 						timestamps{
 							def themePath = "${env.WORKSPACE}@tmp\\theme.zip"
@@ -158,7 +152,14 @@ def call(body) {
 					// 		Utilities.runE2E(this)
 					// 	}
 					// }
-				}	
+
+					stage('Infrastructure Check and Deploy'){
+						timestamps{
+							Utilities.createInfrastructure()
+						}
+					}
+
+				}
 			}
 
 			if (env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'master') {

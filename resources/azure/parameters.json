@@ -3,34 +3,34 @@
     "contentVersion": "1.0.0.0",
   "parameters": {
     "azureSQLsrvName": {
-      "value": "devdemovcsrv"
+      "value": "dev-demovc-srv"
     },
     "azureSQLsrvAdminLogin": {
-      "value": "devdemovcadmin"
+      "value": "dev-demovc-admin"
     },
     "azureSQLdbName": {
-      "value": "devdemovcdb"
+      "value": "dev-demovc-db"
     },
     "storageAccountName": {
-      "value": "devdemovcstorage"
+      "value": "devdemovc"
     },
     "redisCacheName": {
-      "value": "devdemovcredis"
+      "value": "dev-demovc"
     },
     "appInsights": {
       "value": "devdemovcappinsight"
     },
     "appServicePlanBackendName": {
-      "value": "devdemovcadmin"
+      "value": "dev-demovc-admin"
     },
     "webAppBackendName": {
-      "value": "devdemovcadmin"
+      "value": "dev-demovc-admin"
     },
     "appServicePlanStorefrontName": {
-      "value": "devdemovcstore"
+      "value": "dev-demovc-store"
     },
     "webAppStorefrontName": {
-      "value": "devdemovcstore"
+      "value": "dev-demovc-store"
     }
   }
 }

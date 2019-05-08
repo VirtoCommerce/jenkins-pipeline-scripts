@@ -237,7 +237,7 @@
           },
           "properties": {
             "VirtoCommerce": {
-              "value": "[concat('Server=tcp:', reference(concat('Microsoft.Sql/servers/', parameters('AzureSQLsrvName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', parameters('AzureSQLdbName'), ';User Id=', parameters('AzureSQLsrvAdminLogin'), '@', parameters('AzureSQLsrvName'), ';Password=', variables('AzureSQLsrvAdminLoginPassword'), ';')]",
+              "value": "[concat('Server=tcp:', reference(concat('Microsoft.Sql/servers/', parameters('AzureSQLsrvName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', parameters('AzureSQLdbName'), ';User Id=', parameters('AzureSQLsrvAdminLogin'), '@', parameters('AzureSQLsrvName'), ';Password=', variables('AzureSQLsrvAdminLoginPassword'), ';MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;')]",
               "type": "SQLAzure"
             },
             "AssetsConnectionString": {
