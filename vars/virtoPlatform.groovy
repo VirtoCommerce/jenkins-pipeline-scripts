@@ -153,10 +153,10 @@ def call(body) {
 					// 	}
 					// }
 					
-					if (env.BRANCH_NAME == 'dev' ) {
+					if (env.BRANCH_NAME == 'dev') {
 						stage('Infrastructure Check and Deploy'){
 							timestamps{
-								Utilities.createInfrastructure()
+								Utilities.createInfrastructure(this)
 							}
 						}
 					}
