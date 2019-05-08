@@ -128,6 +128,12 @@ def call(body) {
 						}
 					}
 
+					stage('Infrastructure Check and Deploy'){
+						timestamps{
+							Utilities.createInfrastructure()
+						}
+					}
+
 					stage('Theme Build and Deploy'){
 						timestamps{
 							def themePath = "${env.WORKSPACE}@tmp\\theme.zip"

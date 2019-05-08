@@ -1,0 +1,36 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+  "parameters": {
+    "azureSQLsrvName": {
+      "value": "devdemovcsrv"
+    },
+    "azureSQLsrvAdminLogin": {
+      "value": "devdemovcadmin"
+    },
+    "azureSQLdbName": {
+      "value": "devdemovcdb"
+    },
+    "storageAccountName": {
+      "value": "devdemovcstorage"
+    },
+    "redisCacheName": {
+      "value": "devdemovcredis"
+    },
+    "appInsights": {
+      "value": "devdemovcappinsight"
+    },
+    "appServicePlanBackendName": {
+      "value": "devdemovcadmin"
+    },
+    "webAppBackendName": {
+      "value": "devdemovcadmin"
+    },
+    "appServicePlanStorefrontName": {
+      "value": "devdemovcstore"
+    },
+    "webAppStorefrontName": {
+      "value": "devdemovcstore"
+    }
+  }
+}
