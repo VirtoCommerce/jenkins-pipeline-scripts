@@ -442,4 +442,9 @@ class Utilities {
     def static generateAllureReport(context){
         context.allure includeProperties: false, jdk: '', results: [[path: "./../workspace@tmp/output"]]
     }
+
+    def static createInfrastructure(context)
+    {
+         Utilities.runSharedPS(context, "vc-CreateInfrastructure.ps1")
+    }
 }

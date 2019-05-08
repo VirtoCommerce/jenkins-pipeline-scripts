@@ -1,0 +1,362 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+      "AzureSQLsrvName": {
+        "minLength": 1,
+        "type": "String"
+      },
+        "AzureSQLsrvAdminLogin": {
+            "minLength": 1,
+            "type": "String"
+        },
+        "AzureSQLdbName": {
+            "minLength": 1,
+            "type": "String"
+        },
+        "StorageAccountName": {
+            "minLength": 1,
+            "type": "String"
+        },
+        "RedisCacheName": {
+            "minLength": 1,
+            "type": "String"
+        },
+        "AppInsights": {
+            "minLength": 1,
+            "type": "String"
+        },
+        "AppServicePlanBackendName": {
+            "minLength": 1,
+            "type": "String"
+        },
+        "WebAppBackendName": {
+            "minLength": 1,
+            "type": "String"
+        },
+        "AppServicePlanStorefrontName": {
+            "minLength": 1,
+            "type": "String"
+        },
+        "WebAppStorefrontName": {
+            "minLength": 1,
+            "type": "String"
+        }
+    },
+  "variables": {
+    "AzureSQLdbCollation": "SQL_Latin1_General_CP1_CI_AS",
+    "AzureSQLdbEdition": "Standard",
+    "AzureSQLdbRequestedServiceObjectiveName": "S0",
+    "AzureSQLdbmaxSizeBytes": "268435456000",
+    "StorageAccountType": "Standard_LRS",
+    "RedisCacheSKUName": "Basic",
+    "RedisCacheSKUFamily": "C",
+    "RedisCacheSKUCapacity": 0,
+    "AppServicePlanBackendSkuName": "B1",
+    "AppServicePlanStorefrontSkuName": "B1",
+    "AzureSQLsrvAdminLoginPassword": "[concat('P', uniqueString(resourceGroup().id, '224F5A8B-51DB-46A3-A7C8-59B0DD584A41'), 'x', '!')]"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Sql/servers",
+      "name": "[parameters('AzureSQLsrvName')]",
+      "apiVersion": "2018-06-01-preview",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "displayName": "AzureSQLserver"
+      },
+      "properties": {
+        "administratorLogin": "[parameters('AzureSQLsrvAdminLogin')]",
+        "administratorLoginPassword": "[variables('AzureSQLsrvAdminLoginPassword')]"
+      },
+      "resources": [
+        {
+          "type": "firewallrules",
+          "name": "AllowAllWindowsAzureIps",
+          "apiVersion": "2018-06-01-preview",
+          "location": "[resourceGroup().location]",
+          "properties": {
+            "startIpAddress": "0.0.0.0",
+            "endIpAddress": "0.0.0.0"
+          },
+          "dependsOn": [
+            "[resourceId('Microsoft.Sql/servers', parameters('AzureSQLsrvName'))]"
+          ]
+        },
+        {
+          "type": "databases",
+          "name": "[parameters('AzureSQLdbName')]",
+          "apiVersion": "2018-06-01-preview",
+          "location": "[resourceGroup().location]",
+          "tags": {
+            "displayName": "AzureSQLdatabase"
+          },
+          "properties": {
+            "collation": "[variables('AzureSQLdbCollation')]",
+            "edition": "[variables('AzureSQLdbEdition')]",
+            "maxSizeBytes": "[variables('AzureSQLdbmaxSizeBytes')]",
+            "requestedServiceObjectiveName": "[variables('AzureSQLdbRequestedServiceObjectiveName')]"
+          },
+          "dependsOn": [
+            "[resourceId('Microsoft.Sql/servers', parameters('AzureSQLsrvName'))]"
+          ]
+        }
+      ],
+      "dependsOn": []
+    },
+    {
+      "type": "Microsoft.Storage/storageAccounts",
+      "sku": {
+        "name": "[variables('StorageAccountType')]"
+      },
+      "kind": "Storage",
+      "name": "[parameters('StorageAccountName')]",
+      "apiVersion": "2018-02-01",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "displayName": "StorageAccount"
+      },
+      "dependsOn": []
+    },
+    {
+      "type": "Microsoft.Cache/Redis",
+      "name": "[parameters('RedisCacheName')]",
+      "apiVersion": "2018-03-01",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "displayName": "RedisCache"
+      },
+      "properties": {
+        "sku": {
+          "name": "[variables('RedisCacheSKUName')]",
+          "family": "[variables('RedisCacheSKUFamily')]",
+          "capacity": "[variables('RedisCacheSKUCapacity')]"
+        } 
+      },
+      "dependsOn": []
+    },
+    {
+      "type": "Microsoft.Insights/components",
+      "kind": "web",
+      "name": "[parameters('AppInsights')]",
+      "apiVersion": "2018-03-01",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "displayName": "ApplicationInsights"
+      },
+      "properties": {
+        "ApplicationId": "[parameters('AppInsights')]",
+        "Application_Type": "web",
+        "Flow_Type": "Bluefield",
+        "Request_Source": "rest"
+      },
+      "dependsOn": []
+    },
+    {
+      "type": "Microsoft.Web/serverfarms",
+      "sku": {
+        "name": "[variables('AppServicePlanBackendSkuName')]"
+      },
+      "name": "[parameters('AppServicePlanBackendName')]",
+      "apiVersion": "2018-02-01",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "displayName": "AppServicePlanBackend"
+      },
+      "properties": {
+        "name": "[parameters('AppServicePlanBackendName')]",
+        "numberOfWorkers": 2
+      },
+      "dependsOn": []
+    },
+    {
+      "type": "Microsoft.Web/sites",
+      "name": "[parameters('WebAppBackendName')]",
+      "apiVersion": "2018-02-01",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "[concat('hidden-related:', resourceId('Microsoft.Web/serverfarms', parameters('AppServicePlanBackendName')))]": "Resource",
+        "displayName": "WebAppBackend"
+      },
+      "properties": {
+        "name": "[parameters('WebAppBackendName')]",
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('AppServicePlanBackendName'))]"
+      },
+      "resources": [
+        {
+          "type": "config",
+          "name": "web",
+          "apiVersion": "2018-02-01",
+          "tags": {
+            "displayName": "WebConfigBackend"
+          },
+          "properties": {
+            "phpVersion": "",
+            "use32BitWorkerProcess": false,
+            "alwaysOn": true,
+            "httpsOnly": true,
+            "virtualApplications": [
+              {
+                "virtualPath": "/",
+                "physicalPath": "site\\wwwroot\\platform",
+                "preloadEnabled": false,
+                "virtualDirectories": [
+                  {
+                    "virtualPath": "/modules",
+                    "physicalPath": "site\\wwwroot\\modules"
+                  }
+                ]
+              }
+            ]
+          },
+          "dependsOn": [
+            "[resourceId('Microsoft.Web/sites', parameters('WebAppBackendName'))]"
+          ]
+        },
+        {
+          "type": "config",
+          "name": "appsettings",
+          "apiVersion": "2018-02-01",
+          "tags": {
+            "displayName": "AppSettingsBackend"
+          },
+          "properties": {
+            "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(concat('Microsoft.Insights/components/', parameters('AppInsights')), '2015-05-01').InstrumentationKey]"
+          },
+          "dependsOn": [
+            "[resourceId('Microsoft.Web/sites', parameters('WebAppBackendName'))]",
+            "[concat('Microsoft.Insights/components/', parameters('AppInsights'))]"
+          ]
+        },
+        {
+          "type": "config",
+          "name": "connectionstrings",
+          "apiVersion": "2018-02-01",
+          "tags": {
+            "displayName": "ConnectionStringsBackend"
+          },
+          "properties": {
+            "VirtoCommerce": {
+              "value": "[concat('Server=tcp:', reference(concat('Microsoft.Sql/servers/', parameters('AzureSQLsrvName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', parameters('AzureSQLdbName'), ';User Id=', parameters('AzureSQLsrvAdminLogin'), '@', parameters('AzureSQLsrvName'), ';Password=', variables('AzureSQLsrvAdminLoginPassword'), ';MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;')]",
+              "type": "SQLAzure"
+            },
+            "AssetsConnectionString": {
+              "value": "[concat('provider=AzureBlobStorage;rootPath=assets;DefaultEndpointsProtocol=https;AccountName=',parameters('storageAccountName'),';AccountKey=',concat(listKeys(parameters('storageAccountName'),'2015-05-01-preview').key1))]",
+              "type": "Custom"
+            },
+            "CmsConnectionString": {
+              "value": "[concat('provider=AzureBlobStorage;rootPath=cms;DefaultEndpointsProtocol=https;AccountName=',parameters('storageAccountName'),';AccountKey=',concat(listKeys(parameters('storageAccountName'),'2015-05-01-preview').key1))]",
+              "type": "Custom"
+            },
+            "SearchConnectionString": {
+              "value": "provider=Lucene;server=~/App_Data/Lucene;scope=default",
+              "type": "Custom"
+            },
+            "redisConnectionString": {
+              "value": "[concat(parameters('RedisCacheName'),'.redis.cache.windows.net,abortConnect=false,ssl=true,password=', listKeys(resourceId('Microsoft.Cache/Redis', parameters('RedisCacheName')),'2015-08-01').primaryKey)]",
+              "type": "Custom"
+            }
+          },
+          "dependsOn": [
+            "[resourceId('Microsoft.Web/sites', parameters('WebAppBackendName'))]",
+            "[concat('Microsoft.Sql/servers/', parameters('AzureSQLsrvName'))]",
+            "[concat('Microsoft.Storage/storageAccounts/', parameters('storageAccountName'))]",
+            "[concat('Microsoft.Cache/Redis/', parameters('RedisCacheName'))]"
+          ]
+        }
+      ],
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/serverfarms', parameters('AppServicePlanBackendName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Web/serverfarms",
+      "sku": {
+        "name": "[variables('AppServicePlanStorefrontSkuName')]"
+      },
+      "name": "[parameters('AppServicePlanStorefrontName')]",
+      "apiVersion": "2018-02-01",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "displayName": "AppServicePlanStorefront"
+      },
+      "properties": {
+        "name": "[parameters('AppServicePlanStorefrontName')]",
+        "numberOfWorkers": 2
+      },
+      "dependsOn": []
+    },
+    {
+      "type": "Microsoft.Web/sites",
+      "name": "[parameters('WebAppStorefrontName')]",
+      "apiVersion": "2018-02-01",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "[concat('hidden-related:', resourceId('Microsoft.Web/serverfarms', parameters('AppServicePlanStorefrontName')))]": "Resource",
+        "displayName": "WebAppStorefront"
+      },
+      "properties": {
+        "name": "[parameters('WebAppStorefrontName')]",
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('AppServicePlanStorefrontName'))]"
+      },
+      "resources": [
+        {
+          "type": "config",
+          "name": "web",
+          "apiVersion": "2018-02-01",
+          "tags": {
+            "displayName": "WebConfigStorefront"
+          },
+          "properties": {
+            "phpVersion": "",
+            "use32BitWorkerProcess": false,
+            "alwaysOn": true,
+            "httpsOnly": true
+          },
+          "dependsOn": [
+            "[resourceId('Microsoft.Web/sites', parameters('WebAppStorefrontName'))]"
+          ]
+        },
+        {
+          "type": "config",
+          "name": "appsettings",
+          "apiVersion": "2018-02-01",
+          "tags": {
+            "displayName": "AppSettingsStorefront"
+          },
+          "properties": {
+            "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(concat('Microsoft.Insights/components/', parameters('AppInsights')), '2015-05-01').InstrumentationKey]",
+            "ASPNETCORE_ENVIRONMENT": "Development",
+            "VirtoCommerce:Endpoint:Url": "[reference(concat('Microsoft.Web/sites/', parameters('WebAppBackendName')), '2015-08-01').defaultHostName]"
+          },
+          "dependsOn": [
+            "[resourceId('Microsoft.Web/sites', parameters('WebAppStorefrontName'))]",
+            "[concat('Microsoft.Insights/components/', parameters('AppInsights'))]"
+          ]
+        },
+        {
+          "type": "config",
+          "name": "connectionstrings",
+          "apiVersion": "2018-02-01",
+          "tags": {
+            "displayName": "ConnectionStringsStorefront"
+          },
+          "properties": {
+            "ContentConnectionString": {
+              "value": "[concat('provider=AzureBlobStorage;rootPath=cms;DefaultEndpointsProtocol=https;AccountName=',parameters('storageAccountName'),';AccountKey=',concat(listKeys(parameters('storageAccountName'),'2015-05-01-preview').key1))]",
+              "type": "Custom"
+            }
+          },
+          "dependsOn": [
+            "[resourceId('Microsoft.Web/sites', parameters('WebAppStorefrontName'))]",
+            "[concat('Microsoft.Storage/storageAccounts/', parameters('storageAccountName'))]"
+          ]
+        }
+      ],
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/serverfarms', parameters('AppServicePlanStorefrontName'))]"
+      ]
+    }
+  ],
+    "outputs": {}
+}
