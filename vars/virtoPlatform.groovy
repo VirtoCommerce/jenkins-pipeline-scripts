@@ -152,13 +152,14 @@ def call(body) {
 					// 		Utilities.runE2E(this)
 					// 	}
 					// }
-
-					stage('Infrastructure Check and Deploy'){
-						timestamps{
-							Utilities.createInfrastructure()
+					
+					if (env.BRANCH_NAME == 'dev' ) {
+						stage('Infrastructure Check and Deploy'){
+							timestamps{
+								Utilities.createInfrastructure()
+							}
 						}
 					}
-
 				}
 			}
 
