@@ -446,4 +446,12 @@ class Utilities {
     def static createInfrastructure(context){
         Utilities.runSharedPS(context, "vc-CreateInfrastructure.ps1")
     }
+
+    def static isPullRequest(context){
+        return context.env.BRANCH_NAME.startsWith("PR-")
+    }
+    def static getPullRequestNumber(context){
+        def number = context.env.BRANCH_NAME.replace('PR-', '')
+        return number
+    }
 }

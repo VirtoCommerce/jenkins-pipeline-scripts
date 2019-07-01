@@ -231,8 +231,17 @@ class Packaging {
             coverageReportType = 'opencover'
         }
         context.withSonarQubeEnv('VC Sonar Server') {
-            // Due to SONARMSBRU-307 value of sonar.host.url and credentials should be passed on command line
-            context.bat "\"${sqScannerMsBuildHome}\\SonarQube.Scanner.MSBuild.exe\" begin /d:\"sonar.branch=${context.env.BRANCH_NAME}\" /n:\"${fullJobName}\" /k:\"${fullJobName}\" /d:\"sonar.organization=virtocommerce\" /d:sonar.host.url=%SONAR_HOST_URL% /d:sonar.login=%SONAR_AUTH_TOKEN% /d:sonar.cs.${coverageReportType}.reportsPaths=\"${coverageFolder}\\VisualStudio.Unit.coveragexml\""
+            def repoName = Utilities.getRepoName(context)
+            def prNumber = Utilities.getPullRequestNumber(context)
+            def orgName = Utilities.getOrgName(context)
+            if(Utilities.isPullRequest(context)){
+                context.bat "\"${sqScannerMsBuildHome}\\SonarQube.Scanner.MSBuild.exe\" begin /d:\"sonar.branch=${context.env.BRANCH_NAME}\" /n:\"${fullJobName}\" /k:\"${fullJobName}\" /d:sonar.github.oauth=${context.env.GITHUB_TOKEN} /d:sonar.analysis.mode=preview /d:sonar.github.pullRequest=\"${prNumber}\" /d:sonar.github.repository=${orgName}/${repoName} /d:sonar.host.url=%SONAR_HOST_URL% /d:sonar.login=%SONAR_AUTH_TOKEN% /d:sonar.cs.${coverageReportType}.reportsPaths=\"${coverageFolder}\\VisualStudio.Unit.coveragexml\""
+            }
+            else{
+                // Due to SONARMSBRU-307 value of sonar.host.url and credentials should be passed on command line
+                context.bat "\"${sqScannerMsBuildHome}\\SonarQube.Scanner.MSBuild.exe\" begin /d:\"sonar.branch=${context.env.BRANCH_NAME}\" /n:\"${fullJobName}\" /k:\"${fullJobName}\" /d:\"sonar.organization=virtocommerce\" /d:sonar.host.url=%SONAR_HOST_URL% /d:sonar.login=%SONAR_AUTH_TOKEN% /d:sonar.cs.${coverageReportType}.reportsPaths=\"${coverageFolder}\\VisualStudio.Unit.coveragexml\""
+            }
+            
         }        
     }
 
