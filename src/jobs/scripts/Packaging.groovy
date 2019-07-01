@@ -250,7 +250,7 @@ class Packaging {
         def fullJobName = Utilities.getRepoName(context)
 
         context.withSonarQubeEnv('VC Sonar Server') {
-            context.bat "\"${sqScannerMsBuildHome}\\sonar-scanner-3.0.3.778\\bin\\sonar-scanner.bat\" scan -Dsonar.projectKey=theme_default_${context.env.BRANCH_NAME} -Dsonar.sources=./assets -Dsonar.organization=virtocommerce -Dsonar.branch=${context.env.BRANCH_NAME} -Dsonar.projectName=\"${fullJobName}\" -Dsonar.host.url=%SONAR_HOST_URL% -Dsonar.login=%SONAR_AUTH_TOKEN%"
+            context.bat "\"${sqScannerMsBuildHome}\\sonar-scanner-3.0.3.778\\bin\\sonar-scanner.bat\" scan -Dsonar.projectKey=theme_default_${context.env.BRANCH_NAME} -Dsonar.sources=./assets -Dsonar.branch=${context.env.BRANCH_NAME} -Dsonar.projectName=\"${fullJobName}\" -Dsonar.host.url=%SONAR_HOST_URL% -Dsonar.login=%SONAR_AUTH_TOKEN%"
         }
     }
 
