@@ -241,7 +241,6 @@ class Packaging {
                 // Due to SONARMSBRU-307 value of sonar.host.url and credentials should be passed on command line
                 context.bat "\"${sqScannerMsBuildHome}\\SonarQube.Scanner.MSBuild.exe\" begin /d:\"sonar.branch=${context.env.BRANCH_NAME}\" /n:\"${fullJobName}\" /k:\"${fullJobName}\" /d:\"sonar.organization=virtocommerce\" /d:sonar.host.url=%SONAR_HOST_URL% /d:sonar.login=%SONAR_AUTH_TOKEN% /d:sonar.cs.${coverageReportType}.reportsPaths=\"${coverageFolder}\\VisualStudio.Unit.coveragexml\""
             }
-            
         }        
     }
 
@@ -266,6 +265,10 @@ class Packaging {
 
     def static checkAnalyzerGate(context)
     {
+		if(Utilities.isPullRequest(context))
+        {
+            return
+        }
 		context.timeout(time: 1, unit: 'HOURS') { // Just in case something goes wrong, pipeline will be killed after a timeout
 			def qg = context.waitForQualityGate() // Reuse taskId previously collected by withSonarQubeEnv
 			if (qg.status != 'OK' && qg.status != 'WARN') {
