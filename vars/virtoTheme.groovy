@@ -27,9 +27,14 @@ def call(body) {
 				}
 			}
 
-			stage('Build + Analyze') {
+			stage('Code Analysis'){
+				timestamps{
+					Packaging.startSonarJS(this)
+				}
+			}
+
+			stage('Build') {
 				timestamps { 
-                    Packaging.startSonarJS(this)
 					Packaging.runGulpBuild(this)
 				}
 			}
