@@ -56,10 +56,12 @@ def call(body) {
 
 			if(params.themeResultZip == null)
 			{
-				if (Packaging.getShouldPublish(this)) {
-					stage('Publish') {
-						timestamps { 
+				stage('Publish') {
+					timestamps { 
+						if (Packaging.getShouldPublish(this)) {
 							Packaging.publishRelease(this, version, "")
+						}
+						if (Packaging.getShouldStage(this)) {
 							def stagingName = Utilities.getStagingNameFromBranchName(this)
 							Utilities.runSharedPS(this, "VC-Theme2Azure.ps1", /-StagingName "${stagingName}" -StoreName "${storeName}"/)
 						}
