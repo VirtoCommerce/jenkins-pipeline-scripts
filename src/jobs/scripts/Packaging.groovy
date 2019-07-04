@@ -287,7 +287,7 @@ class Packaging {
         {
             context.deleteDir()
         }        
-        context.bat "npm install --dev"
+        context.bat "npm install --prefer-offline --dev"
         def bowerjs = new File("${context.env.WORKSPACE}\\bower.json")
         if(bowerjs.exists()){
             context.bat "node node_modules\\bower\\bin\\bower install --force-latest"
