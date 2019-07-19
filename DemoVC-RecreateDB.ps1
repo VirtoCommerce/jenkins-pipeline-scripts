@@ -108,7 +108,7 @@ Invoke-RestMethod $DestKuduDelPath -Headers @{"Authorization"=$DestKuduApiAuthor
 
 Start-Sleep -s 30
 Write-Output "Create database $databaseName"
-New-AzureRmSqlDatabase -ResourceGroupName $DestResourceGroupName -ServerName $SqlServerName -DatabaseName $databaseName
+New-AzureRmSqlDatabase -ResourceGroupName $DestResourceGroupName -ServerName $SqlServerName -DatabaseName $databaseName -Edition 'Standard' -RequestedServiceObjectiveName 'S0'
 
 # Start web site
 
