@@ -118,15 +118,16 @@ class Modules {
             }
         }
         else {
-            echo "no module.manifest files found"
+            context.echo "no module.manifest files found"
             return null
         }
 
         def wsDir = context.env.WORKSPACE
         def fullManifestPath = "$wsDir\\$manifestPath"
 
-        context.echo "parsing $fullManifestPath"
-        def manifest = new XmlSlurper().parse(fullManifestPath)
+        context.echo "parsing $manifestPath"
+        def manifestContent = context.readFile(manifestPath)
+        def manifest = new XmlSlurper().parseText(manifestContent)
 
         def id = manifest.id.toString()
 
