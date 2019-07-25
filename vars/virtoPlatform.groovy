@@ -176,7 +176,7 @@ def call(body) {
 							Packaging.publishRelease(this, version, notes)
 						}
 
-						if(solution == 'VirtoCommerce.Platform.sln' || projectType == 'NETCORE2')
+						if((solution == 'VirtoCommerce.Platform.sln' || projectType == 'NETCORE2') && env.BRANCH_NAME == 'dev')
 						{
 							Utilities.runSharedPS(this, "${deployScript}")
 						}

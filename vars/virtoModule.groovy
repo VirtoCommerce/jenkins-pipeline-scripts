@@ -137,13 +137,18 @@ import jobs.scripts.*
 			if (env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'master') {
 				stage('Publish')
 				{
-					timestamps { 	
-						Utilities.runSharedPS(this, "${deployScript}")				
+					timestamps { 				
 						if (Packaging.getShouldPublish(this)) {
 							processManifests(true) // publish artifacts to github releases
 						}
-						if(env.BRANCH_NAME == 'master')
-							Packaging.createNugetPackages(this)
+						switch(env.BRANCH_NAME){
+							case 'master':
+								Packaging.createNugetPackages(this)
+								break
+							case 'dev':
+								Utilities.runSharedPS(this, "${deployScript}")
+								break
+						}
 					}
 				}
 			}		

@@ -61,7 +61,7 @@ def call(body) {
 						if (Packaging.getShouldPublish(this)) {
 							Packaging.publishRelease(this, version, "")
 						}
-						if (Packaging.getShouldStage(this)) {
+						if (env.BRANCH_NAME == 'dev') {
 							def stagingName = Utilities.getStagingNameFromBranchName(this)
 							Utilities.runSharedPS(this, "VC-Theme2Azure.ps1", /-StagingName "${stagingName}" -StoreName "${storeName}"/)
 						}
