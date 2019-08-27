@@ -41,7 +41,7 @@ def call(body) {
 					{
 						dir("${env.WORKSPACE}\\ng-app")
 						{
-							bat "npm install --production='false' --prefer-offline"
+							bat "npm install --production=\"false\" --prefer-offline"
 							bat "npm run build"
 						}
 					}
@@ -96,7 +96,7 @@ def call(body) {
 				def failedStageLog = Utilities.getFailedStageStr(log)
 				def failedStageName = Utilities.getFailedStageName(failedStageLog)
 				def mailBody = Utilities.getMailBody(this, failedStageName, failedStageLog)
-				emailext body:mailBody, subject: "${env.JOB_NAME}:${env.BUILD_NUMBER} - ${currentBuild.currentResult}", recipientProviders: [[$class: 'CulpritsRecipientProvider'], [$class: 'RequesterRecipientProvider']]
+				//emailext body:mailBody, subject: "${env.JOB_NAME}:${env.BUILD_NUMBER} - ${currentBuild.currentResult}", recipientProviders: [[$class: 'CulpritsRecipientProvider'], [$class: 'RequesterRecipientProvider']]
 			}
 		}
 	
