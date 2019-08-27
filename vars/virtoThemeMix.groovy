@@ -48,11 +48,11 @@ def call(body) {
 				}
 			}
 
-			stage('Quality Gate'){
-                timestamps{
-                    Packaging.checkAnalyzerGate(this)
-                }
-            }
+			// stage('Quality Gate'){
+            //     timestamps{
+            //         Packaging.checkAnalyzerGate(this)
+            //     }
+            // }
 
 			if(params.themeResultZip != null){
                 def artifacts = findFiles(glob: 'artifacts/*.zip')
