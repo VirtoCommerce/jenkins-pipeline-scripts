@@ -27,11 +27,17 @@ def call(body) {
 				}
 			}
 
-			// stage('Code Analysis'){
-			// 	timestamps{
-			// 		Packaging.startSonarJS(this)
-			// 	}
-			// }
+			stage('Code Analysis'){
+				timestamps{
+					echo "Packaging.startSonarJS"
+        			def sqScannerMsBuildHome = tool 'Scanner for MSBuild'
+        			def fullJobName = Utilities.getRepoName(this)
+
+					withSonarQubeEnv('VC Sonar Server') {
+						bat "\"${sqScannerMsBuildHome}\\sonar-scanner-3.0.3.778\\bin\\sonar-scanner.bat\" scan -Dsonar.projectKey=theme_default_${env.BRANCH_NAME} -Dsonar.sources=./ng-app/src -Dsonar.branch=${env.BRANCH_NAME} -Dsonar.projectName=\"${fullJobName}\" -Dsonar.host.url=%SONAR_HOST_URL% -Dsonar.login=%SONAR_AUTH_TOKEN%"
+					}
+				}
+			}
 
 			stage('Build')
 			{
@@ -52,9 +58,11 @@ def call(body) {
 			{
 				timestamps
 				{
-					dir("${env.WORKSPACE}\\ng-app")
-					{
-						Packaging.checkAnalyzerGate(this)
+					withSonarQubeEnv("VC Sonar Server"){
+						dir("${env.WORKSPACE}\\ng-app")
+						{
+							Packaging.checkAnalyzerGate(this)
+						}
 					}
                 }
             }
