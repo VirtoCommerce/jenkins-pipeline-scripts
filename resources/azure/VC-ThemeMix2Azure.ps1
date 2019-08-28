@@ -23,7 +23,7 @@ if ($StagingName -eq "qa"){
 }
 $BlobContext = New-AzureStorageContext -ConnectionString $ConnectionString
 
-$AzureBlobName = "Themes/default/$StoreName"
+$AzureBlobName = "Themes/$StoreName/default"
 
 Write-Host "Remove from $StoreName"
 Get-AzureStorageBlob -Blob ("$AzureBlobName*") -Container "cms" -Context $BlobContext  | ForEach-Object { Remove-AzureStorageBlob -Blob $_.Name -Container "cms" -Context $BlobContext } -ErrorAction Continue
