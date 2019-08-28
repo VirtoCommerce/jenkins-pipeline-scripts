@@ -48,20 +48,30 @@ def call(body) {
 				}
 			}
 
-			// stage('Quality Gate'){
-            //     timestamps{
-            //         Packaging.checkAnalyzerGate(this)
-            //     }
-            // }
-
-			if(params.themeResultZip != null){
-                def artifacts = findFiles(glob: 'artifacts/*.zip')
-                for(artifact in artifacts){
-                    bat "copy /Y \"${artifact.path}\" \"${params.themeResultZip}\""
+			stage('Quality Gate')
+			{
+				timestamps
+				{
+					dir("${env.WORKSPACE}\\ng-app")
+					{
+						Packaging.checkAnalyzerGate(this)
+					}
                 }
             }
+
+			dir("${env.WORKSPACE}\\ng-app")
+			{
+				if(params.themeResultZip != null)
+				{
+					def artifacts = findFiles(glob: 'artifacts/*.zip')
+					for(artifact in artifacts)
+					{
+						bat "copy /Y \"${artifact.path}\" \"${params.themeResultZip}\""
+					}
+				}
 			
-			def version = Utilities.getPackageVersion(this)
+				def version = Utilities.getPackageVersion(this)
+			}
 
 			if(params.themeResultZip == null)
 			{
