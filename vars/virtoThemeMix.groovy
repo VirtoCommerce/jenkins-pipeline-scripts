@@ -29,6 +29,7 @@ def call(body) {
 
 			stage('Code Analysis'){
 				timestamps{
+					bat "npm install -g typescript"
 					echo "Packaging.startSonarJS"
         			def sqScannerMsBuildHome = tool 'Scanner for MSBuild'
         			def fullJobName = Utilities.getRepoName(this)
