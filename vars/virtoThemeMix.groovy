@@ -69,9 +69,10 @@ def call(body) {
                 }
             }
 
+			def version
 			dir("${env.WORKSPACE}\\ng-app")
 			{
-				def version = Utilities.getPackageVersion(this)
+				version = Utilities.getPackageVersion(this)
 			}
 			def zipFile = "${env.WORKSPACE}\\artifacts\\dental-theme-${version}.zip"
 			stage('Packaging')
