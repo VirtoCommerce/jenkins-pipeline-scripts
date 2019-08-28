@@ -78,7 +78,7 @@ def call(body) {
 			stage('Packaging')
 			{
 				timestamps {
-					zip zipFile: zipFile, dir: "artifacts"
+					zip zipFile: zipFile, dir: "./"
 					if(params.themeResultZip != null) {
 						bat "copy /Y \"${zipFile}\" \"${params.themeResultZip}\""
 					}
