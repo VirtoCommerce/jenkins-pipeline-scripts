@@ -71,26 +71,31 @@ def call(body) {
 
 			dir("${env.WORKSPACE}\\ng-app")
 			{
-				if(params.themeResultZip != null)
-				{
-					def artifacts = findFiles(glob: 'artifacts/*.zip')
-					for(artifact in artifacts)
-					{
-						bat "copy /Y \"${artifact.path}\" \"${params.themeResultZip}\""
+				def version = Utilities.getPackageVersion(this)
+			}
+			def zipFile = "${env.WORKSPACE}\\artifacts\\dental-theme-${version}.zip"
+			stage('Packaging')
+			{
+				timestamps {
+					zip zipFile: zipFile, dir: "artifacts"
+					if(params.themeResultZip != null) {
+						bat "copy /Y \"${zipFile}\" \"${params.themeResultZip}\""
 					}
 				}
-			
-				def version = Utilities.getPackageVersion(this)
 			}
 
 			if(params.themeResultZip == null)
 			{
-				stage('Publish') {
-					timestamps { 
-						if (Packaging.getShouldPublish(this)) {
+				stage('Publish')
+				{
+					timestamps
+					{
+						if (Packaging.getShouldPublish(this))
+						{
 							Packaging.publishRelease(this, version, "")
 						}
-						if (env.BRANCH_NAME == 'dev') {
+						if (env.BRANCH_NAME == 'dev')
+						{
 							def stagingName = Utilities.getStagingNameFromBranchName(this)
 							Utilities.runSharedPS(this, "VC-Theme2Azure.ps1", /-StagingName "${stagingName}" -StoreName "${storeName}"/)
 						}
