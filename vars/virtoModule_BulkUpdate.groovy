@@ -126,14 +126,19 @@ import jobs.scripts.*
 				}
 			}
 
-			if (env.BRANCH_NAME == 'bulk-update/dev' || env.BRANCH_NAME == 'bulk-update/master') {
-				stage('Publish')
-				{
-					timestamps {
+			if (env.BRANCH_NAME == 'bulk-update/dev' || env.BRANCH_NAME == 'bulk-update/master'){
+				stage('ARM deploy'){
+					Utilities.createInfrastructure(this)
+				}
+			}
+
+			if (env.BRANCH_NAME == 'bulk-update/dev' || env.BRANCH_NAME == 'bulk-update/master'){
+				stage('Publish'){
+					timestamps{
 						// if (Packaging.getShouldPublish(this)) {
 						// 	processManifests(true) // publish artifacts to github releases
 						// }
-						switch(env.BRANCH_NAME) {
+						switch(env.BRANCH_NAME){
 							case 'bulk-update/master':
 							 	//Packaging.createNugetPackages(this)
 								Utilities.runSharedPS(this, "${deployScript}")

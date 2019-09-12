@@ -1,0 +1,27 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "sqlServerName": {
+      "value": "bulkupdate-srv-dev"
+    },
+    "sqlAdministratorLogin": {
+      "value": "bulkupdate-admin-dev"
+    },
+    "sqlDatabaseName": {
+      "value": "bulkupdate-db-dev"
+    },
+    "storageAccountName": {
+      "value": "bulkupdatedev"
+    },
+    "appServicePlanName": {
+      "value": "bulkupdate-admin-dev"
+    },
+    "appInsights": {
+      "value": "bulkupdate-admin-dev"
+    },
+    "webAppName": {
+      "value": "bulkupdate-admin-dev"
+    }
+  }
+}
