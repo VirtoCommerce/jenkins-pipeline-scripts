@@ -199,7 +199,7 @@ class Packaging {
         }
         else
         {
-		    context.bat "Nuget restore ${solution}"
+		    context.bat "${context.env.NUGET}\\nuget.exe restore ${solution}"
             context.bat "\"${context.tool DefaultMSBuild}\" \"${solution}\" /p:Configuration=Debug /p:Platform=\"Any CPU\" /t:rebuild /m"
         }
     }
