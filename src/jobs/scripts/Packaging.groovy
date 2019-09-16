@@ -5,7 +5,7 @@ class Packaging {
     private static String DefaultBranchOrCommitPR = '${sha1}'
     private static String DefaultBranchOrCommitPush = '*/master'
     private static String DefaultRefSpec = '+refs/pull/*:refs/remotes/origin/pr/*'
-    private static String DefaultMSBuild = 'MSBuild 15.0'
+    private static String DefaultMSBuild = 'MSBuild'
     private static String DefaultSharedLibName = 'virto-shared-library'
 
     /*
@@ -117,7 +117,6 @@ class Packaging {
         {
             context.withEnv(["DOCKER_TAG=${dockerTag}", "COMPOSE_PROJECT_NAME=${context.env.BUILD_TAG}"]) {
                 context.bat "docker-compose down -v"
-                context.bat "docker-compose rm -f -v"
             }
         }
     }

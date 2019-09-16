@@ -71,7 +71,7 @@ import jobs.scripts.*
 				}
 			}			
 
-			if (env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'master') {
+			if (env.BRANCH_NAME == 'dev') {
 				stage('Create Test Environment') {
 					timestamps { 
 						// Start docker environment
