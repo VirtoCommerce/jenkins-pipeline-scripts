@@ -95,13 +95,13 @@ class Modules {
         def testFolderName = "dev"
 
         // copy artifacts to global location that can be used by other modules, but don't do that for master branch as we need to test it with real manifest
-        if (context.env.BRANCH_NAME != 'master') {
-            context.dir(packagesDir)
-            {		
-                // copy all files to modules
-                context.bat "xcopy *.zip \"${allModulesDir}\" /y" 
-            }	
-        }
+        // if (context.env.BRANCH_NAME != 'master') {
+        //     context.dir(packagesDir)
+        //     {		
+        //         // copy all files to modules
+        //         context.bat "xcopy *.zip \"${allModulesDir}\" /y" 
+        //     }	
+        // }
 
         //paths += "\"..\\..\\..\\vc-platform\\${testFolderName}\\workspace\\virtocommerce.platform.tests\\bin\\debug\\VirtoCommerce.Platform.Test.dll\""
 
