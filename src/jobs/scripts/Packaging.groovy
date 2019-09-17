@@ -260,8 +260,8 @@ class Packaging {
         def sqScannerMsBuildHome = context.tool 'Scanner for MSBuild'
         def fullJobName = Utilities.getRepoName(context)
         context.withSonarQubeEnv('VC Sonar Server') {
-            context.bat "\"${sqScannerMsBuildHome}\\SonarScanner.MSBuild.exe\" end "
-        }        
+            context.bat "\"${sqScannerMsBuildHome}\\SonarScanner.MSBuild.exe\" end /d:sonar.login=%SONAR_AUTH_TOKEN%"
+        }          
     }
 
     def static checkAnalyzerGate(context)
