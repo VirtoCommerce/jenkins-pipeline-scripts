@@ -217,7 +217,6 @@ class Utilities {
 
     def static runUnitTest(context, traits, paths, resultsFileName)
     {
-        def xUnitExecutable = "${context.env.XUnit}\\xunit.console.exe"
         def coverageExecutable = "${context.env.CodeCoverage}\\CodeCoverage.exe"
         def coverageFolder = Utilities.getCoverageFolder(context)
 
@@ -225,12 +224,12 @@ class Utilities {
         context.dir(coverageFolder)
         {
             context.deleteDir()
-        }     
+        }   
 
         if(paths.size() < 1)
         {
             return
-        }       
+        }     
 
         // recreate it now
         File folder = new File(coverageFolder); 
@@ -238,14 +237,13 @@ class Utilities {
             throw new Exception("can't create coverage folder: " + coverageFolder); 
         } 
 
-        if(isNetCore(context.projectType)){
             
-            def pdbDirs = getPDBDirsStr(context)
-            context.bat "\"${context.env.OPENCOVER}\\opencover.console.exe\" -oldStyle -searchdirs:\"${pdbDirs}\" -register:user -filter:\"+[Virto*]* -[xunit*]*\" -output:\"${coverageFolder}\\VisualStudio.Unit.coveragexml\" -target:\"${context.env.VSTEST_DIR}\\vstest.console.exe\" -targetargs:\"${paths} /TestCaseFilter:(Category=Unit|Category=ci)\""
+        def pdbDirs = getPDBDirsStr(context)
+        if(isNetCore(context.projectType)){
+            context.bat "\"${context.env.OPENCOVER}\\opencover.console.exe\" -oldStyle -searchdirs:\"${pdbDirs}\" -register:user -filter:\"+[Virto*]* -[xunit*]*\" -output:\"${coverageFolder}\\VisualStudio.Unit.coveragexml\" -target:\"${context.env.DOTNET_PATH}\\dotnet.exe\" -targetargs:\"vstest ${paths} /TestCaseFilter:(Category=Unit|Category=CI)\""
         }
         else{
-            context.bat "\"${coverageExecutable}\" collect /output:\"${coverageFolder}\\VisualStudio.Unit.coverage\" \"${xUnitExecutable}\" ${paths} -xml \"${resultsFileName}\" ${traits} -parallel none"
-            context.bat "\"${coverageExecutable}\" analyze /output:\"${coverageFolder}\\VisualStudio.Unit.coveragexml\" \"${coverageFolder}\\VisualStudio.Unit.coverage\""
+            context.bat "\"${context.env.OPENCOVER}\\opencover.console.exe\" -oldStyle -searchdirs:\"${pdbDirs}\" -register:user -filter:\"+[*]* -[Moq]* -[xunit*]* -[Common.*]*\" -output:\"${coverageFolder}\\VisualStudio.Unit.coveragexml\" -target:\"${context.env.DOTNET_PATH}\\dotnet.exe\" -targetargs:\"vstest ${paths} /TestCaseFilter:(Category=Unit|Category=CI) --logger:trx\""
         }
         context.step([$class: 'XUnitPublisher', testTimeMargin: '3000', thresholdMode: 1, thresholds: [[$class: 'FailedThreshold', failureNewThreshold: '', failureThreshold: '', unstableNewThreshold: '', unstableThreshold: ''], [$class: 'SkippedThreshold', failureNewThreshold: '', failureThreshold: '', unstableNewThreshold: '', unstableThreshold: '']], tools: [[$class: 'XUnitDotNetTestType', deleteOutputFiles: true, failIfNotNew: false, pattern: resultsFileName, skipNoTestFiles: true, stopProcessingIfError: false]]])
     }
