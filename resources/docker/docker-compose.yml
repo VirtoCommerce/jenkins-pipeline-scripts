@@ -3,7 +3,7 @@ version: '3'
 services:
 
   vc-db:
-    image: microsoft/mssql-server-windows-express
+    image: krankenbro/mssql-express-2019:latest
     ports:
       - "${DOCKER_SQL_PORT:-1433}:1433"
     environment: 
