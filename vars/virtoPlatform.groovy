@@ -105,7 +105,7 @@ def call(body) {
 
 			if(solution == 'VirtoCommerce.Platform.sln' || projectType == 'NETCORE2') // skip docker and publishing for NET4
 			{
-				if (env.BRANCH_NAME == 'dev') {
+				if (env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'release') {
 					stage('Create Test Environment') {
 						timestamps { 
 							// Start docker environment				
