@@ -32,13 +32,6 @@ class Utilities {
         return "VirtoCommerce"
     }
 
-    def static getRepoName(context)
-    {
-        def tokens = "${context.env.JOB_NAME}".tokenize('/')
-        def REPO_NAME = tokens[1]
-        return REPO_NAME
-    }
-
     def static getRepoNamePrefix(context){
         def repoName = getRepoName(context)
         def tokens = repoName.tokenize("-")
