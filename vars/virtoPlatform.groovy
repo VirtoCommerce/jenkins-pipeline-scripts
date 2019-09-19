@@ -21,11 +21,10 @@ def call(body) {
 		def webProject = 'VirtoCommerce.Platform.Web\\VirtoCommerce.Platform.Web.csproj'
 		def zipArtifact = 'VirtoCommerce.Platform'
 		def websiteDir = 'VirtoCommerce.Platform.Web'
-		def deployScript = 'VC-Platform2AzureDev.ps1'
+		def deployScript = 'VC-Platform2Azure.ps1'
 		def dockerTag = "${env.BRANCH_NAME}-branch"
 		def buildOrder = Utilities.getNextBuildOrder(this)
 		if (env.BRANCH_NAME == 'master') {
-			deployScript = 'VC-Platform2AzureQA.ps1'
 			dockerTag = "latest"
 		}
 
@@ -35,12 +34,7 @@ def call(body) {
 			settingsFileContent = readFile(SETTINGS_FILE)
 		}
 		SETTINGS = new Settings(settingsFileContent)
-		SETTINGS.setRegion('Virto')
-		SETTINGS.setEnvironment('MASTER')
-		echo "SETTINGS name: ${SETTINGS['name']}"
-		echo "SETTINGS prefix: ${SETTINGS['prefix']}"
-		echo "SETTINGS approvers: ${SETTINGS['approvers']}"
-		echo "${SETTINGS}"
+		SETTINGS.setEnvironment(env.BRANCH_NAME)
 		
 		if(projectType == null)
 		{
@@ -56,11 +50,14 @@ def call(body) {
 			websiteDir = 'VirtoCommerce.Storefront'
 			webProject = 'VirtoCommerce.Storefront\\VirtoCommerce.Storefront.csproj'
 			zipArtifact = 'VirtoCommerce.StoreFront'
-			deployScript = 'VC-Storefront2AzureDev.ps1'
-			if (env.BRANCH_NAME == 'master') {
-				deployScript = 'VC-Storefront2AzureQA.ps1'
-			}
+			deployScript = 'VC-Storefront2Azure.ps1'
 		}
+		if(Utilities.isNetCore(projectType)){
+			SETTINGS.setRegion('storefront')
+		} else {
+			SETTINGS.setRegion('platform')
+		}
+
 		
 		try {
 			Utilities.notifyBuildStatus(this, "Started")
@@ -191,7 +188,7 @@ def call(body) {
 
 						if((solution == 'VirtoCommerce.Platform.sln' || projectType == 'NETCORE2') && env.BRANCH_NAME == 'dev')
 						{
-							Utilities.runSharedPS(this, "${deployScript}")
+							Utilities.runSharedPS(this, "${deployScript}", "-SubscriptionID ${SETTINGS['subscriptionID']} -WebAppName ${SETTINGS['appName']} -ResourceGroupName ${SETTINGS['resourceGroupName']}")
 						}
 					}
 				}
