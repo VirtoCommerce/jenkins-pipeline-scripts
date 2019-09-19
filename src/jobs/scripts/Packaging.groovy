@@ -248,14 +248,11 @@ class Packaging {
     def static startSonarJS(context){
         def sqScanner = context.tool 'SonarScannerJS'
         def fullJobName = Utilities.getRepoName(context)
-        def sources = "./themes"
+        def sources = "./assets"
         def repoName = Utilities.getRepoName(context)
         def prNumber = Utilities.getPullRequestNumber(context)
         def orgName = Utilities.getOrgName(context)
         def projectKey = "${fullJobName}_${context.env.BRANCH_NAME}".replaceAll('/', '_')
-        if(Utilities.getRepoNamePrefix(context)=='hot'){
-            sources = "./src"
-        }
 
         context.withSonarQubeEnv('VC Sonar Server') {
             if(Utilities.isPullRequest(context)){
