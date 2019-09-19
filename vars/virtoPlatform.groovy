@@ -34,8 +34,10 @@ def call(body) {
 			SETTINGS = new Settings(readFile(SETTINGS_FILE))
 			SETTINGS.setRegion('Virto')
 			SETTINGS.setEnvironment('MASTER')
+			echo "SETTINGS prefix: ${SETTINGS['prefix']}"
 		}
 		echo "SETTINGS approvers: ${SETTINGS['approvers']}"
+		echo "${SETTINGS}"
 		
 		if(projectType == null)
 		{
