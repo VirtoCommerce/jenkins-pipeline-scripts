@@ -28,6 +28,14 @@ def call(body) {
 			deployScript = 'VC-Platform2AzureQA.ps1'
 			dockerTag = "latest"
 		}
+
+		def SETTINGS
+		configFileProvider([configFile(fileId: 'shared_lib_settings', variable: 'SETTINGS_FILE')]) {
+			SETTINGS = new Settings(readFile(SETTINGS_FILE))
+			SETTINGS.setRegion('Virto')
+			SETTINGS.setEnvironment('MASTER')
+		}
+		echo "SETTINGS approvers: ${SETTINGS['approvers']}"
 		
 		if(projectType == null)
 		{
