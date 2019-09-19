@@ -32,6 +32,25 @@ class Utilities {
         return "VirtoCommerce"
     }
 
+    def static getRepoName(context)
+    {
+        def tokens = "${context.env.JOB_NAME}".tokenize('/')
+        def REPO_NAME = tokens[1]
+        return REPO_NAME
+    }
+
+    def static getRepoNamePrefix(context){
+        def repoName = getRepoName(context)
+        def tokens = repoName.tokenize("-")
+        return tokens[0]
+    }
+
+    def static getProjectType(context){
+        def repoName = getRepoName(context)
+        def tokens = repoName.tokenize("-")
+        return tokens[1]
+    }
+
     def static runSharedPS(context, scriptName, args = '')
     {
  	    context.bat "powershell.exe -File \"${context.env.WORKSPACE}\\..\\workspace@libs\\${DefaultSharedLibName}\\resources\\azure\\${scriptName}\" ${args} -ErrorAction Stop"
