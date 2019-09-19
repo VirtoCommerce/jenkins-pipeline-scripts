@@ -246,12 +246,24 @@ class Packaging {
     }
 
     def static startSonarJS(context){
-        context.echo "Packaging.startSonarJS"
-        def sqScannerMsBuildHome = context.tool 'Scanner for MSBuild'
+        def sqScanner = context.tool 'SonarScannerJS'
         def fullJobName = Utilities.getRepoName(context)
+        def sources = "./themes"
+        def repoName = Utilities.getRepoName(context)
+        def prNumber = Utilities.getPullRequestNumber(context)
+        def orgName = Utilities.getOrgName(context)
+        def projectKey = "${fullJobName}_${context.env.BRANCH_NAME}".replaceAll('/', '_')
+        if(Utilities.getRepoNamePrefix(context)=='hot'){
+            sources = "./src"
+        }
 
         context.withSonarQubeEnv('VC Sonar Server') {
-            context.bat "\"${sqScannerMsBuildHome}\\sonar-scanner-3.0.3.778\\bin\\sonar-scanner.bat\" scan -Dsonar.projectKey=theme_default_${context.env.BRANCH_NAME} -Dsonar.sources=./assets -Dsonar.branch=${context.env.BRANCH_NAME} -Dsonar.projectName=\"${fullJobName}\" -Dsonar.host.url=%SONAR_HOST_URL% -Dsonar.login=%SONAR_AUTH_TOKEN%"
+            if(Utilities.isPullRequest(context)){
+                context.bat "\"${sqScanner}\\bin\\sonar-scanner.bat\" scan -Dsonar.projectKey=${projectKey} -Dsonar.sources=${sources} -Dsonar.branch=${context.env.BRANCH_NAME} -Dsonar.projectName=\"${fullJobName}\" -Dsonar.host.url=%SONAR_HOST_URL% -Dsonar.login=%SONAR_AUTH_TOKEN% -Dsonar.github.oauth=${context.env.GITHUB_TOKEN} -Dsonar.analysis.mode=preview -Dsonar.github.pullRequest=\"${prNumber}\" -Dsonar.github.repository=${orgName}/${repoName}"
+            }
+            else{
+                context.bat "\"${sqScanner}\\bin\\sonar-scanner.bat\" scan -Dsonar.projectKey=${projectKey} -Dsonar.sources=${sources} -Dsonar.branch=${context.env.BRANCH_NAME} -Dsonar.projectName=\"${fullJobName}\" -Dsonar.host.url=%SONAR_HOST_URL% -Dsonar.login=%SONAR_AUTH_TOKEN%"
+            }
         }
     }
 
