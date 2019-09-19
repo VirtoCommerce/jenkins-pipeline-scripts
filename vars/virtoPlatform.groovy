@@ -30,12 +30,14 @@ def call(body) {
 		}
 
 		def SETTINGS
+		def settingsFileContent
 		configFileProvider([configFile(fileId: 'shared_lib_settings', variable: 'SETTINGS_FILE')]) {
-			SETTINGS = new Settings(readFile(SETTINGS_FILE))
-			SETTINGS.setRegion('Virto')
-			SETTINGS.setEnvironment('MASTER')
-			echo "SETTINGS prefix: ${SETTINGS['prefix']}"
+			settingsFileContent = readFile(SETTINGS_FILE)
 		}
+		SETTINGS = new Settings(settingsFileContent)
+		SETTINGS.setRegion('Virto')
+		SETTINGS.setEnvironment('MASTER')
+		echo "SETTINGS prefix: ${SETTINGS['prefix']}"
 		echo "SETTINGS approvers: ${SETTINGS['approvers']}"
 		echo "${SETTINGS}"
 		
