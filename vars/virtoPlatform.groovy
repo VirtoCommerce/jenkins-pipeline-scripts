@@ -37,6 +37,7 @@ def call(body) {
 		SETTINGS = new Settings(settingsFileContent)
 		SETTINGS.setRegion('Virto')
 		SETTINGS.setEnvironment('MASTER')
+		echo "SETTINGS name: ${SETTINGS['name']}"
 		echo "SETTINGS prefix: ${SETTINGS['prefix']}"
 		echo "SETTINGS approvers: ${SETTINGS['approvers']}"
 		echo "${SETTINGS}"
