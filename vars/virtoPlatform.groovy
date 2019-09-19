@@ -178,7 +178,7 @@ def call(body) {
 					timestamps { 
 						if(solution == 'VirtoCommerce.Platform.sln' || projectType == 'NETCORE2')
 						{
-							Packaging.pushDockerImage(this, dockerImage, dockerTag)
+							//Packaging.pushDockerImage(this, dockerImage, dockerTag)
 						}
 						if (Packaging.getShouldPublish(this)) {
 							Packaging.createNugetPackages(this)
