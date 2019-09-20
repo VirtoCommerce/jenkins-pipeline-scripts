@@ -454,7 +454,16 @@ class Utilities {
     }
 
     def static createInfrastructure(context){
-        Utilities.runSharedPS(context, "vc-CreateInfrastructure.ps1")
+        if (context.env.BRANCH_NAME == 'bulk-update/dev'){
+            Utilities.runSharedPS(context, "vc-CreateInfrastructureBulkUpdateDev.ps1")
+        }
+        else if (context.env.BRANCH_NAME == 'bulk-update/master'){
+            Utilities.runSharedPS(context, "vc-CreateInfrastructureBulkUpdateQA.ps1")
+        }
+        else{
+            Utilities.runSharedPS(context, "vc-CreateInfrastructure.ps1")
+        }
+        
     }
 
     def static isPullRequest(context){
