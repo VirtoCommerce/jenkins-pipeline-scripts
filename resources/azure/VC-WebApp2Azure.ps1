@@ -5,11 +5,11 @@
     $KuduPath
 )
 
-# Get Storefront Zip File
+# Get App Zip File
 
 $Path2Zip = Get-Childitem -Recurse -Path "${env:WORKSPACE}\artifacts\" -File -Include *.zip
 
-# Upload Storefront Zip File to Azure
+# Upload App Zip File to Azure
 
 $ApplicationID ="${env:AzureAppID}"
 $APIKey = ConvertTo-SecureString "${env:AzureAPIKey}" -AsPlainText -Force
