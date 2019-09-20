@@ -24,10 +24,13 @@ import jobs.scripts.*
 		}
 
 		def SETTINGS
+		def settingsFileContent
 		configFileProvider([configFile(fileId: 'shared_lib_settings', variable: 'SETTINGS_FILE')]) {
-			SETTINGS = new Settings(readFile(SETTINGS_FILE))
-			SETTINGS.setRegion('Virto')
+			settingsFileContent = readFile(SETTINGS_FILE)
 		}
+		SETTINGS = new Settings(settingsFileContent)
+		SETTINGS.setEnvironment(env.BRANCH_NAME)
+		SETTINGS.setRegion('module')
 
 		try {	
 			step([$class: 'GitHubCommitStatusSetter', contextSource: [$class: 'ManuallyEnteredCommitContextSource', context: 'ci.virtocommerce.com'], statusResultSource: [$class: 'ConditionalStatusResultSource', results: [[$class: 'AnyBuildResult', message: 'Building on Virto Commerce CI', state: 'PENDING']]]])			
@@ -153,7 +156,7 @@ import jobs.scripts.*
 								Packaging.createNugetPackages(this)
 								break
 							case 'dev':
-								Utilities.runSharedPS(this, "${deployScript}")
+								Utilities.runSharedPS(this, "${deployScript}", "-SubscriptionID ${SETTINGS['subscriptionID']} -WebAppName ${SETTINGS['appName']} -ResourceGroupName ${SETTINGS['resourceGroupName']}")
 								break
 						}
 					}

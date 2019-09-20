@@ -1,3 +1,8 @@
+param(
+    $SubscriptionID,
+    $WebAppName,
+    $ResourceGroupName
+)
 # Get Module Name
 
 $Path = Get-Childitem -Recurse -Path "${env:WORKSPACE}\" -File -Include module.manifest
@@ -16,39 +21,36 @@ $ApplicationID ="${env:AzureAppID}"
 $APIKey = ConvertTo-SecureString "${env:AzureAPIKey}" -AsPlainText -Force
 $psCred = New-Object System.Management.Automation.PSCredential($ApplicationID, $APIKey)
 $TenantID = "${env:AzureTenantID}"
-$SubscriptionID = "${env:AzureSubscriptionIDQA}"
 
 Add-AzureRmAccount -Credential $psCred -TenantId $TenantID -ServicePrincipal
 Select-AzureRmSubscription -SubscriptionId $SubscriptionID
 
-$DestResourceGroupName = "${env:AzureResourceGroupNameQA}"
-$DestWebAppName = "${env:AzureWebAppAdminNameQA}"
-$DestKuduDelPath = "https://$DestWebAppName.scm.azurewebsites.net/api/vfs/site/modules/$ModuleName/?recursive=true"
-$DestKuduPath = "https://$DestWebAppName.scm.azurewebsites.net/api/zip/site/wwwroot/modules/$ModuleName/"
+$DestKuduDelPath = "https://$WebAppName.scm.azurewebsites.net/api/vfs/site/modules/$ModuleName/?recursive=true"
+$DestKuduPath = "https://$WebAppName.scm.azurewebsites.net/api/zip/site/wwwroot/modules/$ModuleName/"
 
-function Get-AzureRmWebAppPublishingCredentials($DestResourceGroupName, $DestWebAppName, $slotName = $null){
+function Get-AzureRmWebAppPublishingCredentials($ResourceGroupName, $WebAppName, $slotName = $null){
 	if ([string]::IsNullOrWhiteSpace($slotName)){
         $ResourceType = "Microsoft.Web/sites/config"
-		$DestResourceName = "$DestWebAppName/publishingcredentials"
+		$DestResourceName = "$WebAppName/publishingcredentials"
 	}
 	else{
         $ResourceType = "Microsoft.Web/sites/slots/config"
-		$DestResourceName = "$DestWebAppName/$slotName/publishingcredentials"
+		$DestResourceName = "$WebAppName/$slotName/publishingcredentials"
 	}
-	$DestPublishingCredentials = Invoke-AzureRmResourceAction -ResourceGroupName $DestResourceGroupName -ResourceType $ResourceType -ResourceName $DestResourceName -Action list -ApiVersion 2015-08-01 -Force
+	$DestPublishingCredentials = Invoke-AzureRmResourceAction -ResourceGroupName $ResourceGroupName -ResourceType $ResourceType -ResourceName $DestResourceName -Action list -ApiVersion 2015-08-01 -Force
     	return $DestPublishingCredentials
 }
 
-function Get-KuduApiAuthorisationHeaderValue($DestResourceGroupName, $DestWebAppName){
-    $DestPublishingCredentials = Get-AzureRmWebAppPublishingCredentials $DestResourceGroupName $DestWebAppName
+function Get-KuduApiAuthorisationHeaderValue($ResourceGroupName, $WebAppName){
+    $DestPublishingCredentials = Get-AzureRmWebAppPublishingCredentials $ResourceGroupName $WebAppName
     return ("Basic {0}" -f [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes(("{0}:{1}" -f $DestPublishingCredentials.Properties.PublishingUserName, $DestPublishingCredentials.Properties.PublishingPassword))))
 }
 
-$DestKuduApiAuthorisationToken = Get-KuduApiAuthorisationHeaderValue $DestResourceGroupName $DestWebAppName
+$DestKuduApiAuthorisationToken = Get-KuduApiAuthorisationHeaderValue $ResourceGroupName $WebAppName
 
-Write-Host "Stop $DestWebAppName"
+Write-Host "Stop $WebAppName"
 
-Stop-AzureRmWebApp -ResourceGroupName $DestResourceGroupName -Name $DestWebAppName
+Stop-AzureRmWebApp -ResourceGroupName $ResourceGroupName -Name $WebAppName
 
 Start-Sleep -s 5
 
@@ -66,9 +68,9 @@ Invoke-RestMethod -Uri $DestKuduPath `
 
 Start-Sleep -s 5
 
-Write-Host "Start $DestWebAppName"
+Write-Host "Start $WebAppName"
 
-Start-AzureRmWebApp -ResourceGroupName $DestResourceGroupName -Name $DestWebAppName
+Start-AzureRmWebApp -ResourceGroupName $ResourceGroupName -Name $WebAppName
 
 #Destination2
 
