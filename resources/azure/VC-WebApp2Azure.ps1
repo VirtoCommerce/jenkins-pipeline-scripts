@@ -1,14 +1,15 @@
-param(
+﻿param(
     $SubscriptionID,
     $WebAppName,
-    $ResourceGroupName
+    $ResourceGroupName,
+    $KuduPath
 )
 
-# Get Platform Zip File
+# Get Storefront Zip File
 
 $Path2Zip = Get-Childitem -Recurse -Path "${env:WORKSPACE}\artifacts\" -File -Include *.zip
 
-# Upload Platform Zip File to Azure
+# Upload Storefront Zip File to Azure
 
 $ApplicationID ="${env:AzureAppID}"
 $APIKey = ConvertTo-SecureString "${env:AzureAPIKey}" -AsPlainText -Force
@@ -17,8 +18,6 @@ $TenantID = "${env:AzureTenantID}"
 
 Add-AzureRmAccount -Credential $psCred -TenantId $TenantID -ServicePrincipal
 Select-AzureRmSubscription -SubscriptionId $SubscriptionID
-
-$DestKuduPath = "https://$WebAppName.scm.azurewebsites.net/api/zip/site/wwwroot/platform/"
 
 function Get-AzureRmWebAppPublishingCredentials($ResourceGroupName, $WebAppName, $slotName = $null){
 	if ([string]::IsNullOrWhiteSpace($slotName)){
@@ -48,7 +47,7 @@ Start-Sleep -s 5
 
 Write-Host "Uploading File"
 
-Invoke-RestMethod -Uri $DestKuduPath `
+Invoke-RestMethod -Uri $KuduPath `
                         -Headers @{"Authorization"=$DestKuduApiAuthorisationToken;"If-Match"="*"} `
                         -Method PUT `
                         -InFile $Path2Zip `

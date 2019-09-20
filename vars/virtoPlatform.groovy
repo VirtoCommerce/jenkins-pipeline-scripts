@@ -21,7 +21,7 @@ def call(body) {
 		def webProject = 'VirtoCommerce.Platform.Web\\VirtoCommerce.Platform.Web.csproj'
 		def zipArtifact = 'VirtoCommerce.Platform'
 		def websiteDir = 'VirtoCommerce.Platform.Web'
-		def deployScript = 'VC-Platform2Azure.ps1'
+		def deployScript = 'VC-WebApp2Azure.ps1'
 		def dockerTag = "${env.BRANCH_NAME}-branch"
 		def buildOrder = Utilities.getNextBuildOrder(this)
 		if (env.BRANCH_NAME == 'master') {
@@ -50,7 +50,6 @@ def call(body) {
 			websiteDir = 'VirtoCommerce.Storefront'
 			webProject = 'VirtoCommerce.Storefront\\VirtoCommerce.Storefront.csproj'
 			zipArtifact = 'VirtoCommerce.StoreFront'
-			deployScript = 'VC-Storefront2Azure.ps1'
 		}
 		if(Utilities.isNetCore(projectType)){
 			SETTINGS.setRegion('storefront')
@@ -188,7 +187,7 @@ def call(body) {
 
 						if((solution == 'VirtoCommerce.Platform.sln' || projectType == 'NETCORE2') && env.BRANCH_NAME == 'dev')
 						{
-							Utilities.runSharedPS(this, "${deployScript}", "-SubscriptionID ${SETTINGS['subscriptionID']} -WebAppName ${SETTINGS['appName']} -ResourceGroupName ${SETTINGS['resourceGroupName']}")
+							Utilities.runSharedPS(this, "${deployScript}", "-SubscriptionID ${SETTINGS['subscriptionID']} -WebAppName ${SETTINGS['appName']} -ResourceGroupName ${SETTINGS['resourceGroupName']} -KuduPath ${SETTINGS['kuduPath']}")
 						}
 					}
 				}
