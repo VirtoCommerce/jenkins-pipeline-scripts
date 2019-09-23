@@ -443,17 +443,32 @@ class Utilities {
         context.allure includeProperties: false, jdk: '', results: [[path: "./../workspace@tmp/output"]]
     }
 
+    def static getAzureTemplateDir(context) {
+        def tmp = Utilities.getTempFolder(context)
+		return "${tmp}\\azure_template"
+    }
+
+    def static getAzureTemplate(context) {
+        def prefix = getRepoNamePrefix(context)
+        context.git credentialsId: context.env.GITHUB_CREDENTIALS_ID, url: "https://github.com/VirtoCommerce/${prefix}-arm-templates.git"
+    }
+
     def static createInfrastructure(context){
-        if (context.env.BRANCH_NAME == 'bulk-update/dev'){
-            Utilities.runSharedPS(context, "vc-CreateInfrastructureBulkUpdateDev.ps1")
+        //def AzureTempDir = Utilities.getAzureTemplateDir(context)
+        def AzureTempDir = "..\\workspace@libs\\virto-shared-library\\resources\\azure"
+        context.dir(AzureTempDir){
+            //context.deleteDir()
+            //getAzureTemplate(context)
+            if (context.env.BRANCH_NAME == 'bulk-update/dev'){
+                Utilities.runSharedPS(context, "vc-CreateInfrastructureBulkUpdateDev.ps1")
+            }
+            else if (context.env.BRANCH_NAME == 'bulk-update/master'){
+                Utilities.runSharedPS(context, "vc-CreateInfrastructureBulkUpdateQA.ps1")
+            }
+            else{
+                Utilities.runSharedPS(context, "vc-CreateInfrastructure.ps1")
+            }
         }
-        else if (context.env.BRANCH_NAME == 'bulk-update/master'){
-            Utilities.runSharedPS(context, "vc-CreateInfrastructureBulkUpdateQA.ps1")
-        }
-        else{
-            Utilities.runSharedPS(context, "vc-CreateInfrastructure.ps1")
-        }
-        
     }
 
     def static isPullRequest(context){
