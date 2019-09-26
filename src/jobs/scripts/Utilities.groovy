@@ -473,4 +473,14 @@ class Utilities {
         def number = context.env.BRANCH_NAME.replace('PR-', '')
         return number
     }
+
+    
+    @NonCPS
+    def getUserCause(){
+        for (cause in currentBuild.rawBuild.getCauses()) {
+            if (cause instanceof Cause.UserIdCause) {
+                return cause.getUserName()
+            }
+        }
+    }
 }

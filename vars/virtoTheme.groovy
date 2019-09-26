@@ -23,7 +23,7 @@ def call(body) {
 			settingsFileContent = readFile(SETTINGS_FILE)
 		}
 		SETTINGS = new Settings(settingsFileContent)
-		SETTINGS.setEnvironment(env.BRANCH_NAME)
+		SETTINGS.setEnvironment(env.BRANCH_NAME.toLowerCase())
 		SETTINGS.setRegion('theme')
 
 		try {
@@ -68,6 +68,7 @@ def call(body) {
 			{
 				stage('Publish') {
 					timestamps { 
+						Packaging.saveArtifact(this, 'vc', 'theme', 'theme', artifacts[0].path)
 						if (Packaging.getShouldPublish(this)) {
 							Packaging.publishRelease(this, version, "")
 						}

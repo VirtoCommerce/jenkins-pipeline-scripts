@@ -1,0 +1,495 @@
+
+import groovy.util.*
+import jobs.scripts.*
+import groovy.json.JsonSlurperClassic
+
+def SETTINGS
+
+def DELIVERY_BACKEND = false
+def DELIVERY_FRONTEND = false
+def DELIVERY_THEME = false
+def UPDATE_CS = false
+def UPDATE_PLATFORM = false
+def UPDATE_IMAGE = false
+def UPDATE_MODULE = false
+def LOGIC_APPS = false
+
+def UNSTABLE = false
+def CAUSES = []
+
+def PLATFORM_VERSION
+def PROJECT_TYPE
+def BACKEND_FILE
+def FRONTEND_FILE
+def THEME_FILE
+def MODULE_ID
+def MODULE_FILE
+def ENV_NAME
+def LOGICAPP_FILE
+def LOGICAPP_NAME
+
+def DOCKER_SQL_PORT
+def DOCKER_PLATFORM_PORT
+def DOCKER_STOREFRONT_PORT
+def DOCKER_PREFIX
+def DOCKER_TAG
+
+def PROJECT_TYPES
+
+
+pipeline {
+    agent any
+
+    options{
+        timestamps()
+    }
+    
+    stages{
+        stage("User Input"){
+            steps{
+                script{
+                    def SETTINGS
+                    def settingsFileContent
+                    configFileProvider([configFile(fileId: 'shared_lib_settings', variable: 'SETTINGS_FILE')]) {
+                        settingsFileContent = readFile(SETTINGS_FILE)
+                    }
+                    SETTINGS = new Settings(settingsFileContent)
+                    def buildOrder = Utilities.getNextBuildOrder(this)
+                    PRJ_TYPES = SETTINGS.getRegions().join("\n")
+                    def regionAndEnvChoices = input message: "Select Region and Environment", parameters: [
+                        choice(name: 'Region', choices: PRJ_TYPES),
+                        choice(name: 'Environments', choices:"None\nDEV\nRELEASE\nMASTER")
+                    ]
+                    PROJECT_TYPE = regionAndEnvChoices['Region']
+                    ENV_NAME = regionAndEnvChoices['Environments']
+                    SETTINGS.setRegion(PROJECT_TYPE)
+                    SETTINGS.setEnvironment(ENV_NAME)
+                    echo "Vars: PROJECT_TYPE - ${PROJECT_TYPE}, UPDATE_CS - ${UPDATE_CS}, ENV_NAME - ${ENV_NAME}"
+                    def msgToHook = "Started by ${Utilities.getUserCause()}<br/>Project type ${PROJECT_TYPE}<br/>Environment ${ENV_NAME}<br/>${UPDATE_CS ? "Update Solution<br/>":""}"
+                    Utilities.notifyBuildStatus(this, SETTINGS['prefix'], SETTINGS['of365hook'], msgToHook, 'STARTED')
+                }
+            }
+        }
+
+        
+
+        stage("Preparing Solution"){
+            when{
+            }
+            steps{
+                script{
+                    checkout scm
+                    def csSrc = "${env.CS_FOLDER}\\${ENV_NAME}"
+                    def modulesRoot = "${env.WORKSPACE}\\CS\\module"
+                    def platformRoot = "${env.WORKSPACE}\\CS\\platform"
+                    powershell "Remove-Item -Path ${env.WORKSPACE}\\CS\\* -Recurse -Force -ErrorAction Continue"
+                    powershell "Copy-Item -Path ${csSrc}\\* -Destination ${env.WORKSPACE}\\CS -Recurse -Force"
+                    powershell "Rename-Item -Path ${modulesRoot} -NewName Modules"
+                }
+            }
+        }
+        stage ("Docker Environment"){
+            steps{
+                script{
+                    if(UPDATE_CS){
+                        def dockerTag = ENV_NAME == 'MASTER' ? 'latest' : 'dev'
+                        
+                        stage('Create Test Environment') {
+						timestamps { 
+							// Start docker environment				
+							Packaging.startDockerTestEnvironment(this, dockerTag)
+						}
+					}
+					stage('Install VC Modules'){
+						timestamps{
+							// install modules
+							Packaging.installModules(this, 1)
+							// check installed modules
+							Packaging.checkInstalledModules(this)
+						}
+					}
+
+					stage('Install Sample Data'){
+						timestamps{
+							// now create sample data
+							Packaging.createSampleData(this)	
+						}
+					}
+
+					stage('Theme Install'){
+						timestamps{
+							def themePath = "${env.WORKSPACE}@tmp\\theme.zip"
+							build(job: "../vc-theme-default/${env.BRANCH_NAME}", parameters: [string(name: 'themeResultZip', value: themePath)])
+							Packaging.installTheme(this, themePath)
+						}
+					}
+
+					if(!Utilities.isNetCore(projectType)) {
+						stage("Swagger Schema Validation"){
+							timestamps{
+								def tempFolder = Utilities.getTempFolder(this)
+								def schemaPath = "${tempFolder}\\swagger.json"
+
+								Utilities.validateSwagger(this, schemaPath)
+							}
+						}
+					}
+
+                        stage('E2E')
+                        {
+                            timestamps 
+                            {
+                                def sfPort = DOCKER_STOREFRONT_PORT
+                                def pfPort = DOCKER_PLATFORM_PORT
+                                def DefaultAdminDockerPrefix = 'http://localhost'
+                                def storefrontUrl =  'https://localhost'
+                                def msg = ""
+                                def subj = ""
+                                def to = "virto.qa@virtoway.com"
+                                def status = "SUCCESS"
+                                def mailBody = "See ${env.JOB_URL}"
+                                
+                                try {
+                                    def wait = 0
+                                    sleep(time: wait, unit: 'SECONDS')
+                                    wait = wait + 30
+                                    def e2eDir = "${env.WORKSPACE}\\e2e"
+                                    dir(e2eDir) {
+                                        deleteDir()
+                                        git credentialsId: env.GITHUB_CREDENTIALS_ID, url: "https://github.com/heineken-order-transfer/hot-quality-gate.git", branch: 'init'
+                                        def allureResultsPath = "${env.WORKSPACE}\\allure-results-${PROJECT_TYPE}"
+                                        def allureReportPath = "${env.WORKSPACE}\\allure-report"
+                                        def allureResultsEsc = allureResultsPath.replace("\\", "\\\\")
+                                        def jsonConf = "{\\\"output\\\":\\\"${allureResultsEsc}\\\",\\\"helpers\\\":{\\\"REST\\\":{\\\"endpoint\\\":\\\"${DefaultAdminDockerPrefix}:${pfPort}\\\"},\\\"WebDriver\\\":{\\\"url\\\":\\\"${storefrontUrl}:${sfPort}\\\"}}}"
+                                        bat "npm i"
+                                        bat "node_modules\\.bin\\codeceptjs run --config ${SETTINGS['codeceptConfig']} --verbose -o \"${jsonConf}\""
+                                    }
+                                }
+                                catch(any){
+                                    status = "FAILURE"
+                                    echo any.getMessage()
+                                    CAUSES.add("E2E FAILURE")
+                                }
+                                finally{
+                                    if(!Utilities.isMasterNode(this)){
+                                        stash(name:'allure', includes:"allure-results-${PROJECT_TYPE}/**")
+                                    }
+                                    subj = "E2E ${status}"
+                                    
+                                    msg = "E2E ${status}. Url: ${slave}-ci.virtoway.com\n Storefront port:${sfPort}, Platform port: ${pfPort}"
+                                    Utilities.notifyBuildStatus(this, SETTINGS['prefix'], SETTINGS['of365hook'], msg, status)
+                                    // emailext body:mailBody, replyTo: 'do-not-reply@virtoway.com', subject: subj, to: to, recipientProviders: [[$class: 'CulpritsRecipientProvider']]
+                                    input(message: msg, submitter:SETTINGS['approvers_e2e'])
+                                }
+                            }
+                        }
+                    } else {
+                        stage('Initialization'){timestamps{}}
+                        stage('Create Test Environment'){timestamps{}}
+                        stage('Install Modules'){timestamps{}}
+                        stage('Install Sample Data'){timestamps{}}
+                        stage('Theme Install'){timestamps{}}
+                        stage('E2E'){timestamps{}}
+                    }
+                }
+            }
+        }
+        stage("Update Solution"){
+            when {
+                expression {
+                    UPDATE_CS
+                }
+            }
+            steps {
+                script{
+                    def csRoot = "${env.WORKSPACE}\\CS"
+                    runPS('upload-CS.ps1', 
+                        "-PlatformDir ${csRoot}\\platform -ModulesDir ${csRoot}\\modules -StorefrontDir ${csRoot}\\storefront -ThemeDir ${csRoot}\\theme\\${PROJECT_TYPE} -WebAppName ${SETTINGS['webAppName']} -WebAppPublicName ${SETTINGS['webAppPublicName']} -ResourceGroupName ${SETTINGS['resourceGroupName']} -SubscriptionID ${SETTINGS['subscriptionID']}")
+                }
+            }
+        }
+
+        
+        stage("Delivering Backend"){
+            when{
+                expression{
+                    DELIVERY_BACKEND
+                }
+            }
+            steps{
+                script{
+                    if(ENV_NAME == 'ACC'){
+                        echo "Octopus api: ${env.OCTOPUS_USR}"
+                        def res = powershell script: "${env.Utils}\\octopus\\octo.exe push --package ${BACKEND_FILE} --server ${env.OCTOPUS_USR} --apiKey ${env.OCTOPUS_PSW}", returnStatus:true
+                        if(res != 0){
+                            UNSTABLE = true
+                            CAUSES.add("Delivering Backend: octopus failed")
+                        }
+                    }
+                    else{
+                        def contentPath = "platform"
+                        if(DELIVERY_BACKEND)
+                            contentPath = ""
+                        runPS("Deploy-ToAzure.ps1", "-ZipFile ${BACKEND_FILE} -WebAppName \"${SETTINGS['webAppName']}\" -ResourceGroupName \"${SETTINGS['resourceGroupName']}\" -SubscriptionID \"${SETTINGS['subscriptionID']}\" -DestContentPath \"${contentPath}\"")
+                    }
+                }
+            }
+        }
+        stage("Delivering Storefront"){
+            when{
+                expression{
+                    DELIVERY_FRONTEND
+                }
+            }
+            steps{
+                script{
+                    if(ENV_NAME == 'ACC'){
+                        if(DELIVERY_BACKEND){
+                            sleep time:5, unit:'MINUTES'
+                        }
+                        def res = powershell script:"${env.Utils}\\octopus\\octo.exe push --package ${FRONTEND_FILE} --server ${env.OCTOPUS_USR} --apiKey ${env.OCTOPUS_PSW}", returnStatus:true
+                        if(res != 0){
+                            UNSTABLE = true
+                            CAUSES.add("Delivering Storefront: octopus failed")
+                        }
+                    } else {
+                        def tmpFrontendPath = "${env.WORKSPACE}@tmp\\frontendTemp"
+                        dir(tmpFrontendPath){
+                            deleteDir()
+                            powershell "Expand-Archive -Path ${FRONTEND_FILE} -DestinationPath ."
+                            powershell "Remove-Item ${FRONTEND_FILE} -Force"
+                            powershell "Expand-Archive -Path ${THEME_FILE} -DestinationPath .\\wwwroot\\theme"
+                            zip dir: tmpFrontendPath, zipFile: FRONTEND_FILE
+                        }
+                        runPS("Deploy-ToAzure.ps1", "-ZipFile ${FRONTEND_FILE} -WebAppName \"${SETTINGS['webAppPublicName']}\" -ResourceGroupName \"${SETTINGS['resourceGroupName']}\" -SubscriptionID \"${SETTINGS['subscriptionID']}\"")
+                    }
+                }
+            }
+        }
+        stage("Delivering Theme"){
+            when{
+                expression{
+                    DELIVERY_THEME
+                }
+            }
+            steps{
+                script{
+                    if(ENV_NAME == 'ACC'){
+                        if(DELIVERY_BACKEND){
+                            sleep time:5, unit:'MINUTES'
+                        }
+                        def res = powershell script: "${env.Utils}\\octopus\\octo.exe push --package ${THEME_FILE} --server ${env.OCTOPUS_USR} --apiKey ${env.OCTOPUS_PSW}", returnStatus: true
+                        if(res != 0){
+                            UNSTABLE = true
+                            CAUSES.add("Delivering Theme: octopus failed")
+                        }
+                    } else {
+                        runPS("Deploy-ToAzure.ps1", "-ZipFile ${THEME_FILE} -WebAppName \"${SETTINGS['webAppPublicName']}\" -ResourceGroupName \"${SETTINGS['resourceGroupName']}\" -SubscriptionID \"${SETTINGS['subscriptionID']}\" -DestContentPath \"wwwroot\\theme\"")
+                    }
+                }
+            }
+        }
+
+        stage("Updating Platform"){
+            when{
+                expression{
+                    return UPDATE_PLATFORM && !DELIVERY_BACKEND
+                }
+            }
+            steps{
+                runPS("Deploy-ToAzure.ps1", "-ZipFile ${BACKEND_FILE} -WebAppName \"${SETTINGS['webAppName']}\" -ResourceGroupName \"${SETTINGS['resourceGroupName']}\" -SubscriptionID \"${SETTINGS['subscriptionID']}\" -DestContentPath \"platform\"")
+            }
+        }
+
+        stage("Updating Module"){
+            when{
+                expression{
+                    UPDATE_MODULE
+                }
+            }
+            steps{
+                script{
+                    runPS("VC-Module2Azure.ps1", "-Prefix ${SETTINGS['prefix']} -ModuleName ${MODULE_ID} -Path2Zip ${MODULE_FILE} -BranchName ${ENV_NAME}")
+                }
+            }
+        }
+
+        stage("Updating Platform Docker Image"){
+            when{
+                expression{
+                    return UPDATE_IMAGE && ENV_NAME != 'None'
+                }
+            }
+            steps{      
+                script{  
+                    node(SETTINGS['agentLabel'] ?: 'master') {
+                        deleteDir()       
+                        unstash name: 'platform'
+                        unzip zipFile: 'Platform.zip', dir: 'VirtoCommerce.Platform'
+                        def dstConfigPath = "${env.WORKSPACE}\\VirtoCommerce.Platform\\platform\\Web.config"
+                        def srcConfigPath = "${env.WORKSPACE}\\${SETTINGS['config']}"
+                        powershell "${env.WORKSPACE}\\combine-configs.ps1 -srcConfigPath ${srcConfigPath} -dstConfigPath ${dstConfigPath} -ErrorAction Stop"
+                        def dockerImage = docker.build("${SETTINGS['prefix']}-platform:${SETTINGS['dockerTag']}")
+                    }
+                }
+            }
+        }
+        stage('Preparing Logic Apps'){
+            when{
+                expression{
+                    LOGIC_APPS
+                }
+            }
+            steps{
+                script{
+                    def logicAppsDir = "${env.WORKSPACE}\\LogicApps"
+                    def logicAppsRoot = "${logicAppsDir}\\${SETTINGS['prefix']}-AzureResourceGroup"
+                    dir(logicAppsDir){
+                        deleteDir()
+                        git branch: 'dev', credentialsId: '58ec1dd6-95a5-42f1-afd9-cace1f5fa2dd', url: "https://github.com/heineken-order-transfer/${SETTINGS['prefix']}-logic-apps.git" 
+                    
+                        def apps = Utilities.getSubfolders(logicAppsRoot)
+                        def logicApp = input message:"Select Logic App", parameters:[choice(name: 'logicApp', choices: apps.join("\n"))]
+                        def appDir = "${logicAppsRoot}\\${logicApp}"
+                        if(ENV_NAME == 'ACC'){
+                            def deliveryInfo = getDeliveryInfo()
+                            def logicAppVersion = "${deliveryInfo['LOGICAPPS'][PROJECT_TYPE][logicApp]['version']}.${deliveryInfo['LOGICAPPS'][PROJECT_TYPE][logicApp]['number']}" 
+                            LOGICAPP_FILE = "${env.WORKSPACE}@tmp\\VirtoWay.B2BOrderTransfer.${PROJECT_TYPE}.LA-${logicApp}.deployer.${logicAppVersion}.zip"
+                            deliveryInfo['LOGICAPPS'][PROJECT_TYPE][logicApp]['number']++
+                            updateDeliveryInfo(deliveryInfo)
+                            powershell "Rename-Item -Path ${appDir}\\LogicApp-${logicApp}.json -NewName DeploymentTemplate.json -Force"
+                            powershell "Compress-Archive -Path ${appDir}\\DeploymentTemplate.json, ${appDir}\\DeploymentTemplate.param.*.json -DestinationPath ${LOGICAPP_FILE}"
+                        }
+                        else{
+                            LOGICAPP_NAME = logicApp
+                            LOGICAPP_FILE = appDir
+                        }
+                    }
+                }
+            }
+        }
+        stage('Delivery Logic App'){
+            when{
+                expression{
+                    LOGIC_APPS
+                }
+            }
+            steps{
+                script{
+                    if(ENV_NAME == 'ACC'){
+                        def res = powershell script: "${env.Utils}\\octopus\\octo.exe push --package ${LOGICAPP_FILE} --server ${env.OCTOPUS_USR} --apiKey ${env.OCTOPUS_PSW}", returnStatus: true
+                        if(res != 0){
+                            UNSTABLE = true
+                            CAUSES.add("Delivering Logic App: octopus failed")
+                        }
+                    }
+                    else{
+                        def templateFile = "${LOGICAPP_FILE}\\LogicApp-${LOGICAPP_NAME}.json"
+                        def envname = ENV_NAME.toLowerCase()
+                        def templateParametersFile = "${LOGICAPP_FILE}\\LogicApp-${LOGICAPP_NAME}.parameters.${envname}.json"
+                        powershell "${env.WORKSPACE}\\ps\\Deploy-LogicApps.ps1 -SubscriptionID ${SETTINGS['subscriptionID']} -ResourceGroupName ${SETTINGS['resourceGroupName']} -TemplateFile ${templateFile} -TemplateParametersFile ${templateParametersFile}"
+                    }
+                }
+            }
+        }
+    }
+    post{
+        always{
+            script{
+                if(UNSTABLE && currentBuild.result != 'FAILED'){
+                    currentBuild.result = 'UNSTABLE'
+                    Utilities.checkLogForWarnings(this)
+                }
+                Utilities.notifyBuildStatus(this, SETTINGS['prefix'], SETTINGS['of365hook'], "", currentBuild.result)
+                if(UPDATE_CS && (PROJECT_TYPE=='HOT' || PROJECT_TYPE=='RW1')){
+                    node(SETTINGS['agentLabel']){
+                        withEnv(["DOCKER_TAG=${DOCKER_TAG}", "DOCKER_PREFIX=${DOCKER_PREFIX}", "DOCKER_PLATFORM_PORT=${DOCKER_PLATFORM_PORT}", "DOCKER_STOREFRONT_PORT=${DOCKER_STOREFRONT_PORT}", "DOCKER_SQL_PORT=${DOCKER_SQL_PORT}", "COMPOSE_PROJECT_NAME=${env.BUILD_TAG}"]){
+                            bat "docker-compose down -v"
+                        }
+                        bat "docker image prune -f"
+                    }
+                    //Utilities.generateAllureReport(this)
+                    def slave = SETTINGS['agentLabel']
+                    if(slave != null){
+                        try{
+                            unstash 'allure'
+                        }
+                        catch(any){
+                            echo any.getMessage()
+                        }
+                    }
+                    allure results: [[path: "allure-results-${PROJECT_TYPE}"]]
+                }
+                if(CAUSES.size() > 0){
+                    echo "UNSTABLE's Causes:"
+                    for(cause in CAUSES){
+                        echo cause
+                    }
+                }
+            }
+        }
+    }
+}
+def runPS(psName, args){
+    powershell "${env.WORKSPACE}\\ps\\${psName} ${args} -ErrorAction Stop"
+}
+
+def getVirtoModules() {
+    def modulesJsonUrl = "https://raw.githubusercontent.com/VirtoCommerce/vc-modules/master/modules.json"
+    def response = httpRequest httpMode:'GET', responseHandle: 'STRING', url:modulesJsonUrl
+    def content = response.content
+    return new JsonSlurperClassic().parseText(content)
+}
+
+def downloadVirtoModule(url, path){
+    httpRequest acceptType: 'APPLICATION_OCTETSTREAM', httpMode: 'GET', outputFile: path, responseHandle: 'NONE', url: url
+}
+
+def getDeliveryInfo() {
+    def deliveryFile = readFile("C:\\CICD\\delivery.json")
+    return new JsonSlurperClassic().parseText(deliveryFile)
+}
+
+def updateDeliveryInfo(data){
+    def json = groovy.json.JsonOutput.toJson(data)
+    json = groovy.json.JsonOutput.prettyPrint(json)
+    writeFile(file:"C:\\CICD\\delivery.json", text: json)
+}
+
+class GithubRelease{
+    long id
+    String name
+    boolean prerelease
+    String tag_name
+    String created_at
+    String published_at
+    List<Map> assets
+
+    GithubRelease(json){
+        id = json.id
+        name = json.name
+        prerelease = json.prerelease
+        tag_name = json.tag_name
+        created_at = json.created_at
+        published_at = json.published_at
+        assets = json.assets
+    }
+
+    static GithubRelease getLatestGithubRelease(context, repoOrg, repoName, region=''){
+        def tagNameStarts = 'v'
+        if(region != ''){
+            tagNameStarts = region
+        }
+        def releasesUrl = "https://api.github.com/repos/${repoOrg}/${repoName}/releases"
+        def response = context.httpRequest authentication:"${context.env.GITHUB_CREDENTIALS_ID}", httpMode:'GET', responseHandle: 'STRING', url:releasesUrl
+        def content = response.content
+        def releases = new JsonSlurperClassic().parseText(content)
+        for(release in releases){
+            if(release.tag_name.startsWith(tagNameStarts) && !release.prerelease){
+                context.echo "Release id: ${release.id}"
+                return new GithubRelease(release)
+            }
+        }
+        throw new Exception("No github releases found")
+    }
+}

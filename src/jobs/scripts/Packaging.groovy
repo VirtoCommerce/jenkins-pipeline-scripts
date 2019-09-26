@@ -466,4 +466,26 @@ class Packaging {
             }
         }
     }
+
+    def static saveArtifact(context, prefix, projectType, id, artifact){
+        def destinationFolderPath = "${context.env.SOLUTION_FOLDER}\\${prefix}\\${context.env.BRANCH_NAME}\\${projectType}"
+        switch(projectType){
+            case 'module':
+                destinationFolderPath = destinationFolderPath + "\\${id}"
+                break
+            case 'theme':
+                def region = Utilities.getRegionFromBranchName(context)
+                if(region == '')
+                    region = prefix
+                destinationFolderPath = destinationFolderPath + "\\${region}"
+                break
+        }
+        def destinationFolder = new File(destinationFolderPath)
+        if(destinationFolder.exists()){
+            context.dir(destinationFolderPath){
+                context.deleteDir()
+            }
+        }
+        context.powershell "Expand-Archive -Path ${artifact} -DestinationPath ${destinationFolderPath} -Force"
+    }
 }

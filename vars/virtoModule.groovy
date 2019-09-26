@@ -29,7 +29,7 @@ import jobs.scripts.*
 			settingsFileContent = readFile(SETTINGS_FILE)
 		}
 		SETTINGS = new Settings(settingsFileContent)
-		SETTINGS.setEnvironment(env.BRANCH_NAME)
+		SETTINGS.setEnvironment(env.BRANCH_NAME.toLowerCase())
 		SETTINGS.setRegion('module')
 
 		try {	
@@ -147,7 +147,10 @@ import jobs.scripts.*
 			if (env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'master') {
 				stage('Publish')
 				{
-					timestamps { 				
+					timestamps { 
+						def moduleId = Modules.getModuleId(this)
+						def artifacts = findFiles(glob: 'artifacts\\*.zip')
+						Packaging.saveArtifact(this, 'vc', 'module', moduleId, artifacts[0].path)
 						if (Packaging.getShouldPublish(this)) {
 							processManifests(true) // publish artifacts to github releases
 						}
