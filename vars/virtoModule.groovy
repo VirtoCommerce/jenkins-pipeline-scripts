@@ -29,7 +29,7 @@ import jobs.scripts.*
 			settingsFileContent = readFile(SETTINGS_FILE)
 		}
 		SETTINGS = new Settings(settingsFileContent)
-		SETTINGS.setEnvironment(env.BRANCH_NAME.toLowerCase())
+		SETTINGS.setEnvironment(env.BRANCH_NAME)
 		SETTINGS.setRegion('module')
 
 		try {	

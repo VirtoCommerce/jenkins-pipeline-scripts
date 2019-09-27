@@ -23,7 +23,7 @@ def call(body) {
 			settingsFileContent = readFile(SETTINGS_FILE)
 		}
 		SETTINGS = new Settings(settingsFileContent)
-		SETTINGS.setEnvironment(env.BRANCH_NAME.toLowerCase())
+		SETTINGS.setEnvironment(env.BRANCH_NAME)
 		SETTINGS.setRegion('theme')
 
 		try {
@@ -55,8 +55,9 @@ def call(body) {
                 }
             }
 
+			def artifacts
 			if(params.themeResultZip != null){
-                def artifacts = findFiles(glob: 'artifacts/*.zip')
+                artifacts = findFiles(glob: 'artifacts/*.zip')
                 for(artifact in artifacts){
                     bat "copy /Y \"${artifact.path}\" \"${params.themeResultZip}\""
                 }

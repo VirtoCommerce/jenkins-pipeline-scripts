@@ -175,6 +175,14 @@ def call(body) {
 			if (env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'master') {
 				stage('Publish'){
 					timestamps { 
+						def packagesDir = Utilities.getArtifactFolder(this)
+						def artifacts
+						dir(packagesDir)
+						{ 
+							artifacts = findFiles(glob: '*.zip')
+						}
+						Packaging.saveArtifact(this, 'vc', Utilities.getProjectType(this), '', artifacts[0].path)
+
 						if(solution == 'VirtoCommerce.Platform.sln' || projectType == 'NETCORE2')
 						{
 							//Packaging.pushDockerImage(this, dockerImage, dockerTag)
