@@ -16,21 +16,27 @@ node {
     psfolder = "${env.WORKSPACE}\\resources\\demoVC"
     dir(psfolder){
         stage('Platform Update'){
-            SETTINGS.setEnvironment('platform')
-            withEnv(["AzureSubscriptionIDProd=${SETTINGS['subscriptionID']}", "AzureResourceGroupNameProd=${SETTINGS['resourceGroupName']}", "AzureWebAppAdminNameProd=${SETTINGS['appName']}"]){
-                powershell "${psfolder}\\PlatformUpdate.ps1"
+            timestamps {
+                SETTINGS.setEnvironment('platform')
+                withEnv(["AzureSubscriptionIDProd=${SETTINGS['subscriptionID']}", "AzureResourceGroupNameProd=${SETTINGS['resourceGroupName']}", "AzureWebAppAdminNameProd=${SETTINGS['appName']}"]){
+                    powershell "${psfolder}\\PlatformUpdate.ps1"
+                }
             }
         }
 
         stage('Storefront Update'){
-            SETTINGS.setEnvironment('storefront')
-            withEnv(["AzureSubscriptionIDProd=${SETTINGS['subscriptionID']}", "AzureResourceGroupNameProd=${SETTINGS['resourceGroupName']}", "AzureWebAppNameProd=${SETTINGS['appName']}"]){
-                powershell "${psfolder}\\StorefrontUpdate.ps1"
+            timestamps {
+                SETTINGS.setEnvironment('storefront')
+                withEnv(["AzureSubscriptionIDProd=${SETTINGS['subscriptionID']}", "AzureResourceGroupNameProd=${SETTINGS['resourceGroupName']}", "AzureWebAppNameProd=${SETTINGS['appName']}"]){
+                    powershell "${psfolder}\\StorefrontUpdate.ps1"
+                }
             }
         }
 
         stage('Recreate DB'){
-            powershell "${psfolder}\\RecreateDB.ps1"
+            timestamps{
+                powershell "${psfolder}\\RecreateDB.ps1"
+            }
         }
     }
 }
