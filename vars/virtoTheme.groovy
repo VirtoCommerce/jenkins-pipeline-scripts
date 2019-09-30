@@ -55,9 +55,8 @@ def call(body) {
                 }
             }
 
-			def artifacts
+			def artifacts = findFiles(glob: 'artifacts/*.zip')
 			if(params.themeResultZip != null){
-                artifacts = findFiles(glob: 'artifacts/*.zip')
                 for(artifact in artifacts){
                     bat "copy /Y \"${artifact.path}\" \"${params.themeResultZip}\""
                 }
