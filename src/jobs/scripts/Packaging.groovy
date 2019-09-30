@@ -474,10 +474,6 @@ class Packaging {
                 destinationFolderPath = destinationFolderPath + "\\${id}"
                 break
             case 'theme':
-                def region = Utilities.getRegionFromBranchName(context)
-                if(region == '')
-                    region = prefix
-                destinationFolderPath = destinationFolderPath + "\\${region}"
                 break
         }
         def destinationFolder = new File(destinationFolderPath)
