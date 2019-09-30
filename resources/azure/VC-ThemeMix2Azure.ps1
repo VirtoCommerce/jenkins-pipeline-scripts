@@ -1,4 +1,9 @@
-﻿param([string] $StagingName, [string] $StoreName)
+﻿param(
+    [string] $StagingName,
+    [string] $StoreName,
+    $AzureBlobName,
+    $AzureBlobKey
+    )
 
 $ErrorActionPreference = "Stop"
 
@@ -15,12 +20,7 @@ Add-Type -AssemblyName System.IO.Compression.FileSystem
 # Upload Theme Zip File to Azure
 
 $ConnectionString = "DefaultEndpointsProtocol=https;AccountName={0};AccountKey={1};EndpointSuffix=core.windows.net"
-if ($StagingName -eq "dev"){
-    $ConnectionString = $ConnectionString -f ${env:AzureBlobNameDev}, ${env:AzureBlobKeyDev}
-}
-if ($StagingName -eq "qa"){
-    $ConnectionString = $ConnectionString -f ${env:AzureBlobNameQA}, ${env:AzureBlobKeyQA}
-}
+$ConnectionString = $ConnectionString -f ${AzureBlobName}, ${AzureBlobKey}
 $BlobContext = New-AzureStorageContext -ConnectionString $ConnectionString
 
 $AzureBlobName = "Themes/$StoreName/default"

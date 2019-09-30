@@ -17,6 +17,16 @@ def call(body) {
 			projectType = 'Theme'
 		}
 		try {
+
+			def SETTINGS
+			def settingsFileContent
+			configFileProvider([configFile(fileId: 'shared_lib_settings', variable: 'SETTINGS_FILE')]) {
+				settingsFileContent = readFile(SETTINGS_FILE)
+			}
+			SETTINGS = new Settings(settingsFileContent)
+			SETTINGS.setEnvironment(env.BRANCH_NAME)
+			SETTINGS.setRegion('themeMix')
+
 			echo "Building branch ${env.BRANCH_NAME}"
 			Utilities.notifyBuildStatus(this, "Started")
 
@@ -100,7 +110,7 @@ def call(body) {
 						if (env.BRANCH_NAME == 'dev')
 						{
 							def stagingName = Utilities.getStagingNameFromBranchName(this)
-							Utilities.runSharedPS(this, "VC-ThemeMix2Azure.ps1", /-StagingName "${stagingName}" -StoreName "${storeName}"/)
+							Utilities.runSharedPS(this, "VC-ThemeMix2Azure.ps1", "-StagingName ${stagingName} -StoreName ${storeName} -AzureBlobName ${SETTINGS['azureBlobName']} -AzureBlobKey ${SETTINGS['azureBlobKey']}")
 						}
 					}
 				}
