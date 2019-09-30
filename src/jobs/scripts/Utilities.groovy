@@ -157,9 +157,37 @@ class Utilities {
         return tempFolder
     }
 
-    def static notifyBuildStatus(context, status)
+    def static notifyBuildStatus(context, webHook, message='', status = '')
     {
-        context.office365ConnectorSend status:context.currentBuild.result, webhookUrl:context.env.O365_WEBHOOK
+        def warnings = context.env.WARNINGS ? "WARNINGS:<br/>${context.env.WARNINGS}" : ''
+        if(message != '')
+            message = "${message}<br/>${warnings}"
+        def color 
+        switch(status) {
+            case 'STARTED':
+                color = '428bca'
+                break
+            case 'SUCCESS':
+                color = '00e60c'
+                break
+            case 'E2E Success':
+                color = '00e60c'
+                break
+            case 'UNSTABLE':
+                color = 'e6e600'
+                break
+            case 'FAILURE':
+                color = 'e60000'
+                break
+            case 'E2E Failed':
+                color = 'e60000'
+                break
+            default:
+                color = 'e60000'
+                break
+        }
+        context.echo "Status is: ${status}; color: ${color}"
+        context.office365ConnectorSend message: message, status:status, webhookUrl:webHook, color: color
     }    
 
     def static getPlatformPort(context)

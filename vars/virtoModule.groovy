@@ -34,7 +34,7 @@ import jobs.scripts.*
 
 		try {	
 			step([$class: 'GitHubCommitStatusSetter', contextSource: [$class: 'ManuallyEnteredCommitContextSource', context: 'ci.virtocommerce.com'], statusResultSource: [$class: 'ConditionalStatusResultSource', results: [[$class: 'AnyBuildResult', message: 'Building on Virto Commerce CI', state: 'PENDING']]]])			
-			Utilities.notifyBuildStatus(this, "started")
+			Utilities.notifyBuildStatus(this, SETTINGS['of365hook'], '', 'STARTED')
 
 			stage('Checkout') {
 				timestamps { 	
@@ -174,30 +174,29 @@ import jobs.scripts.*
 		}
 		catch (any) {
 			currentBuild.result = 'FAILURE'
-			Utilities.notifyBuildStatus(this, currentBuild.result)
 			throw any //rethrow exception to prevent the build from proceeding
 		}
 		finally {
 			Packaging.stopDockerTestEnvironment(this, dockerTag)
 			Utilities.generateAllureReport(this)
+			Utilities.notifyBuildStatus(this, SETTINGS['of365hook'], "Build finished", currentBuild.currentResult)
 			step([$class: 'LogParserPublisher',
 				  failBuildOnError: false,
 				  parsingRulesPath: env.LOG_PARSER_RULES,
 				  useProjectRule: false])
-			if(currentBuild.result != 'FAILURE') {
-				step([$class: 'Mailer', notifyEveryUnstableBuild: true, recipients: emailextrecipients([[$class: 'CulpritsRecipientProvider'], [$class: 'RequesterRecipientProvider']])])
-			}
-			else {
-				def log = currentBuild.rawBuild.getLog(300)
-				def failedStageLog = Utilities.getFailedStageStr(log)
-				def failedStageName = Utilities.getFailedStageName(failedStageLog)
-				def mailBody = Utilities.getMailBody(this, failedStageName, failedStageLog)
-				emailext body:mailBody, subject: "${env.JOB_NAME}:${env.BUILD_NUMBER} - ${currentBuild.currentResult}", recipientProviders: [[$class: 'CulpritsRecipientProvider'], [$class: 'RequesterRecipientProvider']]
-			}
+			// if(currentBuild.result != 'FAILURE') {
+			// 	step([$class: 'Mailer', notifyEveryUnstableBuild: true, recipients: emailextrecipients([[$class: 'CulpritsRecipientProvider'], [$class: 'RequesterRecipientProvider']])])
+			// }
+			// else {
+			// 	def log = currentBuild.rawBuild.getLog(300)
+			// 	def failedStageLog = Utilities.getFailedStageStr(log)
+			// 	def failedStageName = Utilities.getFailedStageName(failedStageLog)
+			// 	def mailBody = Utilities.getMailBody(this, failedStageName, failedStageLog)
+			// 	emailext body:mailBody, subject: "${env.JOB_NAME}:${env.BUILD_NUMBER} - ${currentBuild.currentResult}", recipientProviders: [[$class: 'CulpritsRecipientProvider'], [$class: 'RequesterRecipientProvider']]
+			// }
 		}
 
 		step([$class: 'GitHubCommitStatusSetter', statusResultSource: [$class: 'ConditionalStatusResultSource', results: []]])
-		Utilities.notifyBuildStatus(this, currentBuild.result)
     }
 }
 

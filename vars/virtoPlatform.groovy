@@ -59,7 +59,7 @@ def call(body) {
 
 		
 		try {
-			Utilities.notifyBuildStatus(this, "Started")
+			Utilities.notifyBuildStatus(this, SETTINGS['of365hook'], '', 'STARTED')
 
 			stage('Checkout') {
 				timestamps { 
@@ -185,7 +185,7 @@ def call(body) {
 
 						if(solution == 'VirtoCommerce.Platform.sln' || projectType == 'NETCORE2')
 						{
-							//Packaging.pushDockerImage(this, dockerImage, dockerTag)
+							Packaging.pushDockerImage(this, dockerImage, dockerTag)
 						}
 						if (Packaging.getShouldPublish(this)) {
 							Packaging.createNugetPackages(this)
@@ -207,31 +207,30 @@ def call(body) {
 		}
 		catch (any) {
 			currentBuild.result = 'FAILURE'
-			Utilities.notifyBuildStatus(this, currentBuild.result)
 			throw any //rethrow exception to prevent the build from proceeding
 		}
 		finally {
 			Packaging.stopDockerTestEnvironment(this, dockerTag)
 			Utilities.generateAllureReport(this)
+			Utilities.notifyBuildStatus(this, SETTINGS['of365hook'], "Build finished", currentBuild.currentResult)
 			step([$class: 'LogParserPublisher',
 				  failBuildOnError: false,
 				  parsingRulesPath: env.LOG_PARSER_RULES,
 				  useProjectRule: false])
 			bat "docker image prune --force"
-			if(currentBuild.result != 'FAILURE') {
-				step([$class: 'Mailer', notifyEveryUnstableBuild: true, recipients: emailextrecipients([[$class: 'CulpritsRecipientProvider'], [$class: 'RequesterRecipientProvider']])])
-			}
-			else {
-				def log = currentBuild.rawBuild.getLog(300)
-				def failedStageLog = Utilities.getFailedStageStr(log)
-				def failedStageName = Utilities.getFailedStageName(failedStageLog)
-				def mailBody = Utilities.getMailBody(this, failedStageName, failedStageLog)
-				emailext body:mailBody, subject: "${env.JOB_NAME}:${env.BUILD_NUMBER} - ${currentBuild.currentResult}", recipientProviders: [[$class: 'CulpritsRecipientProvider'], [$class: 'RequesterRecipientProvider']]
-			}
+			// if(currentBuild.result != 'FAILURE') {
+			// 	step([$class: 'Mailer', notifyEveryUnstableBuild: true, recipients: emailextrecipients([[$class: 'CulpritsRecipientProvider'], [$class: 'RequesterRecipientProvider']])])
+			// }
+			// else {
+			// 	def log = currentBuild.rawBuild.getLog(300)
+			// 	def failedStageLog = Utilities.getFailedStageStr(log)
+			// 	def failedStageName = Utilities.getFailedStageName(failedStageLog)
+			// 	def mailBody = Utilities.getMailBody(this, failedStageName, failedStageLog)
+			// 	emailext body:mailBody, subject: "${env.JOB_NAME}:${env.BUILD_NUMBER} - ${currentBuild.currentResult}", recipientProviders: [[$class: 'CulpritsRecipientProvider'], [$class: 'RequesterRecipientProvider']]
+			// }
 	    	//step([$class: 'Mailer', notifyEveryUnstableBuild: true, recipients: 'dev@virtoway.com', sendToIndividuals: true])
 		}
 	
 	  	step([$class: 'GitHubCommitStatusSetter', statusResultSource: [$class: 'ConditionalStatusResultSource', results: []]])
-		Utilities.notifyBuildStatus(this, currentBuild.result)
 	}
 }

@@ -28,7 +28,7 @@ def call(body) {
 			SETTINGS.setRegion('themeMix')
 
 			echo "Building branch ${env.BRANCH_NAME}"
-			Utilities.notifyBuildStatus(this, "Started")
+			Utilities.notifyBuildStatus(this, SETTINGS['of365hook'], '', 'STARTED')
 
 			stage('Checkout') {
 				timestamps { 
@@ -119,7 +119,6 @@ def call(body) {
 		}
 		catch (any) {
 			currentBuild.result = 'FAILURE'
-			Utilities.notifyBuildStatus(this, currentBuild.result)
 			throw any //rethrow exception to prevent the build from proceeding
 		}
 		finally {
@@ -127,19 +126,19 @@ def call(body) {
 				  failBuildOnError: false,
 				  parsingRulesPath: env.LOG_PARSER_RULES,
 				  useProjectRule: false])
-			if(currentBuild.result != 'FAILURE') {
-				step([$class: 'Mailer', notifyEveryUnstableBuild: true, recipients: emailextrecipients([[$class: 'CulpritsRecipientProvider'], [$class: 'RequesterRecipientProvider']])])
-			}
-			else {
-				def log = currentBuild.rawBuild.getLog(300)
-				def failedStageLog = Utilities.getFailedStageStr(log)
-				def failedStageName = Utilities.getFailedStageName(failedStageLog)
-				def mailBody = Utilities.getMailBody(this, failedStageName, failedStageLog)
-				emailext body:mailBody, subject: "${env.JOB_NAME}:${env.BUILD_NUMBER} - ${currentBuild.currentResult}", recipientProviders: [[$class: 'CulpritsRecipientProvider'], [$class: 'RequesterRecipientProvider']]
-			}
+			Utilities.notifyBuildStatus(this, SETTINGS['of365hook'], "Build finished", currentBuild.currentResult)
+			// if(currentBuild.result != 'FAILURE') {
+			// 	step([$class: 'Mailer', notifyEveryUnstableBuild: true, recipients: emailextrecipients([[$class: 'CulpritsRecipientProvider'], [$class: 'RequesterRecipientProvider']])])
+			// }
+			// else {
+			// 	def log = currentBuild.rawBuild.getLog(300)
+			// 	def failedStageLog = Utilities.getFailedStageStr(log)
+			// 	def failedStageName = Utilities.getFailedStageName(failedStageLog)
+			// 	def mailBody = Utilities.getMailBody(this, failedStageName, failedStageLog)
+			// 	emailext body:mailBody, subject: "${env.JOB_NAME}:${env.BUILD_NUMBER} - ${currentBuild.currentResult}", recipientProviders: [[$class: 'CulpritsRecipientProvider'], [$class: 'RequesterRecipientProvider']]
+			// }
 		}
 	
 	  	step([$class: 'GitHubCommitStatusSetter', statusResultSource: [$class: 'ConditionalStatusResultSource', results: []]])
-		Utilities.notifyBuildStatus(this, currentBuild.result)
 	}
 }
