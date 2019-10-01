@@ -16,16 +16,17 @@ def call(body) {
 		if(projectType==null){
 			projectType = 'Theme'
 		}
-		try {
 
-			def SETTINGS
-			def settingsFileContent
-			configFileProvider([configFile(fileId: 'shared_lib_settings', variable: 'SETTINGS_FILE')]) {
-				settingsFileContent = readFile(SETTINGS_FILE)
-			}
-			SETTINGS = new Settings(settingsFileContent)
-			SETTINGS.setEnvironment(env.BRANCH_NAME)
-			SETTINGS.setRegion('themeMix')
+		def SETTINGS
+		def settingsFileContent
+		configFileProvider([configFile(fileId: 'shared_lib_settings', variable: 'SETTINGS_FILE')]) {
+			settingsFileContent = readFile(SETTINGS_FILE)
+		}
+		SETTINGS = new Settings(settingsFileContent)
+		SETTINGS.setEnvironment(env.BRANCH_NAME)
+		SETTINGS.setRegion('themeMix')
+
+		try {
 
 			echo "Building branch ${env.BRANCH_NAME}"
 			Utilities.notifyBuildStatus(this, SETTINGS['of365hook'], '', 'STARTED')
