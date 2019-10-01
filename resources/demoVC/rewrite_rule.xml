@@ -7,11 +7,6 @@
 					<conditions trackAllCaptures="true" />
 					<action type="Redirect" url="http://admin-demo.virtocommerce.com" />
 				</rule>
-				<rule name="Redirect dental" stopProcessing="true">
-					<match url="^dental(.*)" />
-					<conditions trackAllCaptures="true" />
-					<action type="Redirect" url="http://demovc-public-procurement.azurewebsites.net" />
-				</rule>
 			</rules>
 		</rewrite>
 	</system.webServer>
