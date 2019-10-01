@@ -94,7 +94,8 @@ def call(body) {
 			{
 				timestamps {
 					//zip zipFile: zipFile, dir: "./"
-					powershell "Get-ChildItem ./ -Directory | where { \$_.Name -notin ${excludes_list}} | Compress-Archive -DestinationPath ${zipFile} -Update -Force"
+					powershell "New-Item -ItemType Directory -Force -Path ${env.WORKSPACE}\\artifacts"
+					powershell "Get-ChildItem ./ -Directory | where { \$_.Name -notin ${excludes_list}} | Compress-Archive -DestinationPath ${zipFile} -Update"
 
 					if(params.themeResultZip != null) {
 						bat "copy /Y \"${zipFile}\" \"${params.themeResultZip}\""
