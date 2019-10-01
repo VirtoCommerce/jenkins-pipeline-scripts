@@ -87,12 +87,15 @@ def call(body) {
 			}
 			// bat "rmdir .git .vs .vscode .scannerwork node_modules ng-app@tmp ng-app\\node_modules /s /q"
 			// bat "del .deployment .gitignore Jenkinsfile package-lock.json deploy.cmd /s /q"
-			powershell "Remove-Item -Path .git .vs .vscode .scannerwork node_modules ng-app@tmp ng-app\\node_modules .deployment .gitignore Jenkinsfile package-lock.json deploy.cmd -ErrorAction Ignore"
+			//powershell "Remove-Item -Path .git .vs .vscode .scannerwork node_modules ng-app@tmp ng-app\\node_modules .deployment .gitignore Jenkinsfile package-lock.json deploy.cmd -ErrorAction Ignore"
+			def excludes_list = "@(\".git\", \".vs\", \".vscode\", \".scannerwork\", \"node_modules\", \"ng-app@tmp\", \"ng-app\\node_modules\", \".deployment\", \".gitignore\", \"Jenkinsfile\", \"package-lock.json\", \"deploy.cmd\")"
 			def zipFile = "${env.WORKSPACE}\\artifacts\\dental-theme-${version}.zip"
 			stage('Packaging')
 			{
 				timestamps {
-					zip zipFile: zipFile, dir: "./"
+					//zip zipFile: zipFile, dir: "./"
+					powershell "Get-ChildItem ./ -Directory | where { \$_.Name -notin ${excludes_list}} | Compress-Archive -DestinationPath ${zipFile} -Update"
+
 					if(params.themeResultZip != null) {
 						bat "copy /Y \"${zipFile}\" \"${params.themeResultZip}\""
 					}
