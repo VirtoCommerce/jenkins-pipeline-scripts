@@ -56,13 +56,10 @@ def call(body) {
 			{
 				timestamps
 				{
-					if (env.BRANCH_NAME == 'dev')
+					dir("${env.WORKSPACE}\\ng-app")
 					{
-						dir("${env.WORKSPACE}\\ng-app")
-						{
-							bat "npm install --prefer-offline"
-							bat "npm run build-prod"
-						}
+						bat "npm install --prefer-offline"
+						bat "npm run build-prod"
 					}
 				}
 			}
