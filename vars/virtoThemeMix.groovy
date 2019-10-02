@@ -60,8 +60,8 @@ def call(body) {
 					{
 						dir("${env.WORKSPACE}\\ng-app")
 						{
-							bat "npm install --production=\"false\" --prefer-offline"
-							bat "npm run build"
+							bat "npm install --prefer-offline"
+							bat "npm run build-prod"
 						}
 					}
 				}
