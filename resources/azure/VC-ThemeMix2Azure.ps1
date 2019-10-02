@@ -16,9 +16,9 @@ $Path2Zip = Get-Childitem -Recurse -Path "${env:WORKSPACE}\artifacts\" -File -In
 # Unzip Theme Zip File
 
 $Path = "${env:WORKSPACE}\artifacts\" + [System.IO.Path]::GetFileNameWithoutExtension($Path2Zip)
-#Add-Type -AssemblyName System.IO.Compression.FileSystem
-#[System.IO.Compression.ZipFile]::ExtractToDirectory($Path2Zip, $Path)
-Expand-Archive -Path $Path2Zip -DestinationPath $Path
+Add-Type -AssemblyName System.IO.Compression.FileSystem
+[System.IO.Compression.ZipFile]::ExtractToDirectory($Path2Zip, $Path)
+#Expand-Archive -Path $Path2Zip -DestinationPath $Path
 
 # Upload Theme Zip File to Azure
 
