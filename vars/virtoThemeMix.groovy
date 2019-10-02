@@ -96,7 +96,8 @@ def call(body) {
 				timestamps {
 					//zip zipFile: zipFile, dir: "./"
 					powershell "New-Item -ItemType Directory -Force -Path ${env.WORKSPACE}\\artifacts"
-					powershell "Copy-Item -Path .\\ -Destination ${env.WORKSPACE}\\artifacts\\tmp -Exclude ${exclude_list} -Recurse"
+					powershell "Copy-Item -Path (Get-Item -Path \"${env.WORKSPACE}\\*\" -Exclude ${exclude_list}).FullName -Destination ${env.WORKSPACE}\\artifacts\\tmp -Recurse -Force"
+					//powershell "Copy-Item -Path .\\ -Destination ${env.WORKSPACE}\\artifacts\\tmp -Exclude ${exclude_list} -Recurse"
 					zip zipFile: zipFile, dir: "${env.WORKSPACE}\\artifacts\\tmp\\"
 					powershell "Remove-Item ${env.WORKSPACE}\\artifacts\\tmp -Recurse -Force"
 					//powershell "Get-ChildItem ./ -Directory | where { \$_.Name -notin ${exclude_list}} | Compress-Archive -DestinationPath ${zipFile} -Update"
