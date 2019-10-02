@@ -116,7 +116,9 @@ def call(body) {
 						if (env.BRANCH_NAME == 'dev')
 						{
 							def stagingName = Utilities.getStagingNameFromBranchName(this)
-							Utilities.runSharedPS(this, "VC-ThemeMix2Azure.ps1", "-StagingName ${stagingName} -StoreName ${storeName} -AzureBlobName ${SETTINGS['azureBlobName']} -AzureBlobKey ${SETTINGS['azureBlobKey']}")
+							withEnv(["AzureBlobName=${SETTINGS['azureBlobName']}", "AzureBlobKey=${SETTINGS['azureBlobKey']}"]){
+								Utilities.runSharedPS(this, "VC-ThemeMix2Azure.ps1", "-StagingName ${stagingName} -StoreName ${storeName}")
+							}
 						}
 					}
 				}

@@ -1,9 +1,11 @@
 ﻿param(
     [string] $StagingName,
-    [string] $StoreName,
-    $AzureBlobName,
-    $AzureBlobKey
+    [string] $StoreName
     )
+
+
+$AzureBlobName = $env:AzureBlobName
+$AzureBlobKey = $env:AzureBlobKey
 
 $ErrorActionPreference = "Stop"
 
