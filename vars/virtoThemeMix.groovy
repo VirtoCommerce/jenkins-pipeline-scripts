@@ -89,8 +89,7 @@ def call(body) {
 			// bat "del .deployment .gitignore Jenkinsfile package-lock.json deploy.cmd /s /q"
 			//powershell "Remove-Item -Path .git .vs .vscode .scannerwork node_modules ng-app@tmp ng-app\\node_modules .deployment .gitignore Jenkinsfile package-lock.json deploy.cmd -Force -ErrorAction Ignore"
 			def exclude_list = "@(\"artifacts\", \".git\", \".vs\", \".vscode\", \".scannerwork\", \"node_modules\", \"ng-app@tmp\", \"ng-app\\node_modules\", \".deployment\", \".gitignore\", \"Jenkinsfile\", \"package-lock.json\", \"deploy.cmd\")"
-			///powershell "Get-Item -Path ${env.WORKSPACE} -Recurse -Include $exclude_list | Remove-Item -Recurse -Force"
-			powershell "foreach(\$path in \$exclude_list){ Remove-Item ${env.WORKSPACE}\\\$path\\* -Recurse -Force }"
+			powershell "Get-ChildItem -Path ${env.WORKSPACE} -Recurse -Include $exclude_list | Remove-Item -Recurse -Force"
 			//def exclude_list = "artifacts .git .vs .vscode .scannerwork node_modules ng-app@tmp ng-app\\node_modules .deployment .gitignore Jenkinsfile package-lock.json deploy.cmd"
 			def zipFile = "${env.WORKSPACE}\\artifacts\\dental-theme-${version}.zip"
 			stage('Packaging')
