@@ -89,7 +89,7 @@ def call(body) {
 			// bat "del .deployment .gitignore Jenkinsfile package-lock.json deploy.cmd /s /q"
 			//powershell "Remove-Item -Path .git .vs .vscode .scannerwork node_modules ng-app@tmp ng-app\\node_modules .deployment .gitignore Jenkinsfile package-lock.json deploy.cmd -Force -ErrorAction Ignore"
 			//def excludes_list = "@(\"artifacts\", \".git\", \".vs\", \".vscode\", \".scannerwork\", \"node_modules\", \"ng-app@tmp\", \"ng-app\\node_modules\", \".deployment\", \".gitignore\", \"Jenkinsfile\", \"package-lock.json\", \"deploy.cmd\")"
-			def exlude_list = "artifacts .git .vs .vscode .scannerwork node_modules ng-app@tmp ng-app\\node_modules .deployment .gitignore Jenkinsfile package-lock.json deploy.cmd"
+			def exclude_list = "artifacts .git .vs .vscode .scannerwork node_modules ng-app@tmp ng-app\\node_modules .deployment .gitignore Jenkinsfile package-lock.json deploy.cmd"
 			def zipFile = "${env.WORKSPACE}\\artifacts\\dental-theme-${version}.zip"
 			stage('Packaging')
 			{
