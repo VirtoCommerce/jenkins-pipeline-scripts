@@ -323,10 +323,13 @@ Write-Output "Get latest release vc-theme-b2b"
 $b2bAsset = Get-GithubLatestReleaseAssetUrl -RepoName "vc-theme-b2b"
 Write-Output "Get latest release vc-theme-material"
 $clothingAsset = Get-GithubLatestReleaseAssetUrl -RepoName "vc-theme-material"
+Write-Output "Get latest release vc-procurement-portal-theme"
+$dentalAsset = Get-GithubLatestReleaseAssetUrl -RepoName "vc-procurement-portal-theme"
 
 $elecPath = "Electronics"
 $b2bPath = "B2B-store"
 $clothPath = "Clothing"
+$dentalPath = "dental"
 
 Write-Output "Prepare Theme $elecPath"
 Prepare-Theme -AssetUrl $electronicsAsset -Path $elecPath
@@ -334,6 +337,8 @@ Write-Output "Prepare Theme $b2bPath"
 Prepare-Theme -AssetUrl $b2bAsset -Path $b2bPath
 Write-Output "Prepare Theme $clothPath"
 Prepare-Theme -AssetUrl $clothingAsset -Path $clothPath
+Write-Output "Prepare Theme $dentalPath"
+Prepare-Theme -AssetUrl $dentalAsset -Path $dentalPath
 
 #Remove blobs
 
@@ -349,12 +354,14 @@ Write-Output "AzCopy $b2bPath"
 & "${env:Utils}\AzCopy\AzCopy" $b2bPath https://$($accountname).blob.core.windows.net/$ContainerName/$dirpath$b2bPath /DestKey:$accountKey /S
 Write-Output "AzCopy $clothPath"
 & "${env:Utils}\AzCopy\AzCopy" $clothPath https://$($accountname).blob.core.windows.net/$ContainerName/$dirpath$clothPath /DestKey:$accountKey /S
+Write-Output "AzCopy $dentalPath"
+& "${env:Utils}\AzCopy\AzCopy" $dentalPath https://$($accountname).blob.core.windows.net/$ContainerName/$dirpath$dentalPath /DestKey:$accountKey /S
 
 Write-Output "Remove Temporary Files"
 Remove-Item $elecPath -Recurse -Force
 Remove-Item $b2bPath -Recurse -Force
 Remove-Item $clothPath -Recurse -Force
-
+Remove-Item $dentalPath -Recurse -Force
 
 Write-Output "Switching $WebSiteName slot"
 
