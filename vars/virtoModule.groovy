@@ -300,7 +300,7 @@ def updateModule(def id, def version, def platformVersion, def title, def author
 {
 	// MODULES
 	dir('modules') {
-		checkout([$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'sasha-jenkins', url: 'git@github.com:VirtoCommerce/vc-modules.git']]])
+		checkout([$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'vc-ci', url: 'git@github.com:VirtoCommerce/vc-modules.git']]])
 
 		def inputFile = readFile file: 'modules.json', encoding: 'utf-8'
 		def json = Utilities.jsonParse(inputFile)
