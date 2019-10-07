@@ -18,6 +18,16 @@ import jobs.scripts.*
 		def dockerTag = "${env.BRANCH_NAME}-branch"
 		def buildOrder = Utilities.getNextBuildOrder(this)
 		projectType = config.projectType
+
+		def SETTINGS
+		def settingsFileContent
+		configFileProvider([configFile(fileId: 'shared_lib_settings', variable: 'SETTINGS_FILE')]) {
+			settingsFileContent = readFile(SETTINGS_FILE)
+		}
+		SETTINGS = new Settings(settingsFileContent)
+		SETTINGS.setEnvironment(env.BRANCH_NAME)
+		SETTINGS.setRegion('virtocommerce')
+
 	    if (env.BRANCH_NAME == 'dev-vc-new-design') {
 			deployScript = 'VC-2AzureDEV.ps1'
 			dockerTag = "latest"
@@ -44,7 +54,7 @@ import jobs.scripts.*
 					switch(env.BRANCH_NAME) {
 						case 'dev-vc-new-design':
 							def stagingName = "dev-vc-new-design"
-							Utilities.runSharedPS(this, "${deployScript}")
+							Utilities.runSharedPS(this, "${deployScript}", "-AzureBlobName ${SETTINGS['azureBlobName']} -AzureBlobKey ${SETTINGS['azureBlobKey']}")
 							break
 					}
 				}
