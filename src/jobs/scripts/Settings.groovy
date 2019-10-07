@@ -16,6 +16,9 @@ class Settings{
             throw new Exception("Settings error: Environment is not set")
         if((item == 'approvers' || item == 'approvers_e2e') & !_settings.containsKey(item))
             return ''
+        if(_environment.startsWith('PR-')){
+            return ''
+        }
         return _settings[_region][_environment][item]
     }
     def setRegion(String region){
