@@ -39,6 +39,17 @@ import jobs.scripts.*
 				return true
 			}
 
+			stage('Build') {
+				timestamps {
+					switch(env.BRANCH_NAME) {
+						case 'dev-vc-new-design':
+							def stagingName = "dev-vc-new-design"
+							Utilities.runSharedPS(this, "${deployScript}")
+							break
+					}
+				}
+			}
+
 			stage('E2E') {
 				timestamps {
 					Utilities.runE2E(this)
@@ -49,7 +60,7 @@ import jobs.scripts.*
 				timestamps {
 					switch(env.BRANCH_NAME) {
 						case 'dev-vc-new-design':
-							Utilities.runSharedPS(this, "${deployScript}")
+							//tilities.runSharedPS(this, "${deployScript}")
 							break
 					}
 				}
