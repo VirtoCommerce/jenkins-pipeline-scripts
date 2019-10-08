@@ -29,10 +29,8 @@ if ($StagingName -eq "dev-vc-new-design"){
 }
 $BlobContext = New-AzureStorageContext -ConnectionString $ConnectionString
 
-$AzureBlobName = ""
-
-Write-Host "Remove from cms-content"
+Write-Host "Remove from $StoreName"
 Get-AzureStorageBlob -Blob ("$AzureBlobName*") -Container "cms-content" -Context $BlobContext  | ForEach-Object { Remove-AzureStorageBlob -Blob $_.Name -Container "cms-content" -Context $BlobContext } -ErrorAction Continue
 
-Write-Host "Upload to cms-content"
+Write-Host "Upload to $StoreName"
 Get-ChildItem -File -Recurse $Path | ForEach-Object { Set-AzureStorageBlobContent -File $_.FullName -Blob ("$AzureBlobName/" + (([System.Uri]("$Path/")).MakeRelativeUri([System.Uri]($_.FullName))).ToString()) -Container "cms-content" -Context $BlobContext }
