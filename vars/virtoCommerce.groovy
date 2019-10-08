@@ -54,7 +54,8 @@ import jobs.scripts.*
 					switch(env.BRANCH_NAME) {
 						case 'dev-vc-new-design':
 							def stagingName = "dev-vc-new-design"
-							Utilities.runSharedPS(this, "${deployScript}", "-AzureBlobName ${SETTINGS['azureBlobName']} -AzureBlobKey ${SETTINGS['azureBlobKey']}")
+							def storeName = "vc4test"
+							Utilities.runSharedPS(this, "${deployScript}", "-StagingName ${stagingName} -StoreName ${storeName} -AzureBlobName ${SETTINGS['azureBlobName']} -AzureBlobKey ${SETTINGS['azureBlobKey']}")
 							break
 					}
 				}
