@@ -517,12 +517,12 @@ class Utilities {
 
     def static getRepoURL(context) {
         context.bat "git config --get remote.origin.url > .git/remote-url"
-        return readFile(".git/remote-url").trim()
+        return context.readFile(".git/remote-url").trim()
     }
     
     def static getCommitSha(context) {
         context.bat "git rev-parse HEAD > .git/current-commit"
-        return readFile(".git/current-commit").trim()
+        return context.readFile(".git/current-commit").trim()
     }
     
     def static updateGithubCommitStatus(context, state, message) {
