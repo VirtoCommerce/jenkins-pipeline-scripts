@@ -515,17 +515,17 @@ class Utilities {
         }
     }
 
-    def getRepoURL(context) {
+    def static getRepoURL(context) {
         context.bat "git config --get remote.origin.url > .git/remote-url"
         return readFile(".git/remote-url").trim()
     }
     
-    def getCommitSha(context) {
+    def static getCommitSha(context) {
         context.bat "git rev-parse HEAD > .git/current-commit"
         return readFile(".git/current-commit").trim()
     }
     
-    def updateGithubCommitStatus(context, state, message) {
+    def static updateGithubCommitStatus(context, state, message) {
         // workaround https://issues.jenkins-ci.org/browse/JENKINS-38674
         repoUrl = getRepoURL(context)
         commitSha = getCommitSha(context)
