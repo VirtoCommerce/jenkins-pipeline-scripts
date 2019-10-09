@@ -527,8 +527,8 @@ class Utilities {
     
     def static updateGithubCommitStatus(context, state, message) {
         // workaround https://issues.jenkins-ci.org/browse/JENKINS-38674
-        repoUrl = getRepoURL(context)
-        commitSha = getCommitSha(context)
+        def repoUrl = getRepoURL(context)
+        def commitSha = getCommitSha(context)
         
         context.step([
             $class: 'GitHubCommitStatusSetter',
