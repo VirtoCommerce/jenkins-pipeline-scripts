@@ -355,7 +355,7 @@ Write-Output "AzCopy $b2bPath"
 Write-Output "AzCopy $clothPath"
 & "${env:Utils}\AzCopy\AzCopy" $clothPath https://$($accountname).blob.core.windows.net/$ContainerName/$dirpath$clothPath /DestKey:$accountKey /S
 Write-Output "AzCopy $dentalPath"
-& "${env:Utils}\AzCopy\AzCopy" $dentalPath https://$($accountname).blob.core.windows.net/$ContainerName/$dirpath$dentalPath /DestKey:$accountKey /S
+& "${env:Utils}\AzCopy\AzCopy" $dentalPath https://$($accountname).blob.core.windows.net/$ContainerName/$dirpath$dentalPath/default /DestKey:$accountKey /S
 
 Write-Output "Remove Temporary Files"
 Remove-Item $elecPath -Recurse -Force
