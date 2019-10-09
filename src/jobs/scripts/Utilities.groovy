@@ -514,4 +514,33 @@ class Utilities {
             }
         }
     }
+
+    def getRepoURL(context) {
+        context.bat "git config --get remote.origin.url > .git/remote-url"
+        return readFile(".git/remote-url").trim()
+    }
+    
+    def getCommitSha(context) {
+        context.bat "git rev-parse HEAD > .git/current-commit"
+        return readFile(".git/current-commit").trim()
+    }
+    
+    def updateGithubCommitStatus(context, state, message) {
+        // workaround https://issues.jenkins-ci.org/browse/JENKINS-38674
+        repoUrl = getRepoURL(context)
+        commitSha = getCommitSha(context)
+        
+        context.step([
+            $class: 'GitHubCommitStatusSetter',
+            reposSource: [$class: "ManuallyEnteredRepositorySource", url: repoUrl],
+            commitShaSource: [$class: "ManuallyEnteredShaSource", sha: commitSha],
+            errorHandlers: [[$class: 'ShallowAnyErrorHandler']],
+            statusResultSource: [
+            $class: 'ConditionalStatusResultSource',
+            results: [
+                    [$class: 'AnyBuildResult', message: message, state: state]
+                ]
+            ]
+        ])
+    }
 }
