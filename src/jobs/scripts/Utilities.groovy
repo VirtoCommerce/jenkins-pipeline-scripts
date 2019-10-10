@@ -464,7 +464,7 @@ class Utilities {
 
     def static runE2E(context){
         def e2eDir = Utilities.getE2EDir(context)
-        context.dir(e2eDir) {
+        context.dir(e2eDir){
             context.deleteDir()
             getE2ETests(context)
             //def sfPort = Utilities.getStorefrontPort(context)
@@ -476,8 +476,10 @@ class Utilities {
                 context.deleteDir()
             }
             def allureResultsEsc = allureResultsPath.replace("\\", "\\\\")
-            def jsonConf = "{\\\"output\\\":\\\"${allureResultsEsc}\\\",\\\"helpers\\\":{\\\"Protractor\\\":{\\\"url\\\":\\\"${DefaultAdminDockerPrefix}:${sfPort}\\\"}}}"            
-            context.bat "${context.env.NODE_MODULES}\\.bin\\codeceptjs.cmd run -o \"${jsonConf}\""
+            def jsonConf = "{\\\"output\\\":\\\"${allureResultsEsc}\\\",\\\"helpers\\\":{\\\"Protractor\\\":{\\\"url\\\":\\\"${DefaultAdminDockerPrefix}:${sfPort}\\\"}}}"
+            context.withEnv("${context.env.vcapikey_e2e}"){
+                context.bat "${context.env.NODE_MODULES}\\.bin\\codeceptjs.cmd run -o \"${jsonConf}\""
+            }
         }
     }
     def static generateAllureReport(context){
