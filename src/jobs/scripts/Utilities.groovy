@@ -477,7 +477,7 @@ class Utilities {
             }
             def allureResultsEsc = allureResultsPath.replace("\\", "\\\\")
             def jsonConf = "{\\\"output\\\":\\\"${allureResultsEsc}\\\",\\\"helpers\\\":{\\\"Protractor\\\":{\\\"url\\\":\\\"${DefaultAdminDockerPrefix}:${sfPort}\\\"}}}"
-            context.withEnv("${context.env.vcapikey_e2e}"){
+            context.withEnv(["vcapikey=${context.env.vcapikey_e2e}"]){
                 context.bat "${context.env.NODE_MODULES}\\.bin\\codeceptjs.cmd run -o \"${jsonConf}\""
             }
         }
