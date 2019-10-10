@@ -1,6 +1,7 @@
 node {
     stage('Checkout'){
-        git branch: 'release/3.0.0', credentialsId: 'vc-ci', url: 'https://github.com/VirtoCommerce/vc-platform-core.git'
+        deleteDir()
+        git branch: 'release/3.0.0', credentialsId: 'vc-ci', url: 'https://github.com/VirtoCommerce/vc-module-store.git'
     }
 
     stage('Build'){
