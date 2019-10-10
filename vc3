@@ -1,0 +1,18 @@
+node {
+    stage('Checkout'){
+        git branch: 'release/3.0.0', credentialsId: 'vc-ci', url: 'https://github.com/VirtoCommerce/vc-platform-core.git'
+    }
+
+    stage('Build'){
+        bat "nuke Publish"
+    }
+
+
+    stage('Unit Tests'){
+        bat "nuke Test"
+    }   
+
+    stage('Code Analysis'){
+
+    }
+}
