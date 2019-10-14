@@ -1,3 +1,5 @@
+import jobs.scripts.*
+
 node {
     stage('Checkout'){
         deleteDir()
