@@ -1,19 +1,15 @@
 node {
     stage('Checkout'){
         deleteDir()
-        git branch: 'release/3.0.0', credentialsId: 'vc-ci', url: 'https://github.com/VirtoCommerce/vc-module-store.git'
+        checkout scm
     }
 
     stage('Build'){
         bat "vc-build Compress"
+        bat "vc-build Pack"
     }
-
 
     stage('Unit Tests'){
         bat "vc-build Test"
     }   
-
-    stage('Code Analysis'){
-        
-    }
 }
