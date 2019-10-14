@@ -1,17 +1,36 @@
 import jobs.scripts.*
 
-node {
-    stage('Checkout'){
-        deleteDir()
-        checkout scm
-    }
+def call(body) {
+	// evaluate the body block, and collect configuration into the object
+	def config = [:]
+	body.resolveStrategy = Closure.DELEGATE_FIRST
+	body.delegate = config
+	body()
 
-    stage('Build'){
-        bat "vc-build Compress"
-        bat "vc-build Pack"
-    }
+    node {
+        def SETTINGS
+        def settingsFileContent
+        configFileProvider([configFile(fileId: 'shared_lib_settings', variable: 'SETTINGS_FILE')]) {
+            settingsFileContent = readFile(SETTINGS_FILE)
+        }
+        SETTINGS = new Settings(settingsFileContent)
+        SETTINGS.setRegion('platform-core')
+        SETTINGS.setEnvironment(env.BRANCH_NAME)
+        stage('Checkout'){
+            deleteDir()
+            checkout scm
+        }
 
-    stage('Unit Tests'){
-        bat "vc-build Test"
-    }   
+        stage('Build'){
+            bat "vc-build Compress"
+            bat "vc-build Pack"
+        }
+
+        stage('Unit Tests'){
+            bat "vc-build Test"
+        }   
+
+        stage('Deploy'){
+        }
+    }
 }
