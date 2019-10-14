@@ -6,6 +6,7 @@ node {
 
     stage('Build'){
         bat "vc-build Publish"
+        bat "vc-build Compress"
     }
 
 
