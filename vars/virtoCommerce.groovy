@@ -64,6 +64,8 @@ import jobs.scripts.*
 			stage('E2E') {
 				timestamps {
 					Utilities.runE2E(this)
+					echo "${env.BUILD_URL}/allure"
+					Utilities.notifyBuildStatus(this, SETTINGS['of365hook'], "${env.BUILD_URL}/allure")
 				}
 			}
 			
