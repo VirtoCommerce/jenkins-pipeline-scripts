@@ -81,7 +81,7 @@ import jobs.scripts.*
 				timestamps {
 					switch(env.BRANCH_NAME) {
 						case 'dev-vc-new-design':
-							//tilities.runSharedPS(this, "${deployScript}")
+							Utilities.runSharedPS(this, "${deployScript}")
 							break
 					}
 				}
