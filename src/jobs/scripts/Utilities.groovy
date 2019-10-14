@@ -468,15 +468,16 @@ class Utilities {
             context.deleteDir()
             getE2ETests(context)
             //def sfPort = Utilities.getStorefrontPort(context)
-            def sfPort = "443"
-            def DefaultAdminDockerPrefix = "https://vc-public-test.azurewebsites.net"
+            def sfPort = "80"
+            def DefaultAdminDockerPrefix = "http://vc-public-test.azurewebsites.net"
             def allureResultsPath = "${context.env.WORKSPACE}\\allure-results"
             def allureReportPath = "${context.env.WORKSPACE}\\allure-report"
             context.dir(allureReportPath){
                 context.deleteDir()
             }
             def allureResultsEsc = allureResultsPath.replace("\\", "\\\\")
-            def jsonConf = "{\\\"output\\\":\\\"${allureResultsEsc}\\\",\\\"helpers\\\":{\\\"Protractor\\\":{\\\"url\\\":\\\"${DefaultAdminDockerPrefix}:${sfPort}\\\"}}}"
+            //def jsonConf = "{\\\"output\\\":\\\"${allureResultsEsc}\\\",\\\"helpers\\\":{\\\"Protractor\\\":{\\\"url\\\":\\\"${DefaultAdminDockerPrefix}:${sfPort}\\\"}}}"
+            def jsonConf = "{\\\"output\\\":\\\"${allureResultsEsc}\\\",\\\"helpers\\\":{\\\"REST\\\":{\\\"url\\\":\\\"${DefaultAdminDockerPrefix}:${sfPort}\\\"}}}"
             context.withEnv(["vcapikey=${context.env.vcapikey_e2e}"]){
                 context.bat "${context.env.NODE_MODULES}\\.bin\\codeceptjs.cmd run -o \"${jsonConf}\""
             }
