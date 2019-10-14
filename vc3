@@ -5,12 +5,12 @@ node {
     }
 
     stage('Build'){
-        bat "nuke Publish"
+        bat "vc-build Publish"
     }
 
 
     stage('Unit Tests'){
-        bat "nuke Test"
+        bat "bc-build Test"
     }   
 
     stage('Code Analysis'){
