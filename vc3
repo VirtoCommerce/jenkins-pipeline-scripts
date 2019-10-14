@@ -10,7 +10,7 @@ node {
 
 
     stage('Unit Tests'){
-        bat "bc-build Test"
+        bat "vc-build Test"
     }   
 
     stage('Code Analysis'){
