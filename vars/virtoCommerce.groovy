@@ -65,10 +65,14 @@ import jobs.scripts.*
 				timestamps {
 					try{
 						Utilities.runE2E(this)
-						"${env.BUILD_URL}/allure"
+						def e2eStatus = "E2E Success"
 					}
 					catch(any){
-						Utilities.notifyBuildStatus(this, SETTINGS['of365hook'], "${env.BUILD_URL}/allure",'E2E Failed')
+						e2eStatus = "E2E Failed"
+					}
+					finally{
+						def allureReportAddress = "${env.BUILD_URL}/allure"
+						Utilities.notifyBuildStatus(this, SETTINGS['of365hook'], "${allureReportAddress}", "${e2eStatus}")
 					}
 				}
 			}
