@@ -40,7 +40,7 @@ def call(body) {
                 // $ResourceGroupName,
                 // $SubscriptionID,
                 // $DestContentPath = ""
-                def artifacts = glob "artifacts/*.zip"
+                def artifacts = findFiles(glob: "artifacts/*.zip")
                 def artifactPath = artifacts[0].path
                 Utilities.runSharedPS(this, "DeployTo-Azure.ps1", "-ZipFile \"${artifactPath}\" -WebAppName ${SETTINGS['webAppName']} -ResourceGroupName ${SETTINGS['resourceGroupName']} -SubscriptionID ${SETTINGS['subscriptionID']} -DestContentPath \"platform\"")
             }
