@@ -9,7 +9,8 @@ def call(body) {
 
     node {
         def escapedBranch = env.BRANCH_NAME.replaceAll('/', '_')
-        def workspace = "D:\\Buildsv3\\${env.JOB_NAME}\\${escapedBranch}"
+        def repoName = Utilities.getRepoName(this)
+        def workspace = "D:\\Buildsv3\\${repoName}\\${escapedBranch}"
         dir(workspace){
             def SETTINGS
             def settingsFileContent
