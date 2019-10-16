@@ -26,6 +26,7 @@ def call(body) {
             }
 
             stage('Build'){
+                bat "dotnet build-server shutdown"
                 bat "vc-build Compress"
             }
 

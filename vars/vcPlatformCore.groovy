@@ -26,6 +26,7 @@ def call(body) {
             }
 
             stage('Build'){
+                bat "dotnet build-server shutdown"
                 bat "vc-build Compress"
                 //bat "vc-build Pack"
             }
@@ -42,7 +43,7 @@ def call(body) {
                 // $DestContentPath = ""
                 def artifacts = findFiles(glob: "artifacts/*.zip")
                 def artifactPath = artifacts[0].path
-                Utilities.runSharedPS(this, "DeployTo-Azure.ps1", "-ZipFile \"${artifactPath}\" -WebAppName ${SETTINGS['webAppName']} -ResourceGroupName ${SETTINGS['resourceGroupName']} -SubscriptionID ${SETTINGS['subscriptionID']} -DestContentPath \"platform\"")
+                Utilities.runSharedPS(this, "v3\\DeployTo-Azure.ps1", "-ZipFile \"${artifactPath}\" -WebAppName ${SETTINGS['webAppName']} -ResourceGroupName ${SETTINGS['resourceGroupName']} -SubscriptionID ${SETTINGS['subscriptionID']} -DestContentPath \"platform\"")
             }
         }
     }
