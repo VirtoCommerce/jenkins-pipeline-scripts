@@ -23,7 +23,6 @@ def call(body) {
 
         stage('Build'){
             bat "vc-build Compress"
-            bat "vc-build Pack"
         }
 
         stage('Unit Tests'){
