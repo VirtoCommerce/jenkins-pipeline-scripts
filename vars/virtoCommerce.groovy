@@ -75,17 +75,7 @@ import jobs.scripts.*
 						Utilities.notifyBuildStatus(this, SETTINGS['of365hook'], "${allureReportAddress}", "${e2eStatus}")
 					}
 				}
-			}
-			
-			stage('Publish') {
-				timestamps {
-					switch(env.BRANCH_NAME) {
-						case 'dev-vc-new-design':
-							Utilities.runSharedPS(this, "${deployScript}")
-							break
-					}
-				}
-			}
+			}		
 			
 			stage('Cleanup') {
 				timestamps { 
