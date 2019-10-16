@@ -35,6 +35,12 @@ def call(body) {
             }   
 
             stage('Deploy'){
+                def moduleId = Modules.getModuleId(this)
+                def artifacts = findFiles(glob: "artifacts/*.zip")
+                def artifactPath = artifacts[0].path
+                def dstContentPath = "modules\\${moduleId}"
+                Utilities.runSharedPS(this, "v3\\DeployTo-Azure.ps1", "-ZipFile \"${artifactPath}\" -WebAppName ${SETTINGS['webAppName']} -ResourceGroupName ${SETTINGS['resourceGroupName']} -SubscriptionID ${SETTINGS['subscriptionID']} -DestContentPath \"${dstContentPath}\"")
+                Utilities.runSharedPS(this, "v3\\Restart-WebApp.ps1", "-WebAppName ${SETTINGS['webAppName']} -ResourceGroupName ${SETTINGS['resourceGroupName']} -SubscriptionID ${SETTINGS['subscriptionID']}")
             }
         }
     }
