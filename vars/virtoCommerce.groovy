@@ -34,12 +34,9 @@ import jobs.scripts.*
 		}
 		try {
 			//Utilities.notifyBuildStatus(this, "started")
-			stage('Checkout') {
-				timestamps {
-					// clean folder for a release
-					if (Packaging.getShouldPublish(this)) {
-						deleteDir()
-					}
+			stage('Checkout'){
+				timestamps{
+					deleteDir()
 					checkout scm
 				}
 			}
