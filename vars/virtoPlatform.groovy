@@ -196,6 +196,13 @@ def call(body) {
 						if((solution == 'VirtoCommerce.Platform.sln' || projectType == 'NETCORE2') && env.BRANCH_NAME == 'dev')
 						{
 							Utilities.runSharedPS(this, "${deployScript}", "-SubscriptionID ${SETTINGS['subscriptionID']} -WebAppName ${SETTINGS['appName']} -ResourceGroupName ${SETTINGS['resourceGroupName']} -KuduPath ${SETTINGS['kuduPath']}")
+							if(projectType == 'NETCORE2'){
+								SETTINGS.setRegion('storefront-core')
+								SETTINGS.setEnvironment('release/3.0.0')
+								Utilities.runSharedPS(this, "${deployScript}", "-SubscriptionID ${SETTINGS['subscriptionID']} -WebAppName ${SETTINGS['appName']} -ResourceGroupName ${SETTINGS['resourceGroupName']} -KuduPath ${SETTINGS['kuduPath']}")
+								SETTINGS.setRegion('storefront')
+								SETTINGS.setEnvironment(env.BRANCH_NAME)
+							}
 						}
 					}
 				}
