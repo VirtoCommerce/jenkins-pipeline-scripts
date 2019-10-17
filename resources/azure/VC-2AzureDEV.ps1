@@ -7,8 +7,8 @@
 
 $ErrorActionPreference = "Stop"
 
-Copy-Item .\pages\ .\artifacts\Pages -Recurse -Force
-Copy-Item .\theme\ .\artifacts\Theme -Recurse -Force
+Copy-Item .\pages\ .\artifacts\Pages\vccom -Recurse -Force
+Copy-Item .\theme\ .\artifacts\Theme\vccom\default -Recurse -Force
 Compress-Archive -Path .\artifacts\* -CompressionLevel Fastest -DestinationPath .\artifacts\artifact.zip -Force
 
 # Get Theme Zip File
