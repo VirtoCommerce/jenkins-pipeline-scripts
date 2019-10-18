@@ -90,51 +90,51 @@ import jobs.scripts.*
 					}
 				}
 
-				// stage('Install VC Modules'){
-				// 	timestamps{
+				stage('Install VC Modules'){
+					timestamps{
 
-				// 		// install modules
-				// 		Packaging.installModules(this, 0)
+						// install modules
+						Packaging.installModules(this, 0)
 
-                //         // install module
-                //         Modules.installModuleArtifacts(this)
+                        // install module
+                        Modules.installModuleArtifacts(this)
 
-				// 		//check installed modules
-				// 		Packaging.checkInstalledModules(this)
+						//check installed modules
+						Packaging.checkInstalledModules(this)
 
-				// 	}
-				// }
+					}
+				}
 
-				// stage('Install Sample Data'){
-				// 	timestamps{
-				// 		// now create sample data
-				// 		Packaging.createSampleData(this)
-				// 	}
-				// }
+				stage('Install Sample Data'){
+					timestamps{
+						// now create sample data
+						Packaging.createSampleData(this)
+					}
+				}
 
-				// stage('Theme Build and Deploy'){
-				// 	timestamps {
-				// 		def themePath = "${env.WORKSPACE}@tmp\\theme.zip"
-				// 		build(job: "../vc-theme-default/${env.BRANCH_NAME}", parameters: [string(name: 'themeResultZip', value: themePath)])
-				// 		Packaging.installTheme(this, themePath)
-				// 	}
-				// }
+				stage('Theme Build and Deploy'){
+					timestamps {
+						def themePath = "${env.WORKSPACE}@tmp\\theme.zip"
+						build(job: "../vc-theme-default/${env.BRANCH_NAME}", parameters: [string(name: 'themeResultZip', value: themePath)])
+						Packaging.installTheme(this, themePath)
+					}
+				}
 
-				// stage("Swagger Schema Validation"){
-				// 	timestamps{
-				// 		def tempFolder = Utilities.getTempFolder(this)
-				// 		def schemaPath = "${tempFolder}\\swagger.json"
+				stage("Swagger Schema Validation"){
+					timestamps{
+						def tempFolder = Utilities.getTempFolder(this)
+						def schemaPath = "${tempFolder}\\swagger.json"
 
-				// 		Utilities.validateSwagger(this, schemaPath)
-				// 	}
-				// }	
+						Utilities.validateSwagger(this, schemaPath)
+					}
+				}	
 
-				// stage('Integration Tests')
-				// {
-				// 	timestamps {
-				// 		Modules.runIntegrationTests(this)
-				// 	}
-				// }
+				stage('Integration Tests')
+				{
+					timestamps {
+						Modules.runIntegrationTests(this)
+					}
+				}
 
 				// stage('E2E'){
 				// 	timestamps{
