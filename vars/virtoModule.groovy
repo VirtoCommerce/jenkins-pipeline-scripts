@@ -32,7 +32,7 @@ import jobs.scripts.*
 		SETTINGS.setEnvironment(env.BRANCH_NAME)
 		SETTINGS.setRegion('module')
 
-		try {	
+		try {
 			//step([$class: 'GitHubCommitStatusSetter', contextSource: [$class: 'ManuallyEnteredCommitContextSource', context: 'ci.virtocommerce.com'], statusResultSource: [$class: 'ConditionalStatusResultSource', results: [[$class: 'AnyBuildResult', message: 'Building on Virto Commerce CI', state: 'PENDING']]]])		
 			//Utilities.updateGithubCommitStatus(this, 'PENDING', 'Building on Virto Commerce CI')
 			Utilities.notifyBuildStatus(this, SETTINGS['of365hook'], '', 'STARTED')
@@ -131,19 +131,17 @@ import jobs.scripts.*
 
 				stage('Integration Tests')
 				{
-					timestamps { 					
+					timestamps {
 						Modules.runIntegrationTests(this)
 					}
 				}
 
-				
-
-				// stage('E2E') {
-				// 	timestamps {
+				// stage('E2E'){
+				// 	timestamps{
 				// 		Utilities.runE2E(this)
 				// 	}
-				// }				
-			}				
+				// }
+			}
 
 			if (env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'master') {
 				stage('Publish')
