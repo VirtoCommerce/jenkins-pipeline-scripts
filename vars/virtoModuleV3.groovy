@@ -27,6 +27,17 @@ def call(body) {
 
             stage('Build'){
                 bat "dotnet build-server shutdown"
+                withSonarQubeEnv('VC Sonar Server'){
+                    bat "vc-build SonarQubeStart -SonarUrl ${env.SONAR_HOST_URL} -SonarAuthToken \"${env.SONAR_AUTH_TOKEN}\" "// %SONAR_HOST_URL% %SONAR_AUTH_TOKEN%
+                    bat "vc-build SonarQubeEnd -SonarUrl ${env.SONAR_HOST_URL} -SonarAuthToken ${env.SONAR_AUTH_TOKEN}"
+                }
+            }
+
+            stage('Quality Gate'){
+                Packaging.checkAnalyzerGate(this)
+            }
+
+            stage('Packaging'){                
                 bat "vc-build Compress"
             }
 
