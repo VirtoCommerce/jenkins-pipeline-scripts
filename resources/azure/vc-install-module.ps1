@@ -24,7 +24,7 @@ if ([string]::IsNullOrWhiteSpace($hmacSecret)) {
 Write-Output $platformContainer
 Write-Output $moduleZipArchievePath
 docker cp $moduleZipArchievePath ${platformContainer}:/vc-platform/${moduleId}.zip
-docker exec $platformContainer powershell -Command "if([System.IO.File]::Exists(C:\vc-platform\Modules\$moduleId)){ Remove-Item C:\vc-platform\Modules\$moduleId -Force -Recurse }"
+docker exec $platformContainer powershell -Command "if(Test-Path C:\vc-platform\Modules\$moduleId){ Remove-Item C:\vc-platform\Modules\$moduleId -Force -Recurse }"
 docker exec $platformContainer powershell -Command "Expand-Archive -Path C:\vc-platform\${moduleId}.zip -DestinationPath C:\vc-platform\Modules\$moduleId"
 
 #restart platform
