@@ -24,10 +24,20 @@ Add-Type -AssemblyName System.IO.Compression.FileSystem
 # Upload Theme Zip File to Azure
 
 $ConnectionString = "DefaultEndpointsProtocol=https;AccountName={0};AccountKey={1};EndpointSuffix=core.windows.net"
-if ($StagingName -eq "dev-vc-new-design"){
+if ($StagingName -eq "deploy"){
     $ConnectionString = $ConnectionString -f $AzureBlobName, $AzureBlobKey
 }
 $BlobContext = New-AzureStorageContext -ConnectionString $ConnectionString
+
+Write-Host "$StagingName"
+Write-Host "$StoreName"
+Write-Host "$AzureBlobName"
+Write-Host "$StagingName"
+
+$Now = Get-Date -format yyyyMMdd-HHmmss
+$DestContainer = "cms-content_" + $Now
+Get-AzureStorageBlob -Container "cms-content" | Start-AzureStorageBlobCopy -DestContainer $DestContainer
+
 
 Write-Host "Remove from $StoreName"
 Get-AzureStorageBlob -Blob ("$AzureBlobName*") -Container "cms-content" -Context $BlobContext  | ForEach-Object { Remove-AzureStorageBlob -Blob $_.Name -Container "cms-content" -Context $BlobContext } -ErrorAction Continue
