@@ -46,12 +46,12 @@ import jobs.scripts.*
 				return true
 			}
 
-			stage('Build') {
+			stage('Copy to dev') {
 				timestamps {
 					switch(env.BRANCH_NAME) {
 						case 'deploy':
 							def stagingName = "deploy"
-							def storeName = "cms-content"
+							def storeName = "docs"
 							Utilities.runSharedPS(this, "${deployScript}", "-StagingName ${stagingName} -StoreName ${storeName} -AzureBlobName ${SETTINGS['azureBlobName']} -AzureBlobKey ${SETTINGS['azureBlobKey']}")
 							break
 					}

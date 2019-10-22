@@ -7,8 +7,9 @@
 
 $ErrorActionPreference = "Stop"
 
-Copy-Item .\pages\ .\artifacts\Pages\vccom -Recurse -Force
-Copy-Item .\theme\ .\artifacts\Theme\vccom\default -Recurse -Force
+#Copy-Item .\pages\ .\artifacts\Pages\vccom -Recurse -Force
+#Copy-Item .\theme\ .\artifacts\Theme\vccom\default -Recurse -Force
+Copy-Item .\pages\docs .\artifacts\docs -Recurse -Force
 Compress-Archive -Path .\artifacts\* -CompressionLevel Fastest -DestinationPath .\artifacts\artifact.zip -Force
 
 # Get Theme Zip File
@@ -29,16 +30,15 @@ if ($StagingName -eq "deploy"){
 }
 $BlobContext = New-AzureStorageContext -ConnectionString $ConnectionString
 
-Write-Host "$StagingName"
-Write-Host "$StoreName"
-Write-Host "$AzureBlobName"
+$PathTo = "cms-content/Pages/vccom"
+$AzureBlobName = "$PathTo/$StoreName"
 
 $Now = Get-Date -format yyyyMMdd-HHmmss
-$DestContainer = "cms-content_" + $Now
-Get-AzureStorageBlob -Blob ("$AzureBlobName*") -Container $StoreName -Context $BlobContext -Verbose | Start-AzureStorageBlobCopy -DestContainer $DestContainer -Verbose
+$DestContainer = $AzureBlobName + "_" + $Now
+Get-AzureStorageBlob -Blob ("$AzureBlobName*") -Container $PathTo -Context $BlobContext -Verbose | Start-AzureStorageBlobCopy -DestContainer $DestContainer -Verbose
 
 Write-Host "Remove from $StoreName"
-Get-AzureStorageBlob -Blob ("$AzureBlobName*") -Container $StoreName -Context $BlobContext  | ForEach-Object { Remove-AzureStorageBlob -Blob $_.Name -Container $StoreName -Context $BlobContext } -ErrorAction Continue
+Get-AzureStorageBlob -Blob ("$AzureBlobName*") -Container $PathTo -Context $BlobContext  | ForEach-Object { Remove-AzureStorageBlob -Blob $_.Name -Container $PathTo -Context $BlobContext } -ErrorAction Continue
 
 Write-Host "Upload to $StoreName"
-Get-ChildItem -File -Recurse $Path | ForEach-Object { Set-AzureStorageBlobContent -File $_.FullName -Blob ("$AzureBlobName/" + (([System.Uri]("$Path/")).MakeRelativeUri([System.Uri]($_.FullName))).ToString()) -Container $StoreName -Context $BlobContext }
+Get-ChildItem -File -Recurse $Path | ForEach-Object { Set-AzureStorageBlobContent -File $_.FullName -Blob ("$AzureBlobName/" + (([System.Uri]("$Path/")).MakeRelativeUri([System.Uri]($_.FullName))).ToString()) -Container $PathTo -Context $BlobContext }
