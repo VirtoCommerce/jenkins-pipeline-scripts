@@ -36,11 +36,10 @@ Write-Host "$StagingName"
 
 $Now = Get-Date -format yyyyMMdd-HHmmss
 $DestContainer = "cms-content_" + $Now
-Get-AzureStorageBlob -Container "cms-content" | Start-AzureStorageBlobCopy -DestContainer $DestContainer
-
+Get-AzureStorageBlob -Blob ("$AzureBlobName*") -Container $StoreName | Start-AzureStorageBlobCopy -DestContainer $DestContainer
 
 Write-Host "Remove from $StoreName"
-Get-AzureStorageBlob -Blob ("$AzureBlobName*") -Container "cms-content" -Context $BlobContext  | ForEach-Object { Remove-AzureStorageBlob -Blob $_.Name -Container "cms-content" -Context $BlobContext } -ErrorAction Continue
+Get-AzureStorageBlob -Blob ("$AzureBlobName*") -Container $StoreName -Context $BlobContext  | ForEach-Object { Remove-AzureStorageBlob -Blob $_.Name -Container "cms-content" -Context $BlobContext } -ErrorAction Continue
 
 Write-Host "Upload to $StoreName"
 Get-ChildItem -File -Recurse $Path | ForEach-Object { Set-AzureStorageBlobContent -File $_.FullName -Blob ("$AzureBlobName/" + (([System.Uri]("$Path/")).MakeRelativeUri([System.Uri]($_.FullName))).ToString()) -Container "cms-content" -Context $BlobContext }
