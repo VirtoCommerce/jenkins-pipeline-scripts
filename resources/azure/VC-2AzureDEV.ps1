@@ -35,10 +35,10 @@ Write-Host "$AzureBlobName"
 
 $Now = Get-Date -format yyyyMMdd-HHmmss
 $DestContainer = "cms-content_" + $Now
-Get-AzureStorageBlob -Blob ("$AzureBlobName*") -Container $StoreName -Context $BlobContext | Start-AzureStorageBlobCopy -DestContainer $DestContainer
+Get-AzureStorageBlob -Blob ("$AzureBlobName*") -Container $StoreName -Context $BlobContext -Verbose | Start-AzureStorageBlobCopy -DestContainer $DestContainer -Verbose
 
 Write-Host "Remove from $StoreName"
-Get-AzureStorageBlob -Blob ("$AzureBlobName*") -Container $StoreName -Context $BlobContext  | ForEach-Object { Remove-AzureStorageBlob -Blob $_.Name -Container "cms-content" -Context $BlobContext } -ErrorAction Continue
+Get-AzureStorageBlob -Blob ("$AzureBlobName*") -Container $StoreName -Context $BlobContext  | ForEach-Object { Remove-AzureStorageBlob -Blob $_.Name -Container $StoreName -Context $BlobContext } -ErrorAction Continue
 
 Write-Host "Upload to $StoreName"
-Get-ChildItem -File -Recurse $Path | ForEach-Object { Set-AzureStorageBlobContent -File $_.FullName -Blob ("$AzureBlobName/" + (([System.Uri]("$Path/")).MakeRelativeUri([System.Uri]($_.FullName))).ToString()) -Container "cms-content" -Context $BlobContext }
+Get-ChildItem -File -Recurse $Path | ForEach-Object { Set-AzureStorageBlobContent -File $_.FullName -Blob ("$AzureBlobName/" + (([System.Uri]("$Path/")).MakeRelativeUri([System.Uri]($_.FullName))).ToString()) -Container $StoreName -Context $BlobContext }
