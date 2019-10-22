@@ -32,11 +32,10 @@ $BlobContext = New-AzureStorageContext -ConnectionString $ConnectionString
 Write-Host "$StagingName"
 Write-Host "$StoreName"
 Write-Host "$AzureBlobName"
-Write-Host "$StagingName"
 
 $Now = Get-Date -format yyyyMMdd-HHmmss
 $DestContainer = "cms-content_" + $Now
-Get-AzureStorageBlob -Blob ("$AzureBlobName*") -Container $StoreName | Start-AzureStorageBlobCopy -DestContainer $DestContainer
+Get-AzureStorageBlob -Blob ("$AzureBlobName*") -Container $StoreName -Context $BlobContext | Start-AzureStorageBlobCopy -DestContainer $DestContainer
 
 Write-Host "Remove from $StoreName"
 Get-AzureStorageBlob -Blob ("$AzureBlobName*") -Container $StoreName -Context $BlobContext  | ForEach-Object { Remove-AzureStorageBlob -Blob $_.Name -Container "cms-content" -Context $BlobContext } -ErrorAction Continue
