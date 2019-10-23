@@ -19,7 +19,9 @@ $Path2Zip = Get-Childitem -Recurse -Path "${env:WORKSPACE}\artifacts\" -File -In
 # Unzip Theme Zip File
 
 $Path = "${env:WORKSPACE}\artifacts\" + [System.IO.Path]::GetFileNameWithoutExtension($Path2Zip)
-Remove-Item $Path -Recurse -Force -ErrorAction Continue
+if(![System.IO.File]::Exists($Path)){
+    Remove-Item $Path -Recurse -Force -ErrorAction Continue
+}
 Add-Type -AssemblyName System.IO.Compression.FileSystem
 [System.IO.Compression.ZipFile]::ExtractToDirectory($Path2Zip, $Path)
 
