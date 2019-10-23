@@ -22,7 +22,7 @@ node {
                 def fileName = ghRelease.assets[0].name
                 def filePath = "${env.WORKSPACE}@tmp\\${fileName}"
                 GithubRelease.downloadGithubRelease(this, ghRelease.assets[0].url, filePath)
-                powershell "${psfolder}\\PlatformUpdate.ps1 -SubscriptionID ${SETTINGS['subscriptionID']} -ResourceGroupName ${SETTINGS['resourceGroupName']} -WebAppName ${SETTINGS['appName']} -Path2Zip ${filePath}"
+                powershell "${psfolder}\\PlatformUpdate.ps1 -SubscriptionID ${SETTINGS['subscriptionID']} -ResourceGroupName ${SETTINGS['resourceGroupName']} -WebAppName ${SETTINGS['appName']} -Path2Zip ${filePath} -ErrorAction Stop"
             }
         }
 
@@ -30,7 +30,7 @@ node {
             timestamps {
                 SETTINGS.setEnvironment('storefront')
                 withEnv(["AzureSubscriptionIDProd=${SETTINGS['subscriptionID']}", "AzureResourceGroupNameProd=${SETTINGS['resourceGroupName']}", "AzureWebAppNameProd=${SETTINGS['appName']}"]){
-                    powershell "${psfolder}\\StorefrontUpdate.ps1"
+                    powershell "${psfolder}\\StorefrontUpdate.ps1 -ErrorAction Stop"
                 }
             }
         }
@@ -38,7 +38,7 @@ node {
         stage('Recreate DB'){
             timestamps{
                 SETTINGS.setEnvironment('platform') 
-                powershell "${psfolder}\\RecreateDB.ps1 -SubscriptionID ${SETTINGS['subscriptionID']} -ResourceGroupName ${SETTINGS['resourceGroupName']}"
+                powershell "${psfolder}\\RecreateDB.ps1 -SubscriptionID ${SETTINGS['subscriptionID']} -ResourceGroupName ${SETTINGS['resourceGroupName']} -ErrorAction Stop"
             }
         }
     }
