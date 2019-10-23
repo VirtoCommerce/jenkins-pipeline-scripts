@@ -72,7 +72,7 @@ Remove-AzureRmSqlDatabase -ResourceGroupName $DestResourceGroupName -ServerName 
 
 # Remove blob containers
 
-$storageConnectionString = ($webSite.SiteConfig.ConnectionStrings | Where Name -eq 'CmsContentConnectionString').ConnectionString
+$storageConnectionString = $webSite.SiteConfig.Assets.AzureBlobStorage.ConnectionString
 Write-Output "Storage connection string: $storageConnectionString"
 
 $storageSettings = @{}
