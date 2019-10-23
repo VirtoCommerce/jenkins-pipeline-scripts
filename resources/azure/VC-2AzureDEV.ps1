@@ -12,14 +12,13 @@ $ErrorActionPreference = "Stop"
 Copy-Item .\pages\docs .\artifacts\docs -Recurse -Force
 Compress-Archive -Path .\artifacts\* -CompressionLevel Fastest -DestinationPath .\artifacts\artifact.zip -Force
 
-# Get Theme Zip File
-$Path2Zip = Get-Childitem -Recurse -Path "${env:WORKSPACE}\artifacts\" -File -Include *.zip
+
+$Path2Zip = Get-Childitem -Recurse -Path "${env:WORKSPACE}\artifacts\" -File -Include artifact.zip
 
 # Unzip Theme Zip File
 $Path = "${env:WORKSPACE}\artifacts\" + [System.IO.Path]::GetFileNameWithoutExtension($Path2Zip)
 
 Write-Host "path to zip:  $Path2Zip"
-Write-Host "path: $Path"
 
 Expand-Archive -Path "$Path2Zip" -DestinationPath "$Path" -Force
 
