@@ -1,0 +1,45 @@
+import jobs.scripts.*
+
+node {
+    def SETTINGS
+    
+    stage('Init'){
+        deleteDir()
+        checkout scm
+        def settingsFileContent
+		configFileProvider([configFile(fileId: 'shared_lib_settings', variable: 'SETTINGS_FILE')]) {
+			settingsFileContent = readFile(SETTINGS_FILE)
+		}
+		SETTINGS = new Settings(settingsFileContent)
+		SETTINGS.setRegion('demo3')
+    }
+    psfolder = "${env.WORKSPACE}\\resources\\demoVC3"
+    dir(psfolder){
+        stage('Platform Update'){
+            timestamps {
+                SETTINGS.setEnvironment('platform')
+                def ghRelease = GithubRelease.getLatestGithubRelease(this, Utilities.getRepoOrg(this), Utilities.getRepoName(this), '3.0.0', true)
+                def fileName = ghRelease.assets[0].name
+                def filePath = "${env.WORKSPACE}@tmp\\${fileName}"
+                GithubRelease.downloadGithubRelease(this, ghRelease.url, filePath)
+                powershell "${psfolder}\\PlatformUpdate.ps1 -SubscriptionID ${SETTINGS['subscriptionID']} -ResourceGroupName ${SETTINGS['resourceGroupName']} -WebAppName ${SETTINGS['appName']} -Path2Zip ${filePath}"
+            }
+        }
+
+        stage('Storefront Update'){
+            timestamps {
+                SETTINGS.setEnvironment('storefront')
+                withEnv(["AzureSubscriptionIDProd=${SETTINGS['subscriptionID']}", "AzureResourceGroupNameProd=${SETTINGS['resourceGroupName']}", "AzureWebAppNameProd=${SETTINGS['appName']}"]){
+                    powershell "${psfolder}\\StorefrontUpdate.ps1"
+                }
+            }
+        }
+
+        stage('Recreate DB'){
+            timestamps{
+                SETTINGS.setEnvironment('platform') 
+                powershell "${psfolder}\\RecreateDB.ps1 -SubscriptionID ${SETTINGS['subscriptionID']} -ResourceGroupName ${SETTINGS['resourceGroupName']}"
+            }
+        }
+    }
+}
