@@ -5,7 +5,7 @@ param (
     $Password = "store",
     $WebAppPublicName = "prod-demovc3-store",
     $WebAppAdminName = "prod-demovc3-admin",
-    $SqlServerName = 'demovc'
+    $SqlServerName = 'prod-demovc3-srv'
 )
 #$ErrorActionPreference = 'Stop'
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
