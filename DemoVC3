@@ -21,7 +21,7 @@ node {
                 def ghRelease = GithubRelease.getLatestGithubRelease(this, Utilities.getOrgName(this), 'vc-platform', '3.0.0', true)
                 def fileName = ghRelease.assets[0].name
                 def filePath = "${env.WORKSPACE}@tmp\\${fileName}"
-                GithubRelease.downloadGithubRelease(this, ghRelease.url, filePath)
+                GithubRelease.downloadGithubRelease(this, ghRelease.assets[0].url, filePath)
                 powershell "${psfolder}\\PlatformUpdate.ps1 -SubscriptionID ${SETTINGS['subscriptionID']} -ResourceGroupName ${SETTINGS['resourceGroupName']} -WebAppName ${SETTINGS['appName']} -Path2Zip ${filePath}"
             }
         }
