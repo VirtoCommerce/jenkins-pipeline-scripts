@@ -1,3 +1,5 @@
+package jobs.scripts
+
 class GithubRelease{
     long id
     String name
