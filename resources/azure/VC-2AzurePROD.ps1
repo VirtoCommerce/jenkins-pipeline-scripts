@@ -7,8 +7,6 @@
 
 $ErrorActionPreference = "Stop"
 
-#Copy-Item .\pages\ .\artifacts\Pages\vccom -Recurse -Force
-#Copy-Item .\theme\ .\artifacts\Theme\vccom\default -Recurse -Force
 Copy-Item .\pages\docs .\artifacts\docs -Recurse -Force
 Compress-Archive -Path .\artifacts\* -CompressionLevel Fastest -DestinationPath .\artifacts\artifact.zip -Force
 
@@ -34,8 +32,8 @@ $AzureBlobName = "$StoreName"
 $Now = Get-Date -format yyyyMMdd-HHmmss
 $DestContainer = $AzureBlobName + "-" + $Now
 
-$DestWebAppName = "vc-public-test"
-$DestResourceGroupName = "DEV-VC"
+$DestWebAppName = "vc-public-pro-staging"
+$DestResourceGroupName = "PROD-VC"
 
 Write-Host "Stop $DestWebAppName"
 Stop-AzureRmWebApp -ResourceGroupName $DestResourceGroupName -Name $DestWebAppName
