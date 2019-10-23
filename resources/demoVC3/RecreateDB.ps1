@@ -58,7 +58,7 @@ $connectionString = ($webSite.SiteConfig.ConnectionStrings | Where Name -eq 'Vir
 Write-Output "ConnectionString: $connectionString"
 $sb = New-Object System.Data.Common.DbConnectionStringBuilder
 $sb.set_ConnectionString($connectionstring)
-$databaseName = $sb['Database']
+$databaseName = $sb['Initial Catalog']
 
 # Stop web site
 
