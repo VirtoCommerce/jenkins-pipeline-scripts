@@ -2,7 +2,10 @@
     [string] $StagingName, 
     [string] $StoreName,
     $AzureBlobName,
-    $AzureBlobKey
+    $AzureBlobKey,
+    $WebAppName,
+    $ResourceGroupName,
+    $SubscriptionID
 )
 
 $ErrorActionPreference = "Stop"
@@ -34,8 +37,16 @@ $AzureBlobName = "$StoreName"
 $Now = Get-Date -format yyyyMMdd-HHmmss
 $DestContainer = $AzureBlobName + "-" + $Now
 
-$DestWebAppName = "vc-public-test"
-$DestResourceGroupName = "DEV-VC"
+$ApplicationID ="${env:AzureAppID}"
+$APIKey = ConvertTo-SecureString "${env:AzureAPIKey}" -AsPlainText -Force
+$psCred = New-Object System.Management.Automation.PSCredential($ApplicationID, $APIKey)
+$TenantID = "${env:AzureTenantID}"
+
+Add-AzureRmAccount -Credential $psCred -TenantId $TenantID -ServicePrincipal
+Select-AzureRmSubscription -SubscriptionId $SubscriptionID
+
+$DestWebAppName = $WebAppName
+$DestResourceGroupName = $ResourceGroupName
 
 Write-Host "Stop $DestWebAppName"
 Stop-AzureRmWebApp -ResourceGroupName $DestResourceGroupName -Name $DestWebAppName

@@ -2,7 +2,10 @@
     [string] $StagingName, 
     [string] $StoreName,
     $AzureBlobName,
-    $AzureBlobKey
+    $AzureBlobKey,
+    $WebAppName,
+    $ResourceGroupName,
+    $SubscriptionID
 )
 
 $ErrorActionPreference = "Stop"
@@ -32,8 +35,8 @@ $AzureBlobName = "$StoreName"
 $Now = Get-Date -format yyyyMMdd-HHmmss
 $DestContainer = $AzureBlobName + "-" + $Now
 
-$DestWebAppName = "vc-public-pro-staging"
-$DestResourceGroupName = "PROD-VC"
+#$DestWebAppName = $WebAppName
+#$DestResourceGroupName = $ResourceGroupName
 
 Write-Host "Stop $DestWebAppName"
 Stop-AzureRmWebApp -ResourceGroupName $DestResourceGroupName -Name $DestWebAppName
@@ -47,5 +50,5 @@ Get-AzureStorageBlob -Blob ("Pages/vccom/docs*") -Container "cms-content" -Conte
 Write-Host "Upload to $StoreName"
 Get-ChildItem -File -Recurse $Path | ForEach-Object { Set-AzureStorageBlobContent -File $_.FullName -Blob ("Pages/vccom/" + (([System.Uri]("$Path/")).MakeRelativeUri([System.Uri]($_.FullName))).ToString()) -Container "cms-content" -Context $BlobContext }
 
-Write-Host "Start $DestWebAppName"
-Start-AzureRmWebApp -ResourceGroupName $DestResourceGroupName -Name $DestWebAppName
+#Write-Host "Start $DestWebAppName"
+#Start-AzureRmWebApp -ResourceGroupName $DestResourceGroupName -Name $DestWebAppName
