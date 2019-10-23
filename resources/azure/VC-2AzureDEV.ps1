@@ -17,7 +17,11 @@ $Path2Zip = Get-Childitem -Recurse -Path "${env:WORKSPACE}\artifacts\" -File -In
 
 # Unzip Theme Zip File
 $Path = "${env:WORKSPACE}\artifacts\" + [System.IO.Path]::GetFileNameWithoutExtension($Path2Zip)
-Expand-Archive -Path $Path2Zip -DestinationPath $Path -Force
+
+Write-Host "path to zip:  $Path2Zip"
+Write-Host "path: $Path"
+
+Expand-Archive -Path "$Path2Zip" -DestinationPath "$Path" -Force
 
 # Upload Zip File to Azure
 $ConnectionString = "DefaultEndpointsProtocol=https;AccountName={0};AccountKey={1};EndpointSuffix=core.windows.net"
