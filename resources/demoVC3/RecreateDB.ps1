@@ -83,7 +83,7 @@ foreach ($kvpString in $storageConnectionString.Split(';', [System.StringSplitOp
 }
 
 $storageContext = New-AzureStorageContext -StorageAccountName $storageSettings['AccountName'] -StorageAccountKey $storageSettings['AccountKey']
-$containers = $storageContext | Get-AzureStorageContainer | Select Name
+#$containers = $storageContext | Get-AzureStorageContainer | Select Name
 
 Write-Output "Removing storage container: $containerName"
 Remove-AzureStorageContainer -Name cms -Context $storageContext -Force
