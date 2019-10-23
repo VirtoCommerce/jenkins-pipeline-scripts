@@ -21,6 +21,7 @@ $Path2Zip = Get-Childitem -Recurse -Path "${env:WORKSPACE}\artifacts\" -File -In
 $Path = "${env:WORKSPACE}\artifacts\" + [System.IO.Path]::GetFileNameWithoutExtension($Path2Zip)
 Remove-Item $Path -Recurse -Force -ErrorAction Continue
 Add-Type -AssemblyName System.IO.Compression.FileSystem
+[System.IO.Compression.ZipFile]::ExtractToDirectory($Path2Zip, $Path)
 
 # Upload Zip File to Azure
 
@@ -45,4 +46,4 @@ Get-AzureStorageBlob -Blob ("Pages/vccom/docs*") -Container "cms-content" -Conte
 Write-Host "$Path"
 Write-Host "$Path2Zip"
 Write-Host "Upload to $StoreName"
-Get-ChildItem -File -Recurse $Path | ForEach-Object { Set-AzureStorageBlobContent -File $_.FullName -Blob ("Pages/vccom/" + (([System.Uri]("$Path/")).MakeRelativeUri([System.Uri]($_.FullName))).ToString()) -Container "cms-content" -Context $BlobContext }
+Get-ChildItem -File -Recurse "$Path" | ForEach-Object { Set-AzureStorageBlobContent -File $_.FullName -Blob ("Pages/vccom/" + (([System.Uri]("$Path/")).MakeRelativeUri([System.Uri]($_.FullName))).ToString()) -Container "cms-content" -Context $BlobContext }
