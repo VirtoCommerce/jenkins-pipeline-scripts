@@ -41,5 +41,8 @@ Get-AzureStorageBlob -Container $StoreName -Context $BlobContext | Start-AzureSt
 Write-Host "Remove from $StoreName"
 Get-AzureStorageBlob -Blob ("Pages/vccom/docs*") -Container "cms-content" -Context $BlobContext  | ForEach-Object { Remove-AzureStorageBlob -Blob $_.Name -Container "cms-content" -Context $BlobContext } -ErrorAction Continue
 
+
+Write-Host "$Path"
+Write-Host "$Path2Zip"
 Write-Host "Upload to $StoreName"
-Get-ChildItem -File -Recurse $Path | ForEach-Object { Set-AzureStorageBlobContent -File $_.FullName -Blob ("Pages/vccom/docs/" + (([System.Uri]("$Path/")).MakeRelativeUri([System.Uri]($_.FullName))).ToString()) -Container "cms-content" -Context $BlobContext }
+Get-ChildItem -File -Recurse $Path | ForEach-Object { Set-AzureStorageBlobContent -File $_.FullName -Blob ("Pages/vccom/" + (([System.Uri]("$Path/")).MakeRelativeUri([System.Uri]($_.FullName))).ToString()) -Container "cms-content" -Context $BlobContext }
