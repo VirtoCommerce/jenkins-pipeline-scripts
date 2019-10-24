@@ -76,7 +76,7 @@ Write-Output "!!!dbg"
 foreach($setting in $webSite.SiteConfig.AppSettings){
     Write-Output "$($setting.Name) $($setting.Value)"
 }
-$storageConnectionString = $webSite.SiteConfig.Assets.AzureBlobStorage.ConnectionString
+$storageConnectionString = $webSite.SiteConfig.AppSettings["Assets:AzureBlobStorage:ConnectionString"]
 Write-Output "Storage connection string: $storageConnectionString"
 
 $storageSettings = @{}
