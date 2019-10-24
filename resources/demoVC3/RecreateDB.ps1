@@ -72,15 +72,15 @@ Remove-AzureRmSqlDatabase -ResourceGroupName $DestResourceGroupName -ServerName 
 
 # Remove blob containers
 
-Write-Output "!!!dbg"
+#Write-Output "!!!dbg"
 #foreach($setting in $webSite.SiteConfig.AppSettings){
 #    Write-Output "name: $($setting.Name) value: $($setting.Value)"
 #}
 $storageConnectionString = $webSite.SiteConfig.AppSettings | Where-Object { $_.Name -eq "Assets:AzureBlobStorage:ConnectionString" }
-Write-Output "Storage connection string: $storageConnectionString"
+Write-Output "Storage connection string: $($storageConnectionString.Value)"
 
 $storageSettings = @{}
-foreach ($kvpString in $storageConnectionString.Split(';', [System.StringSplitOptions]::RemoveEmptyEntries))
+foreach ($kvpString in $storageConnectionString.Value.Split(';', [System.StringSplitOptions]::RemoveEmptyEntries))
 {
     $kvp = $kvpString.Split('=', 2)
     $storageSettings[$kvp[0]] = $kvp[1]
