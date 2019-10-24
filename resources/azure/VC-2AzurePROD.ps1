@@ -10,6 +10,8 @@
 
 $ErrorActionPreference = "Stop"
 
+#Copy-Item .\pages\ .\artifacts\Pages\vccom -Recurse -Force
+#Copy-Item .\theme\ .\artifacts\Theme\vccom\default -Recurse -Force
 Copy-Item .\pages\docs .\artifacts\docs -Recurse -Force
 Compress-Archive -Path .\artifacts\* -CompressionLevel Fastest -DestinationPath .\artifacts\artifact.zip -Force
 
@@ -35,8 +37,16 @@ $AzureBlobName = "$StoreName"
 $Now = Get-Date -format yyyyMMdd-HHmmss
 $DestContainer = $AzureBlobName + "-" + $Now
 
-#$DestWebAppName = $WebAppName
-#$DestResourceGroupName = $ResourceGroupName
+$ApplicationID ="${env:AzureAppID}"
+$APIKey = ConvertTo-SecureString "${env:AzureAPIKey}" -AsPlainText -Force
+$psCred = New-Object System.Management.Automation.PSCredential($ApplicationID, $APIKey)
+$TenantID = "${env:AzureTenantID}"
+
+Add-AzureRmAccount -Credential $psCred -TenantId $TenantID -ServicePrincipal
+Select-AzureRmSubscription -SubscriptionId $SubscriptionID
+
+$DestWebAppName = $WebAppName
+$DestResourceGroupName = $ResourceGroupName
 
 Write-Host "Stop $DestWebAppName"
 Stop-AzureRmWebApp -ResourceGroupName $DestResourceGroupName -Name $DestWebAppName
@@ -50,5 +60,5 @@ Get-AzureStorageBlob -Blob ("Pages/vccom/docs*") -Container "cms-content" -Conte
 Write-Host "Upload to $StoreName"
 Get-ChildItem -File -Recurse $Path | ForEach-Object { Set-AzureStorageBlobContent -File $_.FullName -Blob ("Pages/vccom/" + (([System.Uri]("$Path/")).MakeRelativeUri([System.Uri]($_.FullName))).ToString()) -Container "cms-content" -Context $BlobContext }
 
-#Write-Host "Start $DestWebAppName"
-#Start-AzureRmWebApp -ResourceGroupName $DestResourceGroupName -Name $DestWebAppName
+Write-Host "Start $DestWebAppName"
+Start-AzureRmWebApp -ResourceGroupName $DestResourceGroupName -Name $DestWebAppName
