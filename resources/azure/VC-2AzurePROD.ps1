@@ -33,6 +33,7 @@ if ($StagingName -eq "deploy"){
 $BlobContext = New-AzureStorageContext -ConnectionString $ConnectionString
 
 $AzureBlobName = "$StoreName"
+$SlotName = "staging"
 
 $Now = Get-Date -format yyyyMMdd-HHmmss
 $DestContainer = $AzureBlobName + "-" + $Now
@@ -49,7 +50,7 @@ $DestWebAppName = $WebAppName
 $DestResourceGroupName = $ResourceGroupName
 
 Write-Host "Stop $DestWebAppName"
-Stop-AzureRmWebApp -ResourceGroupName $DestResourceGroupName -Name $DestWebAppName
+Stop-AzureRmWebAppSlot -ResourceGroupName $DestResourceGroupName -Name $DestWebAppName -Slot $SlotName
 
 New-AzureStorageContainer -Name $DestContainer -Context $BlobContext -Permission Container
 Get-AzureStorageBlob -Container $StoreName -Context $BlobContext | Start-AzureStorageBlobCopy -DestContainer "$DestContainer" -Force
@@ -61,4 +62,4 @@ Write-Host "Upload to $StoreName"
 Get-ChildItem -File -Recurse $Path | ForEach-Object { Set-AzureStorageBlobContent -File $_.FullName -Blob ("Pages/vccom/" + (([System.Uri]("$Path/")).MakeRelativeUri([System.Uri]($_.FullName))).ToString()) -Container "cms-content" -Context $BlobContext }
 
 Write-Host "Start $DestWebAppName"
-Start-AzureRmWebApp -ResourceGroupName $DestResourceGroupName -Name $DestWebAppName
+Start-AzureRmWebAppSlot -ResourceGroupName $DestResourceGroupName -Name $DestWebAppName -Slot $SlotName
