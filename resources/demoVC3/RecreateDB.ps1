@@ -74,7 +74,7 @@ Remove-AzureRmSqlDatabase -ResourceGroupName $DestResourceGroupName -ServerName 
 
 Write-Output "!!!dbg"
 foreach($setting in $webSite.SiteConfig.AppSettings){
-    Write-Output "$($setting.Name) $($setting.Value)"
+    Write-Output "name: $($setting.Name) value: $($setting.Value)"
 }
 $storageConnectionString = $webSite.SiteConfig.AppSettings["Assets:AzureBlobStorage:ConnectionString"]
 Write-Output "Storage connection string: $storageConnectionString"
