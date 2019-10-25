@@ -223,6 +223,10 @@ do
 while ($sampleDataState -ne "Undefined")
 
 # Sample data installation
+
+$headerValue = Get-AuthToken $WebAppAdminName $Username $Password
+$headers = @{}
+$headers.Add("Authorization", $headerValue)
     
 $sampleDataImportResult = Invoke-RestMethod $sampleDataImportUrl -Method Post -Headers $headers -ErrorAction Stop
 
@@ -248,9 +252,6 @@ do
 }
 while ($sampleDataState -ne "Completed" -and $cycleCount -lt 111)
 
-$headerValue = Get-AuthToken $WebAppAdminName $Username $Password
-$headers = @{}
-$headers.Add("Authorization", $headerValue)
 #Set platform setting to prevent run setup wizard on first user log-in
 $setupStepSetting = "[{`"name`":`"VirtoCommerce.SetupStep`",`"value`":`"workspace`"}]";
 $headers.Add("Content-Type", "application/json;charset=UTF-8");
