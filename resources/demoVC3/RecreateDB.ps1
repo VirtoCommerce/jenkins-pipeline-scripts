@@ -16,7 +16,7 @@ function Get-AuthToken {
         $username,
         $password
     )
-    $url = "https://$appName.azurewebsites.net/connect/token"
+    $url = "https://$($appName).azurewebsites.net/connect/token"
     $grant_type = "password"
     $content_type = "application/x-www-form-urlencoded"
 
