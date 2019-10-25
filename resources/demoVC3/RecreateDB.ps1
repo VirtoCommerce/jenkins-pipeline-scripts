@@ -16,8 +16,7 @@ function Get-AuthToken {
         $username,
         $password
     )
-    $url = "https://$($appName).azurewebsites.net/connect/token"
-    Write-Output "dbg token url: $url"
+    $url = "https://${$appName}.azurewebsites.net/connect/token"
     $grant_type = "password"
     $content_type = "application/x-www-form-urlencoded"
 
@@ -168,7 +167,7 @@ Function convert-fromhex
 }
 
 # Initiate modules and sample data installation
-
+Write-Output "$WebAppAdminName, $Username; https://$($WebAppAdminName).azurewebsites.net/connect/token"
 $headerValue = Get-AuthToken($WebAppAdminName, $Username, $Password)
 $headers = @{}
 $headers.Add("Authorization", $headerValue)
