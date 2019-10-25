@@ -23,7 +23,8 @@ function Get-AuthToken {
     $body = @{username=$username; password=$password; grant_type=$grant_type}
     $response = Invoke-WebRequest -Uri $url -Method Post -ContentType $content_type -Body $body
     $responseContent = $response.Content | ConvertFrom-Json
-    return "$($responseContent.token_type) $($responseContent.access_token)"
+    #return "$($responseContent.token_type) $($responseContent.access_token)"
+    return "Bearer $($responseContent.access_token)"
 }
 
 $ApplicationID ="${env:AzureAppID}"
