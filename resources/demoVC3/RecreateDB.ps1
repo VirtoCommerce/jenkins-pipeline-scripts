@@ -17,6 +17,7 @@ function Get-AuthToken {
         $password
     )
     $url = "https://$($appName).azurewebsites.net/connect/token"
+    Write-Output "dbg token url: $url"
     $grant_type = "password"
     $content_type = "application/x-www-form-urlencoded"
 
