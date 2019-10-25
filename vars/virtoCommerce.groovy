@@ -46,7 +46,7 @@ import jobs.scripts.*
 				return true
 			}
 
-			stage('Copy to dev') {
+			stage('Copy to DEV-VC') {
 				timestamps {
 					switch(env.BRANCH_NAME) {
 						case 'deploy':
@@ -72,13 +72,25 @@ import jobs.scripts.*
 						//Utilities.notifyBuildStatus(this, SETTINGS['of365hook'], "${allureReportAddress}", "${e2eStatus}")
 					}
 				}
-			}		
+			}
+
+			stage('Copy to PROD-VC') {
+				timestamps {
+					switch(env.BRANCH_NAME) {
+						case 'deploy':
+							def stagingName = "deploy"
+							def storeName = "cms-content"
+							Utilities.runSharedPS(this, "${deployScript}", "-StagingName ${stagingName} -StoreName ${storeName} -AzureBlobName ${SETTINGS['azureBlobNameProd']} -AzureBlobKey ${SETTINGS['azureBlobKeyProd']} -WebAppName ${SETTINGS['webAppNameProd']} -ResourceGroupName ${SETTINGS['resourceGroupNameProd']} -SubscriptionID ${SETTINGS['subscriptionID']}")
+							break
+					}
+				}
+			}
 			
 			stage('Cleanup') {
 				timestamps { 
 					Packaging.cleanSolutions(this)
 				}
-			}				
+			}
 		}
 		catch (any) {
 			currentBuild.result = 'FAILURE'
