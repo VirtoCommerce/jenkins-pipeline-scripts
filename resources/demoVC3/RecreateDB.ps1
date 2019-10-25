@@ -227,9 +227,10 @@ while ($sampleDataState -ne "Undefined")
 $headerValue = Get-AuthToken $WebAppAdminName $Username $Password
 $headers = @{}
 $headers.Add("Authorization", $headerValue)
+Write-Output "!!!DBG $headerValue url: $sampleDataImportUrl"
     
 $sampleDataImportResult = Invoke-RestMethod $sampleDataImportUrl -Method Post -Headers $headers -ErrorAction Stop
-
+Write-Output "!!!DBG sd import result $sampleDataImportResult"
 # Wait until sample data have been imported
 Write-Output "Waiting for sample data import to be completed"
 $cycleCount = 0
