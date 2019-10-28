@@ -12,16 +12,15 @@ param (
 
 function Get-AuthToken {
     param (
-        $appName,
+        $appAuthUrl,
         $username,
         $password
     )
-    $url = "https://$($appName).azurewebsites.net/connect/token"
     $grant_type = "password"
     $content_type = "application/x-www-form-urlencoded"
 
     $body = @{username=$username; password=$password; grant_type=$grant_type}
-    $response = Invoke-WebRequest -Uri $url -Method Post -ContentType $content_type -Body $body
+    $response = Invoke-WebRequest -Uri $appAuthUrl -Method Post -ContentType $content_type -Body $body
     $responseContent = $response.Content | ConvertFrom-Json
     #return "$($responseContent.token_type) $($responseContent.access_token)"
     return $responseContent.access_token
@@ -44,6 +43,7 @@ $modulesInstallUrl = "https://$WebAppAdminName-$SlotName.azurewebsites.net/api/p
 $sampleDataStateUrl = "https://$WebAppAdminName-$SlotName.azurewebsites.net/api/platform/sampledata/state"
 $sampleDataImportUrl = "https://$WebAppAdminName-$SlotName.azurewebsites.net/api/platform/sampledata/autoinstall"
 $setSettingUrl = "https://$WebAppAdminName-$SlotName.azurewebsites.net/api/platform/settings"
+$appAuthUrl = "https://$WebAppAdminName-$SlotName.azurewebsites.net/connect/token"
 $DestResourceGroupName = $ResourceGroupName
 
 
@@ -168,8 +168,7 @@ Function convert-fromhex
 }
 
 # Initiate modules and sample data installation
-Write-Output "$WebAppAdminName, $Username; https://$($WebAppAdminName).azurewebsites.net/connect/token"
-$authToken = Get-AuthToken $WebAppAdminName $Username $Password
+$authToken = Get-AuthToken $appAuthUrl $Username $Password
 $headers = @{}
 $headers.Add("Authorization", "Bearer $authToken")
 
