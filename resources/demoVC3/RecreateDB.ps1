@@ -24,7 +24,7 @@ function Get-AuthToken {
     $response = Invoke-WebRequest -Uri $url -Method Post -ContentType $content_type -Body $body
     $responseContent = $response.Content | ConvertFrom-Json
     #return "$($responseContent.token_type) $($responseContent.access_token)"
-    return "Bearer $($responseContent.access_token)"
+    return $responseContent.access_token
 }
 
 $ApplicationID ="${env:AzureAppID}"
@@ -169,9 +169,9 @@ Function convert-fromhex
 
 # Initiate modules and sample data installation
 Write-Output "$WebAppAdminName, $Username; https://$($WebAppAdminName).azurewebsites.net/connect/token"
-$headerValue = Get-AuthToken $WebAppAdminName $Username $Password
+$authToken = Get-AuthToken $WebAppAdminName $Username $Password
 $headers = @{}
-$headers.Add("Authorization", $headerValue)
+$headers.Add("Authorization", "Bearer $authToken")
 
 # Modules installation
 
@@ -224,13 +224,6 @@ do
 while ($sampleDataState -ne "Undefined")
 
 # Sample data installation
-
-$headerValue = Get-AuthToken $WebAppAdminName $Username $Password
-$headers = @{}
-$headers.Add("Authorization", $headerValue)
-Write-Output "!!!DBG $headerValue url: $sampleDataImportUrl"
-$headers_dbg = $headers | ConvertTo-Json
-Write-Output "!!!DBG $headers_dbg"
     
 $sampleDataImportResult = Invoke-RestMethod $sampleDataImportUrl -Method Post -Headers $headers -ErrorAction Stop
 Write-Output "!!!DBG sd import result $sampleDataImportResult"
