@@ -70,9 +70,9 @@ import jobs.scripts.*
 					finally {
 						def allureReportAddress = "${env.BUILD_URL}/allure"
 						//Utilities.notifyBuildStatus(this, SETTINGS['of365hook'], "${allureReportAddress}", "${e2eStatus}")
-						msg = "E2E ${e2eStatus}."
+						msg = "${e2eStatus}."
 						if(!(e2eStatus == 'E2E Success')) {
-							input(message: msg, submitter: ${SETTINGS['releaseApprovers']})
+							input(message: msg, submitter: env.APPROVERS)
 						}
 					}
 				}
