@@ -468,8 +468,8 @@ class Utilities {
             context.deleteDir()
             getE2ETests(context)
             def sfPort = Utilities.getStorefrontPort(context)
-            def DefaultAdminDockerPrefix = "https://vc-public-test.azurewebsites.net"
-            def autoPilot = "https://api2.autopilothq.com"
+            def DefaultAdminDockerPrefix = "https://vc-public-test.azurewebsites.net/"
+            def autoPilot = "https://api2.autopilothq.com/"
             def allureResultsPath = "${context.env.WORKSPACE}\\allure-results"
             def allureReportPath = "${context.env.WORKSPACE}\\allure-report"
             context.dir(allureReportPath){
