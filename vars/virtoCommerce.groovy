@@ -84,7 +84,7 @@ import jobs.scripts.*
 						case 'deploy':
 							def stagingName = "deploy"
 							def storeName = "cms-content"
-							def deployScript = 'VC-2AzurePROD.ps1'
+							deployScript = 'VC-2AzurePROD.ps1'
 							Utilities.runSharedPS(this, "${deployScript}", "-StagingName ${stagingName} -StoreName ${storeName} -AzureBlobName ${SETTINGS['azureBlobNameProd']} -AzureBlobKey ${SETTINGS['azureBlobKeyProd']} -WebAppName ${SETTINGS['webAppNameProd']} -ResourceGroupName ${SETTINGS['resourceGroupNameProd']} -SubscriptionID ${SETTINGS['subscriptionID']}")
 							break
 					}
