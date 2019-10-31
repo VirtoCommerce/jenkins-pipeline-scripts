@@ -152,7 +152,7 @@ import jobs.scripts.*
 						def moduleId = Modules.getModuleId(this)
 						def artifacts = findFiles(glob: 'artifacts\\*.zip')
 						Packaging.saveArtifact(this, 'vc', 'module', moduleId, artifacts[0].path)
-						if (env.BRANCH_NAME == 'master') {
+						if (env.BRANCH_NAME == 'master' || env.BRANCH_NAME =='1.1.3') {
 							processManifests(true) // publish artifacts to github releases
 						}
 						switch(env.BRANCH_NAME){
