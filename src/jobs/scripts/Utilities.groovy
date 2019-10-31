@@ -434,7 +434,7 @@ class Utilities {
     }
 
     def static getPlatformContainer(context){
-        def tag = context.env.BUILD_TAG.toLowerCase().replaceAll('.', '')
+        def tag = context.env.BUILD_TAG.toLowerCase().replaceAll("\.", '')
         def containerId = 'vc-platform-web'
         return "${tag}_${containerId}_1"
     }
