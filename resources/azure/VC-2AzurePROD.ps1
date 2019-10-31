@@ -51,5 +51,11 @@ Get-AzureStorageBlob -Blob ("Pages/vccom/docs/*") -Container "cms-content" -Cont
 Write-Host "Upload to $StoreName"
 Get-ChildItem -File -Recurse $Path | ForEach-Object { Set-AzureStorageBlobContent -File $_.FullName -Blob ("Pages/vccom/" + (([System.Uri]("$Path/")).MakeRelativeUri([System.Uri]($_.FullName))).ToString()) -Container "cms-content" -Context $BlobContext }
 
-Write-Host "Start $DestWebAppName"
+Write-Output "Restarting web site $DestWebAppName slot $SlotName"
 Start-AzureRmWebAppSlot -ResourceGroupName $DestResourceGroupName -Name $DestWebAppName -Slot $SlotName
+Start-Sleep -s 66
+
+Write-Output "Switching $DestWebAppName slot"
+Switch-AzureRmWebAppSlot -Name $DestWebAppName -ResourceGroupName $DestResourceGroupName -SourceSlotName "staging" -DestinationSlotName "production"
+
+

@@ -64,12 +64,16 @@ import jobs.scripts.*
 						Utilities.runE2E(this)
 						def e2eStatus = "E2E Success"
 					}
-					catch(any){
+					catch(any) {
 						e2eStatus = "E2E Failed"
 					}
-					finally{
+					finally {
 						def allureReportAddress = "${env.BUILD_URL}/allure"
 						//Utilities.notifyBuildStatus(this, SETTINGS['of365hook'], "${allureReportAddress}", "${e2eStatus}")
+						msg = "${e2eStatus}."
+						if(!(e2eStatus == 'E2E Success')) {
+							input(message: msg, submitter: env.APPROVERS)
+						}
 					}
 				}
 			}
@@ -80,6 +84,7 @@ import jobs.scripts.*
 						case 'deploy':
 							def stagingName = "deploy"
 							def storeName = "cms-content"
+							deployScript = 'VC-2AzurePROD.ps1'
 							Utilities.runSharedPS(this, "${deployScript}", "-StagingName ${stagingName} -StoreName ${storeName} -AzureBlobName ${SETTINGS['azureBlobNameProd']} -AzureBlobKey ${SETTINGS['azureBlobKeyProd']} -WebAppName ${SETTINGS['webAppNameProd']} -ResourceGroupName ${SETTINGS['resourceGroupNameProd']} -SubscriptionID ${SETTINGS['subscriptionID']}")
 							break
 					}
