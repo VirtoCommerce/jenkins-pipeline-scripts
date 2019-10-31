@@ -114,7 +114,10 @@ import jobs.scripts.*
 				stage('Theme Build and Deploy'){
 					timestamps {
 						def themePath = "${env.WORKSPACE}@tmp\\theme.zip"
-						build(job: "../vc-theme-default/${env.BRANCH_NAME}", parameters: [string(name: 'themeResultZip', value: themePath)])
+						def themeJobName = "../vc-theme-default/${env.BRANCH_NAME}"
+						if(env.BRANCH_NAME == "1.1.3")
+							themeJobName = "../vc-theme-default/master"
+						build(job: themeJobName, parameters: [string(name: 'themeResultZip', value: themePath)])
 						Packaging.installTheme(this, themePath)
 					}
 				}
