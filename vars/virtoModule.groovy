@@ -38,11 +38,8 @@ import jobs.scripts.*
 			Utilities.notifyBuildStatus(this, SETTINGS['of365hook'], '', 'STARTED')
 
 			stage('Checkout') {
-				timestamps { 	
-					// clean folder for a release
-					if (Packaging.getShouldPublish(this)) {
-						deleteDir()
-					}	
+				timestamps {
+					deleteDir()
 					checkout scm
 				}				
 			}			
@@ -82,7 +79,7 @@ import jobs.scripts.*
 				}
 			}			
 
-			if (env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'release') {
+			if (env.BRANCH_NAME=='1.1.3' || env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'release') {
 				stage('Create Test Environment') {
 					timestamps { 
 						// Start docker environment
@@ -143,18 +140,18 @@ import jobs.scripts.*
 				// }
 			}
 
-			if (env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'master') {
+			if (env.BRANCH_NAME == '1.1.3' || env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'master') {
 				stage('Publish')
 				{
 					timestamps { 
 						def moduleId = Modules.getModuleId(this)
 						def artifacts = findFiles(glob: 'artifacts\\*.zip')
 						Packaging.saveArtifact(this, 'vc', 'module', moduleId, artifacts[0].path)
-						if (Packaging.getShouldPublish(this)) {
+						if (env.BRANCH_NAME == 'master') {
 							processManifests(true) // publish artifacts to github releases
 						}
 						switch(env.BRANCH_NAME){
-							case 'master':
+							case ['master', '1.1.3']:
 								Packaging.createNugetPackages(this)
 								break
 							case 'dev':
@@ -274,20 +271,22 @@ def processManifest(def publish, def manifestPath)
 	if (publish) {
 		packageUrl = Packaging.publishRelease(this, version, releaseNotes)
 
-		updateModule(
-			id,
-			version,
-			platformVersion,
-			title,
-			authors,
-			owners,
-			description,
-			dependencies,
-			projectUrl,
-			packageUrl,
-			iconUrl)
+		if(env.BRANCH_NAME != '1.1.3'){
+			updateModule(
+				id,
+				version,
+				platformVersion,
+				title,
+				authors,
+				owners,
+				description,
+				dependencies,
+				projectUrl,
+				packageUrl,
+				iconUrl)
 
-		publishTweet("${title} ${version} published ${projectUrl} #virtocommerceci")
+			publishTweet("${title} ${version} published ${projectUrl} #virtocommerceci")
+		}
 	}
 }
 
