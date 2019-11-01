@@ -52,7 +52,7 @@ class Modules {
 
     def static runUnitTests(context)
     {
-        Modules.runTests(context, "-trait \"category=ci\" -trait \"category=Unit\"", "xUnit.UnitTests.xml")
+        Modules.runTests(context, "Category=Unit|Category=CI", "xUnit.UnitTests.xml")
     }
 
     def static runIntegrationTests(context)
@@ -63,7 +63,7 @@ class Modules {
 
         // create context
         context.withEnv(["VC_PLATFORM=http://ci.virtocommerce.com:${platformPort}", "VC_STOREFRONT=http://ci.virtocommerce.com:${storefrontPort}", "VIRTO_CONN_STR_VirtoCommerce=Data Source=http://ci.virtocommerce.com:${sqlPort};Initial Catalog=VirtoCommerce2;Persist Security Info=True;User ID=sa;Password=v!rto_Labs!;MultipleActiveResultSets=True;Connect Timeout=30" ]) {
-            Modules.runTests(context, "-trait \"category=Integration\"", "xUnit.IntegrationTests.xml")
+            Modules.runTests(context, "Integration", "xUnit.IntegrationTests.xml")
         }
     }
 
