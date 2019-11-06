@@ -15,19 +15,17 @@ $WebSiteName2 = "vc-public-pro"
 $SlotName = "staging"
 $DestResourceGroupName = "PROD-VC"
 
-$appId = "${env:HMAC_APP_ID}"
-$secret = "${env:HMAC_SECRET}"
-
-
 # Swap web site slots
 Start-Sleep -s 11
 
 Write-Output "Switching $WebSiteName slot"
 
 Switch-AzureRmWebAppSlot -Name $WebSiteName -ResourceGroupName $DestResourceGroupName -SourceSlotName $SlotName -DestinationSlotName "production"
+Stop-AzureRmWebAppSlot -ResourceGroupName $DestResourceGroupName -Name $WebSiteName -Slot $SlotName
 
 Write-Output "Switching $WebSiteName2 slot"
  
 Switch-AzureRmWebAppSlot -Name $WebSiteName2 -ResourceGroupName $DestResourceGroupName -SourceSlotName $SlotName -DestinationSlotName "production"
+Stop-AzureRmWebAppSlot -ResourceGroupName $DestResourceGroupName -Name $WebSiteName2 -Slot $SlotName
 
 Write-Output "Completed"
