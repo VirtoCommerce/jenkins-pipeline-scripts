@@ -13,7 +13,7 @@ node {
 		SETTINGS = new Settings(settingsFileContent)
 		SETTINGS.setRegion('virtocommerce')
     }
-    psfolder = "${env.WORKSPACE}\\resources\\vc_platformUpdate"
+    psfolder = "${env.WORKSPACE}\\resources\\demoVC"
     dir(psfolder){
         stage('Platform Update'){
             timestamps {
