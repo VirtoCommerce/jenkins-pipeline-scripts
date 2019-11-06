@@ -1,4 +1,4 @@
-#$ErrorActionPreference = 'Stop'
+$ErrorActionPreference = 'Stop'
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
 $ApplicationID ="${env:AzureAppID}"
@@ -11,7 +11,6 @@ Add-AzureRmAccount -Credential $psCred -TenantId $TenantID -ServicePrincipal
 Select-AzureRmSubscription -SubscriptionId $SubscriptionID
 
 $WebSiteName = "vc-admin-pro"
-$WebSiteName2 = "vc-public-pro"
 $SlotName = "staging"
 $DestResourceGroupName = "PROD-VC"
 
@@ -22,10 +21,5 @@ Write-Output "Switching $WebSiteName slot"
 
 Switch-AzureRmWebAppSlot -Name $WebSiteName -ResourceGroupName $DestResourceGroupName -SourceSlotName $SlotName -DestinationSlotName "production"
 Stop-AzureRmWebAppSlot -ResourceGroupName $DestResourceGroupName -Name $WebSiteName -Slot $SlotName
-
-Write-Output "Switching $WebSiteName2 slot"
- 
-Switch-AzureRmWebAppSlot -Name $WebSiteName2 -ResourceGroupName $DestResourceGroupName -SourceSlotName $SlotName -DestinationSlotName "production"
-Stop-AzureRmWebAppSlot -ResourceGroupName $DestResourceGroupName -Name $WebSiteName2 -Slot $SlotName
 
 Write-Output "Completed"
