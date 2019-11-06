@@ -13,23 +13,20 @@ node {
 		SETTINGS = new Settings(settingsFileContent)
 		SETTINGS.setRegion('virtocommerce')
     }
-    psfolder = "${env.WORKSPACE}\\resources\\demoVC"
+    psfolder = "${env.WORKSPACE}\\resources\\virtocommerce"
     dir(psfolder){
         stage('Platform Update'){
             timestamps {
-                SETTINGS.setEnvironment('dev_platform')
+                SETTINGS.setEnvironment('platform')
                 withEnv(["AzureSubscriptionIDProd=${SETTINGS['subscriptionID']}", "AzureResourceGroupNameProd=${SETTINGS['resourceGroupName']}", "AzureWebAppAdminNameProd=${SETTINGS['appName']}"]){
                     powershell "${psfolder}\\PlatformUpdate.ps1"
                 }
             }
         }
 
-        stage('Storefront Update'){
-            timestamps {
-                SETTINGS.setEnvironment('dev_storefront')
-                withEnv(["AzureSubscriptionIDProd=${SETTINGS['subscriptionID']}", "AzureResourceGroupNameProd=${SETTINGS['resourceGroupName']}", "AzureWebAppNameProd=${SETTINGS['appName']}"]){
-                    powershell "${psfolder}\\StorefrontUpdate.ps1"
-                }
+        stage('SwapSlot'){
+            timestamps{
+                powershell "${psfolder}\\SwapSlot.ps1"
             }
         }
     }
