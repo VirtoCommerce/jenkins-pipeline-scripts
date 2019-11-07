@@ -5,7 +5,7 @@ $ApplicationID ="${env:AzureAppID}"
 $APIKey = ConvertTo-SecureString "${env:AzureAPIKey}" -AsPlainText -Force
 $psCred = New-Object System.Management.Automation.PSCredential($ApplicationID, $APIKey)
 $TenantID = "${env:AzureTenantID}"
-$SubscriptionID = "${env:AzureSubscriptionIDProd}"
+$SubscriptionID = "CloudPlatform"
 
 Add-AzureRmAccount -Credential $psCred -TenantId $TenantID -ServicePrincipal
 Select-AzureRmSubscription -SubscriptionId $SubscriptionID
