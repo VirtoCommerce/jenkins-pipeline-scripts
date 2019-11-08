@@ -44,54 +44,26 @@ function Get-KuduApiAuthorisationHeaderValue($DestResourceGroupName, $DestWebApp
 
 $DestKuduApiAuthorisationToken = Get-KuduApiAuthorisationHeaderValue $DestResourceGroupName $DestWebAppName
 
+Write-Host "Stop WebApp $DestWebAppName"
 
-if ($slotName = "staging"){
-  Write-Host "Stop WebApp $DestWebAppName-$slotName"
+Stop-AzureRmWebApp -ResourceGroupName $DestResourceGroupName -Name $DestWebAppName
 
-  Stop-AzureRmWebAppSlot -ResourceGroupName $DestResourceGroupName -Name $DestWebAppName -Slot $slotName
+Start-Sleep -s 15
 
-  Start-Sleep -s 15
+Write-Host "Deleting Files at $DestKuduDelPath"
 
-  Write-Host "Deleting Files at $DestKuduDelPath"
+Invoke-RestMethod -Uri $DestKuduDelPath -Headers @{"Authorization"=$DestKuduApiAuthorisationToken;"If-Match"="*"} -Method DELETE
 
-  Invoke-RestMethod -Uri $DestKuduDelPath -Headers @{"Authorization"=$DestKuduApiAuthorisationToken;"If-Match"="*"} -Method DELETE
+Write-Host "Uploading File $Path2Zip to $DestKuduPath"
 
-  Write-Host "Uploading File $Path2Zip to $DestKuduPath"
+Invoke-RestMethod -Uri $DestKuduPath `
+                        -Headers @{"Authorization"=$DestKuduApiAuthorisationToken;"If-Match"="*"} `
+                        -Method PUT `
+                        -InFile $Path2Zip `
+                        -ContentType "multipart/form-data"
 
-  Invoke-RestMethod -Uri $DestKuduPath `
-                          -Headers @{"Authorization"=$DestKuduApiAuthorisationToken;"If-Match"="*"} `
-                          -Method PUT `
-                          -InFile $Path2Zip `
-                          -ContentType "multipart/form-data"
+Start-Sleep -s 5
 
-  Start-Sleep -s 5
+Write-Host "Start WebApp $DestWebAppName"
 
-  Write-Host "Start WebApp $DestWebAppName-$slotName"
-
-  Start-AzureRmWebAppSlot -ResourceGroupName $DestResourceGroupName -Name $DestWebAppName -Slot $slotName
-}
-else{
-  Write-Host "Stop WebApp $DestWebAppName"
-
-  Stop-AzureRmWebApp -ResourceGroupName $DestResourceGroupName -Name $DestWebAppName
-
-  Start-Sleep -s 15
-
-  Write-Host "Deleting Files at $DestKuduDelPath"
-
-  Invoke-RestMethod -Uri $DestKuduDelPath -Headers @{"Authorization"=$DestKuduApiAuthorisationToken;"If-Match"="*"} -Method DELETE
-
-  Write-Host "Uploading File $Path2Zip to $DestKuduPath"
-
-  Invoke-RestMethod -Uri $DestKuduPath `
-                          -Headers @{"Authorization"=$DestKuduApiAuthorisationToken;"If-Match"="*"} `
-                          -Method PUT `
-                          -InFile $Path2Zip `
-                          -ContentType "multipart/form-data"
-
-  Start-Sleep -s 5
-
-  Write-Host "Start WebApp $DestWebAppName"
-
-  Start-AzureRmWebApp -ResourceGroupName $DestResourceGroupName -Name $DestWebAppName
-}
+Start-AzureRmWebApp -ResourceGroupName $DestResourceGroupName -Name $DestWebAppName
