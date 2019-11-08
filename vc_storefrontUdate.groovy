@@ -18,7 +18,7 @@ node {
     dir(psfolder){
          stage('Storefront Update'){
             timestamps {
-                SETTINGS.setEnvironment('storefront')
+                SETTINGS.setEnvironment('dev_storefront')
                 withEnv(["AzureSubscriptionIDProd=${SETTINGS['subscriptionID']}", "AzureResourceGroupNameProd=${SETTINGS['resourceGroupName']}", "AzureWebAppNameProd=${SETTINGS['appName']}"]){
                     powershell "${psfolder}\\StorefrontUpdate.ps1"
                 }
