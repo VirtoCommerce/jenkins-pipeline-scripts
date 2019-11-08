@@ -199,6 +199,7 @@ import jobs.scripts.*
 
 		//step([$class: 'GitHubCommitStatusSetter', statusResultSource: [$class: 'ConditionalStatusResultSource', results: []]])
 		//Utilities.updateGithubCommitStatus(this, currentBuild.result, '')
+		Utilities.cleanPRFolder(this)
     }
 }
 

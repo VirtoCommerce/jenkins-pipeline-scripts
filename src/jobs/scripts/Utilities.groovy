@@ -546,4 +546,10 @@ class Utilities {
             ]
         ])
     }
+
+    def static cleanPRFolder(context){
+        if(Utilities.isPullRequest(context)){
+            context.cleanWs notFailBuild: true
+        }
+    }
 }

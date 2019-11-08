@@ -150,5 +150,6 @@ def call(body) {
 		}
 	
 	  	//step([$class: 'GitHubCommitStatusSetter', statusResultSource: [$class: 'ConditionalStatusResultSource', results: []]])
+		  Utilities.cleanPRFolder(this)
 	}
 }
