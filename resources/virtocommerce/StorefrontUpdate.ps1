@@ -23,10 +23,16 @@ Select-AzureRmSubscription -SubscriptionId $SubscriptionID
 
 $DestResourceGroupName = "${env:AzureResourceGroupNameProd}"
 $DestWebAppName = "${env:AzureWebAppNameProd}"
-$slotName = "staging"
-$DestKuduDelPath = "https://$DestWebAppName-$slotName.scm.azurewebsites.net/api/vfs/site/wwwroot/?recursive=true"
-$DestKuduConfPath = "https://$DestWebAppName-$slotName.scm.azurewebsites.net/api/vfs/site/wwwroot/web.config"
-$DestKuduPath = "https://$DestWebAppName-$slotName.scm.azurewebsites.net/api/zip/site/wwwroot/"
+if ($DestResourceGroupName = "PROD-VC"){
+  $slotName = "staging"
+  $DestKuduDelPath = "https://$DestWebAppName-$slotName.scm.azurewebsites.net/api/vfs/site/wwwroot/?recursive=true"
+  $DestKuduPath = "https://$DestWebAppName-$slotName.scm.azurewebsites.net/api/zip/site/wwwroot/"
+}
+else {
+  $slotName = ""
+  $DestKuduDelPath = "https://$DestWebAppName.scm.azurewebsites.net/api/vfs/site/wwwroot/?recursive=true"
+  $DestKuduPath = "https://$DestWebAppName.scm.azurewebsites.net/api/zip/site/wwwroot/"
+}
 
 function Get-AzureRmWebAppPublishingCredentials($DestResourceGroupName, $DestWebAppName, $slotName = $null){
 	if ([string]::IsNullOrWhiteSpace($slotName)){
@@ -49,7 +55,7 @@ function Get-KuduApiAuthorisationHeaderValue($DestResourceGroupName, $DestWebApp
 $DestKuduApiAuthorisationToken = Get-KuduApiAuthorisationHeaderValue $DestResourceGroupName $DestWebAppName
 
 
-if ($DestResourceGroupName = "PROD-VC"){
+if ($slotName = "staging"){
   Write-Host "Stop WebApp $DestWebAppName-$slotName"
 
   Stop-AzureRmWebAppSlot -ResourceGroupName $DestResourceGroupName -Name $DestWebAppName -Slot $slotName
