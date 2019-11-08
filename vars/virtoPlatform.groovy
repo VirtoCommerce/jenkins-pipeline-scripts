@@ -236,10 +236,10 @@ def call(body) {
 			// 	emailext body:mailBody, subject: "${env.JOB_NAME}:${env.BUILD_NUMBER} - ${currentBuild.currentResult}", recipientProviders: [[$class: 'CulpritsRecipientProvider'], [$class: 'RequesterRecipientProvider']]
 			// }
 	    	//step([$class: 'Mailer', notifyEveryUnstableBuild: true, recipients: 'dev@virtoway.com', sendToIndividuals: true])
+			Utilities.cleanPRFolder(this)
 		}
 	
 	  	//step([$class: 'GitHubCommitStatusSetter', statusResultSource: [$class: 'ConditionalStatusResultSource', results: []]])
 		//Utilities.updateGithubCommitStatus(this, currentBuild.result, '')
-		Utilities.cleanPRFolder(this)
 	}
 }
