@@ -23,28 +23,16 @@ Select-AzureRmSubscription -SubscriptionId $SubscriptionID
 
 $DestResourceGroupName = "${env:AzureResourceGroupNameProd}"
 $DestWebAppName = "${env:AzureWebAppNameProd}"
-if ($DestResourceGroupName = "PROD-VC"){
-  $slotName = "staging"
-  Write-Host "$slotName is..."
-  $DestKuduDelPath = "https://$DestWebAppName-$slotName.scm.azurewebsites.net/api/vfs/site/wwwroot/?recursive=true"
-  $DestKuduPath = "https://$DestWebAppName-$slotName.scm.azurewebsites.net/api/zip/site/wwwroot/"
-}
-else{
-  $slotName = ""
-  Write-Host "$slotName is..."
-  $DestKuduDelPath = "https://$DestWebAppName.scm.azurewebsites.net/api/vfs/site/wwwroot/?recursive=true"
-  $DestKuduPath = "https://$DestWebAppName.scm.azurewebsites.net/api/zip/site/wwwroot/"
-}
+$slotName = " "
+Write-Host "$slotName is..."
+$DestKuduDelPath = "https://$DestWebAppName.scm.azurewebsites.net/api/vfs/site/wwwroot/?recursive=true"
+$DestKuduPath = "https://$DestWebAppName.scm.azurewebsites.net/api/zip/site/wwwroot/"
 
 function Get-AzureRmWebAppPublishingCredentials($DestResourceGroupName, $DestWebAppName, $slotName = $null){
-	if ([string]::IsNullOrWhiteSpace($slotName)){
-    $ResourceType = "Microsoft.Web/sites/config"
-		$DestResourceName = "$DestWebAppName/publishingcredentials"
-	}
-	else{
-    $ResourceType = "Microsoft.Web/sites/slots/config"
-		$DestResourceName = "$DestWebAppName/$slotName/publishingcredentials"
-	}
+
+  $ResourceType = "Microsoft.Web/sites/config"
+  $DestResourceName = "$DestWebAppName/publishingcredentials"
+	
 	$DestPublishingCredentials = Invoke-AzureRmResourceAction -ResourceGroupName $DestResourceGroupName -ResourceType $ResourceType -ResourceName $DestResourceName -Action list -ApiVersion 2015-08-01 -Force
     	return $DestPublishingCredentials
 }
