@@ -312,7 +312,7 @@ class Packaging {
             paths += "\"$test.path\" "
         }
 
-        Utilities.runUnitTest(context, "-trait \"category=ci\" -trait \"category=Unit\"", paths, "xUnit.UnitTests.xml")
+        Utilities.runUnitTest(context, "Category=Unit|Category=CI", paths, "xUnit.UnitTests.xml")
     }
 
 	def static publishRelease(context, version, releaseNotes)
