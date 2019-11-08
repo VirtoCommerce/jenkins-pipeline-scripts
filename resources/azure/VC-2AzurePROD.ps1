@@ -39,7 +39,7 @@ Select-AzureRmSubscription -SubscriptionId $SubscriptionID
 $DestWebAppName = $WebAppName
 $DestResourceGroupName = $ResourceGroupName
 
-stopSlot -DestWebAppName $DestWebAppName -DestResourceGroupName $DestResourceGroupName -SlotName $SlotName
+Stop-AzureRmWebAppSlot -ResourceGroupName $DestResourceGroupName -Name $DestWebAppName -Slot $SlotName
 
 New-AzureStorageContainer -Name $DestContainer -Context $BlobContext -Permission Container
 Get-AzureStorageBlob -Container $StoreName -Context $BlobContext | Start-AzureStorageBlobCopy -DestContainer "$DestContainer" -Force
@@ -57,13 +57,4 @@ Start-Sleep -s 66
 Write-Output "Switching $DestWebAppName slot"
 Switch-AzureRmWebAppSlot -Name $DestWebAppName -ResourceGroupName $DestResourceGroupName -SourceSlotName "staging" -DestinationSlotName "production"
 
-stopSlot -DestWebAppName $DestWebAppName -DestResourceGroupName $DestResourceGroupName -SlotName $SlotName
-function stopSlot {
-    param (
-        [string] $DestWebAppName,
-        [string] $DestResourceGroupName,
-        [string] $SlotName
-    )
-    Write-Host "Stop $DestWebAppName"
-    Stop-AzureRmWebAppSlot -ResourceGroupName $DestResourceGroupName -Name $DestWebAppName -Slot $SlotName
-}
+Stop-AzureRmWebAppSlot -ResourceGroupName $DestResourceGroupName -Name $DestWebAppName -Slot $SlotName
