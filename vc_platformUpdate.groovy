@@ -26,7 +26,22 @@ node {
 
         stage('E2E'){
             timestamps{
-                Utilities.runE2E(this)
+                timeout(20){ // minutes by default
+                    try{
+                        Utilities.runE2E(this)
+                        def e2eStatus = "E2E Success"
+                    }
+                    catch(any){
+                        e2eStatus = "E2E Failed"
+                    }
+                    finally{
+                        //Utilities.notifyBuildStatus(this, SETTINGS['of365hook'], "${e2eStatus}")
+                        msg = "${e2eStatus}."
+                        if(!(e2eStatus == 'E2E Success')) {
+                            input(message: msg, submitter: env.APPROVERS)
+                        }
+                    }
+                }
             }
         }
 
@@ -35,5 +50,11 @@ node {
                 powershell "${psfolder}\\SwapSlot.ps1"
             }
         }
+        
+        stage('Cleanup'){
+            timestamps{
+                Packaging.cleanSolutions(this)
+			}
+		}
     }
 }

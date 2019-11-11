@@ -58,21 +58,23 @@ import jobs.scripts.*
 				}
 			}
 
-			stage('E2E') {
-				timestamps {
-					try{
-						Utilities.runE2E(this)
-						def e2eStatus = "E2E Success"
-					}
-					catch(any) {
-						e2eStatus = "E2E Failed"
-					}
-					finally {
-						def allureReportAddress = "${env.BUILD_URL}/allure"
-						//Utilities.notifyBuildStatus(this, SETTINGS['of365hook'], "${allureReportAddress}", "${e2eStatus}")
-						msg = "${e2eStatus}."
-						if(!(e2eStatus == 'E2E Success')) {
-							input(message: msg, submitter: env.APPROVERS)
+			stage('E2E'){
+				timestamps{
+					timeout(20){ // minutes by default
+						try{
+							Utilities.runE2E(this)
+							def e2eStatus = "E2E Success"
+						}
+						catch(any){
+							e2eStatus = "E2E Failed"
+						}
+						finally{
+							def allureReportAddress = "${env.BUILD_URL}/allure"
+							//Utilities.notifyBuildStatus(this, SETTINGS['of365hook'], "${allureReportAddress}", "${e2eStatus}")
+							msg = "${e2eStatus}."
+							if(!(e2eStatus == 'E2E Success')) {
+								input(message: msg, submitter: env.APPROVERS)
+							}
 						}
 					}
 				}
