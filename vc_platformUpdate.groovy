@@ -24,6 +24,12 @@ node {
             }
         }
 
+        stage('E2E'){
+            timestamps{
+                Utilities.runE2E(this)
+            }
+        }
+
         stage('SwapSlot'){
             timestamps{
                 powershell "${psfolder}\\SwapSlot.ps1"

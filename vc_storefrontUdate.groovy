@@ -25,6 +25,12 @@ node {
             }
         }
         
+        stage('E2E'){
+            timestamps{
+                Utilities.runE2E(this)
+            }
+        }
+        
         stage('Cleanup') {
             timestamps {
                 Packaging.cleanSolutions(this)
