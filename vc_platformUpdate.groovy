@@ -15,10 +15,25 @@ node {
     }
     psfolder = "${env.WORKSPACE}\\resources\\virtocommerce"
     dir(psfolder){
+
+        stage('User Input'){
+            timeout(time: 30, unit: 'MINUTES'){
+                def envChoices = input(message: "Choose environment to update", parameters: [choice(name: 'Environments', choices:"Dev\nProduction")])
+                if(envChoices == 'Dev'){
+                    envChoices = ""
+                }
+                else if (envChoices == 'Production'){
+                    envChoices = "staging"
+                }
+            }
+        }
+
         stage('Platform Update'){
-            timestamps {
+            timestamps{
                 SETTINGS.setEnvironment('platform')
-                withEnv(["AzureSubscriptionIDProd=${SETTINGS['subscriptionID']}", "AzureResourceGroupNameProd=${SETTINGS['resourceGroupName']}", "AzureWebAppAdminNameProd=${SETTINGS['appName']}"]){
+                withEnv([
+                    "AzureSubscriptionIDProd=${SETTINGS['subscriptionID']}", "AzureResourceGroupNameProd=${SETTINGS['resourceGroupName']}",
+                    "AzureWebAppAdminNameProd=${SETTINGS['appName']}", "devOrStaging=${'envChoices'}"]){
                     powershell "${psfolder}\\PlatformUpdate.ps1"
                 }
             }
@@ -26,7 +41,7 @@ node {
 
         stage('E2E'){
             timestamps{
-                timeout(20){ // minutes by default
+                timeout(time: 20, unit: 'MINUTES'){
                     try{
                         Utilities.runE2E(this)
                         def e2eStatus = "E2E Success"

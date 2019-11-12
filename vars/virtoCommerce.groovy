@@ -60,7 +60,7 @@ import jobs.scripts.*
 
 			stage('E2E'){
 				timestamps{
-					timeout(20){ // minutes by default
+					timeout(time: 20, unit: 'MINUTES'){
 						try{
 							Utilities.runE2E(this)
 							def e2eStatus = "E2E Success"

@@ -22,7 +22,8 @@ Select-AzureRmSubscription -SubscriptionId $SubscriptionID
 
 $DestResourceGroupName = "${env:AzureResourceGroupNameProd}"
 $DestWebAppName = "${env:AzureWebAppAdminNameProd}"
-$slotName = "staging"
+$slotName = "${env:devOrStaging}" #"staging"
+Write-Host "Slot is: $slotName"
 $DestKuduDelPath = "https://$DestWebAppName-$slotName.scm.azurewebsites.net/api/vfs/site/wwwroot/platform/?recursive=true"
 $DestKuduPath = "https://$DestWebAppName-$slotName.scm.azurewebsites.net/api/zip/site/wwwroot/platform/"
 $DestKuduPutPath = "https://$DestWebAppName-$slotName.scm.azurewebsites.net/api/vfs/site/wwwroot/platform/App_Data/VirtoCommerce.lic"
