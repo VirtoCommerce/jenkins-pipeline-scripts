@@ -23,6 +23,9 @@ Select-AzureRmSubscription -SubscriptionId $SubscriptionID
 $DestResourceGroupName = "${env:AzureResourceGroupNameProd}"
 $DestWebAppName = "${env:AzureWebAppAdminNameProd}"
 $slotName = "${env:devOrStaging}" #"staging"
+if($null -eq $slotName){
+    $slotName = "staging"
+}
 Write-Host "Slot is: $slotName"
 $DestKuduDelPath = "https://$DestWebAppName-$slotName.scm.azurewebsites.net/api/vfs/site/wwwroot/platform/?recursive=true"
 $DestKuduPath = "https://$DestWebAppName-$slotName.scm.azurewebsites.net/api/zip/site/wwwroot/platform/"
