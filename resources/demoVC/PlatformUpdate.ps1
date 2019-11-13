@@ -23,7 +23,7 @@ Select-AzureRmSubscription -SubscriptionId $SubscriptionID
 $DestResourceGroupName = "${env:AzureResourceGroupNameProd}"
 $DestWebAppName = "${env:AzureWebAppAdminNameProd}"
 $slotName = "${env:devOrStaging}" #"staging"
-if($null -eq $slotName){
+if([string]::IsNullOrEmpty($slotName)){
     $slotName = "staging"
 }
 Write-Host "Slot is: $slotName"
