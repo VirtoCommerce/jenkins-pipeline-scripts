@@ -46,12 +46,12 @@ def call(body) {
             }   
 
             if(!Utilities.isPullRequest(this)){
-                // stage('Publish'){
-                //     powershell "vc-build PublishPackages -ApiKey ${env.NUGET_KEY} -skip Clean+Restore+Compile+Test"
+                stage('Publish'){
+                    powershell "vc-build PublishPackages -ApiKey ${env.NUGET_KEY} -skip Clean+Restore+Compile+Test"
                 //     powershell "vc-build PublishModuleManifest"
                 //     def orgName = Utilities.getOrgName(this)
                 //     powershell "vc-build Release -GitHubUser ${orgName} -GitHubToken ${env.GITHUB_TOKEN} -PreRelease -skip Clean+Restore+Compile+Test"
-                // }
+                }
 
             stage('Deploy'){
                 def moduleId = Modules.getModuleId(this)
