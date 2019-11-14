@@ -50,16 +50,17 @@ def call(body) {
             //     def orgName = Utilities.getOrgName(this)
             //     powershell "vc-build Release -GitHubUser ${orgName} -GitHubToken ${env.GITHUB_TOKEN} -PreRelease -skip Clean+Restore+Compile+Test"
             // }
-
-            stage('Deploy'){
-                // $ZipFile,
-                // $WebAppName,
-                // $ResourceGroupName,
-                // $SubscriptionID,
-                // $DestContentPath = ""
-                def artifacts = findFiles(glob: "artifacts/*.zip")
-                def artifactPath = artifacts[0].path
-                Utilities.runSharedPS(this, "v3\\DeployTo-Azure.ps1", "-ZipFile \"${artifactPath}\" -WebAppName ${SETTINGS['webAppName']} -ResourceGroupName ${SETTINGS['resourceGroupName']} -SubscriptionID ${SETTINGS['subscriptionID']} -DestContentPath \"platform\"")
+            if(!Utilities.isPullRequest(this)){
+                stage('Deploy'){
+                    // $ZipFile,
+                    // $WebAppName,
+                    // $ResourceGroupName,
+                    // $SubscriptionID,
+                    // $DestContentPath = ""
+                    def artifacts = findFiles(glob: "artifacts/*.zip")
+                    def artifactPath = artifacts[0].path
+                    Utilities.runSharedPS(this, "v3\\DeployTo-Azure.ps1", "-ZipFile \"${artifactPath}\" -WebAppName ${SETTINGS['webAppName']} -ResourceGroupName ${SETTINGS['resourceGroupName']} -SubscriptionID ${SETTINGS['subscriptionID']} -DestContentPath \"platform\"")
+                }
             }
         }
     }
