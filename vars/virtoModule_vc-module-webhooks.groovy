@@ -14,12 +14,12 @@ import jobs.scripts.*
     node
     {
 		properties([disableConcurrentBuilds()])
-	    def deployScript = 'VC-Module2AzureBulkUpdateDev.ps1'
+	    def deployScript = 'VC-Module2AzureWebhooksDev.ps1'
 		def dockerTag = "${env.BRANCH_NAME}-branch"
 		def buildOrder = Utilities.getNextBuildOrder(this)
 		projectType = config.projectType
-	    if (env.BRANCH_NAME == 'bulk-update/master') {
-			deployScript = 'VC-Module2AzureBulkUpdateQA.ps1'
+	    if (env.BRANCH_NAME == 'master') {
+			deployScript = 'VC-Module2AzureWebhooksQA.ps1'
 			dockerTag = "latest"
 		}
 		try {	
@@ -27,14 +27,13 @@ import jobs.scripts.*
 			Utilities.notifyBuildStatus(this, "started")
 
 			stage('Checkout') {
-				timestamps { 	
-					// clean folder for a release
+				timestamps {
 					if (Packaging.getShouldPublish(this)) {
 						deleteDir()
-					}	
+					}
 					checkout scm
-				}				
-			}			
+				}
+			}
 
 			if(Utilities.checkAndAbortBuild(this))
 			{
@@ -43,8 +42,7 @@ import jobs.scripts.*
 
 			stage('Build')
 			{
-				timestamps { 
-												
+				timestamps {
 					Packaging.startAnalyzer(this)
 					Packaging.buildSolutions(this)
 				}
@@ -71,36 +69,32 @@ import jobs.scripts.*
 				}
 			}
 
-			if (env.BRANCH_NAME == 'bulk-update/dev' || env.BRANCH_NAME == 'bulk-update/master'){
-				stage('ARM deploy'){
-					Utilities.createInfrastructure(this)
-				}
-			}
+			// if (env.BRANCH_NAME == 'dev'){
+			// 	stage('ARM deploy'){
+			// 		Utilities.createInfrastructure(this)
+			// 	}
+			// }
 
-			if (env.BRANCH_NAME == 'bulk-update/dev' || env.BRANCH_NAME == 'bulk-update/master'){
+			if (env.BRANCH_NAME == 'dev'){
 				stage('Publish'){
 					timestamps{
-						// if (Packaging.getShouldPublish(this)) {
-						// 	processManifests(true) // publish artifacts to github releases
-						// }
 						switch(env.BRANCH_NAME){
-							case 'bulk-update/master':
-							 	//Packaging.createNugetPackages(this)
+							case 'master':
 								Utilities.runSharedPS(this, "${deployScript}")
 							 	break
-							case 'bulk-update/dev':
+							case 'dev':
 								Utilities.runSharedPS(this, "${deployScript}")
 								break
 						}
 					}
 				}
-			}		
+			}
 
 			stage('Cleanup') {
 				timestamps { 
 					Packaging.cleanSolutions(this)
 				}
-			}				
+			}
 		}
 		catch (any) {
 			currentBuild.result = 'FAILURE'
