@@ -22,9 +22,18 @@ import jobs.scripts.*
 			deployScript = 'VC-Module2AzureWebhooksQA.ps1'
 			dockerTag = "latest"
 		}
-		try {	
-			step([$class: 'GitHubCommitStatusSetter', contextSource: [$class: 'ManuallyEnteredCommitContextSource', context: 'ci.virtocommerce.com'], statusResultSource: [$class: 'ConditionalStatusResultSource', results: [[$class: 'AnyBuildResult', message: 'Building on Virto Commerce CI', state: 'PENDING']]]])			
-			Utilities.notifyBuildStatus(this, "started")
+
+		def SETTINGS
+		def settingsFileContent
+		// configFileProvider([configFile(fileId: 'shared_lib_settings', variable: 'SETTINGS_FILE')]) {
+		// 	settingsFileContent = readFile(SETTINGS_FILE)
+		// }
+		// SETTINGS = new Settings(settingsFileContent)
+		// SETTINGS.setEnvironment(env.BRANCH_NAME)
+		// SETTINGS.setRegion('module_webhooks')
+
+		try {
+			//Utilities.notifyBuildStatus(this, SETTINGS['of365hook'], '', 'STARTED')
 
 			stage('Checkout') {
 				timestamps {
@@ -97,20 +106,13 @@ import jobs.scripts.*
 		finally {
 			Packaging.stopDockerTestEnvironment(this, dockerTag)
 			Utilities.generateAllureReport(this)
-			//step([$class: 'LogParserPublisher', failBuildOnError: false, parsingRulesPath: env.LOG_PARSER_RULES, useProjectRule: false])
-			if(currentBuild.result != 'FAILURE') {
-				//step([$class: 'Mailer', notifyEveryUnstableBuild: true, recipients: emailextrecipients([[$class: 'CulpritsRecipientProvider'], [$class: 'RequesterRecipientProvider']])])
-			}
-			else {
-				def log = currentBuild.rawBuild.getLog(300)
-				def failedStageLog = Utilities.getFailedStageStr(log)
-				def failedStageName = Utilities.getFailedStageName(failedStageLog)
-				def mailBody = Utilities.getMailBody(this, failedStageName, failedStageLog)
-				//emailext body:mailBody, subject: "${env.JOB_NAME}:${env.BUILD_NUMBER} - ${currentBuild.currentResult}", recipientProviders: [[$class: 'CulpritsRecipientProvider'], [$class: 'RequesterRecipientProvider']]
-			}
+			//Utilities.notifyBuildStatus(this, SETTINGS['of365hook'], "Build finished", currentBuild.currentResult)
+			step([$class: 'LogParserPublisher',
+				  failBuildOnError: false,
+				  parsingRulesPath: env.LOG_PARSER_RULES,
+				  useProjectRule: false])
+			Utilities.cleanPRFolder(this)
 		}
-
-		step([$class: 'GitHubCommitStatusSetter', statusResultSource: [$class: 'ConditionalStatusResultSource', results: []]])
     }
 }
 
@@ -214,7 +216,7 @@ def updateModule(def id, def version, def platformVersion, def title, def author
 {
 	// MODULES
 	dir('modules') {
-		checkout([$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'sasha-jenkins', url: 'git@github.com:VirtoCommerce/vc-modules.git']]])
+		git credentialsId: 'vc-ci', url: 'https://github.com/VirtoCommerce/vc-modules.git'
 
 		def inputFile = readFile file: 'modules.json', encoding: 'utf-8'
 		def json = Utilities.jsonParse(inputFile)
