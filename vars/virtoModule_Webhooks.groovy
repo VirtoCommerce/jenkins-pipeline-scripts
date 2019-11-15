@@ -97,19 +97,16 @@ import jobs.scripts.*
 		finally {
 			Packaging.stopDockerTestEnvironment(this, dockerTag)
 			Utilities.generateAllureReport(this)
-			step([$class: 'LogParserPublisher',
-				  failBuildOnError: false,
-				  parsingRulesPath: env.LOG_PARSER_RULES,
-				  useProjectRule: false])
+			//step([$class: 'LogParserPublisher', failBuildOnError: false, parsingRulesPath: env.LOG_PARSER_RULES, useProjectRule: false])
 			if(currentBuild.result != 'FAILURE') {
-				step([$class: 'Mailer', notifyEveryUnstableBuild: true, recipients: emailextrecipients([[$class: 'CulpritsRecipientProvider'], [$class: 'RequesterRecipientProvider']])])
+				//step([$class: 'Mailer', notifyEveryUnstableBuild: true, recipients: emailextrecipients([[$class: 'CulpritsRecipientProvider'], [$class: 'RequesterRecipientProvider']])])
 			}
 			else {
 				def log = currentBuild.rawBuild.getLog(300)
 				def failedStageLog = Utilities.getFailedStageStr(log)
 				def failedStageName = Utilities.getFailedStageName(failedStageLog)
 				def mailBody = Utilities.getMailBody(this, failedStageName, failedStageLog)
-				emailext body:mailBody, subject: "${env.JOB_NAME}:${env.BUILD_NUMBER} - ${currentBuild.currentResult}", recipientProviders: [[$class: 'CulpritsRecipientProvider'], [$class: 'RequesterRecipientProvider']]
+				//emailext body:mailBody, subject: "${env.JOB_NAME}:${env.BUILD_NUMBER} - ${currentBuild.currentResult}", recipientProviders: [[$class: 'CulpritsRecipientProvider'], [$class: 'RequesterRecipientProvider']]
 			}
 		}
 
