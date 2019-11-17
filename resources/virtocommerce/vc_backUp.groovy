@@ -2,7 +2,7 @@ import jobs.scripts.*
 
 node {
     def SETTINGS
-    
+
     stage('Init'){
         deleteDir()
         checkout scm
@@ -16,11 +16,19 @@ node {
 
     psfolder = "${env.WORKSPACE}\\resources\\virtocommerce"
     dir(psfolder){
-         stage('Storefront Update'){
+         stage('Content backup to DEV'){
             timestamps {
                 SETTINGS.setEnvironment('backUp')
-                withEnv(["AzureSubscriptionIDProd=${SETTINGS['subscriptionID']}", "AzureResourceGroupNameProd=${SETTINGS['resourceGroupName']}", "AzureWebAppNameProd=${SETTINGS['appName']}"]){
-                    powershell "${psfolder}"
+                withEnv([
+                        "SubscriptionID=${SETTINGS['subscriptionID']}",
+                        "ResourceGroupName=${SETTINGS['resourceGroupName']}",
+                        "WebAppName=${SETTINGS['appName']}",
+                        "sourceStorage=${SETTINGS['sourceStorage']}",
+                        "destStorage=${SETTINGS['destStorage']}",
+                        "sourceSAS=${SETTINGS['sourceSAS']}",
+                        "destSAS=${SETTINGS['destSAS']}"
+                        ]){
+                    powershell "${psfolder}\\vc_backUp.ps1"
                 }
             }
         }
