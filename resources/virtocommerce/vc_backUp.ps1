@@ -22,9 +22,10 @@ Select-AzureRmSubscription -SubscriptionId $SubscriptionID
 Write-Host "Stop WebApp $WebAppName"
 Stop-AzureRmWebApp -ResourceGroupName $ResourceGroupName -Name $WebAppName
 
-& "azcopy.exe" copy
+& "resources/virtocommerce/azcopy.exe" copy
 Write-Output "Getting publishing profile for $WebAppName app"
-& "azcopy.exe" copy https://${sourceStorage}.blob.core.windows.net/cms-content${sourceSAS} https://${destStorage}.blob.core.windows.net/cms-content${destSAS}
+#& "${env:Utils}\AzCopy10\AzCopy"
+& "resources/virtocommerce/azcopy.exe" copy https://${sourceStorage}.blob.core.windows.net/cms-content${sourceSAS} https://${destStorage}.blob.core.windows.net/cms-content${destSAS}
 
 Write-Host "Start WebApp $WebAppName"
 Start-AzureRmWebApp -ResourceGroupName $ResourceGroupName -Name $WebAppName
