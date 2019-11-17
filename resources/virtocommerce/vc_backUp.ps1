@@ -22,12 +22,9 @@ Select-AzureRmSubscription -SubscriptionId $SubscriptionID
 Write-Host "Stop WebApp $WebAppName"
 Stop-AzureRmWebApp -ResourceGroupName $ResourceGroupName -Name $WebAppName
 
-Start-Sleep -s 5
-
-& ${env:Utils}\AzCopy\azcopy.exe
+& "azcopy.exe" copy
 Write-Output "Getting publishing profile for $WebAppName app"
-& ${env:Utils}\AzCopy\azcopy.exe copy https://$(${sourceStorage}).blob.core.windows.net/cms-content$(${sourceSAS}) https://$(${destStorage}).blob.core.windows.net/cms-content$(${destSAS})
-Start-Sleep -s 5
+& "azcopy.exe" copy https://${sourceStorage}.blob.core.windows.net/cms-content${sourceSAS} https://${destStorage}.blob.core.windows.net/cms-content${destSAS}
 
 Write-Host "Start WebApp $WebAppName"
 Start-AzureRmWebApp -ResourceGroupName $ResourceGroupName -Name $WebAppName
