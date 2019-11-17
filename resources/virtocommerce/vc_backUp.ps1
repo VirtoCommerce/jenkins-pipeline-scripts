@@ -1,5 +1,21 @@
 $ErrorActionPreference = 'Stop'
 
+$SubscriptionID="${env:SubscriptionID}"
+$ResourceGroupName="${env:ResourceGroupName}"
+$WebAppName="${env:WebAppName}"
+$sourceStorage="${env:sourceStorage}"
+$destStorage="${env:destStorage}"
+$sourceSAS="${env:sourceSAS}"
+$destSAS="${env:destSAS}"
+
+Write-Host $SubscriptionID
+Write-Host $ResourceGroupName
+Write-Host $WebAppName
+Write-Host $sourceStorage
+Write-Host $destStorage
+Write-Host $sourceSAS
+Write-Host $destSAS
+
 $ApplicationID ="${env:AzureAppID}"
 $APIKey = ConvertTo-SecureString "${env:AzureAPIKey}" -AsPlainText -Force
 $psCred = New-Object System.Management.Automation.PSCredential($ApplicationID, $APIKey)
@@ -14,10 +30,10 @@ Stop-AzureRmWebApp -ResourceGroupName $ResourceGroupName -Name $WebAppName
 Start-Sleep -s 5
 
 # Getting Publish Profile
-Write-Output "Getting publishing profile for $DestWebAppName app"
+Write-Output "Getting publishing profile for $WebAppName app"
 $tmpPublishProfile = [System.IO.Path]::GetTempFileName() + ".xml"
 
-Write-Output "Getting publishing profile for $DestWebAppName app"
+Write-Output "Getting publishing profile for $WebAppName app"
 & "${env:Utils}\AzCopy\AzCopy" copy "https://${sourceStorage}.blob.core.windows.net/cms-content${sourceSAS}" "https://${destStorage}.blob.core.windows.net/cms-content${destSAS}"
 Start-Sleep -s 5
 
