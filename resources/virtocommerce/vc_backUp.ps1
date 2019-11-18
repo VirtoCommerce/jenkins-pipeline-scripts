@@ -23,7 +23,7 @@ Write-Host "Stop WebApp $WebAppName"
 Stop-AzureRmWebApp -ResourceGroupName $ResourceGroupName -Name $WebAppName
 
 Write-Output "Getting publishing profile for $WebAppName app"
-& "${env:Utils}\AzCopy10\AzCopy" copy https://${sourceStorage}.blob.core.windows.net/cms-content${sourceSAS} https://${destStorage}.blob.core.windows.net/cms-content${destSAS}
+& "${env:Utils}\AzCopy10\AzCopy" copy https://${sourceStorage}.blob.core.windows.net/cms-content${sourceSAS} https://${destStorage}.blob.core.windows.net/cms-content${destSAS} --recursive
 
 Write-Host "Start WebApp $WebAppName"
 Start-AzureRmWebApp -ResourceGroupName $ResourceGroupName -Name $WebAppName
