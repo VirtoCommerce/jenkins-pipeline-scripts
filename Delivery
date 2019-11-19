@@ -432,7 +432,8 @@ pipeline {
     }
 }
 def runPS(psName, args){
-    powershell "${env.WORKSPACE}\\ps\\${psName} ${args} -ErrorAction Stop"
+    def psPath = libraryResource "delivery/${psName}"
+    powershell "${psPath} ${args} -ErrorAction Stop"
 }
 
 def getVirtoModules() {
