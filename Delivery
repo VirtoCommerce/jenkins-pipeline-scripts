@@ -74,6 +74,9 @@ pipeline {
 
         stage("Preparing Solution"){
             when{
+                expression {
+                    UPDATE_CS
+                }
             }
             steps{
                 script{
