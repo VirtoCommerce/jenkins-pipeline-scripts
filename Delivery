@@ -48,7 +48,6 @@ pipeline {
         stage("User Input"){
             steps{
                 script{
-                    def SETTINGS
                     def settingsFileContent
                     configFileProvider([configFile(fileId: 'delivery_settings', variable: 'SETTINGS_FILE')]) {
                         settingsFileContent = readFile(SETTINGS_FILE)
