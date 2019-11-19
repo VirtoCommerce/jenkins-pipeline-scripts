@@ -208,7 +208,6 @@ pipeline {
                     def webAppPublicName = SETTINGS['webAppPublicName']
                     def resourceGroupName = SETTINGS['resourceGroupName']
                     def subscriptionID = SETTINGS['subscriptionID']
-                    echo "dbg: ${webAppName}, ${webAppPublicName}, ${resourceGroupName}, ${subscriptionID}"
                     runPS('upload-CS.ps1', 
                         "-PlatformDir ${csRoot}\\platform -ModulesDir ${csRoot}\\modules -StorefrontDir ${csRoot}\\storefront -ThemeDir ${csRoot}\\theme -WebAppName ${webAppName} -WebAppPublicName ${webAppPublicName} -ResourceGroupName ${resourceGroupName} -SubscriptionID ${subscriptionID}")
                 }
@@ -437,6 +436,7 @@ pipeline {
 }
 def runPS(psName, args){
     def psPath = libraryResource "delivery/${psName}"
+    echo "dbg: ${psPath} ${args}"
     powershell "${psPath} ${args} -ErrorAction Stop"
 }
 
