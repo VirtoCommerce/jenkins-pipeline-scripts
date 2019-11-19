@@ -9,10 +9,6 @@ param(
     $SubscriptionID
 )
 
-. $PSScriptRoot\utilities.ps1 
-
-
-
 # Upload Storefront Zip File to Azure
 
 $ApplicationID ="${env:AzureAppID}"
