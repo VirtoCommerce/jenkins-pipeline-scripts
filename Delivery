@@ -63,7 +63,7 @@ pipeline {
                     SETTINGS.setRegion(PROJECT_TYPE)
                     SETTINGS.setEnvironment(ENV_NAME)
                     echo "Vars: PROJECT_TYPE - ${PROJECT_TYPE}, UPDATE_CS - ${UPDATE_CS}, ENV_NAME - ${ENV_NAME}"
-                    def msgToHook = "Started by ${Utilities.getUserCause()}<br/>Delivery Option ${PROJECT_TYPE}<br/>Environment ${ENV_NAME}<br/>${UPDATE_CS ? "Update Solution<br/>":""}"
+                    def msgToHook = "Delivery Option ${PROJECT_TYPE}<br/>Environment ${ENV_NAME}<br/>${UPDATE_CS ? "Update Solution<br/>":""}"
                     //Utilities.notifyBuildStatus(this, SETTINGS['prefix'], SETTINGS['of365hook'], msgToHook, 'STARTED')
                 }
             }
