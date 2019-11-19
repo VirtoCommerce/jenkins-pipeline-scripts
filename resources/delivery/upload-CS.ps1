@@ -9,7 +9,7 @@ param(
     $SubscriptionID
 )
 
-. $PSScriptRoot\utilities.ps1 
+. $PSScriptRoot\..\azure\utilities.ps1 
 
 
 
