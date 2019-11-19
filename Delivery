@@ -62,7 +62,6 @@ pipeline {
                     ENV_NAME = regionAndEnvChoices.trim()//['Environments']
                     SETTINGS.setRegion(PROJECT_TYPE)
                     SETTINGS.setEnvironment(ENV_NAME)
-                    echo "SETTINGS ${SETTINGS['webAppName']}"
                     echo "Vars: PROJECT_TYPE - ${PROJECT_TYPE}, UPDATE_CS - ${UPDATE_CS}, ENV_NAME - ${ENV_NAME}"
                     def msgToHook = "Delivery Option ${PROJECT_TYPE}<br/>Environment ${ENV_NAME}<br/>${UPDATE_CS ? "Update Solution<br/>":""}"
                     //Utilities.notifyBuildStatus(this, SETTINGS['prefix'], SETTINGS['of365hook'], msgToHook, 'STARTED')
@@ -205,12 +204,16 @@ pipeline {
             steps {
                 script{
                     def csRoot = "${env.WORKSPACE}\\CS"
+                    def webAppName = SETTINGS['webAppName']
+                    def webAppPublicName = SETTINGS['webAppPublicName']
+                    def resourceGroupName = SETTINGS['resourceGroupName']
+                    def subscriptionID = SETTINGS['subscriptionID']
+                    echo "dbg: ${webAppName}, ${webAppPublicName}, ${resourceGroupName}, ${subscriptionID}"
                     runPS('upload-CS.ps1', 
-                        "-PlatformDir ${csRoot}\\platform -ModulesDir ${csRoot}\\modules -StorefrontDir ${csRoot}\\storefront -ThemeDir ${csRoot}\\theme -WebAppName ${SETTINGS['webAppName']} -WebAppPublicName ${SETTINGS['webAppPublicName']} -ResourceGroupName ${SETTINGS['resourceGroupName']} -SubscriptionID ${SETTINGS['subscriptionID']}")
+                        "-PlatformDir ${csRoot}\\platform -ModulesDir ${csRoot}\\modules -StorefrontDir ${csRoot}\\storefront -ThemeDir ${csRoot}\\theme -WebAppName ${webAppName} -WebAppPublicName ${webAppPublicName} -ResourceGroupName ${resourceGroupName} -SubscriptionID ${subscriptionID}")
                 }
             }
         }
-
         
         stage("Delivering Backend"){
             when{
