@@ -59,9 +59,10 @@ pipeline {
                     ]
                     PROJECT_TYPE = 'SOLUTION'
                     UPDATE_CS = true
-                    ENV_NAME = regionAndEnvChoices//['Environments']
+                    ENV_NAME = regionAndEnvChoices.trim()//['Environments']
                     SETTINGS.setRegion(PROJECT_TYPE)
                     SETTINGS.setEnvironment(ENV_NAME)
+                    echo "SETTINGS ${SETTINGS['webAppName']}"
                     echo "Vars: PROJECT_TYPE - ${PROJECT_TYPE}, UPDATE_CS - ${UPDATE_CS}, ENV_NAME - ${ENV_NAME}"
                     def msgToHook = "Delivery Option ${PROJECT_TYPE}<br/>Environment ${ENV_NAME}<br/>${UPDATE_CS ? "Update Solution<br/>":""}"
                     //Utilities.notifyBuildStatus(this, SETTINGS['prefix'], SETTINGS['of365hook'], msgToHook, 'STARTED')
