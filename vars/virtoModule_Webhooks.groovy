@@ -18,7 +18,7 @@ import jobs.scripts.*
 		def dockerTag = "${env.BRANCH_NAME}-branch"
 		def buildOrder = Utilities.getNextBuildOrder(this)
 		projectType = config.projectType
-	    if (env.BRANCH_NAME == 'master') {
+	    if (env.BRANCH_NAME == 'qa' || env.BRANCH_NAME == 'master'){
 			deployScript = 'VC-Module2AzureWebhooksQA.ps1'
 			dockerTag = "latest"
 		}
@@ -84,7 +84,7 @@ import jobs.scripts.*
 			// 	}
 			// }
 
-			if (env.BRANCH_NAME == 'dev'){
+			if (env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'qa'){
 				stage('Publish'){
 					timestamps{
 						Utilities.runSharedPS(this, "${deployScript}")
