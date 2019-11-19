@@ -54,7 +54,6 @@ pipeline {
                     }
                     SETTINGS = new Settings(settingsFileContent)
                     def buildOrder = Utilities.getNextBuildOrder(this)
-                    PRJ_TYPES = SETTINGS.getRegions().join("\n")
                     def regionAndEnvChoices = input message: "Select Environment", parameters: [
                         choice(name: 'Environments', choices:"DEV\n")
                     ]
