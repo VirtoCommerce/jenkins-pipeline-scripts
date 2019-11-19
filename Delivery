@@ -401,8 +401,8 @@ pipeline {
                     currentBuild.result = 'UNSTABLE'
                     Utilities.checkLogForWarnings(this)
                 }
-                Utilities.notifyBuildStatus(this, SETTINGS['prefix'], SETTINGS['of365hook'], "", currentBuild.result)
-                if(UPDATE_CS && (PROJECT_TYPE=='HOT' || PROJECT_TYPE=='RW1')){
+                //Utilities.notifyBuildStatus(this, SETTINGS['prefix'], SETTINGS['of365hook'], "", currentBuild.result)
+                if(!UPDATE_CS && (PROJECT_TYPE=='HOT' || PROJECT_TYPE=='RW1')){
                     node(SETTINGS['agentLabel']){
                         withEnv(["DOCKER_TAG=${DOCKER_TAG}", "DOCKER_PREFIX=${DOCKER_PREFIX}", "DOCKER_PLATFORM_PORT=${DOCKER_PLATFORM_PORT}", "DOCKER_STOREFRONT_PORT=${DOCKER_STOREFRONT_PORT}", "DOCKER_SQL_PORT=${DOCKER_SQL_PORT}", "COMPOSE_PROJECT_NAME=${env.BUILD_TAG}"]){
                             bat "docker-compose down -v"
