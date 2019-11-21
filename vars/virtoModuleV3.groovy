@@ -56,7 +56,7 @@ def call(body) {
                         if(publishPackagesStatus != 0){
                             def nugetAlreadyExists = false
                             for(line in publishPackagesOut.trim().split("\n")){
-                                if(line.contains("error: Response status code does not indicate success: 409")){
+                                if(line.contains("409")){
                                     nugetAlreadyExists = true
                                 }
                             }
