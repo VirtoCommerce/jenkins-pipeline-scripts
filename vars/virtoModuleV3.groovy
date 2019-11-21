@@ -50,13 +50,14 @@ def call(body) {
 
                 if(!Utilities.isPullRequest(this)){
                     stage('Publish'){
-                        def publishPackagesOut = powershell(script:"vc-build PublishPackages -ApiKey ${env.NUGET_KEY} -skip Clean+Restore+Compile+Test", returnStdout: true).trim()
+                        def publishPackagesStatus = powershell script:"vc-build PublishPackages -ApiKey ${env.NUGET_KEY} -skip Clean+Restore+Compile+Test > out.log", returnStatus: true
+                        def publishPackagesOut = readFile "out.log"
                         echo publishPackagesOut
-                        if(publishPackagesOut.contains("error: Response status code does not indicate success: 409")){
-                            UNSTABLE_CAUSES.add("Nuget package already exists.")
-                        }
-                        else{
-                            if(publishPackagesOut.contains("error: ")){
+                        if(publishPackagesStatus != 0){
+                            if(publishPackagesOut.contains("error: Response status code does not indicate success: 409")){
+                                UNSTABLE_CAUSES.add("Nuget package already exists.")
+                            }
+                            else{
                                 throw new Exception("ERROR: script returned exit code -1")
                             }
                         }
