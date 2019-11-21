@@ -470,10 +470,8 @@ class Packaging {
     def static saveArtifact(context, prefix, projectType, id, artifact){
         def destinationFolderPath = "${context.env.SOLUTION_FOLDER}\\${prefix}\\${context.env.BRANCH_NAME}\\${projectType}"
         switch(projectType){
-            case 'module':
+            case ['module','theme']:
                 destinationFolderPath = destinationFolderPath + "\\${id}"
-                break
-            case 'theme':
                 break
         }
         def destinationFolder = new File(destinationFolderPath)
