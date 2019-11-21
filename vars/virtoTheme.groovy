@@ -68,22 +68,7 @@ def call(body) {
 			{
 				stage('Publish') {
 					timestamps {
-						def themeId
-						switch(Utilities.getRepoName(this)){
-							case 'vc-theme-default':
-								themeId = 'Electronics'
-								break
-							case 'vc-theme-b2b':
-								themeId = 'B2B-store'
-								break
-							case 'vc-theme-material':
-								themeId = 'Clothing'
-								break
-							case 'vc-procurement-portal-theme':
-								themeId = 'dental'
-								break
-						}
-						Packaging.saveArtifact(this, 'vc', 'theme', themeId, artifacts[0].path)
+						Packaging.saveArtifact(this, 'vc', 'theme', config.sampleStore, artifacts[0].path)
 						if (Packaging.getShouldPublish(this)) {
 							Packaging.publishRelease(this, version, "")
 						}

@@ -112,6 +112,7 @@ def call(body) {
 				{
 					timestamps
 					{
+						Packaging.saveArtifact(this, 'vc', 'theme', "${config.sampleStore}\\default", zipFile)
 						if (Packaging.getShouldPublish(this))
 						{
 							Packaging.publishRelease(this, version, "")
