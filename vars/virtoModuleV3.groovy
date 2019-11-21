@@ -56,10 +56,8 @@ def call(body) {
                         if(publishPackagesStatus != 0){
                             def nugetAlreadyExists = false
                             def lines = publishPackagesOut.trim().split("\n")
-                            echo "Lines number: ${lines.length}"
                             for(line in lines){
-                                echo "checked: ${line}"
-                                if(line.contains("409")){
+                                if(line.contains("error: Response status code does not indicate success: 409")){
                                     nugetAlreadyExists = true
                                 }
                             }
