@@ -55,7 +55,8 @@ def call(body) {
                         echo publishPackagesOut
                         if(publishPackagesStatus != 0){
                             def nugetAlreadyExists = false
-                            for(line in publishPackagesOut.trim().split("\n")){
+                            def lines = publishPackagesOut.trim().split("\n")
+                            for(line in lines){
                                 echo "checked: ${line}"
                                 if(line.contains('409')){
                                     nugetAlreadyExists = true
