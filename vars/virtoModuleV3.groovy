@@ -7,6 +7,8 @@ def call(body) {
 	body.delegate = config
 	body()
 
+    def UNSTABLE_CAUSES = []
+
     node {
         def escapedBranch = env.BRANCH_NAME.replaceAll('/', '_')
         def repoName = Utilities.getRepoName(this)
@@ -20,46 +22,69 @@ def call(body) {
             SETTINGS = new Settings(settingsFileContent)
             SETTINGS.setRegion('platform-core')
             SETTINGS.setEnvironment(env.BRANCH_NAME)
-            stage('Checkout'){
-                deleteDir()
-                checkout scm
-            }
-
-            stage('Build'){
-                bat "dotnet build-server shutdown"
-                withSonarQubeEnv('VC Sonar Server'){
-                    bat "vc-build SonarQubeStart -SonarUrl ${env.SONAR_HOST_URL} -SonarAuthToken \"${env.SONAR_AUTH_TOKEN}\" "// %SONAR_HOST_URL% %SONAR_AUTH_TOKEN%
-                    bat "vc-build SonarQubeEnd -SonarUrl ${env.SONAR_HOST_URL} -SonarAuthToken ${env.SONAR_AUTH_TOKEN}"
-                }
-            }
-
-            stage('Quality Gate'){
-                Packaging.checkAnalyzerGate(this)
-            }
-
-            stage('Packaging'){                
-                bat "vc-build Compress -skip Clean+Restore+Compile+Test"
-            }
-
-            stage('Unit Tests'){
-                bat "vc-build Test -skip Restore+Compile"
-            }   
-
-            if(!Utilities.isPullRequest(this)){
-                stage('Publish'){
-                    powershell "vc-build PublishPackages -ApiKey ${env.NUGET_KEY} -skip Clean+Restore+Compile+Test"
-                //     powershell "vc-build PublishModuleManifest"
-                //     def orgName = Utilities.getOrgName(this)
-                //     powershell "vc-build Release -GitHubUser ${orgName} -GitHubToken ${env.GITHUB_TOKEN} -PreRelease -skip Clean+Restore+Compile+Test"
+            try {
+                stage('Checkout'){
+                    deleteDir()
+                    checkout scm
                 }
 
-                stage('Deploy'){
-                    def moduleId = Modules.getModuleId(this)
-                    def artifacts = findFiles(glob: "artifacts/*.zip")
-                    def artifactPath = artifacts[0].path
-                    def dstContentPath = "modules\\${moduleId}"
-                    Utilities.runSharedPS(this, "v3\\DeployTo-Azure.ps1", "-ZipFile \"${artifactPath}\" -WebAppName ${SETTINGS['webAppName']} -ResourceGroupName ${SETTINGS['resourceGroupName']} -SubscriptionID ${SETTINGS['subscriptionID']} -DestContentPath \"${dstContentPath}\"")
-                    //Utilities.runSharedPS(this, "v3\\Restart-WebApp.ps1", "-WebAppName ${SETTINGS['webAppName']} -ResourceGroupName ${SETTINGS['resourceGroupName']} -SubscriptionID ${SETTINGS['subscriptionID']}")
+                stage('Build'){
+                    bat "dotnet build-server shutdown"
+                    withSonarQubeEnv('VC Sonar Server'){
+                        bat "vc-build SonarQubeStart -SonarUrl ${env.SONAR_HOST_URL} -SonarAuthToken \"${env.SONAR_AUTH_TOKEN}\" "// %SONAR_HOST_URL% %SONAR_AUTH_TOKEN%
+                        bat "vc-build SonarQubeEnd -SonarUrl ${env.SONAR_HOST_URL} -SonarAuthToken ${env.SONAR_AUTH_TOKEN}"
+                    }
+                }
+
+                stage('Quality Gate'){
+                    Packaging.checkAnalyzerGate(this)
+                }
+
+                stage('Packaging'){                
+                    bat "vc-build Compress -skip Clean+Restore+Compile+Test"
+                }
+
+                stage('Unit Tests'){
+                    bat "vc-build Test -skip Restore+Compile"
+                }   
+
+                if(!Utilities.isPullRequest(this)){
+                    stage('Publish'){
+                        def publishPackagesOut = powershell(script:"vc-build PublishPackages -ApiKey ${env.NUGET_KEY} -skip Clean+Restore+Compile+Test", returnStdout: true).trim()
+                        echo publishPackagesOut
+                        if(publishPackagesOut.contains("error: Response status code does not indicate success: 409")){
+                            UNSTABLE_CAUSES.add("Nuget package already exists.")
+                        }
+                        else{
+                            if(publishPackagesOut.contains("error: ")){
+                                throw new Exception("ERROR: script returned exit code -1")
+                            }
+                        }
+                    //     powershell "vc-build PublishModuleManifest"
+                    //     def orgName = Utilities.getOrgName(this)
+                    //     powershell "vc-build Release -GitHubUser ${orgName} -GitHubToken ${env.GITHUB_TOKEN} -PreRelease -skip Clean+Restore+Compile+Test"
+                    }
+
+                    stage('Deploy'){
+                        def moduleId = Modules.getModuleId(this)
+                        def artifacts = findFiles(glob: "artifacts/*.zip")
+                        def artifactPath = artifacts[0].path
+                        def dstContentPath = "modules\\${moduleId}"
+                        Utilities.runSharedPS(this, "v3\\DeployTo-Azure.ps1", "-ZipFile \"${artifactPath}\" -WebAppName ${SETTINGS['webAppName']} -ResourceGroupName ${SETTINGS['resourceGroupName']} -SubscriptionID ${SETTINGS['subscriptionID']} -DestContentPath \"${dstContentPath}\"")
+                        //Utilities.runSharedPS(this, "v3\\Restart-WebApp.ps1", "-WebAppName ${SETTINGS['webAppName']} -ResourceGroupName ${SETTINGS['resourceGroupName']} -SubscriptionID ${SETTINGS['subscriptionID']}")
+                    }
+                }
+            }
+            catch (any) {
+                currentBuild.result = 'FAILURE'
+                throw any
+            }
+            finally{
+                if(currentBuild.resultIsBetterOrEqualTo('SUCCESS') && UNSTABLE_CAUSES.size()>0){
+                    currentBuild.result = 'UNSTABLE'
+                    for(cause in UNSTABLE_CAUSES){
+                        echo cause
+                    }
                 }
             }
         }
