@@ -54,7 +54,13 @@ def call(body) {
                         def publishPackagesOut = readFile "out.log"
                         echo publishPackagesOut
                         if(publishPackagesStatus != 0){
-                            if(publishPackagesOut.contains("error: Response status code does not indicate success: 409")){
+                            def nugetAlreadyExists = false
+                            for(line in publishPackagesOut.trim().split("\n")){
+                                if(line.contains("error: Response status code does not indicate success: 409")){
+                                    nugetAlreadyExists = true
+                                }
+                            }
+                            if(nugetAlreadyExists){
                                 UNSTABLE_CAUSES.add("Nuget package already exists.")
                             }
                             else{
