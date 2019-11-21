@@ -50,7 +50,7 @@ def call(body) {
 
                 if(!Utilities.isPullRequest(this)){
                     stage('Publish'){
-                        def publishPackagesStatus = powershell script:"vc-build PublishPackages -ApiKey ${env.NUGET_KEY} -skip Clean+Restore+Compile+Test > out.log", returnStatus: true
+                        def publishPackagesStatus = bat script:"vc-build PublishPackages -ApiKey ${env.NUGET_KEY} -skip Clean+Restore+Compile+Test > out.log", returnStatus: true
                         def publishPackagesOut = readFile "out.log"
                         echo publishPackagesOut
                         if(publishPackagesStatus != 0){
@@ -59,7 +59,7 @@ def call(body) {
                             echo "Lines number: ${lines.length}"
                             for(line in lines){
                                 echo "checked: ${line}"
-                                if(line.contains('409')){
+                                if(line.contains("409")){
                                     nugetAlreadyExists = true
                                 }
                             }
