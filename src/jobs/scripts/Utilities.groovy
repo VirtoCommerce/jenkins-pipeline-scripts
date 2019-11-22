@@ -561,7 +561,7 @@ class Utilities {
         context.echo fileContent
         res["status"] = exitCode
         res["stdout"] = fileContent.split("\n")
-        bat "del ${outFile} /F /Q"
+        context.bat "del ${outFile} /F /Q"
         return res
     }
 }
