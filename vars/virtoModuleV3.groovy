@@ -79,7 +79,7 @@ def call(body) {
                                 }
                             }
                             if(ghReleaseExists){
-                                UNSTABLE_CAUSES.add('Release already exists on github')
+                                UNSTABLE_CAUSES.add("Release already exists on github")
                             } else {
                                 throw new Exception("Github release error")
                             }
