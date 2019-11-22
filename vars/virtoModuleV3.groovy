@@ -74,7 +74,13 @@ def call(body) {
                         def mmout = readFile "out.log"
                         echo mmout
                         if(mmStatus!=0){
-                            if(mmout.contains("nothing to commit, working tree clean")){
+                            def nothingToCommit = false
+                            for(line in mmout){
+                                if(line.contains("nothing to commit, working tree clean")){
+                                    nothingToCommit = true
+                                }
+                            }
+                            if(nothingToCommit){
                                 UNSTABLE_CAUSES.add("Module Manifest: nothing to commit, working tree clean")
                             } else {
                                 throw new Exception("Module Manifest: returned nonzero exit status")
