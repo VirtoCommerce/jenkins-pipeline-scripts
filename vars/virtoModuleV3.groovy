@@ -50,27 +50,42 @@ def call(body) {
 
                 if(!Utilities.isPullRequest(this)){
                     stage('Publish'){
-                        def publishPackagesStatus = bat script:"@vc-build PublishPackages -ApiKey ${env.NUGET_KEY} -skip Clean+Restore+Compile+Test > out.log", returnStatus: true
-                        def publishPackagesOut = readFile "out.log"
-                        echo publishPackagesOut
-                        if(publishPackagesStatus != 0){
-                            def nugetAlreadyExists = false
-                            def lines = publishPackagesOut.trim().split("\n")
-                            for(line in lines){
-                                if(line.contains("error: Response status code does not indicate success: 409")){
-                                    nugetAlreadyExists = true
-                                }
-                            }
-                            if(nugetAlreadyExists){
-                                UNSTABLE_CAUSES.add("Nuget package already exists.")
-                            }
-                            else{
-                                throw new Exception("ERROR: script returned exit code -1")
+                        // def publishPackagesStatus = bat script:"@vc-build PublishPackages -ApiKey ${env.NUGET_KEY} -skip Clean+Restore+Compile+Test > out.log", returnStatus: true
+                        // def publishPackagesOut = readFile "out.log"
+                        // echo publishPackagesOut
+                        // if(publishPackagesStatus != 0){
+                        //     def nugetAlreadyExists = false
+                        //     def lines = publishPackagesOut.trim().split("\n")
+                        //     for(line in lines){
+                        //         if(line.contains("error: Response status code does not indicate success: 409")){
+                        //             nugetAlreadyExists = true
+                        //         }
+                        //     }
+                        //     if(nugetAlreadyExists){
+                        //         UNSTABLE_CAUSES.add("Nuget package already exists.")
+                        //     }
+                        //     else{
+                        //         throw new Exception("ERROR: script returned exit code -1")
+                        //     }
+                        // }
+
+                        def stdout
+                        try {
+                            stdout = bat script:"@vc-build PublishPackages -ApiKey ${env.NUGET_KEY} -skip Clean+Restore+Compile+Test", returnStdout: true
+                        }
+                        catch(any){
+                            if(!stdout.contains("error: Response status code does not indicate success: 409")){
+                                throw any
                             }
                         }
-                        bat "vc-build PublishModuleManifest"
-                        def orgName = Utilities.getOrgName(this)
-                        bat "@vc-build Release -GitHubUser ${orgName} -GitHubToken ${env.GITHUB_TOKEN} -PreRelease -skip Clean+Restore+Compile+Test"
+                        finally {
+                            echo stdout
+                        }
+
+
+                        // bat script: "vc-build PublishModuleManifest > out.txt", returnStatus: true
+                        // def orgName = Utilities.getOrgName(this)
+                        // bat "@vc-build Release -GitHubUser ${orgName} -GitHubToken ${env.GITHUB_TOKEN} -PreRelease -skip Clean+Restore+Compile+Test"
                     }
 
                     stage('Deploy'){
