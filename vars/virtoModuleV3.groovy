@@ -75,7 +75,7 @@ def call(body) {
                         echo mmout
                         if(mmStatus!=0){
                             def nothingToCommit = false
-                            for(line in mmout){
+                            for(line in mmout.trim().split("\n")){
                                 if(line.contains("nothing to commit, working tree clean")){
                                     nothingToCommit = true
                                 }
