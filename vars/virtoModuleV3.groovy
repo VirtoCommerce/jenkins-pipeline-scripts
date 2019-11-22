@@ -68,9 +68,9 @@ def call(body) {
                                 throw new Exception("ERROR: script returned exit code -1")
                             }
                         }
-                        bat "vc-build PublishModuleManifest"
-                        def orgName = Utilities.getOrgName(this)
-                        bat "vc-build Release -GitHubUser ${orgName} -GitHubToken ${env.GITHUB_TOKEN} -PreRelease -skip Clean+Restore+Compile+Test"
+                        // bat "vc-build PublishModuleManifest"
+                        // def orgName = Utilities.getOrgName(this)
+                        // bat "vc-build Release -GitHubUser ${orgName} -GitHubToken ${env.GITHUB_TOKEN} -PreRelease -skip Clean+Restore+Compile+Test"
                     }
 
                     stage('Deploy'){
