@@ -68,7 +68,22 @@ def call(body) {
                                 throw new Exception("ERROR: script returned exit code -1")
                             }
                         }
-
+                        
+                        def orgName = Utilities.getOrgName(this)
+                        def releaseResult = Utilities.runBatchScript(this, "@vc-build Release -GitHubUser ${orgName} -GitHubToken ${env.GITHUB_TOKEN} -PreRelease -skip Clean+Restore+Compile+Test")
+                        if(releaseResult['status'!=0]){
+                            def ghReleaseExists = false
+                            for(logLine in releaseResult['stdout']){
+                                if(logLine.contains('422')){
+                                    ghReleaseExists = true
+                                }
+                            }
+                            if(ghReleaseExists){
+                                UNSTABLE_CAUSES.add('Release already exists on github')
+                            } else {
+                                throw new Exception("Github release error")
+                            }
+                        }
 
                         def mmStatus = bat script: "vc-build PublishModuleManifest > out.log", returnStatus: true
                         def mmout = readFile "out.log"
@@ -86,8 +101,6 @@ def call(body) {
                                 throw new Exception("Module Manifest: returned nonzero exit status")
                             }
                         }
-                        // def orgName = Utilities.getOrgName(this)
-                        // bat "@vc-build Release -GitHubUser ${orgName} -GitHubToken ${env.GITHUB_TOKEN} -PreRelease -skip Clean+Restore+Compile+Test"
                     }
 
                     stage('Deploy'){

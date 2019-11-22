@@ -552,4 +552,16 @@ class Utilities {
             context.cleanWs notFailBuild: true
         }
     }
+
+    def static runBatchScript(context, command){
+        def outFile = "log${context.env.BUILD_NUMBER"}.out"
+        def exitCode = context.bat script: "${command} > ${outFile}", returnStatus:true
+        def res = [:]
+        def fileContent = context.readFile(outFile).trim()
+        context.echo fileContent
+        res["status"] = exitCode
+        res["stdout"] = fileContent.split("\n")
+        bat "del ${outFile} /F /Q"
+        return res
+    }
 }
