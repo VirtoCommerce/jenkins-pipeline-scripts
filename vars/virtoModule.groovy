@@ -145,10 +145,10 @@ import jobs.scripts.*
 				// }
 			}
 
-			if (env.BRANCH_NAME == '1.1.3' || env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'master') {
+			if (env.BRANCH_NAME == '1.1.3' || env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'master'){
 				stage('Publish')
 				{
-					timestamps { 
+					timestamps {
 						def moduleId = Modules.getModuleId(this)
 						def artifacts = findFiles(glob: 'artifacts\\*.zip')
 						Packaging.saveArtifact(this, 'vc', 'module', moduleId, artifacts[0].path)
@@ -165,7 +165,20 @@ import jobs.scripts.*
 						}
 					}
 				}
-			}		
+			}
+
+			if(Utilities.getRepoName(this) == 'vc-module-pagebuilder'){
+				stage('Delivery to virtocommerce.com'){
+					timestamps{
+						SETTINGS.setRegion('virtocommerce')
+						SETTINGS.setEnvironment('dev')
+						if(env.BRANCH_NAME == 'master'){
+							SETTINGS.setEnvironment('master')
+						}
+						Utilities.runSharedPS(this, "${deployScript}", "-SubscriptionID ${SETTINGS['subscriptionID']} -WebAppName ${SETTINGS['appName']} -ResourceGroupName ${SETTINGS['resourceGroupName']}")
+					}
+				}
+			}
 
 			stage('Cleanup') {
 				timestamps { 
