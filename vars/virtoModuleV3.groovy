@@ -50,7 +50,7 @@ def call(body) {
 
                 if(!Utilities.isPullRequest(this)){
                     stage('Publish'){
-                        def publishPackagesStatus = bat script:"vc-build PublishPackages -ApiKey ${env.NUGET_KEY} -skip Clean+Restore+Compile+Test > out.log", returnStatus: true
+                        def publishPackagesStatus = bat script:"@vc-build PublishPackages -ApiKey ${env.NUGET_KEY} -skip Clean+Restore+Compile+Test > out.log", returnStatus: true
                         def publishPackagesOut = readFile "out.log"
                         echo publishPackagesOut
                         if(publishPackagesStatus != 0){
@@ -68,9 +68,9 @@ def call(body) {
                                 throw new Exception("ERROR: script returned exit code -1")
                             }
                         }
-                    //     powershell "vc-build PublishModuleManifest"
-                    //     def orgName = Utilities.getOrgName(this)
-                    //     powershell "vc-build Release -GitHubUser ${orgName} -GitHubToken ${env.GITHUB_TOKEN} -PreRelease -skip Clean+Restore+Compile+Test"
+                        bat "vc-build PublishModuleManifest"
+                        def orgName = Utilities.getOrgName(this)
+                        bat "vc-build Release -GitHubUser ${orgName} -GitHubToken ${env.GITHUB_TOKEN} -PreRelease -skip Clean+Restore+Compile+Test"
                     }
 
                     stage('Deploy'){
