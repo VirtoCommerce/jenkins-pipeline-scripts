@@ -554,7 +554,7 @@ class Utilities {
     }
 
     def static runBatchScript(context, command){
-        def outFile = "log${context.env.BUILD_NUMBER"}.out"
+        def outFile = "log${context.env.BUILD_NUMBER}.out"
         def exitCode = context.bat script: "${command} > ${outFile}", returnStatus:true
         def res = [:]
         def fileContent = context.readFile(outFile).trim()
