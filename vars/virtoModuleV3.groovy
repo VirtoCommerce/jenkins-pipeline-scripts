@@ -74,7 +74,7 @@ def call(body) {
                         if(releaseResult['status'!=0]){
                             def ghReleaseExists = false
                             for(logLine in releaseResult['stdout']){
-                                if(logLine.contains('422')){
+                                if(logLine.contains('github returned 422 Unprocessable Entity')){
                                     ghReleaseExists = true
                                 }
                             }
