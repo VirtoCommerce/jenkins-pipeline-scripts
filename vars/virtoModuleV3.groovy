@@ -30,7 +30,6 @@ def call(body) {
 
                 stage('Build'){
                     bat "dotnet build-server shutdown"
-                    bat "vc-build clean"
                     withSonarQubeEnv('VC Sonar Server'){
                         // bat "vc-build SonarQubeStart -SonarUrl ${env.SONAR_HOST_URL} -SonarAuthToken \"${env.SONAR_AUTH_TOKEN}\" "// %SONAR_HOST_URL% %SONAR_AUTH_TOKEN%
                         // bat "vc-build SonarQubeEnd -SonarUrl ${env.SONAR_HOST_URL} -SonarAuthToken ${env.SONAR_AUTH_TOKEN}"
@@ -47,7 +46,7 @@ def call(body) {
                 }   
 
                 stage('Packaging'){                
-                    bat "vc-build Compress -skip Clean+Restore+Compile+Test"
+                    bat "vc-build Compress -skip Restore+Compile+Test"
                 }
 
                 if(!Utilities.isPullRequest(this)){
