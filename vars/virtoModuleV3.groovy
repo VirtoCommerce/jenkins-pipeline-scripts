@@ -30,23 +30,25 @@ def call(body) {
 
                 stage('Build'){
                     bat "dotnet build-server shutdown"
+                    bat "vc-build clean"
                     withSonarQubeEnv('VC Sonar Server'){
-                        bat "vc-build SonarQubeStart -SonarUrl ${env.SONAR_HOST_URL} -SonarAuthToken \"${env.SONAR_AUTH_TOKEN}\" "// %SONAR_HOST_URL% %SONAR_AUTH_TOKEN%
-                        bat "vc-build SonarQubeEnd -SonarUrl ${env.SONAR_HOST_URL} -SonarAuthToken ${env.SONAR_AUTH_TOKEN}"
+                        // bat "vc-build SonarQubeStart -SonarUrl ${env.SONAR_HOST_URL} -SonarAuthToken \"${env.SONAR_AUTH_TOKEN}\" "// %SONAR_HOST_URL% %SONAR_AUTH_TOKEN%
+                        // bat "vc-build SonarQubeEnd -SonarUrl ${env.SONAR_HOST_URL} -SonarAuthToken ${env.SONAR_AUTH_TOKEN}"
+                        bat "vc-build StartAnalyzer -SonarUrl ${env.SONAR_HOST_URL} -SonarAuthToken ${env.SONAR_AUTH_TOKEN}"
                     }
                 }
 
                 stage('Quality Gate'){
                     Packaging.checkAnalyzerGate(this)
                 }
+                
+                stage('Unit Tests'){
+                    bat "vc-build Test -skip Restore+Compile"
+                }   
 
                 stage('Packaging'){                
                     bat "vc-build Compress -skip Clean+Restore+Compile+Test"
                 }
-
-                stage('Unit Tests'){
-                    bat "vc-build Test -skip Restore+Compile"
-                }   
 
                 if(!Utilities.isPullRequest(this)){
                     stage('Publish'){
