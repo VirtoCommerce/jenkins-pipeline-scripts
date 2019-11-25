@@ -46,7 +46,7 @@ def call(body) {
                 }   
 
                 stage('Packaging'){                
-                    bat "vc-build Compress -skip Restore+Compile+Test"
+                    bat "vc-build Compress -skip Clean+Restore+Compile+Test"
                 }
 
                 if(!Utilities.isPullRequest(this)){
