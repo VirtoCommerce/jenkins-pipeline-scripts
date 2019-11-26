@@ -255,11 +255,13 @@ class Packaging {
         def projectKey = "${fullJobName}_${context.env.BRANCH_NAME}".replaceAll('/', '_')
 
         context.withSonarQubeEnv('VC Sonar Server') {
-            if(Utilities.isPullRequest(context)){
-                context.bat "\"${sqScanner}\\bin\\sonar-scanner.bat\" scan -Dsonar.projectKey=${projectKey} -Dsonar.sources=${sources} -Dsonar.branch=${context.env.BRANCH_NAME} -Dsonar.projectName=\"${fullJobName}\" -Dsonar.host.url=%SONAR_HOST_URL% -Dsonar.login=%SONAR_AUTH_TOKEN% -Dsonar.github.oauth=${context.env.GITHUB_TOKEN} -Dsonar.analysis.mode=preview -Dsonar.github.pullRequest=\"${prNumber}\" -Dsonar.github.repository=${orgName}/${repoName}"
-            }
-            else{
-                context.bat "\"${sqScanner}\\bin\\sonar-scanner.bat\" scan -Dsonar.projectKey=${projectKey} -Dsonar.sources=${sources} -Dsonar.branch=${context.env.BRANCH_NAME} -Dsonar.projectName=\"${fullJobName}\" -Dsonar.host.url=%SONAR_HOST_URL% -Dsonar.login=%SONAR_AUTH_TOKEN%"
+            context.timeout(activity: true, time: 15){
+                if(Utilities.isPullRequest(context)){
+                    context.bat "\"${sqScanner}\\bin\\sonar-scanner.bat\" scan -Dsonar.projectKey=${projectKey} -Dsonar.sources=${sources} -Dsonar.branch=${context.env.BRANCH_NAME} -Dsonar.projectName=\"${fullJobName}\" -Dsonar.host.url=%SONAR_HOST_URL% -Dsonar.login=%SONAR_AUTH_TOKEN% -Dsonar.github.oauth=${context.env.GITHUB_TOKEN} -Dsonar.analysis.mode=preview -Dsonar.github.pullRequest=\"${prNumber}\" -Dsonar.github.repository=${orgName}/${repoName}"
+                }
+                else{
+                    context.bat "\"${sqScanner}\\bin\\sonar-scanner.bat\" scan -Dsonar.projectKey=${projectKey} -Dsonar.sources=${sources} -Dsonar.branch=${context.env.BRANCH_NAME} -Dsonar.projectName=\"${fullJobName}\" -Dsonar.host.url=%SONAR_HOST_URL% -Dsonar.login=%SONAR_AUTH_TOKEN%"
+                }
             }
         }
     }
