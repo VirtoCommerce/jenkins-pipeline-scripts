@@ -289,18 +289,20 @@ class Packaging {
 
     def static runGulpBuild(context)
     {
-        def packagesDir = Utilities.getArtifactFolder(context)
+        context.timeout(activity: true, time: 15){
+            def packagesDir = Utilities.getArtifactFolder(context)
 
-        context.dir(packagesDir)
-        {
-            context.deleteDir()
-        }        
-        context.bat "npm install --prefer-offline --dev"
-        def bowerjs = new File("${context.env.WORKSPACE}\\bower.json")
-        if(bowerjs.exists()){
-            context.bat "node node_modules\\bower\\bin\\bower install --force-latest"
+            context.dir(packagesDir)
+            {
+                context.deleteDir()
+            }        
+            context.bat "npm install --prefer-offline --dev"
+            def bowerjs = new File("${context.env.WORKSPACE}\\bower.json")
+            if(bowerjs.exists()){
+                context.bat "node node_modules\\bower\\bin\\bower install --force-latest"
+            }
+            context.bat "node node_modules\\gulp\\bin\\gulp.js compress"
         }
-        context.bat "node node_modules\\gulp\\bin\\gulp.js compress"
     }    
 
     def static runUnitTests(context, tests)
