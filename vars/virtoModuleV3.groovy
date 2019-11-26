@@ -70,38 +70,38 @@ def call(body) {
                             }
                         }
                         
-                        def orgName = Utilities.getOrgName(this)
-                        def releaseResult = Utilities.runBatchScript(this, "@vc-build Release -GitHubUser ${orgName} -GitHubToken ${env.GITHUB_TOKEN} -PreRelease -skip Clean+Restore+Compile+Test")
-                        if(releaseResult['status'!=0]){
-                            def ghReleaseExists = false
-                            for(logLine in releaseResult['stdout']){
-                                if(logLine.contains('github returned 422 Unprocessable Entity')){
-                                    ghReleaseExists = true
-                                }
-                            }
-                            if(ghReleaseExists){
-                                UNSTABLE_CAUSES.add("Release already exists on github")
-                            } else {
-                                throw new Exception("Github release error")
-                            }
-                        }
+                        // def orgName = Utilities.getOrgName(this)
+                        // def releaseResult = Utilities.runBatchScript(this, "@vc-build Release -GitHubUser ${orgName} -GitHubToken ${env.GITHUB_TOKEN} -PreRelease -skip Clean+Restore+Compile+Test")
+                        // if(releaseResult['status'!=0]){
+                        //     def ghReleaseExists = false
+                        //     for(logLine in releaseResult['stdout']){
+                        //         if(logLine.contains('github returned 422 Unprocessable Entity')){
+                        //             ghReleaseExists = true
+                        //         }
+                        //     }
+                        //     if(ghReleaseExists){
+                        //         UNSTABLE_CAUSES.add("Release already exists on github")
+                        //     } else {
+                        //         throw new Exception("Github release error")
+                        //     }
+                        // }
 
-                        def mmStatus = bat script: "vc-build PublishModuleManifest > out.log", returnStatus: true
-                        def mmout = readFile "out.log"
-                        echo mmout
-                        if(mmStatus!=0){
-                            def nothingToCommit = false
-                            for(line in mmout.trim().split("\n")){
-                                if(line.contains("nothing to commit, working tree clean")){
-                                    nothingToCommit = true
-                                }
-                            }
-                            if(nothingToCommit){
-                                UNSTABLE_CAUSES.add("Module Manifest: nothing to commit, working tree clean")
-                            } else {
-                                throw new Exception("Module Manifest: returned nonzero exit status")
-                            }
-                        }
+                        // def mmStatus = bat script: "vc-build PublishModuleManifest > out.log", returnStatus: true
+                        // def mmout = readFile "out.log"
+                        // echo mmout
+                        // if(mmStatus!=0){
+                        //     def nothingToCommit = false
+                        //     for(line in mmout.trim().split("\n")){
+                        //         if(line.contains("nothing to commit, working tree clean")){
+                        //             nothingToCommit = true
+                        //         }
+                        //     }
+                        //     if(nothingToCommit){
+                        //         UNSTABLE_CAUSES.add("Module Manifest: nothing to commit, working tree clean")
+                        //     } else {
+                        //         throw new Exception("Module Manifest: returned nonzero exit status")
+                        //     }
+                        // }
                     }
 
                     stage('Deploy'){
