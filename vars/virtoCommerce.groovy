@@ -3,16 +3,16 @@ import groovy.json.*
 import groovy.util.*
 import jobs.scripts.*
 
-    def call(body) {
+	def call(body){
 
-    // evaluate the body block, and collect configuration into the object
-    def config = [:]
-    body.resolveStrategy = Closure.DELEGATE_FIRST
-    body.delegate = config
-    body()
+	// evaluate the body block, and collect configuration into the object
+	def config = [:]
+	body.resolveStrategy = Closure.DELEGATE_FIRST
+	body.delegate = config
+	body()
 
-    node
-    {
+	node
+	{
 		properties([disableConcurrentBuilds()])
 	    def deployScript = 'VC-2AzureQA.ps1'
 		def dockerTag = "${env.BRANCH_NAME}-branch"
@@ -25,14 +25,15 @@ import jobs.scripts.*
 			settingsFileContent = readFile(SETTINGS_FILE)
 		}
 		SETTINGS = new Settings(settingsFileContent)
-		SETTINGS.setEnvironment(env.BRANCH_NAME)
 		SETTINGS.setRegion('virtocommerce')
+		SETTINGS.setEnvironment(env.BRANCH_NAME)
 
-	    if (env.BRANCH_NAME == 'deploy') {
+		if (env.BRANCH_NAME == 'deploy' || env.BRANCH_NAME == 'dev-vc-new-design'){
 			deployScript = 'VC-2AzureDEV.ps1'
 			dockerTag = "latest"
 		}
-		try {
+
+		try{
 			//Utilities.notifyBuildStatus(this, "started")
 			stage('Checkout'){
 				timestamps{
@@ -51,6 +52,11 @@ import jobs.scripts.*
 					switch(env.BRANCH_NAME) {
 						case 'deploy':
 							def stagingName = "deploy"
+							def storeName = "cms-content"
+							Utilities.runSharedPS(this, "${deployScript}", "-StagingName ${stagingName} -StoreName ${storeName} -AzureBlobName ${SETTINGS['azureBlobName']} -AzureBlobKey ${SETTINGS['azureBlobKey']} -WebAppName ${SETTINGS['webAppName']} -ResourceGroupName ${SETTINGS['resourceGroupName']} -SubscriptionID ${SETTINGS['subscriptionID']}")
+							break
+						case 'dev-vc-new-design':
+							def stagingName = "dev-vc-new-design"
 							def storeName = "cms-content"
 							Utilities.runSharedPS(this, "${deployScript}", "-StagingName ${stagingName} -StoreName ${storeName} -AzureBlobName ${SETTINGS['azureBlobName']} -AzureBlobKey ${SETTINGS['azureBlobKey']} -WebAppName ${SETTINGS['webAppName']} -ResourceGroupName ${SETTINGS['resourceGroupName']} -SubscriptionID ${SETTINGS['subscriptionID']}")
 							break
@@ -82,12 +88,17 @@ import jobs.scripts.*
 
 			stage('Copy to PROD-VC') {
 				timestamps {
+					deployScript = 'VC-2AzurePROD.ps1'
 					switch(env.BRANCH_NAME) {
 						case 'deploy':
 							def stagingName = "deploy"
 							def storeName = "cms-content"
-							deployScript = 'VC-2AzurePROD.ps1'
 							Utilities.runSharedPS(this, "${deployScript}", "-StagingName ${stagingName} -StoreName ${storeName} -AzureBlobName ${SETTINGS['azureBlobNameProd']} -AzureBlobKey ${SETTINGS['azureBlobKeyProd']} -WebAppName ${SETTINGS['webAppNameProd']} -ResourceGroupName ${SETTINGS['resourceGroupNameProd']} -SubscriptionID ${SETTINGS['subscriptionID']}")
+							break
+						case 'dev-vc-new-design':
+							def stagingName = "dev-vc-new-design"
+							def storeName = "cms-content"
+							//Utilities.runSharedPS(this, "${deployScript}", "-StagingName ${stagingName} -StoreName ${storeName} -AzureBlobName ${SETTINGS['azureBlobNameProd']} -AzureBlobKey ${SETTINGS['azureBlobKeyProd']} -WebAppName ${SETTINGS['webAppNameProd']} -ResourceGroupName ${SETTINGS['resourceGroupNameProd']} -SubscriptionID ${SETTINGS['subscriptionID']}")
 							break
 					}
 				}
@@ -124,5 +135,5 @@ import jobs.scripts.*
 		}
 
 		//step([$class: 'GitHubCommitStatusSetter', statusResultSource: [$class: 'ConditionalStatusResultSource', results: []]])
-    }
+	}
 }
