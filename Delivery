@@ -210,7 +210,7 @@ pipeline {
                     def subscriptionID = SETTINGS['subscriptionID']
                     def blobToken = SETTINGS['blobToken']
                     Utilities.runSharedPS(this, 'delivery/upload-CS.ps1', 
-                        "-PlatformDir ${csRoot}\\platform -ModulesDir ${csRoot}\\modules -StorefrontDir ${csRoot}\\storefront -ThemeDir ${csRoot}\\theme -WebAppName ${webAppName} -WebAppPublicName ${webAppPublicName} -ResourceGroupName ${resourceGroupName} -SubscriptionID ${subscriptionID} -BlobToken ${blobToken}")
+                        "-PlatformDir ${csRoot}\\platform -ModulesDir ${csRoot}\\modules -StorefrontDir ${csRoot}\\storefront -ThemeDir ${csRoot}\\theme -WebAppName ${webAppName} -WebAppPublicName ${webAppPublicName} -ResourceGroupName ${resourceGroupName} -SubscriptionID ${subscriptionID} -BlobToken \"${blobToken}\"")
                 }
             }
         }
