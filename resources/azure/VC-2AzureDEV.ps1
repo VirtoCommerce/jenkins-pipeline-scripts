@@ -6,7 +6,6 @@
     $WebAppName,
     $ResourceGroupName,
     $SubscriptionID,
-    $SourceDir,
     $TokenSas
 )
 
@@ -21,12 +20,7 @@ elseif ($StagingName -eq "dev-vc-new-design"){
     $DestDirPath = "Themes/vccom/default"
 }
 
-$Path2Zip = Get-Childitem -Recurse -Path "${env:WORKSPACE}\artifacts\" -File -Include artifact.zip
-
-# Unzip Theme Zip File
-$Path = "${env:WORKSPACE}\artifacts\" + [System.IO.Path]::GetFileNameWithoutExtension($Path2Zip)
-
-Expand-Archive -Path "$Path2Zip" -DestinationPath "$Path" -Force
+$SourceDir = "${env:WORKSPACE}\artifacts"
 
 # Upload Zip File to Azure
 $ConnectionString = "DefaultEndpointsProtocol=https;AccountName={0};AccountKey={1};EndpointSuffix=core.windows.net"
