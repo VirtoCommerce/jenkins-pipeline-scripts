@@ -77,7 +77,7 @@ $dirpath = "Themes"
 Write-Output "AzCopy $elecPath"
 $accountname = "qademovc"
 $token = $BlobToken
-& "${env:Utils}\AzCopy10\AzCopy" sync $ThemeDir \"https://$($accountname).blob.core.windows.net/$ContainerName/$($dirpath)$token\" --delete-destination=true #/DestKey:$accountKey /S
+& "${env:Utils}\AzCopy10\AzCopy" sync $ThemeDir https://$($accountname).blob.core.windows.net/$ContainerName/$($dirpath)$token --delete-destination=true #/DestKey:$accountKey /S
 
 Write-Host "Start Backend $WebAppName"
 
