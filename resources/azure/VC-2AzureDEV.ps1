@@ -54,3 +54,10 @@ Write-Host "Sync $StoreName"
 
 Write-Host "Start $DestWebAppName"
 Start-AzureRmWebApp -ResourceGroupName $DestResourceGroupName -Name $DestWebAppName
+
+Write-Host "$SourceDir https://$($AzureBlobName).blob.core.windows.net/$StoreName/$($DestDirPath)$TokenSas"
+Write-Host $SourceDir
+Write-Host $AzureBlobName
+Write-Host $StoreName
+Write-Host $DestDirPath
+Write-Host $TokenSas
