@@ -49,11 +49,11 @@ import jobs.scripts.*
 
 			stage('Copy to DEV-VC') {
 				timestamps {
+					def sourceDir = "${env.WORKSPACE}\\artifacts"
 					switch(env.BRANCH_NAME) {
 						case 'deploy':
 							def stagingName = "deploy"
 							def storeName = "cms-content"
-							def sourceDir = "${env.WORKSPACE}\\artifacts"
 							Utilities.runSharedPS(this, "${deployScript}", "-StagingName ${stagingName} -StoreName ${storeName} -AzureBlobName ${SETTINGS['azureBlobName']} -AzureBlobKey ${SETTINGS['azureBlobKey']} -WebAppName ${SETTINGS['webAppName']} -ResourceGroupName ${SETTINGS['resourceGroupName']} -SubscriptionID ${SETTINGS['subscriptionID']} -SourceDir ${sourceDir} -TokenSas ${SETTINGS['tokenSas']}")
 							break
 						case 'dev-vc-new-design':
