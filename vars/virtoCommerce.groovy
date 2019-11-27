@@ -53,12 +53,31 @@ import jobs.scripts.*
 						case 'deploy':
 							def stagingName = "deploy"
 							def storeName = "cms-content"
-							Utilities.runSharedPS(this, "${deployScript}", "-StagingName ${stagingName} -StoreName ${storeName} -AzureBlobName ${SETTINGS['azureBlobName']} -AzureBlobKey ${SETTINGS['azureBlobKey']} -WebAppName ${SETTINGS['webAppName']} -ResourceGroupName ${SETTINGS['resourceGroupName']} -SubscriptionID ${SETTINGS['subscriptionID']}")
+							def sourceDir = "${env.WORKSPACE}\\artifacts"
+							Utilities.runSharedPS(this, "${deployScript}", "-StagingName ${stagingName}
+																			-StoreName ${storeName}
+																			-AzureBlobName ${SETTINGS['azureBlobName']}
+																			-AzureBlobKey ${SETTINGS['azureBlobKey']}
+																			-WebAppName ${SETTINGS['webAppName']}
+																			-ResourceGroupName ${SETTINGS['resourceGroupName']}
+																			-SubscriptionID ${SETTINGS['subscriptionID']}
+																			-SourceDir ${sourceDir}
+																			-TokenSas ${SETTINGS['tokenSas']}
+																			")
 							break
 						case 'dev-vc-new-design':
 							def stagingName = "dev-vc-new-design"
 							def storeName = "cms-content"
-							Utilities.runSharedPS(this, "${deployScript}", "-StagingName ${stagingName} -StoreName ${storeName} -AzureBlobName ${SETTINGS['azureBlobName']} -AzureBlobKey ${SETTINGS['azureBlobKey']} -WebAppName ${SETTINGS['webAppName']} -ResourceGroupName ${SETTINGS['resourceGroupName']} -SubscriptionID ${SETTINGS['subscriptionID']}")
+							Utilities.runSharedPS(this, "${deployScript}", "-StagingName${stagingName}
+																			-StoreName ${storeName}
+																			-AzureBlobName${SETTINGS['azureBlobName']}
+																			-AzureBlobKey ${SETTINGS['azureBlobKey']}
+																			-WebAppName ${SETTINGS['webAppName']}
+																			-ResourceGroupName ${SETTINGS['resourceGroupName']}
+																			-SubscriptionID ${SETTINGS['subscriptionID']}
+																			-SourceDir ${sourceDir}
+																			-TokenSas ${SETTINGS['tokenSas']}
+																			")
 							break
 					}
 				}
@@ -89,16 +108,34 @@ import jobs.scripts.*
 			stage('Copy to PROD-VC') {
 				timestamps {
 					deployScript = 'VC-2AzurePROD.ps1'
-					switch(env.BRANCH_NAME) {
+					switch(env.BRANCH_NAME){
 						case 'deploy':
 							def stagingName = "deploy"
 							def storeName = "cms-content"
-							Utilities.runSharedPS(this, "${deployScript}", "-StagingName ${stagingName} -StoreName ${storeName} -AzureBlobName ${SETTINGS['azureBlobNameProd']} -AzureBlobKey ${SETTINGS['azureBlobKeyProd']} -WebAppName ${SETTINGS['webAppNameProd']} -ResourceGroupName ${SETTINGS['resourceGroupNameProd']} -SubscriptionID ${SETTINGS['subscriptionID']}")
+							// Utilities.runSharedPS(this, "${deployScript}", "-StagingName ${stagingName}
+							// 												-StoreName ${storeName}
+							// 												-AzureBlobName ${SETTINGS['azureBlobNameProd']}
+							// 												-AzureBlobKey ${SETTINGS['azureBlobKeyProd']}
+							// 												-WebAppName ${SETTINGS['webAppNameProd']}
+							// 												-ResourceGroupName ${SETTINGS['resourceGroupNameProd']}
+							// 												-SubscriptionID ${SETTINGS['subscriptionID']}
+							// 												-SourceDir ${sourceDir}
+							// 												-TokenSas ${SETTINGS['tokenSasProd']}
+							// 												")
 							break
 						case 'dev-vc-new-design':
 							def stagingName = "dev-vc-new-design"
 							def storeName = "cms-content"
-							//Utilities.runSharedPS(this, "${deployScript}", "-StagingName ${stagingName} -StoreName ${storeName} -AzureBlobName ${SETTINGS['azureBlobNameProd']} -AzureBlobKey ${SETTINGS['azureBlobKeyProd']} -WebAppName ${SETTINGS['webAppNameProd']} -ResourceGroupName ${SETTINGS['resourceGroupNameProd']} -SubscriptionID ${SETTINGS['subscriptionID']}")
+							// Utilities.runSharedPS(this, "${deployScript}", "-StagingName ${stagingName}
+							// 												-StoreName ${storeName}
+							// 												-AzureBlobName ${SETTINGS['azureBlobNameProd']}
+							// 												-AzureBlobKey ${SETTINGS['azureBlobKeyProd']}
+							// 												-WebAppName ${SETTINGS['webAppNameProd']}
+							// 												-ResourceGroupName ${SETTINGS['resourceGroupNameProd']}
+							// 												-SubscriptionID ${SETTINGS['subscriptionID']}
+							// 												-SourceDir ${sourceDir}
+							// 												-TokenSas ${SETTINGS['tokenSasProd']}
+							// 												")
 							break
 					}
 				}
