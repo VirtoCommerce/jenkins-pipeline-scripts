@@ -31,7 +31,7 @@ $BlobContext = New-AzureStorageContext -ConnectionString $ConnectionString
 $SlotName = "staging"
 
 $Now = Get-Date -format yyyyMMdd-HHmmss
-$DestContainer = $AzureBlobName + "-" + $Now
+$DestContainer = $StoreName + "-" + $Now
 
 $ApplicationID ="${env:AzureAppID}"
 $APIKey = ConvertTo-SecureString "${env:AzureAPIKey}" -AsPlainText -Force
