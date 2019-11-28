@@ -10,10 +10,16 @@
 
 $ErrorActionPreference = "Stop"
 
-$Path2Zip = Get-Childitem -Recurse -Path "${env:WORKSPACE}\artifacts\" -File -Include artifact.zip
+if ($StagingName -eq "deploy"){
+    Copy-Item .\pages\docs .\artifacts -Recurse -Force
+    $DestDirPath = "Pages/vccom/docs"
+}
+elseif ($StagingName -eq "dev-vc-new-design"){
+    Copy-Item .\theme .\artifacts -Recurse -Force
+    $DestDirPath = "Themes/vccom/default"
+}
 
-# Unzip Theme Zip File
-$Path = "${env:WORKSPACE}\artifacts\" + [System.IO.Path]::GetFileNameWithoutExtension($Path2Zip)
+$SourceDir = "${env:WORKSPACE}\artifacts"
 
 # Upload Zip File to Azure
 $ConnectionString = "DefaultEndpointsProtocol=https;AccountName={0};AccountKey={1};EndpointSuffix=core.windows.net"
@@ -22,7 +28,6 @@ if ($StagingName -eq "deploy" -or $StagingName -eq "dev-vc-new-design"){
 }
 $BlobContext = New-AzureStorageContext -ConnectionString $ConnectionString
 
-$AzureBlobName = "$StoreName"
 $SlotName = "staging"
 
 $Now = Get-Date -format yyyyMMdd-HHmmss
@@ -44,21 +49,9 @@ Stop-AzureRmWebAppSlot -ResourceGroupName $DestResourceGroupName -Name $DestWebA
 New-AzureStorageContainer -Name $DestContainer -Context $BlobContext -Permission Container
 Get-AzureStorageBlob -Container $StoreName -Context $BlobContext | Start-AzureStorageBlobCopy -DestContainer "$DestContainer" -Force
 
-Write-Host "Remove from $StoreName"
-if ($StagingName -eq "deploy"){
-    Get-AzureStorageBlob -Blob ("Pages/vccom/docs/*") -Container $AzureBlobName -Context $BlobContext | ForEach-Object { Remove-AzureStorageBlob -Blob $_.Name -Container $AzureBlobName -Context $BlobContext } -ErrorAction Continue
-}
-elseif ($StagingName -eq "dev-vc-new-design"){
-    Get-AzureStorageBlob -Blob ("Themes/vccom/default/*") -Container $AzureBlobName -Context $BlobContext | ForEach-Object { Remove-AzureStorageBlob -Blob $_.Name -Container $AzureBlobName -Context $BlobContext } -ErrorAction Continue
-}
-
-Write-Host "Upload to $StoreName"
-if ($StagingName -eq "deploy"){
-    Get-ChildItem -File -Recurse $Path | ForEach-Object { Set-AzureStorageBlobContent -File $_.FullName -Blob ("Pages/vccom/" + (([System.Uri]("$Path/")).MakeRelativeUri([System.Uri]($_.FullName))).ToString()) -Container $AzureBlobName -Context $BlobContext }
-}
-elseif ($StagingName -eq "dev-vc-new-design"){
-    Get-ChildItem -File -Recurse $Path | ForEach-Object { Set-AzureStorageBlobContent -File $_.FullName -Blob ("Themes/vccom/" + (([System.Uri]("$Path/")).MakeRelativeUri([System.Uri]($_.FullName))).ToString()) -Container $AzureBlobName -Context $BlobContext }
-}
+Write-Host "Sync $StoreName"
+$token = $env:AzureBlobToken
+& "${env:Utils}\AzCopy10\AzCopy" sync $SourceDir https://$($AzureBlobName).blob.core.windows.net/$StoreName/$($DestDirPath)$token --delete-destination=true
 
 Write-Output "Restarting web site $DestWebAppName slot $SlotName"
 Start-AzureRmWebAppSlot -ResourceGroupName $DestResourceGroupName -Name $DestWebAppName -Slot $SlotName
