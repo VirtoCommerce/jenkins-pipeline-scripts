@@ -6,8 +6,7 @@ param(
     $WebAppName,
     $WebAppPublicName,
     $ResourceGroupName,
-    $SubscriptionID,
-    $BlobToken
+    $SubscriptionID
 )
 
 # Upload Storefront Zip File to Azure
@@ -76,7 +75,7 @@ $dirpath = "Themes"
 
 Write-Output "AzCopy $elecPath"
 $accountname = "qademovc"
-$token = $BlobToken
+$token = $env:AzureBlobToken
 & "${env:Utils}\AzCopy10\AzCopy" sync $ThemeDir https://$($accountname).blob.core.windows.net/$ContainerName/$($dirpath)$token --delete-destination=true #/DestKey:$accountKey /S
 
 Write-Host "Start Backend $WebAppName"
