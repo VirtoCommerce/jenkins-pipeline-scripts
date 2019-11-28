@@ -53,12 +53,28 @@ import jobs.scripts.*
 						case 'deploy':
 							def stagingName = "deploy"
 							def storeName = "cms-content"
-							Utilities.runSharedPS(this, "${deployScript}", "-StagingName ${stagingName} -StoreName ${storeName} -AzureBlobName ${SETTINGS['azureBlobName']} -AzureBlobKey ${SETTINGS['azureBlobKey']} -WebAppName ${SETTINGS['webAppName']} -ResourceGroupName ${SETTINGS['resourceGroupName']} -SubscriptionID ${SETTINGS['subscriptionID']} -TokenSas ${SETTINGS['tokenSas']}")
+							def azureBlobName = SETTINGS['azureBlobName']
+							def azureBlobKey = SETTINGS['azureBlobKey']
+							def webAppName = SETTINGS['webAppName']
+							def resourceGroupName = SETTINGS['resourceGroupName']
+							def subscriptionID = SETTINGS['subscriptionID']
+							def blobToken = SETTINGS['tokenSas']
+							withEnv(["AzureBlobToken=${blobToken}"]){
+								Utilities.runSharedPS(this, "${deployScript}", "-StagingName ${stagingName} -StoreName ${storeName} -AzureBlobName ${azureBlobName} -AzureBlobKey ${azureBlobKey} -WebAppName ${webAppName} -ResourceGroupName ${resourceGroupName} -SubscriptionID ${subscriptionID}")
+							}
 							break
 						case 'dev-vc-new-design':
 							def stagingName = "dev-vc-new-design"
 							def storeName = "cms-content"
-							Utilities.runSharedPS(this, "${deployScript}", "-StagingName ${stagingName} -StoreName ${storeName} -AzureBlobName ${SETTINGS['azureBlobName']} -AzureBlobKey ${SETTINGS['azureBlobKey']} -WebAppName ${SETTINGS['webAppName']} -ResourceGroupName ${SETTINGS['resourceGroupName']} -SubscriptionID ${SETTINGS['subscriptionID']} -TokenSas ${SETTINGS['tokenSas']}")
+							def azureBlobName = SETTINGS['azureBlobName']
+							def azureBlobKey = SETTINGS['azureBlobKey']
+							def webAppName = SETTINGS['webAppName']
+							def resourceGroupName = SETTINGS['resourceGroupName']
+							def subscriptionID = SETTINGS['subscriptionID']
+							def blobToken = SETTINGS['tokenSas']
+							withEnv(["AzureBlobToken=${blobToken}"]){
+								Utilities.runSharedPS(this, "${deployScript}", "-StagingName ${stagingName} -StoreName ${storeName} -AzureBlobName ${azureBlobName} -AzureBlobKey ${azureBlobKey} -WebAppName ${webAppName} -ResourceGroupName ${resourceGroupName} -SubscriptionID ${subscriptionID}")
+							}
 							break
 					}
 				}
@@ -93,12 +109,28 @@ import jobs.scripts.*
 						case 'deploy':
 							def stagingName = "deploy"
 							def storeName = "cms-content"
-							Utilities.runSharedPS(this, "${deployScript}", "-StagingName ${stagingName} -StoreName ${storeName} -AzureBlobName ${SETTINGS['azureBlobNameProd']} -AzureBlobKey ${SETTINGS['azureBlobKeyProd']} -WebAppName ${SETTINGS['webAppNameProd']} -ResourceGroupName ${SETTINGS['resourceGroupNameProd']} -SubscriptionID ${SETTINGS['subscriptionID']} -TokenSas ${SETTINGS['tokenSasProd']}")
+							def azureBlobName = SETTINGS['azureBlobNameProd']
+							def azureBlobKey = SETTINGS['azureBlobKeyProd']
+							def webAppName = SETTINGS['webAppNameProd']
+							def resourceGroupName = SETTINGS['resourceGroupNameProd']
+							def subscriptionID = SETTINGS['subscriptionID']
+							def blobToken = SETTINGS['tokenSasProd']
+							withEnv(["AzureBlobToken=${blobToken}"]){
+								Utilities.runSharedPS(this, "${deployScript}", "-StagingName ${stagingName} -StoreName ${storeName} -AzureBlobName ${azureBlobName} -AzureBlobKey ${azureBlobKey} -WebAppName ${webAppName} -ResourceGroupName ${resourceGroupName} -SubscriptionID ${subscriptionID}")
+							}
 							break
 						case 'dev-vc-new-design':
 							def stagingName = "dev-vc-new-design"
 							def storeName = "cms-content"
-							Utilities.runSharedPS(this, "${deployScript}", "-StagingName ${stagingName} -StoreName ${storeName} -AzureBlobName ${SETTINGS['azureBlobNameProd']} -AzureBlobKey ${SETTINGS['azureBlobKeyProd']} -WebAppName ${SETTINGS['webAppNameProd']} -ResourceGroupName ${SETTINGS['resourceGroupNameProd']} -SubscriptionID ${SETTINGS['subscriptionID']} -TokenSas ${SETTINGS['tokenSasProd']}")
+							def azureBlobName = SETTINGS['azureBlobNameProd']
+							def azureBlobKey = SETTINGS['azureBlobKeyProd']
+							def webAppName = SETTINGS['webAppNameProd']
+							def resourceGroupName = SETTINGS['resourceGroupNameProd']
+							def subscriptionID = SETTINGS['subscriptionID']
+							def blobToken = SETTINGS['tokenSasProd']
+							withEnv(["AzureBlobToken=${blobToken}"]){
+								Utilities.runSharedPS(this, "${deployScript}", "-StagingName ${stagingName} -StoreName ${storeName} -AzureBlobName ${azureBlobName} -AzureBlobKey ${azureBlobKey} -WebAppName ${webAppName} -ResourceGroupName ${resourceGroupName} -SubscriptionID ${subscriptionID}")
+							}
 							break
 					}
 				}
