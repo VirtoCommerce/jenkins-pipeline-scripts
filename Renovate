@@ -2,7 +2,7 @@ node {
     configFileProvider([configFile(fileId: 'renovate', targetLocation: 'renovate.js', variable: 'RENOVATE_CONFIG')]) {
         withEnv(["RENOVATE_CONFIG_FILE=${RENOVATE_CONFIG}"]){
             stage('Platform'){
-                powershell "renovate --dry-run --autodiscover-filter virtocommerce/vc-platform"
+                powershell "renovate --dry-run --autodiscover-filter VirtoCommerce/vc-platform"
             }
             stage('Modules'){
                 //bat "renovate --autodiscover-filter virtocommerce/vc-module-*"
