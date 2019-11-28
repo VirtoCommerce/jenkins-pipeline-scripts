@@ -51,7 +51,7 @@ Get-AzureStorageBlob -Container $StoreName -Context $BlobContext | Start-AzureSt
 
 Write-Host "Sync $StoreName"
 $token = "$TokenSas"
-& "${env:Utils}\AzCopy10\AzCopy" sync $SourceDir https://$($AzureBlobName).blob.core.windows.net/$StoreName/$($DestDirPath)$token --delete-destination=true
+& "${env:Utils}\AzCopy10\AzCopy" sync $SourceDir https://$($AzureBlobName).blob.core.windows.net/$StoreName/$($DestDirPath)$($token) --delete-destination=true
 
 Write-Host "Start $DestWebAppName"
 Start-AzureRmWebApp -ResourceGroupName $DestResourceGroupName -Name $DestWebAppName
