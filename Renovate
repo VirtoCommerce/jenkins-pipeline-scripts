@@ -5,17 +5,17 @@ node {
                 powershell "renovate --dry-run --autodiscover-filter VirtoCommerce/vc-platform"
             }
             stage('Modules'){
-                //bat "renovate --autodiscover-filter virtocommerce/vc-module-*"
+                //bat "renovate --autodiscover-filter VirtoCommerce/vc-module-*"
             }
         }
     }
     configFileProvider([configFile(fileId: 'renovate_front', targetLocation: 'renovate_front.js', variable: 'RENOVATE_CONFIG')]) {
         withEnv(["RENOVATE_CONFIG_FILE=${RENOVATE_CONFIG}"]){
             stage('Storefront'){
-                powershell "renovate --dry-run --autodiscover-filter virtocommerce/vc-storefront-core"
+                powershell "renovate --dry-run --autodiscover-filter VirtoCommerce/vc-storefront-core"
             }
             stage('Themes'){
-                //bat "renovate --autodiscover-filter virtocommerce/vc-+(theme|procurement)-*"
+                //bat "renovate --autodiscover-filter VirtoCommerce/vc-+(theme|procurement)-*"
             }
         }
     }
