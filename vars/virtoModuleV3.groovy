@@ -51,13 +51,10 @@ def call(body) {
 
                 if(!Utilities.isPullRequest(this)){
                     stage('Publish'){
-                        def publishPackagesStatus = bat script:"@vc-build PublishPackages -ApiKey ${env.NUGET_KEY} -skip Clean+Restore+Compile+Test > out.log", returnStatus: true
-                        def publishPackagesOut = readFile "out.log"
-                        echo publishPackagesOut
-                        if(publishPackagesStatus != 0){
+                        def ghReleaseResult = Utilities.runBatchScript(this, "@vc-build PublishPackages -ApiKey ${env.NUGET_KEY} -skip Clean+Restore+Compile+Test")
+                        if(ghReleaseResult['status'] != 0){
                             def nugetAlreadyExists = false
-                            def lines = publishPackagesOut.trim().split("\n")
-                            for(line in lines){
+                            for(line in ghReleaseResult['stdout']){
                                 if(line.contains("error: Response status code does not indicate success: 409")){
                                     nugetAlreadyExists = true
                                 }
