@@ -201,7 +201,7 @@ do
     try
     {
         Start-Sleep -s 5
-        $sampleDataState = Invoke-RestMethod $sampleDataStateUrl -ErrorAction Stop
+        $sampleDataState = Invoke-RestMethod $sampleDataStateUrl -ErrorAction Stop -TimeoutSec 180
         Write-Output "Sample data state: $sampleDataState"
     }
     catch
