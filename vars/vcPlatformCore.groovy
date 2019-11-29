@@ -37,13 +37,13 @@ def call(body) {
                 Packaging.checkAnalyzerGate(this)
             }
 
-            stage('Packaging'){                
-                bat "vc-build Compress -skip Clean+Restore+Compile+Test"
-            }
-
             stage('Unit Tests'){
                 bat "vc-build Test -skip Restore+Compile"
             }   
+
+            stage('Packaging'){                
+                bat "vc-build Compress -skip Clean+Restore+Compile+Test"
+            }
 
             if(!Utilities.isPullRequest(this)){
                 stage('Publish'){
