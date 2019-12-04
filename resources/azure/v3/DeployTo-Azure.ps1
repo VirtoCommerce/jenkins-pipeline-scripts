@@ -40,7 +40,7 @@ $xml = Get-AzureRmWebAppPublishingProfile -Name $DestWebAppName `
 $contentPath = $DestContentPath
 $msdeploy = "${env:MSDEPLOY_DIR}\msdeploy.exe"
 $sourcewebapp_msdeployUrl = "https://${DestWebAppName}.scm.azurewebsites.net/msdeploy.axd?site=${DestWebAppName}"
-& $msdeploy -verb:sync -dest:contentPath="D:\home\site\wwwroot\$contentPath",computerName=$sourcewebapp_msdeployUrl,publishSettings=$tmpPublishProfile -source:package=$ZipFile # -skip:Directory="App_Data\\Lucene"
+& $msdeploy -verb:sync -dest:contentPath="D:\home\site\wwwroot\$contentPath",computerName=$sourcewebapp_msdeployUrl,publishSettings=$tmpPublishProfile -source:package=$ZipFile -skip:Directory="D:\home\site\wwwroot\$contentPath\App_Data\Lucene"
 
 
 
