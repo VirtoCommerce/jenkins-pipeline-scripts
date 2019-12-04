@@ -1,7 +1,6 @@
 #!groovy
 import jobs.scripts.*
 
-def Utils = library('test-shared-lib').com.test.Utilities
 
 // module script
 def call(body) {
@@ -12,6 +11,7 @@ def call(body) {
 	body()
     
 	node {
+		def Utils = library('test-shared-lib').com.test.Utilities
 		properties([disableConcurrentBuilds()])
 	    def storeName = config.sampleStore
 		projectType = config.projectType
