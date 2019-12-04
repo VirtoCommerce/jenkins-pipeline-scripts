@@ -95,6 +95,7 @@ def call(body) {
                         echo cause
                     }
                 }
+                Utilities.cleanPRFolder(this)
             }
         }
     }
