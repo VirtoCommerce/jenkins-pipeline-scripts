@@ -18,6 +18,8 @@ def call(body) {
 		if(projectType==null){
 			projectType = 'Theme'
 		}
+		echo "Test shared lib"
+		echo Utils.getProjectType(this)
 
 		def SETTINGS
 		def settingsFileContent
