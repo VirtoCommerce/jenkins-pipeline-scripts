@@ -1,6 +1,8 @@
 #!groovy
 import jobs.scripts.*
 
+def Utils = library('test-shared-lib').com.test.Utilities
+
 // module script
 def call(body) {
 	// evaluate the body block, and collect configuration into the object
