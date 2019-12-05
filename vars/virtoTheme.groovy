@@ -20,6 +20,8 @@ def call(body) {
 		}
 		echo "Test shared lib"
 		echo Utils.getProjectType(this)
+		def testContent = libraryResource 'test.ps1'
+		powershell testContent
 
 		def SETTINGS
 		def settingsFileContent
