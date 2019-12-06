@@ -9,8 +9,6 @@ class Utilities {
     private static Integer DefaultPlatformPort = 8090
     private static Integer DefaultStorefrontPort = 8080
     private static Integer DefaultSqlPort = 1434  
-      
-	def Utils = library('test-shared-lib').com.test.Utilities
 
     /**
      * Get the folder name for a job.
