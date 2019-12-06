@@ -11,17 +11,12 @@ def call(body) {
 	body()
     
 	node {
-		def Utils = library('test-shared-lib').com.test.Utilities
 		properties([disableConcurrentBuilds()])
 	    def storeName = config.sampleStore
 		projectType = config.projectType
 		if(projectType==null){
 			projectType = 'Theme'
 		}
-		echo "Test shared lib"
-		echo Utils.getProjectType(this)
-		def testContent = libraryResource 'test.ps1'
-		powershell testContent
 
 		def SETTINGS
 		def settingsFileContent
