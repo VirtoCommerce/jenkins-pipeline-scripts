@@ -1,5 +1,5 @@
 #!groovy
-def globalLib = library('test-shared-lib').com.test
+def globalLib = library('test-shared-lib2').com.test
 
 // module script
 def call(body) {
