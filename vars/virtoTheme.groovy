@@ -1,6 +1,5 @@
 #!groovy
-@Library('test-shared-lib')
-import com.test.*;
+def globalLib = library('test-shared-lib').com.test
 
 // module script
 def call(body) {
@@ -27,7 +26,7 @@ def call(body) {
 		configFileProvider([configFile(fileId: 'shared_lib_settings', variable: 'SETTINGS_FILE')]) {
 			settingsFileContent = readFile(SETTINGS_FILE)
 		}
-		SETTINGS = new com.test.Settings(settingsFileContent)
+		SETTINGS = new globalLib.Settings(settingsFileContent)
 		SETTINGS.setBranch(env.BRANCH_NAME)
 		SETTINGS.setProject('theme')
 
