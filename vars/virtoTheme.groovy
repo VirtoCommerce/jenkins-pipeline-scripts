@@ -1,7 +1,6 @@
 #!groovy
-def Settings = library('test-shared-lib').com.test.Settings
-def Utilities = library('test-shared-lib').com.test.Utilities
-def Packaging = library('test-shared-lib').com.test.Packaging
+@Library('test-shared-lib') _
+import com.test.Settings
 
 // module script
 def call(body) {
