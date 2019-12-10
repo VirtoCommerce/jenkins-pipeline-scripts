@@ -1,12 +1,13 @@
 #!groovy
+def Settings = library('test-shared-lib').com.test.Settings
+def Utilities = library('test-shared-lib').com.test.Utilities
+def Packaging = library('test-shared-lib').com.test.Packaging
 
 // module script
 def call(body) {
 
 	
-	@Library('test-shared-lib') import com.test.Utilities
-	@Library('test-shared-lib') import com.test.Packaging
-	
+
 	// evaluate the body block, and collect configuration into the object
 	def config = [:]
 	body.resolveStrategy = Closure.DELEGATE_FIRST
