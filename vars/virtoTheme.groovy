@@ -1,5 +1,5 @@
 #!groovy
-// library 'test-shared-lib' 
+library 'test-shared-lib' 
 import com.test.*
 
 // module script
@@ -15,8 +15,6 @@ def call(body) {
 	
     
 	node {
-		
-		@Library('test-shared-lib@master')_
 		properties([disableConcurrentBuilds()])
 	    def storeName = config.sampleStore
 		projectType = config.projectType
@@ -29,7 +27,7 @@ def call(body) {
 		configFileProvider([configFile(fileId: 'shared_lib_settings', variable: 'SETTINGS_FILE')]) {
 			settingsFileContent = readFile(SETTINGS_FILE)
 		}
-		SETTINGS = new Settings(settingsFileContent)
+		SETTINGS = new com.test.Settings(settingsFileContent)
 		SETTINGS.setBranch(env.BRANCH_NAME)
 		SETTINGS.setProject('theme')
 
