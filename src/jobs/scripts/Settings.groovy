@@ -2,7 +2,7 @@ package jobs.scripts
 
 import groovy.json.JsonSlurperClassic
 
-class Settings{
+class Settings implements Serializable{
     private Object _settings
     private String _environment
     private String _region
