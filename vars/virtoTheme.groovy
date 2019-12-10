@@ -26,7 +26,7 @@ def call(body) {
 		configFileProvider([configFile(fileId: 'shared_lib_settings', variable: 'SETTINGS_FILE')]) {
 			settingsFileContent = readFile(SETTINGS_FILE)
 		}
-		SETTINGS = new library('test-shared-lib2').com.test.Settings(settingsFileContent)
+		SETTINGS = new library('test-shared-lib').com.test.Settings(settingsFileContent)
 		SETTINGS.setBranch(env.BRANCH_NAME)
 		SETTINGS.setProject('theme')
 
