@@ -1,7 +1,7 @@
 #!groovy
 // library 'test-shared-lib' 
 // import com.test.*
-@Library('test-shared-lib@master')
+@Library('test-shared-lib@master')_
 
 // module script
 def call(body) {
