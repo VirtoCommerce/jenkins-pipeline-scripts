@@ -1,5 +1,5 @@
 #!groovy
-@Library('test-shared-lib') import com.test.*
+Library('test-shared-lib') import com.test.*
 
 // module script
 def call(body) {
