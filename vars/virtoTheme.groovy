@@ -1,5 +1,5 @@
 #!groovy
-import jobs.scripts.*
+@Library('test-shared-lib') _
 
 
 // module script
