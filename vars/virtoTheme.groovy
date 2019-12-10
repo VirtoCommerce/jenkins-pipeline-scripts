@@ -1,5 +1,5 @@
 #!groovy
-@Library('test-shared-lib') _
+@Library('test-shared-lib@') _
 import com.test.Settings
 
 // module script
