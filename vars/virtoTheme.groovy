@@ -14,9 +14,8 @@ def call(body) {
     
 	node {
 		
-		@Library('test-shared-lib')
-		import com.test.*;
-		
+		@Library('test-shared-lib') _
+
 		properties([disableConcurrentBuilds()])
 	    def storeName = config.sampleStore
 		projectType = config.projectType
