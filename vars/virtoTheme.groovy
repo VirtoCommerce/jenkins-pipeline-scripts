@@ -1,11 +1,8 @@
 #!groovy
-@Library('test-shared-lib')
-import com.test.*;
 
 // module script
 def call(body) {
 
-	
 
 	// evaluate the body block, and collect configuration into the object
 	def config = [:]
@@ -16,6 +13,10 @@ def call(body) {
 	
     
 	node {
+		
+		@Library('test-shared-lib')
+		import com.test.*;
+		
 		properties([disableConcurrentBuilds()])
 	    def storeName = config.sampleStore
 		projectType = config.projectType
