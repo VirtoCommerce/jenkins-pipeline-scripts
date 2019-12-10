@@ -1,4 +1,6 @@
 #!groovy
+@Library('test-shared-lib') _ 
+import com.test.*
 
 // module script
 def call(body) {
@@ -8,8 +10,7 @@ def call(body) {
 	body.delegate = config
 	body()
 
-	@Library('test-shared-lib') _ 
-	import com.test.*
+	
     
 	node {
 		properties([disableConcurrentBuilds()])
