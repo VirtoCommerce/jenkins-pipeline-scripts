@@ -1,4 +1,5 @@
 #!groovy
+@Library('test-shared-lib') _
 
 // module script
 def call(body) {
@@ -10,7 +11,6 @@ def call(body) {
 	body.delegate = config
 	body()
 
-	@Library('test-shared-lib') _
 	
     
 	node {
