@@ -11,7 +11,7 @@ def call(body) {
 	body()
 
 	
-	def globalLib = library('test-shared-lib2').com.test
+	def globalLib = library('test-shared-lib')
     
 	node {
 		properties([disableConcurrentBuilds()])
@@ -26,7 +26,7 @@ def call(body) {
 		configFileProvider([configFile(fileId: 'shared_lib_settings', variable: 'SETTINGS_FILE')]) {
 			settingsFileContent = readFile(SETTINGS_FILE)
 		}
-		SETTINGS = new library('test-shared-lib').com.test.Settings(settingsFileContent)
+		SETTINGS = new globalLib.com.test.Settings.new(settingsFileContent)
 		SETTINGS.setBranch(env.BRANCH_NAME)
 		SETTINGS.setProject('theme')
 
