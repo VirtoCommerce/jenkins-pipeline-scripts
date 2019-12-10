@@ -1,7 +1,6 @@
 #!groovy
 // library 'test-shared-lib' 
-// import com.test.*
-@Library('test-shared-lib@master')_
+import com.test.*
 
 // module script
 def call(body) {
@@ -16,7 +15,8 @@ def call(body) {
 	
     
 	node {
-
+		
+		@Library('test-shared-lib@master')_
 		properties([disableConcurrentBuilds()])
 	    def storeName = config.sampleStore
 		projectType = config.projectType
