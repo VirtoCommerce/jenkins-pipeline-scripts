@@ -1,6 +1,4 @@
 #!groovy
-@Library('test-shared-lib') import com.test.*
-
 
 // module script
 def call(body) {
@@ -9,6 +7,8 @@ def call(body) {
 	body.resolveStrategy = Closure.DELEGATE_FIRST
 	body.delegate = config
 	body()
+
+	@Library('test-shared-lib') import com.test.*
     
 	node {
 		properties([disableConcurrentBuilds()])
