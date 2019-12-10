@@ -8,7 +8,8 @@ def call(body) {
 	body.delegate = config
 	body()
 
-	@Library('test-shared-lib') import com.test.*
+	@Library('test-shared-lib') _ 
+	import com.test.*
     
 	node {
 		properties([disableConcurrentBuilds()])
