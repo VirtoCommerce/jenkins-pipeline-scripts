@@ -10,11 +10,10 @@ def call(body) {
 	body.delegate = config
 	body()
 
+	@Library('test-shared-lib') _
 	
     
 	node {
-		
-		@Library('test-shared-lib') _
 
 		properties([disableConcurrentBuilds()])
 	    def storeName = config.sampleStore
