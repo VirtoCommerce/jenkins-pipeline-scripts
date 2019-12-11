@@ -30,13 +30,12 @@ def call(body) {
 		configFileProvider([configFile(fileId: 'shared_lib_settings', variable: 'SETTINGS_FILE')]) {
 			settingsFileContent = readFile(SETTINGS_FILE)
 		}
-		SETTINGS = globalLib.Settings.new(settingsFileContent)
+		SETTINGS = globalLib.Settings.new(settingsFileContent, this)
 		SETTINGS.setBranch(env.BRANCH_NAME)
 		SETTINGS.setProject('theme')
 
 		try {
 			echo "Building branch ${env.BRANCH_NAME}"
-			echo "_Settings type: ${SETTINGS._settings.getClass()}"
 			//Utilities.notifyBuildStatus(this, SETTINGS['of365hook'], '', 'STARTED')
 
 			stage('Checkout') {
