@@ -36,7 +36,7 @@ def call(body) {
 
 		try {
 			echo "Building branch ${env.BRANCH_NAME}"
-			echo "hook: ${SETTINGS['of365hook']}"
+			echo "_Settings: ${SETTINGS._settings}"
 			Utilities.notifyBuildStatus(this, SETTINGS['of365hook'], '', 'STARTED')
 
 			stage('Checkout') {
