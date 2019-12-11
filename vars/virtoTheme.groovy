@@ -1,4 +1,5 @@
 #!groovy
+import com.test.*
 
 // module script
 def call(body) {
