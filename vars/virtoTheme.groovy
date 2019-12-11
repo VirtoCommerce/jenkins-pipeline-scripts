@@ -1,6 +1,7 @@
 #!groovy
-library('test-shared-lib')
-import com.test.*
+def globalLib = library('test-shared-lib').com.test
+def Utilities = globalLib.Utilities
+def Packaging = globalLib.Packaging
 
 // module script
 def call(body) {
@@ -13,7 +14,7 @@ def call(body) {
 	body()
 
 	
-	def globalLib = library('test-shared-lib').com.test
+	
     
 	node {
 		properties([disableConcurrentBuilds()])
