@@ -36,6 +36,7 @@ def call(body) {
 
 		try {
 			echo "Building branch ${env.BRANCH_NAME}"
+			echo "hook: ${SETTINGS['of365hook']}"
 			Utilities.notifyBuildStatus(this, SETTINGS['of365hook'], '', 'STARTED')
 
 			stage('Checkout') {
@@ -82,7 +83,7 @@ def call(body) {
 						}
 						if (env.BRANCH_NAME == 'dev') {
 							def stagingName = Utilities.getStagingNameFromBranchName(this)
-							echo "${SETTINGS['azureBlobName']}"
+							echo "${SETTINGS.getProjects()}"
 							Utilities.runSharedPS(this, "VC-Theme2Azure.ps1", "-StagingName ${stagingName} -StoreName ${storeName} -AzureBlobName ${SETTINGS['azureBlobName']} -AzureBlobKey ${SETTINGS['azureBlobKey']}")
 							SETTINGS.setProject('theme-core')
 							SETTINGS.setBranch('release/3.0.0')
