@@ -36,8 +36,8 @@ def call(body) {
 
 		try {
 			echo "Building branch ${env.BRANCH_NAME}"
-			echo "_Settings: ${SETTINGS._settings}"
-			Utilities.notifyBuildStatus(this, SETTINGS['of365hook'], '', 'STARTED')
+			echo "_Settings type: ${SETTINGS.getClass()}"
+			//Utilities.notifyBuildStatus(this, SETTINGS['of365hook'], '', 'STARTED')
 
 			stage('Checkout') {
 				timestamps { 
@@ -100,7 +100,7 @@ def call(body) {
 			throw any //rethrow exception to prevent the build from proceeding
 		}
 		finally {
-			Utilities.notifyBuildStatus(this, SETTINGS['of365hook'], "Build finished", currentBuild.currentResult)
+			//Utilities.notifyBuildStatus(this, SETTINGS['of365hook'], "Build finished", currentBuild.currentResult)
 			step([$class: 'LogParserPublisher',
 				  failBuildOnError: false,
 				  parsingRulesPath: env.LOG_PARSER_RULES,
