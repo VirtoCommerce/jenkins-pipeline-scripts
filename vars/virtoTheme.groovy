@@ -36,7 +36,7 @@ def call(body) {
 
 		try {
 			echo "Building branch ${env.BRANCH_NAME}"
-			echo "_Settings type: ${SETTINGS.getClass()}"
+			echo "_Settings type: ${SETTINGS._settings.getClass()}"
 			//Utilities.notifyBuildStatus(this, SETTINGS['of365hook'], '', 'STARTED')
 
 			stage('Checkout') {
