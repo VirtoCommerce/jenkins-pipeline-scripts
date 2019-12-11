@@ -82,6 +82,7 @@ def call(body) {
 						}
 						if (env.BRANCH_NAME == 'dev') {
 							def stagingName = Utilities.getStagingNameFromBranchName(this)
+							echo "${SETTINGS['azureBlobName']}"
 							Utilities.runSharedPS(this, "VC-Theme2Azure.ps1", "-StagingName ${stagingName} -StoreName ${storeName} -AzureBlobName ${SETTINGS['azureBlobName']} -AzureBlobKey ${SETTINGS['azureBlobKey']}")
 							SETTINGS.setProject('theme-core')
 							SETTINGS.setBranch('release/3.0.0')
