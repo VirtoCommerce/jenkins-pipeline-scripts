@@ -30,7 +30,7 @@ def call(body) {
 			Utilities.runGlobalScript(this, "test.ps1")
 		}
 		catch(any){
-			echo any.getClass()
+			echo any.getClass().toString()
 			echo any.getMessage()
 			throw any
 		}
