@@ -1,11 +1,11 @@
 #!groovy
-
+import jobs.scripts.*
 // module script
 def call(body) {
 
 	
 	def globalLib = library('test-shared-lib').com.test
-	def Utilities = globalLib.Utilities
+	def Utilities = globalLib.Utilities.new(this)
 	def Packaging = globalLib.Packaging
 
 	// evaluate the body block, and collect configuration into the object
@@ -24,13 +24,14 @@ def call(body) {
 		if(projectType==null){
 			projectType = 'Theme'
 		}
+		Utilities.runSharedPS(this, "test.ps1")
 
 		def SETTINGS
 		def settingsFileContent
 		configFileProvider([configFile(fileId: 'shared_lib_settings', variable: 'SETTINGS_FILE')]) {
 			settingsFileContent = readFile(SETTINGS_FILE)
 		}
-		SETTINGS = globalLib.Settings.new(settingsFileContent, this)
+		SETTINGS = globalLib.Settings.new(settingsFileContent)
 		SETTINGS.setBranch(env.BRANCH_NAME)
 		SETTINGS.setProject('theme')
 
