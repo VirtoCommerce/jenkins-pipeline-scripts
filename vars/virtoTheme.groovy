@@ -24,7 +24,7 @@ def call(body) {
 		if(projectType==null){
 			projectType = 'Theme'
 		}
-		Utilities.runSharedPS(this, "test.ps1")
+		Utilities.runGlobalScript(this, "test.ps1")
 
 		def SETTINGS
 		def settingsFileContent
