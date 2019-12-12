@@ -5,7 +5,7 @@ def call(body) {
 
 	
 	def globalLib = library('test-shared-lib').com.test
-	def Utilities = globalLib.Utilities.new(this)
+	def Utilities = globalLib.Utilities
 	def Packaging = globalLib.Packaging
 
 	// evaluate the body block, and collect configuration into the object
