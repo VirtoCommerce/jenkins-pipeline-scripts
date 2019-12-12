@@ -24,6 +24,8 @@ def call(body) {
 		if(projectType==null){
 			projectType = 'Theme'
 		}
+		def test = libraryResource('azure/Restart-WebApp.ps1')
+		echo test
 		Utilities.runGlobalScript(this, "test.ps1")
 
 		def SETTINGS
