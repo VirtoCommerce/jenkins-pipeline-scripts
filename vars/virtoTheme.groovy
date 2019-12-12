@@ -24,9 +24,16 @@ def call(body) {
 		if(projectType==null){
 			projectType = 'Theme'
 		}
-		def test = libraryResource('azure/Restart-WebApp.ps1')
-		echo test
-		Utilities.runGlobalScript(this, "test.ps1")
+		try {
+			def test = libraryResource('azure/Restart-WebApp.ps1')
+			echo test
+			Utilities.runGlobalScript(this, "test.ps1")
+		}
+		catch(any){
+			echo any.getClass()
+			echo any.getMessage()
+			throw any
+		}
 
 		def SETTINGS
 		def settingsFileContent
