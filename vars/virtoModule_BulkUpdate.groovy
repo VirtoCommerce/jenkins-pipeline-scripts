@@ -77,18 +77,15 @@ import jobs.scripts.*
 				}
 			}
 
-			if (env.BRANCH_NAME == 'bulk-update/dev' || env.BRANCH_NAME == 'bulk-update/master'){
+			if (env.BRANCH_NAME == 'dev-js-shopping-cart-iteration-3'){
 				stage('Publish'){
 					timestamps{
-						// if (Packaging.getShouldPublish(this)) {
-						// 	processManifests(true) // publish artifacts to github releases
-						// }
 						switch(env.BRANCH_NAME){
 							case 'bulk-update/master':
 							 	//Packaging.createNugetPackages(this)
 								Utilities.runSharedPS(this, "${deployScript}")
 							 	break
-							case 'bulk-update/dev':
+							case 'dev-js-shopping-cart-iteration-3':
 								Utilities.runSharedPS(this, "${deployScript}")
 								break
 						}
