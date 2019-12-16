@@ -73,6 +73,7 @@ def call(body) {
 						powershell "Remove-Item ${env.WORKSPACE}\\* -Recurse -Force"
 					}
 					checkout scm
+					Docker.hello(this)
 				}				
 			}
 
