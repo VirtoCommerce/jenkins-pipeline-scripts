@@ -2,7 +2,6 @@
 
 // module script
 def call(body) {
-	def globalLib = library('test-shared-lib').com.test
 
 	// evaluate the body block, and collect configuration into the object
 	def config = [:]
@@ -20,6 +19,7 @@ def call(body) {
 		projectType = config.projectType
 
 		
+		def globalLib = library('test-shared-lib').com.test
 		def Utilities = globalLib.Utilities
 		def Packaging = globalLib.Packaging
 
@@ -97,7 +97,7 @@ def call(body) {
 					Packaging.createReleaseArtifact(this, version, webProject, zipArtifact, websiteDir)
 					if (env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'master') {
 						def websitePath = Utilities.getWebPublishFolder(this, websiteDir)
-						dockerImage = Packaging.createDockerImage(this, zipArtifact.replaceAll('\\.','/'), websitePath, ".", dockerTag)			
+						dockerImage = library('test-shared-lib').com.test.Packaging.createDockerImage(this, zipArtifact.replaceAll('\\.','/'), websitePath, ".", dockerTag)			
 					}
 				}
 			}
