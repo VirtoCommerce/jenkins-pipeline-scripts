@@ -23,7 +23,7 @@ def call(body) {
 		def Utilities = globalLib.Utilities
 		def Packaging = globalLib.Packaging
 
-		echo Packaging.getClass().getMethods()
+		echo Packaging.getClass().getMethods().toString()
 		
 		def webProject = 'VirtoCommerce.Platform.Web\\VirtoCommerce.Platform.Web.csproj'
 		def zipArtifact = 'VirtoCommerce.Platform'
