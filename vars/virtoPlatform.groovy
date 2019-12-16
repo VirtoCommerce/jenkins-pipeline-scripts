@@ -3,8 +3,6 @@
 // module script
 def call(body) {
 	def globalLib = library('test-shared-lib').com.test
-	def Utilities = globalLib.Utilities
-	def Packaging = globalLib.Packaging
 
 	// evaluate the body block, and collect configuration into the object
 	def config = [:]
@@ -20,6 +18,10 @@ def call(body) {
 		def hmacSecret = env.HMAC_SECRET
 		def solution = config.solution
 		projectType = config.projectType
+
+		
+		def Utilities = globalLib.Utilities
+		def Packaging = globalLib.Packaging
 		
 		def webProject = 'VirtoCommerce.Platform.Web\\VirtoCommerce.Platform.Web.csproj'
 		def zipArtifact = 'VirtoCommerce.Platform'
