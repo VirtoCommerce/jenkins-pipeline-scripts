@@ -217,6 +217,7 @@ def call(body) {
 		}
 		catch (any) {
 			currentBuild.result = 'FAILURE'
+			echo any.getMessage()
 			throw any //rethrow exception to prevent the build from proceeding
 		}
 		finally {
