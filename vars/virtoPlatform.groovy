@@ -22,6 +22,8 @@ def call(body) {
 		
 		def Utilities = globalLib.Utilities
 		def Packaging = globalLib.Packaging
+
+		echo Packaging.getClass().getMethods()
 		
 		def webProject = 'VirtoCommerce.Platform.Web\\VirtoCommerce.Platform.Web.csproj'
 		def zipArtifact = 'VirtoCommerce.Platform'
@@ -95,7 +97,6 @@ def call(body) {
 					Packaging.createReleaseArtifact(this, version, webProject, zipArtifact, websiteDir)
 					if (env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'master') {
 						def websitePath = Utilities.getWebPublishFolder(this, websiteDir)
-						echo "zipArtifact.replaceAll: ${zipArtifact.replaceAll('\\.','/')}| websitePath: ${websitePath}, dockerTag: ${dockerTag}"
 						dockerImage = Packaging.createDockerImage(this, zipArtifact.replaceAll('\\.','/'), websitePath, ".", dockerTag)			
 					}
 				}
