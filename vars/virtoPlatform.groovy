@@ -65,7 +65,7 @@ def call(body) {
 
 		
 		try {
-			// Utilities.notifyBuildStatus(this, SETTINGS['of365hook'], '', 'STARTED')
+			Utilities.notifyBuildStatus(this, SETTINGS['of365hook'], '', 'STARTED')
 
 			stage('Checkout') {
 				timestamps { 
@@ -168,48 +168,48 @@ def call(body) {
 					// 	}
 					// }
 					
-					// if (env.BRANCH_NAME == 'dev') {
-					// 	stage('Infrastructure Check and Deploy'){
-					// 		timestamps{
-					// 			Utilities.createInfrastructure(this)
-					// 		}
-					// 	}
-					// }
+					if (env.BRANCH_NAME == 'dev') {
+						stage('Infrastructure Check and Deploy'){
+							timestamps{
+								Utilities.createInfrastructure(this)
+							}
+						}
+					}
 				}
 			}
 
 			if (env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'master') {
 				stage('Publish'){
 					timestamps { 
-						// def packagesDir = Utilities.getArtifactFolder(this)
-						// def artifacts
-						// dir(packagesDir)
-						// { 
-						// 	artifacts = findFiles(glob: '*.zip')
-						// }
-						// Packaging.saveArtifact(this, 'vc', Utilities.getProjectType(this), '', "artifacts/${artifacts[0].path}")
+						def packagesDir = Utilities.getArtifactFolder(this)
+						def artifacts
+						dir(packagesDir)
+						{ 
+							artifacts = findFiles(glob: '*.zip')
+						}
+						Packaging.saveArtifact(this, 'vc', Utilities.getProjectType(this), '', "artifacts/${artifacts[0].path}")
 
-						// if(solution == 'VirtoCommerce.Platform.sln' || projectType == 'NETCORE2')
-						// {
-						// 	Packaging.pushDockerImage(this, dockerImage, dockerTag)
-						// }
-						// if (Packaging.getShouldPublish(this)) {
-						// 	Packaging.createNugetPackages(this)
-						// 	def notes = Utilities.getReleaseNotes(this, webProject)
-						// 	Packaging.publishRelease(this, version, notes)
-						// }
+						if(solution == 'VirtoCommerce.Platform.sln' || projectType == 'NETCORE2')
+						{
+							Packaging.pushDockerImage(this, dockerImage, dockerTag)
+						}
+						if (Packaging.getShouldPublish(this)) {
+							Packaging.createNugetPackages(this)
+							def notes = Utilities.getReleaseNotes(this, webProject)
+							Packaging.publishRelease(this, version, notes)
+						}
 
-						// if((solution == 'VirtoCommerce.Platform.sln' || projectType == 'NETCORE2') && env.BRANCH_NAME == 'dev')
-						// {
-						// 	Utilities.runSharedPS(this, "${deployScript}", "-SubscriptionID ${SETTINGS['subscriptionID']} -WebAppName ${SETTINGS['appName']} -ResourceGroupName ${SETTINGS['resourceGroupName']} -KuduPath ${SETTINGS['kuduPath']}")
-						// 	if(projectType == 'NETCORE2'){
-						// 		SETTINGS.setProject('storefront-core')
-						// 		SETTINGS.setBranch('release/3.0.0')
-						// 		Utilities.runSharedPS(this, "${deployScript}", "-SubscriptionID ${SETTINGS['subscriptionID']} -WebAppName ${SETTINGS['appName']} -ResourceGroupName ${SETTINGS['resourceGroupName']} -KuduPath ${SETTINGS['kuduPath']}")
-						// 		SETTINGS.setProject('storefront')
-						// 		SETTINGS.setBranch(env.BRANCH_NAME)
-						// 	}
-						// }
+						if((solution == 'VirtoCommerce.Platform.sln' || projectType == 'NETCORE2') && env.BRANCH_NAME == 'dev')
+						{
+							Utilities.runSharedPS(this, "${deployScript}", "-SubscriptionID ${SETTINGS['subscriptionID']} -WebAppName ${SETTINGS['appName']} -ResourceGroupName ${SETTINGS['resourceGroupName']} -KuduPath ${SETTINGS['kuduPath']}")
+							if(projectType == 'NETCORE2'){
+								SETTINGS.setProject('storefront-core')
+								SETTINGS.setBranch('release/3.0.0')
+								Utilities.runSharedPS(this, "${deployScript}", "-SubscriptionID ${SETTINGS['subscriptionID']} -WebAppName ${SETTINGS['appName']} -ResourceGroupName ${SETTINGS['resourceGroupName']} -KuduPath ${SETTINGS['kuduPath']}")
+								SETTINGS.setProject('storefront')
+								SETTINGS.setBranch(env.BRANCH_NAME)
+							}
+						}
 					}
 				}
 			}
@@ -226,7 +226,7 @@ def call(body) {
 		finally {
 			Packaging.stopDockerTestEnvironment(this, dockerTag)
 			Utilities.generateAllureReport(this)
-			// Utilities.notifyBuildStatus(this, SETTINGS['of365hook'], "Build finished", currentBuild.currentResult)
+			Utilities.notifyBuildStatus(this, SETTINGS['of365hook'], "Build finished", currentBuild.currentResult)
 			step([$class: 'LogParserPublisher',
 				  failBuildOnError: false,
 				  parsingRulesPath: env.LOG_PARSER_RULES,
