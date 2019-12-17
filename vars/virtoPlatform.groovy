@@ -65,7 +65,7 @@ def call(body) {
 
 		
 		try {
-			Utilities.notifyBuildStatus(this, SETTINGS['of365hook'], '', 'STARTED')
+			// Utilities.notifyBuildStatus(this, SETTINGS['of365hook'], '', 'STARTED')
 
 			stage('Checkout') {
 				timestamps { 
@@ -73,7 +73,6 @@ def call(body) {
 						powershell "Remove-Item ${env.WORKSPACE}\\* -Recurse -Force"
 					}
 					checkout scm
-					Docker.hello(this)
 				}				
 			}
 
@@ -227,7 +226,7 @@ def call(body) {
 		finally {
 			Packaging.stopDockerTestEnvironment(this, dockerTag)
 			Utilities.generateAllureReport(this)
-			Utilities.notifyBuildStatus(this, SETTINGS['of365hook'], "Build finished", currentBuild.currentResult)
+			// Utilities.notifyBuildStatus(this, SETTINGS['of365hook'], "Build finished", currentBuild.currentResult)
 			step([$class: 'LogParserPublisher',
 				  failBuildOnError: false,
 				  parsingRulesPath: env.LOG_PARSER_RULES,
