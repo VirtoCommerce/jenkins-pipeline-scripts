@@ -4,7 +4,7 @@ import jobs.scripts.*
 def call(body) {
 
 	
-	def globalLib = library('test-shared-lib').com.test
+	def globalLib = library('global-shared-lib').com.test
 	def Utilities = globalLib.Utilities
 	def Packaging = globalLib.Packaging
 
@@ -13,9 +13,6 @@ def call(body) {
 	body.resolveStrategy = Closure.DELEGATE_FIRST
 	body.delegate = config
 	body()
-
-	
-	
     
 	node {
 		properties([disableConcurrentBuilds()])
@@ -23,16 +20,6 @@ def call(body) {
 		projectType = config.projectType
 		if(projectType==null){
 			projectType = 'Theme'
-		}
-		try {
-			def test = libraryResource('azure/Restart-WebApp.ps1')
-			echo test
-			Utilities.runGlobalScript(this, "test.ps1")
-		}
-		catch(any){
-			echo any.getClass().toString()
-			echo any.getMessage()
-			throw any
 		}
 
 		def SETTINGS
@@ -46,7 +33,7 @@ def call(body) {
 
 		try {
 			echo "Building branch ${env.BRANCH_NAME}"
-			//Utilities.notifyBuildStatus(this, SETTINGS['of365hook'], '', 'STARTED')
+			Utilities.notifyBuildStatus(this, SETTINGS['of365hook'], '', 'STARTED')
 
 			stage('Checkout') {
 				timestamps { 
@@ -86,20 +73,20 @@ def call(body) {
 			{
 				stage('Publish') {
 					timestamps {
-						// Packaging.saveArtifact(this, 'vc', 'theme', config.sampleStore, artifacts[0].path)
-						// if (Packaging.getShouldPublish(this)) {
-						// 	Packaging.publishRelease(this, version, "")
-						// }
-						// if (env.BRANCH_NAME == 'dev') {
-						// 	def stagingName = Utilities.getStagingNameFromBranchName(this)
-						// 	echo "${SETTINGS.getProjects()}"
-						// 	Utilities.runSharedPS(this, "VC-Theme2Azure.ps1", "-StagingName ${stagingName} -StoreName ${storeName} -AzureBlobName ${SETTINGS['azureBlobName']} -AzureBlobKey ${SETTINGS['azureBlobKey']}")
-						// 	SETTINGS.setProject('theme-core')
-						// 	SETTINGS.setBranch('release/3.0.0')
-						// 	Utilities.runSharedPS(this, "VC-Theme2Azure.ps1", "-StagingName ${stagingName} -StoreName ${storeName} -AzureBlobName ${SETTINGS['azureBlobName']} -AzureBlobKey ${SETTINGS['azureBlobKey']}")
-						// 	SETTINGS.setProject('theme')
-						// 	SETTINGS.setBranch(env.BRANCH_NAME)
-						// }
+						Packaging.saveArtifact(this, 'vc', 'theme', config.sampleStore, artifacts[0].path)
+						if (Packaging.getShouldPublish(this)) {
+							Packaging.publishRelease(this, version, "")
+						}
+						if (env.BRANCH_NAME == 'dev') {
+							def stagingName = Utilities.getStagingNameFromBranchName(this)
+							echo "${SETTINGS.getProjects()}"
+							Utilities.runSharedPS(this, "VC-Theme2Azure.ps1", "-StagingName ${stagingName} -StoreName ${storeName} -AzureBlobName ${SETTINGS['azureBlobName']} -AzureBlobKey ${SETTINGS['azureBlobKey']}")
+							SETTINGS.setProject('theme-core')
+							SETTINGS.setBranch('release/3.0.0')
+							Utilities.runSharedPS(this, "VC-Theme2Azure.ps1", "-StagingName ${stagingName} -StoreName ${storeName} -AzureBlobName ${SETTINGS['azureBlobName']} -AzureBlobKey ${SETTINGS['azureBlobKey']}")
+							SETTINGS.setProject('theme')
+							SETTINGS.setBranch(env.BRANCH_NAME)
+						}
 					}
 				}
 			}
@@ -109,7 +96,7 @@ def call(body) {
 			throw any //rethrow exception to prevent the build from proceeding
 		}
 		finally {
-			//Utilities.notifyBuildStatus(this, SETTINGS['of365hook'], "Build finished", currentBuild.currentResult)
+			Utilities.notifyBuildStatus(this, SETTINGS['of365hook'], "Build finished", currentBuild.currentResult)
 			step([$class: 'LogParserPublisher',
 				  failBuildOnError: false,
 				  parsingRulesPath: env.LOG_PARSER_RULES,
