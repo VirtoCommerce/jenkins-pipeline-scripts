@@ -19,7 +19,7 @@ def call(body) {
 		projectType = config.projectType
 
 		
-		def globalLib = library('test-shared-lib').com.test
+		def globalLib = library('global-shared-lib').com.test
 		def Utilities = globalLib.Utilities
 		def Packaging = globalLib.Packaging
 		def Docker = globalLib.Docker
