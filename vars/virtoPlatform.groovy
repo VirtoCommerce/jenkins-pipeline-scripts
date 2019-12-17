@@ -96,7 +96,7 @@ def call(body) {
 					Packaging.createReleaseArtifact(this, version, webProject, zipArtifact, websiteDir)
 					if (env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'master') {
 						def websitePath = Utilities.getWebPublishFolder(this, websiteDir)
-						dockerImage = Docker.buildDockerImage(this, zipArtifact.replaceAll('\\.','/'), websitePath, ".", dockerTag)			
+						dockerImage = Packaging.buildDockerImage(this, zipArtifact.replaceAll('\\.','/'), websitePath, ".", dockerTag)			
 					}
 				}
 			}
