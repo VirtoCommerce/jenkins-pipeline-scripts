@@ -2,6 +2,8 @@
 import groovy.json.*
 import groovy.util.*
 
+def Modules
+
     def call(body) {
 
     // evaluate the body block, and collect configuration into the object
@@ -17,7 +19,7 @@ import groovy.util.*
 		def globalLib = library('global-shared-lib').com.test
 		def Utilities = globalLib.Utilities
 		def Packaging = globalLib.Packaging
-		def Modules = globalLib.Modules
+		Modules = globalLib.Modules
 
 	    def deployScript = 'VC-Module2AzureDev.ps1'
 		def dockerTag = "${env.BRANCH_NAME}-branch"
