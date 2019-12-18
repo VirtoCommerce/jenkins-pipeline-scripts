@@ -3,8 +3,10 @@ import groovy.json.*
 import groovy.util.*
 
 def Modules
+def Packaging
+def Utilities
 
-    def call(body) {
+def call(body) {
 
     // evaluate the body block, and collect configuration into the object
     def config = [:]
@@ -17,8 +19,8 @@ def Modules
 		properties([disableConcurrentBuilds()])
 
 		def globalLib = library('global-shared-lib').com.test
-		def Utilities = globalLib.Utilities
-		def Packaging = globalLib.Packaging
+		Utilities = globalLib.Utilities
+		Packaging = globalLib.Packaging
 		Modules = globalLib.Modules
 
 	    def deployScript = 'VC-Module2AzureDev.ps1'
