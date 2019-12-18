@@ -1,7 +1,6 @@
 #!groovy
 import groovy.json.*
 import groovy.util.*
-import jobs.scripts.*
 
     def call(body) {
 
@@ -14,6 +13,12 @@ import jobs.scripts.*
     node
     {
 		properties([disableConcurrentBuilds()])
+
+		def globalLib = library('global-shared-lib').com.test
+		def Utilities = globalLib.Utilities
+		def Packaging = globalLib.Packaging
+		def Modules = globalLib.Modules
+
 	    def deployScript = 'VC-Module2AzureDev.ps1'
 		def dockerTag = "${env.BRANCH_NAME}-branch"
 		def buildOrder = Utilities.getNextBuildOrder(this)
@@ -28,11 +33,11 @@ import jobs.scripts.*
 		configFileProvider([configFile(fileId: 'shared_lib_settings', variable: 'SETTINGS_FILE')]) {
 			settingsFileContent = readFile(SETTINGS_FILE)
 		}
-		SETTINGS = new Settings(settingsFileContent)
-		SETTINGS.setEnvironment(env.BRANCH_NAME)
-		SETTINGS.setRegion('module')
+		SETTINGS = globalLib.Settings.new(settingsFileContent)
+		SETTINGS.setBranch(env.BRANCH_NAME)
+		SETTINGS.setProject('module')
 		if(env.BRANCH_NAME == '1.1.3')
-			SETTINGS.setEnvironment('master')
+			SETTINGS.setBranch('master')
 
 		try {
 			//step([$class: 'GitHubCommitStatusSetter', contextSource: [$class: 'ManuallyEnteredCommitContextSource', context: 'ci.virtocommerce.com'], statusResultSource: [$class: 'ConditionalStatusResultSource', results: [[$class: 'AnyBuildResult', message: 'Building on Virto Commerce CI', state: 'PENDING']]]])		
@@ -170,10 +175,10 @@ import jobs.scripts.*
 			if(Utilities.getRepoName(this) == 'vc-module-pagebuilder'){
 				stage('Delivery to virtocommerce.com'){
 					timestamps{
-						SETTINGS.setRegion('virtocommerce')
-						SETTINGS.setEnvironment('dev')
+						SETTINGS.setProject('virtocommerce')
+						SETTINGS.setBranch('dev')
 						if(env.BRANCH_NAME == 'master'){
-							SETTINGS.setEnvironment('master')
+							SETTINGS.setBranch('master')
 						}
 						Utilities.runSharedPS(this, "${deployScript}", "-SubscriptionID ${SETTINGS['subscriptionID']} -WebAppName ${SETTINGS['appName']} -ResourceGroupName ${SETTINGS['resourceGroupName']}")
 					}
