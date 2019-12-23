@@ -78,7 +78,7 @@ pipeline
             {
                 script
                 {
-                    bat "docker run -d --network=${env.BUILD_TAG}_virto --name migration_test_platform3 mt-platform:latest"
+                    bat "docker run -d --network=${env.BUILD_TAG.toLowerCase()}_virto --name migration_test_platform3 mt-platform:latest"
                     input message: "Stop"
                 }
             }
