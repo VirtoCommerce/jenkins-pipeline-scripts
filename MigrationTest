@@ -79,7 +79,7 @@ pipeline
                 script
                 {
                     def conn_str = "Data Source=vc-db;Initial Catalog=VirtoCommerce2;Persist Security Info=True;User ID=sa;Password=v!rto_Labs!;MultipleActiveResultSets=True;Connect Timeout=30;"
-                    bat "docker run -d --network=${env.BUILD_TAG.toLowerCase()}_virto -e ConnectionStrings:VirtoCommerce=\"${conn_str}\" --name migration_test_platform3 mt-platform:latest"
+                    bat "docker run -d --network=${env.BUILD_TAG.toLowerCase()}_virto -e ConnectionStrings:VirtoCommerce=\"${conn_str}\" --name -p 9090:80 migration_test_platform3 mt-platform:latest"
                     input message: "Stop"
                 }
             }
@@ -91,9 +91,9 @@ pipeline
         always
         {
             withEnv(["DOCKER_PLATFORM_PORT=${DOCKER_PLATFORM_PORT}", "DOCKER_STOREFRONT_PORT=${DOCKER_STOREFRONT_PORT}", "DOCKER_SQL_PORT=${DOCKER_SQL_PORT}", "COMPOSE_PROJECT_NAME=${env.BUILD_TAG}"])
-            {
-                bat "docker-compose down -v"
+            {                
                 bat "docker rm migration_test_platform3 -f"
+                bat "docker-compose down -v"
             }
         }
     }
