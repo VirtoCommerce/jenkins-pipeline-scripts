@@ -24,7 +24,7 @@ pipeline
             {
                 script
                 {
-                    powershell script: "Copy-Item ${env.WORKSPACE}@lib\\virto-shared-library\\resources\\migrationTest\\* ${env.WORKSPACE}\\"
+                    powershell script: "Copy-Item .\\resources\\migrationTest\\* ${env.WORKSPACE}\\"
                 }
             }
         }
@@ -44,7 +44,6 @@ pipeline
                     //  remove instances including database
                     // 2. start up new containers
                     withEnv(["DOCKER_PLATFORM_PORT=${DOCKER_PLATFORM_PORT}", "DOCKER_STOREFRONT_PORT=${DOCKER_STOREFRONT_PORT}", "DOCKER_SQL_PORT=${DOCKER_SQL_PORT}", "COMPOSE_PROJECT_NAME=${env.BUILD_TAG}"]) {
-                        bat "docker-compose down -v"
                         bat "docker-compose up -d"
                     }
                 }		
