@@ -78,7 +78,8 @@ pipeline
             {
                 script
                 {
-                    bat "docker run -d --network=${env.BUILD_TAG.toLowerCase()}_virto --name migration_test_platform3 mt-platform:latest"
+                    def conn_str = "Data Source=vc-db;Initial Catalog=VirtoCommerce2;Persist Security Info=True;User ID=sa;Password=v!rto_Labs!;MultipleActiveResultSets=True;Connect Timeout=30;"
+                    bat "docker run -d --network=${env.BUILD_TAG.toLowerCase()}_virto -e ConnectionStrings:VirtoCommerce=\"${conn_str}\" --name migration_test_platform3 mt-platform:latest"
                     input message: "Stop"
                 }
             }
