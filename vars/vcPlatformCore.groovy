@@ -23,6 +23,7 @@ def call(body) {
             SETTINGS = new Settings(settingsFileContent)
             SETTINGS.setRegion('platform-core')
             SETTINGS.setEnvironment(env.BRANCH_NAME)
+            Utilities.notifyBuildStatus(this, SETTINGS['of365hook'], '', 'STARTED')
 
             try {
                 stage('Checkout'){
@@ -96,6 +97,7 @@ def call(body) {
                         echo cause
                     }
                 }
+			    Utilities.notifyBuildStatus(this, SETTINGS['of365hook'], "Build finished", currentBuild.currentResult)
                 Utilities.cleanPRFolder(this)
             }
         }
