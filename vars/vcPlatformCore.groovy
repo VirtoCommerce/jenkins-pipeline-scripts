@@ -10,6 +10,7 @@ def call(body) {
     def UNSTABLE_CAUSES = []
 
     node {
+        properties([disableConcurrentBuilds()])
         def escapedBranch = env.BRANCH_NAME.replaceAll('/', '_')
         def repoName = Utilities.getRepoName(this)
         def workspace = "D:\\Buildsv3\\${repoName}\\${escapedBranch}"
