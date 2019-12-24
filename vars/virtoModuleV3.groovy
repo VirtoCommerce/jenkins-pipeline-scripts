@@ -52,6 +52,10 @@ def call(body) {
 
                 if(!Utilities.isPullRequest(this)){
                     stage('Publish'){
+						def moduleId = Modules.getModuleId(this)
+						def artifacts = findFiles(glob: 'artifacts\\*.zip')
+						Packaging.saveArtifact(this, 'vc', 'module', moduleId, artifacts[0].path)
+                        
                         def ghReleaseResult = Utilities.runBatchScript(this, "@vc-build PublishPackages -ApiKey ${env.NUGET_KEY} -skip Clean+Restore+Compile+Test")
                         if(ghReleaseResult['status'] != 0){
                             def nugetAlreadyExists = false
