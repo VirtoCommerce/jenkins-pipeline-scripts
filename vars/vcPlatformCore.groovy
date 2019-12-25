@@ -57,7 +57,7 @@ def call(body) {
                     powershell script: "Copy-Item ${workspace}\\artifacts\\publish ${websitePath}\\VirtoCommerce.Platform"
                     powershell script: "Copy-Item ${env.WORKSPACE}@libs\\virto-shared-library\\resources\\docker.core\\windowsnano\\PlatformCore\\* ${websitePath}"
                     dir(websitePath){
-                        docker.build("${dockerImageName}:${dockerTag}, ".")
+                        docker.build("${dockerImageName}:${dockerTag}", ".")
                     }
                 }
 
