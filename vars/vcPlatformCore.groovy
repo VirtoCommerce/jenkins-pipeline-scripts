@@ -14,6 +14,8 @@ def call(body) {
         def escapedBranch = env.BRANCH_NAME.replaceAll('/', '_')
         def repoName = Utilities.getRepoName(this)
         def workspace = "D:\\Buildsv3\\${repoName}\\${escapedBranch}"
+        projectType = 'NETCORE2'
+        dockerTag = 'dev'
         dir(workspace){
             def SETTINGS
             def settingsFileContent
@@ -49,6 +51,8 @@ def call(body) {
 
                 stage('Packaging'){                
                     bat "vc-build Compress -skip Clean+Restore+Compile+Test"
+					def websitePath = Utilities.getWebPublishFolder(this, "platform")
+                    dockerImage = Packaging.createDockerImage(this, 'PlatformCore', websitePath, "${workspace}\\artifacts\\publish", dockerTag)	
                 }
 
                 if(!Utilities.isPullRequest(this)){
