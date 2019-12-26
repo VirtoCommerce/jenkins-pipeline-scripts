@@ -54,10 +54,10 @@ def call(body) {
 
 					def websitePath = Utilities.getWebPublishFolder(this, "docker")
                     def dockerImageName = "platform-core"
-                    powershell script: "Copy-Item ${workspace}\\artifacts\\publish ${websitePath}\\VirtoCommerce.Platform -Recurse"
+                    powershell script: "Copy-Item ${workspace}\\artifacts\\publish\\* ${websitePath}\\VirtoCommerce.Platform -Recurse"
                     powershell script: "Copy-Item ${env.WORKSPACE}@libs\\virto-shared-library\\resources\\docker.core\\windowsnano\\PlatformCore\\* ${websitePath}"
                     dir(websitePath){
-                        docker.build("${dockerImageName}:${dockerTag}", ".")
+                        docker.build("${dockerImageName}:${dockerTag}")
                     }
                 }
 
