@@ -57,6 +57,7 @@ def call(body) {
                     powershell script: "Copy-Item ${workspace}\\artifacts\\publish\\* ${websitePath}\\VirtoCommerce.Platform -Recurse -Force"
                     powershell script: "Copy-Item ${env.WORKSPACE}@libs\\virto-shared-library\\resources\\docker.core\\windowsnano\\PlatformCore\\* ${websitePath} -Force"
                     dir(websitePath){
+                        bat "dotnet dev-certs https -ep \"${websitePath}\\devcert.pfx\" -p virto"
                         docker.build("${dockerImageName}:${dockerTag}")
                     }
                 }
