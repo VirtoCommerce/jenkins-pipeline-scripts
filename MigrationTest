@@ -97,6 +97,7 @@ pipeline
                     //powershell "\$files = Get-ChildItem ${modulesRoot} -Recurse; foreach(\$file in \$files){ docker cp \$file.fullname ${platformContainer}:/vc-platform/ }"
                     bat "docker cp ${modulesRoot} ${platformContainer}:/vc-platform/modules"
                     bat "docker start ${platformContainer}"
+                    Utilities.runSharedPS(this, 'v3/vc-check-installed-modules.ps1', "-ApiUrl https://localhost:9090")
                 }
             }
         }
