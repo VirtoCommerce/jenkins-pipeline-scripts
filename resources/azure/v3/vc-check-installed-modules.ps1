@@ -3,7 +3,7 @@ Param(
     $ApiUrl
 )
 
-$appAuthUrl = "https://$WebAppAdminName-$SlotName.azurewebsites.net/connect/token"
+$appAuthUrl = "$ApiUrl/connect/token"
 
 function Get-AuthToken {
     param (
@@ -24,7 +24,7 @@ $authToken = Get-AuthToken $appAuthUrl admin store
 $headers = @{}
 $headers.Add("Authorization", "Bearer $authToken")
 
-$checkModulesUrl = "$apiurl/api/platform/modules"
+$checkModulesUrl = "$ApiUrl/api/platform/modules"
 
 
 $modules = Invoke-RestMethod $checkModulesUrl -Method Get -Headers $headers -ErrorAction Stop
