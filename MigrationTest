@@ -94,7 +94,8 @@ pipeline
                 {
                     def modulesRoot = "${env.SOLUTION_FOLDER}\\vc\\release\\3.0.0\\module"
                     def platformContainer = "migration_test_platform3"
-                    powershell "\$files = Get-ChildItem ${modulesRoot} -Recurse; foreach(\$file in \$files){ docker cp \$file.fullname ${platformContainer}:/vc-platform/ }"
+                    //powershell "\$files = Get-ChildItem ${modulesRoot} -Recurse; foreach(\$file in \$files){ docker cp \$file.fullname ${platformContainer}:/vc-platform/ }"
+                    bat "docker cp ${modulesRoot} ${platformContainer}:/vc-platform/modules"
                     bat "docker start ${platformContainer}"
                 }
             }
