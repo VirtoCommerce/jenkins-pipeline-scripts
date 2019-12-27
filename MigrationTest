@@ -98,7 +98,8 @@ pipeline
                     bat "docker cp ${modulesRoot} ${platformContainer}:/vc-platform/modules"
                     bat "docker start ${platformContainer}"
                     sleep time: 60
-                    pwsh "${env.WORKSPACE}@libs/resources/azure/v3/vc-check-installed-modules.ps1 -ApiUrl https://localhost:9090 -ErrorAction Stop -Verbose"
+                    //pwsh "${env.WORKSPACE}@libs/resources/azure/v3/vc-check-installed-modules.ps1 -ApiUrl https://localhost:9090 -ErrorAction Stop -Verbose"
+                    Utilities.runSharedPS(this, 'v3/vc-check-installed-modules.ps1', '-ApiUrl https://localhost:9090 -Verbose')
                 }
             }
         }
