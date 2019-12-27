@@ -82,7 +82,7 @@ pipeline
                     def platform2Container = Utilities.getPlatformContainer(this)
                     bat "docker stop ${platform2Container}"
                     def conn_str = "Data Source=vc-db;Initial Catalog=VirtoCommerce2;Persist Security Info=True;User ID=sa;Password=v!rto_Labs!;MultipleActiveResultSets=True;Connect Timeout=30;"
-                    bat "docker create -d --network=${env.BUILD_TAG.toLowerCase()}_virto -e ConnectionStrings:VirtoCommerce=\"${conn_str}\" -e ASPNETCORE_URLS=\"https://+;http://+\" -e ASPNETCORE_HTTPS_PORT=443 -p 9090:443 --name migration_test_platform3 platform-core:dev"
+                    bat "docker create --network=${env.BUILD_TAG.toLowerCase()}_virto -e ConnectionStrings:VirtoCommerce=\"${conn_str}\" -e ASPNETCORE_URLS=\"https://+;http://+\" -e ASPNETCORE_HTTPS_PORT=443 -p 9090:443 --name migration_test_platform3 platform-core:dev"
                 }
             }
         }
