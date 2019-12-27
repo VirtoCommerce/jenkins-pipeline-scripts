@@ -26,17 +26,7 @@ $headers.Add("Authorization", "Bearer $authToken")
 
 $checkModulesUrl = "$ApiUrl/api/platform/modules"
 
-class TrustAllCertsPolicy : System.Net.ICertificatePolicy {
-    [bool] CheckValidationResult([System.Net.ServicePoint] $a,
-                                 [System.Security.Cryptography.X509Certificates.X509Certificate] $b,
-                                 [System.Net.WebRequest] $c,
-                                 [int] $d) {
-        return $true
-    }
-}
-[System.Net.ServicePointManager]::CertificatePolicy = [TrustAllCertsPolicy]::new()
-
-$modules = Invoke-RestMethod $checkModulesUrl -Method Get -Headers $headers -ErrorAction Stop
+$modules = Invoke-RestMethod -SkipCertificateCheck $checkModulesUrl -Method Get -Headers $headers -ErrorAction Stop
 $installedModules = 0
 $iserror = $false
 if ($modules.Length -le 0) {
