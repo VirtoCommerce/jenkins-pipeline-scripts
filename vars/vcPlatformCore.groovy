@@ -34,14 +34,16 @@ def call(body) {
                 }
 
                 stage('Build'){
-                    bat "dotnet build-server shutdown"
-                    withSonarQubeEnv('VC Sonar Server'){
-                        bat "vc-build SonarQubeStart -SonarUrl ${env.SONAR_HOST_URL} -SonarAuthToken \"${env.SONAR_AUTH_TOKEN}\" "// %SONAR_HOST_URL% %SONAR_AUTH_TOKEN%
-                        bat "vc-build SonarQubeEnd -SonarUrl ${env.SONAR_HOST_URL} -SonarAuthToken ${env.SONAR_AUTH_TOKEN}"
-                    }
+                    // withSonarQubeEnv('VC Sonar Server'){
+                    //     bat "vc-build SonarQubeStart -SonarUrl ${env.SONAR_HOST_URL} -SonarAuthToken \"${env.SONAR_AUTH_TOKEN}\" "// %SONAR_HOST_URL% %SONAR_AUTH_TOKEN%
+                    //     bat "vc-build SonarQubeEnd -SonarUrl ${env.SONAR_HOST_URL} -SonarAuthToken ${env.SONAR_AUTH_TOKEN}"
+                    // }
+                    Packaging.startAnalyzer(this, true)
+                    bat "vc-build Compile"
                 }
 
                 stage('Quality Gate'){
+                    Packaging.endAnalyzer(this)
                     Packaging.checkAnalyzerGate(this)
                 }
 
@@ -64,8 +66,10 @@ def call(body) {
                     }
                 }
 
-                if(!Utilities.isPullRequest(this)){
-                    stage('Publish'){
+                if(!Utilities.isPullRequest(this))
+                {
+                    stage('Publish')
+                    {
                         // powershell "vc-build PublishPackages -ApiKey ${env.NUGET_KEY} -skip Clean+Restore+Compile+Test"
                         def ghReleaseResult = Utilities.runBatchScript(this, "@vc-build PublishPackages -ApiKey ${env.NUGET_KEY} -skip Clean+Restore+Compile+Test")
                         if(ghReleaseResult['status'] != 0){
@@ -87,7 +91,8 @@ def call(body) {
                     //     def orgName = Utilities.getOrgName(this)
                     //     powershell "vc-build Release -GitHubUser ${orgName} -GitHubToken ${env.GITHUB_TOKEN} -PreRelease -skip Clean+Restore+Compile+Test"
                     }
-                    stage('Deploy'){
+                    stage('Deploy')
+                    {
                         // $ZipFile,
                         // $WebAppName,
                         // $ResourceGroupName,
