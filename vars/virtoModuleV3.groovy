@@ -42,6 +42,7 @@ def call(body) {
                 }
 
                 stage('Quality Gate'){
+                    sleep time: 15
                     Packaging.endAnalyzer(this)
                     Packaging.checkAnalyzerGate(this)
                 }
