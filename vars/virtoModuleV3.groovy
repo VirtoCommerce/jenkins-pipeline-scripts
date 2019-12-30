@@ -30,15 +30,18 @@ def call(body) {
                 }
 
                 stage('Build'){
-                    bat "dotnet build-server shutdown"
-                    withSonarQubeEnv('VC Sonar Server'){
-                        bat "vc-build SonarQubeStart -SonarUrl ${env.SONAR_HOST_URL} -SonarAuthToken \"${env.SONAR_AUTH_TOKEN}\" "// %SONAR_HOST_URL% %SONAR_AUTH_TOKEN%
-                        bat "vc-build SonarQubeEnd -SonarUrl ${env.SONAR_HOST_URL} -SonarAuthToken ${env.SONAR_AUTH_TOKEN}"
-                        //bat "vc-build StartAnalyzer -SonarUrl ${env.SONAR_HOST_URL} -SonarAuthToken ${env.SONAR_AUTH_TOKEN}"
-                    }
+                    // bat "dotnet build-server shutdown"
+                    // withSonarQubeEnv('VC Sonar Server'){
+                    //     bat "vc-build SonarQubeStart -SonarUrl ${env.SONAR_HOST_URL} -SonarAuthToken \"${env.SONAR_AUTH_TOKEN}\" "// %SONAR_HOST_URL% %SONAR_AUTH_TOKEN%
+                    //     bat "vc-build SonarQubeEnd -SonarUrl ${env.SONAR_HOST_URL} -SonarAuthToken ${env.SONAR_AUTH_TOKEN}"
+                    //     //bat "vc-build StartAnalyzer -SonarUrl ${env.SONAR_HOST_URL} -SonarAuthToken ${env.SONAR_AUTH_TOKEN}"
+                    // }
+                    Packaging.startAnalyzer(this, true)
+                    bat "vc-build Compile"
                 }
 
                 stage('Quality Gate'){
+                    Packaging.endAnalyzer(this)
                     Packaging.checkAnalyzerGate(this)
                 }
                 
