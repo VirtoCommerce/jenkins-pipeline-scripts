@@ -281,7 +281,7 @@ class Packaging {
             scannerPath = "dotnet sonarscanner"
         }
         context.withSonarQubeEnv('VC Sonar Server') {
-            context.bat "${scannerPath} end /d:sonar.verbose=true /d:sonar.login=%SONAR_AUTH_TOKEN%"
+            context.bat "${scannerPath} end /d:sonar.login=%SONAR_AUTH_TOKEN%"
         }          
     }
 
