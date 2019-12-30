@@ -14,6 +14,7 @@ def call(body) {
         def escapedBranch = env.BRANCH_NAME.replaceAll('/', '_')
         def repoName = Utilities.getRepoName(this)
         def workspace = "D:\\Buildsv3\\${repoName}\\${escapedBranch}"
+        projectType = 'NETCORE2'
         dir(workspace){
             def SETTINGS
             def settingsFileContent
