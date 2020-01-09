@@ -28,7 +28,7 @@ import jobs.scripts.*
 		SETTINGS.setRegion('virtocommerce')
 		SETTINGS.setEnvironment(env.BRANCH_NAME)
 
-		if (env.BRANCH_NAME == 'deploy' || env.BRANCH_NAME == 'dev-vc-new-design'){
+		if (env.BRANCH_NAME == 'deploy' || env.BRANCH_NAME == 'dev-vc-scriban'){
 			deployScript = 'VC-2AzureDEV.ps1'
 			dockerTag = "latest"
 		}
@@ -63,8 +63,8 @@ import jobs.scripts.*
 								Utilities.runSharedPS(this, "${deployScript}", "-StagingName ${stagingName} -StoreName ${storeName} -AzureBlobName ${azureBlobName} -AzureBlobKey ${azureBlobKey} -WebAppName ${webAppName} -ResourceGroupName ${resourceGroupName} -SubscriptionID ${subscriptionID}")
 							}
 							break
-						case 'dev-vc-new-design':
-							def stagingName = "dev-vc-new-design"
+						case 'dev-vc-scriban':
+							def stagingName = "dev-vc-scriban"
 							def storeName = "cms-content"
 							def azureBlobName = SETTINGS['azureBlobName']
 							def azureBlobKey = SETTINGS['azureBlobKey']
@@ -119,8 +119,8 @@ import jobs.scripts.*
 								Utilities.runSharedPS(this, "${deployScript}", "-StagingName ${stagingName} -StoreName ${storeName} -AzureBlobName ${azureBlobName} -AzureBlobKey ${azureBlobKey} -WebAppName ${webAppName} -ResourceGroupName ${resourceGroupName} -SubscriptionID ${subscriptionID}")
 							}
 							break
-						case 'dev-vc-new-design':
-							def stagingName = "dev-vc-new-design"
+						case 'dev-vc-scriban':
+							def stagingName = "dev-vc-scriban"
 							def storeName = "cms-content"
 							def azureBlobName = SETTINGS['azureBlobNameProd']
 							def azureBlobKey = SETTINGS['azureBlobKeyProd']

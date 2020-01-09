@@ -14,7 +14,7 @@ if ($StagingName -eq "deploy"){
     Copy-Item .\pages\docs .\artifacts -Recurse -Force
     $DestDirPath = "Pages/vccom/docs"
 }
-elseif ($StagingName -eq "dev-vc-new-design"){
+elseif ($StagingName -eq "dev-vc-scriban"){
     Copy-Item .\theme .\artifacts -Recurse -Force
     $DestDirPath = "Themes/vccom/default"
 }
@@ -23,7 +23,7 @@ $SourceDir = "${env:WORKSPACE}\artifacts"
 
 # Upload Zip File to Azure
 $ConnectionString = "DefaultEndpointsProtocol=https;AccountName={0};AccountKey={1};EndpointSuffix=core.windows.net"
-if ($StagingName -eq "deploy" -or $StagingName -eq "dev-vc-new-design"){
+if ($StagingName -eq "deploy" -or $StagingName -eq "dev-vc-scriban"){
     $ConnectionString = $ConnectionString -f $AzureBlobName, $AzureBlobKey
 }
 $BlobContext = New-AzureStorageContext -ConnectionString $ConnectionString
