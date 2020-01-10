@@ -61,14 +61,12 @@ node {
         }
 
         stage('SwapSlot'){
-            if(envChoices == "staging"){
-                timestamps{
-                    def subscriptionID = SETTINGS['subscriptionID']
-                    def appName = SETTINGS['appName']
-                    def slotName = SETTINGS['slotName']
-                    def resourceGroupName = SETTINGS['resourceGroupName']
-                    powershell "${psfolder}\\SwapSlot.ps1 -SubscriptionID ${subscriptionID} -WebSiteName ${appName} -SlotName ${slotName} -DestResourceGroupName ${resourceGroupName}"
-                }
+            timestamps{
+                def subscriptionID = SETTINGS['subscriptionID']
+                def appName = SETTINGS['appName']
+                def slotName = SETTINGS['slotName']
+                def resourceGroupName = SETTINGS['resourceGroupName']
+                powershell "${psfolder}\\SwapSlot.ps1 -SubscriptionID ${subscriptionID} -WebSiteName ${appName} -SlotName ${slotName} -DestResourceGroupName ${resourceGroupName}"
             }
         }
 
