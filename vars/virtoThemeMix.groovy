@@ -56,7 +56,11 @@ def call(body) {
 			{
 				timestamps
 				{
+<<<<<<< HEAD
 					dir("${env.WORKSPACE}\\ng-app")
+=======
+					if (env.BRANCH_NAME == 'dev' || 'master')
+>>>>>>> 57f4b1ea2d4e336a2e006f40f07fe3ba6442f8d4
 					{
 						bat "npm install --prefer-offline"
 						bat "npm run build-prod"
@@ -92,6 +96,7 @@ def call(body) {
 			///powershell "Get-ChildItem -Path ${env.WORKSPACE} -Recurse -Include $exclude_list | Remove-Item -Recurse -Force"
 			//def exclude_list = "artifacts .git .vs .vscode .scannerwork node_modules ng-app@tmp ng-app\\node_modules .deployment .gitignore Jenkinsfile package-lock.json deploy.cmd"
 			def zipFile = "${env.WORKSPACE}\\artifacts\\dental-theme-${version}.zip"
+
 			stage('Packaging')
 			{
 				timestamps {
@@ -117,7 +122,7 @@ def call(body) {
 						{
 							Packaging.publishRelease(this, version, "")
 						}
-						if (env.BRANCH_NAME == 'dev')
+						if (env.BRANCH_NAME == 'dev' || 'master')
 						{
 							def stagingName = Utilities.getStagingNameFromBranchName(this)
 							withEnv(["AzureBlobName=${SETTINGS['azureBlobName']}", "AzureBlobKey=${SETTINGS['azureBlobKey']}"]){
