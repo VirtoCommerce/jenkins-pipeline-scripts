@@ -6,6 +6,7 @@ node {
     stage('Init'){
         deleteDir()
         checkout scm
+        def envChoices
         def settingsFileContent
 		configFileProvider([configFile(fileId: 'shared_lib_settings', variable: 'SETTINGS_FILE')]) {
 			settingsFileContent = readFile(SETTINGS_FILE)
@@ -16,9 +17,27 @@ node {
 
     psfolder = "${env.WORKSPACE}\\resources\\virtocommerce"
     dir(psfolder){
-         stage('Storefront Update'){
-            timestamps {
-                SETTINGS.setEnvironment('dev_storefront')
+
+        stage('User Input'){
+            timeout(time: 30, unit: 'MINUTES'){
+                envChoices = input(message: "Choose environment to update", parameters: [choice(name: 'Environments', choices:"Dev\nProduction")])
+                if(envChoices == 'Production'){
+                    envChoices = "staging"
+                }
+                else if (envChoices == 'Dev'){
+                    envChoices = ""
+                }
+            }
+        }
+
+        stage('Storefront Update'){
+            timestamps{
+                if(envChoices =='staging'){
+                    SETTINGS.setEnvironment('storefront')
+                }
+                else if(envChoices == ''){
+                    SETTINGS.setEnvironment('dev_storefront')
+                }
                 withEnv(["AzureSubscriptionIDProd=${SETTINGS['subscriptionID']}", "AzureResourceGroupNameProd=${SETTINGS['resourceGroupName']}", "AzureWebAppNameProd=${SETTINGS['appName']}"]){
                     powershell "${psfolder}\\StorefrontUpdate.ps1"
                 }
@@ -45,7 +64,19 @@ node {
                 }
             }
         }
-        
+
+        stage('SwapSlot'){
+            if (envChoices == 'staging')
+                timestamps{
+                    SETTINGS.setEnvironment('storefront')
+                    def subscriptionID = SETTINGS['subscriptionID']
+                    def appName = SETTINGS['appName']
+                    def slotName = SETTINGS['slotName']
+                    def resourceGroupName = SETTINGS['resourceGroupName']
+                    powershell "${psfolder}\\SwapSlot.ps1 -SubscriptionID ${subscriptionID} -WebSiteName ${appName} -SlotName ${slotName} -DestResourceGroupName ${resourceGroupName}"
+                }
+        }
+
         stage('Cleanup') {
             timestamps {
                 Packaging.cleanSolutions(this)

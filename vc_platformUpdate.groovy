@@ -6,6 +6,7 @@ node {
     stage('Init'){
         deleteDir()
         checkout scm
+        def envChoices
         def settingsFileContent
 		configFileProvider([configFile(fileId: 'shared_lib_settings', variable: 'SETTINGS_FILE')]) {
 			settingsFileContent = readFile(SETTINGS_FILE)
@@ -13,24 +14,30 @@ node {
 		SETTINGS = new Settings(settingsFileContent)
 		SETTINGS.setRegion('virtocommerce')
     }
+
     psfolder = "${env.WORKSPACE}\\resources\\virtocommerce"
     dir(psfolder){
 
         stage('User Input'){
             timeout(time: 30, unit: 'MINUTES'){
-                def envChoices = input(message: "Choose environment to update", parameters: [choice(name: 'Environments', choices:"Dev\nProduction")])
-                if(envChoices == 'Dev'){
-                    envChoices = ""
-                }
-                else if (envChoices == 'Production'){
+                envChoices = input(message: "Choose environment to update", parameters: [choice(name: 'Environments', choices:"Dev\nProduction")])
+                if(envChoices == 'Production'){
                     envChoices = "staging"
+                }
+                else if(envChoices == 'Dev'){
+                    envChoices = ""
                 }
             }
         }
 
         stage('Platform Update'){
             timestamps{
-                SETTINGS.setEnvironment('platform')
+                if(envChoices =='staging'){
+                    SETTINGS.setEnvironment('platform')
+                }
+                else if(envChoices == ''){
+                    SETTINGS.setEnvironment('dev_platform')
+                }
                 withEnv([
                     "AzureSubscriptionIDProd=${SETTINGS['subscriptionID']}", "AzureResourceGroupNameProd=${SETTINGS['resourceGroupName']}",
                     "AzureWebAppAdminNameProd=${SETTINGS['appName']}", "devOrStaging=${'envChoices'}"]){
@@ -61,13 +68,14 @@ node {
         }
 
         stage('SwapSlot'){
-            timestamps{
-                def subscriptionID = SETTINGS['subscriptionID']
-                def appName = SETTINGS['appName']
-                def slotName = SETTINGS['slotName']
-                def resourceGroupName = SETTINGS['resourceGroupName']
-                powershell "${psfolder}\\SwapSlot.ps1 -SubscriptionID ${subscriptionID} -WebSiteName ${appName} -SlotName ${slotName} -DestResourceGroupName ${resourceGroupName}"
-            }
+            if (envChoices == 'staging')
+                timestamps{
+                    def subscriptionID = SETTINGS['subscriptionID']
+                    def appName = SETTINGS['appName']
+                    def slotName = SETTINGS['slotName']
+                    def resourceGroupName = SETTINGS['resourceGroupName']
+                    powershell "${psfolder}\\SwapSlot.ps1 -SubscriptionID ${subscriptionID} -WebSiteName ${appName} -SlotName ${slotName} -DestResourceGroupName ${resourceGroupName}"
+                }
         }
 
         stage('Cleanup'){
