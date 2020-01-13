@@ -51,6 +51,13 @@ def call(body) {
                     bat "vc-build Test -skip Restore+Compile"
                 }   
 
+                // stage('Swagger')
+                // {
+                //     dir("${workspace}\\src\\VirtoCommerce.Platform.Web"){
+                //         bat "vc-build SwaggerValidation -Skip Restore+Compile+Publish"
+                //     }
+                // }
+
                 stage('Packaging'){                
                     bat "vc-build Compress -skip Clean+Restore+Compile+Test"
 
