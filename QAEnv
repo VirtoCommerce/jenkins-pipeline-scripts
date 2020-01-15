@@ -32,7 +32,7 @@ pipeline
                     def branches = Utilities.getSubfolders("${env.SOLUTION_FOLDER}\\vc").join("\n")
                     def userInput = input message: "Select Branch", parameters: 
                     [
-                        choice(name:'Base', choice:"dev\nmaster"),
+                        choice(name:'Base', choices:"dev\nmaster"),
                         choice(name:'Branch', choices:branches)
                     ]
                     BASE_BRANCH = userInput["Base"]
