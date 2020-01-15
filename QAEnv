@@ -29,7 +29,7 @@ pipeline
                 script
                 {
                     checkout scm
-                    def branches = Utilities.getSubfolder("${env.SOLUTION_FOLDER}\\vc").join("\n")
+                    def branches = Utilities.getSubfolders("${env.SOLUTION_FOLDER}\\vc").join("\n")
                     def userInput = input message: "Select Branch", parameters: 
                     [
                         choice(name:'Base', choice:"dev\nmaster"),
