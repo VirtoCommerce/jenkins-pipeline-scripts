@@ -69,7 +69,8 @@ pipeline
                                 DOCKER_PLATFORM_PORT = Utilities.getPlatformPort(this)
                                 DOCKER_STOREFRONT_PORT = Utilities.getStorefrontPort(this)
                                 DOCKER_PREFIX = 'qaenv'
-                                switch BASE_BRANCH {
+                                switch(BASE_BRANCH)
+                                {
                                     case 'dev':
                                     DOCKER_TAG = 'dev-branch'
                                     break
