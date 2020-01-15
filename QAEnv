@@ -69,7 +69,7 @@ pipeline
                                 DOCKER_PLATFORM_PORT = Utilities.getPlatformPort(this)
                                 DOCKER_STOREFRONT_PORT = Utilities.getStorefrontPort(this)
                                 DOCKER_PREFIX = 'qaenv'
-                                DOCKER_TAG = BASE_BRANCH
+                                DOCKER_TAG = BASE_BRANCH == 'dev' ? 'dev-branch' : BASE_BRANCH
 
                                 echo "DOCKER_PLATFORM_PORT=${DOCKER_PLATFORM_PORT}, DOCKER_STOREFRONT_PORT=${DOCKER_STOREFRONT_PORT}, DOCKER_SQL_PORT=${DOCKER_SQL_PORT}"
                                 // 1. stop containers
