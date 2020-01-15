@@ -46,60 +46,59 @@ def call(body){
 					checkout scm
 				}
 			}
-			def version = Utilities.getAssemblyVersion(this, webProject)
+			def currentProjectDir = "${env.WORKSPACE}\\JsShoppngCartIntergationSample"
+			dir(currentProjectDir){
+				def version = Utilities.getAssemblyVersion(this, webProject)
+				//Utilities.checkReleaseVersion(this, version)
 
-			//Utilities.checkReleaseVersion(this, version)
-
-			stage('Build'){
-				timestamps{
-					Packaging.startAnalyzer(this)
-					def currentProjectDir = "${env.WORKSPACE}\\JsShoppngCartIntergationSample"
-					dir(currentProjectDir){
+				stage('Build'){
+					timestamps{
+						Packaging.startAnalyzer(this)
 						Packaging.runBuild(this, solution)
 					}
 				}
-			}
 
-			stage('Packaging'){
-				timestamps{
-					Packaging.createReleaseArtifact(this, version, webProject, zipArtifact, websiteDir)
-				}
-			}
-
-			def tests = Utilities.getTestDlls(this)
-			if(tests.size() > 0)
-			{
-				stage('Unit Tests'){
+				stage('Packaging'){
 					timestamps{
-						Packaging.runUnitTests(this, tests)
+						Packaging.createReleaseArtifact(this, version, webProject, zipArtifact, websiteDir)
 					}
 				}
-			}
 
-			stage('Code Analysis'){
-				timestamps{
-					Packaging.endAnalyzer(this)
-					Packaging.checkAnalyzerGate(this)
-				}
-			}
-
-			if (env.BRANCH_NAME == 'master'){
-				stage('Publish'){
-					timestamps{
-						def notes = Utilities.getReleaseNotes(this, webProject)
-						//Packaging.publishRelease(this, version, notes)
-
-						def subscriptionID = SETTINGS['subscriptionID']
-						def resourceGroupName = SETTINGS['resourceGroupName']
-						def webAppName = SETTINGS['webAppName-dev']
-						withEnv(["AzureSubscriptionID=${subscriptionID}", "AzureResourceGroupName=${resourceGroupName}", , "AzureWebAppName=${webAppName}"]){
-							Utilities.runSharedPS(this, "${deployScript}", "-Prefix ${prefix}")
+				def tests = Utilities.getTestDlls(this)
+				if(tests.size() > 0)
+				{
+					stage('Unit Tests'){
+						timestamps{
+							Packaging.runUnitTests(this, tests)
 						}
-						webAppName = SETTINGS['webAppName-qa']
-						webAppName = SETTINGS['webAppName-demo']
 					}
 				}
-			}
+
+				stage('Code Analysis'){
+					timestamps{
+						Packaging.endAnalyzer(this)
+						Packaging.checkAnalyzerGate(this)
+					}
+				}
+
+				if (env.BRANCH_NAME == 'master'){
+					stage('Publish'){
+						timestamps{
+							def notes = Utilities.getReleaseNotes(this, webProject)
+							//Packaging.publishRelease(this, version, notes)
+
+							def subscriptionID = SETTINGS['subscriptionID']
+							def resourceGroupName = SETTINGS['resourceGroupName']
+							def webAppName = SETTINGS['webAppName-dev']
+							withEnv(["AzureSubscriptionID=${subscriptionID}", "AzureResourceGroupName=${resourceGroupName}", , "AzureWebAppName=${webAppName}"]){
+								Utilities.runSharedPS(this, "${deployScript}", "-Prefix ${prefix}")
+							}
+							webAppName = SETTINGS['webAppName-qa']
+							webAppName = SETTINGS['webAppName-demo']
+						}
+					}
+				}
+			} // dir
 
 			stage('Cleanup'){
 				timestamps{
