@@ -41,11 +41,17 @@ pipeline
             }
         }
         stage("Preparing Solution"){
-            def csSrc = "${env.SOLUTION_FOLDER}\\vc\\${BRANCH_NAME}"
-            def modulesRoot = "${env.WORKSPACE}\\CS\\module"
-            powershell "Remove-Item -Path ${env.WORKSPACE}\\CS\\* -Recurse -Force -ErrorAction Continue"
-            powershell "Copy-Item -Path ${csSrc}\\* -Destination ${env.WORKSPACE}\\CS -Recurse -Force"
-            powershell "Rename-Item -Path ${modulesRoot} -NewName modules"
+            steps
+            {
+                script
+                {
+                    def csSrc = "${env.SOLUTION_FOLDER}\\vc\\${BRANCH_NAME}"
+                    def modulesRoot = "${env.WORKSPACE}\\CS\\module"
+                    powershell "Remove-Item -Path ${env.WORKSPACE}\\CS\\* -Recurse -Force -ErrorAction Continue"
+                    powershell "Copy-Item -Path ${csSrc}\\* -Destination ${env.WORKSPACE}\\CS -Recurse -Force"
+                    powershell "Rename-Item -Path ${modulesRoot} -NewName modules"
+                }
+            }
         }
         stage("Docker Environment")
         {
