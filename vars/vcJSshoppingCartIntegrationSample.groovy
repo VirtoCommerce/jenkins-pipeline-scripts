@@ -30,7 +30,7 @@ def call(body){
 		projectType = "NETCORE2"
 
 		def websiteDir = 'VirtoCommerce.JavaScriptShoppingCart.IntegrationSample'
-		def webProject = 'JsShoppngCartIntergationSample\\VirtoCommerce.JavaScriptShoppingCart.IntegrationSample.csproj'
+		def webProject = 'VirtoCommerce.JavaScriptShoppingCart.IntegrationSample.csproj'
 		def prefix = '' //Utilities.getRepoNamePrefix(this)
 
 		def zipArtifact = "${prefix}-sample"
