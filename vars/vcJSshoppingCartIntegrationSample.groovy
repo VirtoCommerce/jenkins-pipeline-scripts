@@ -32,7 +32,7 @@ def call(body){
 		def websiteDir = 'JsShoppngCartIntergationSample\\VirtoCommerce.JavaScriptShoppingCart.IntegrationSample'
 		def webProject = 'JsShoppngCartIntergationSample\\VirtoCommerce.JavaScriptShoppingCart.IntegrationSample.csproj'
 		def prefix = '' //Utilities.getRepoNamePrefix(this)
-		def slave = Utilities.getSlave(this)
+
 		def zipArtifact = "${prefix}-sample"
 		def deployScript = 'VC-2Azure.ps1'
 
