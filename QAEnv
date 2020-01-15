@@ -10,7 +10,7 @@ def DOCKER_PLATFORM_PORT
 def DOCKER_STOREFRONT_PORT
 def DOCKER_PREFIX
 def DOCKER_TAG
-def projectType == 'NETCORE2'
+def projectType = 'NETCORE2'
 
 pipeline
 {
