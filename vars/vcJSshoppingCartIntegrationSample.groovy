@@ -15,7 +15,14 @@ def call(body){
 		// configuration parameters
 		def solution = config.solution
 		projectType = config.projectType
-		def SETTINGS = new Settings(readFile("${env.WORKSPACE}@libs\\virto-shared-library\\resources\\settings.json"))
+		
+		def SETTINGS
+		def settingsFileContent
+		configFileProvider([configFile(fileId: 'shared_lib_settings', variable: 'SETTINGS_FILE')]) {
+			settingsFileContent = readFile(SETTINGS_FILE)
+		}
+		SETTINGS = new Settings(settingsFileContent)
+		
 		SETTINGS.setRegion("vcJSshoppingCartIntegrationSample")
 		SETTINGS.setEnvironment(env.BRANCH_NAME)
 
