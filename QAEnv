@@ -10,7 +10,6 @@ def DOCKER_PLATFORM_PORT
 def DOCKER_STOREFRONT_PORT
 def DOCKER_PREFIX
 def DOCKER_TAG
-def projectType = 'NETCORE2'
 
 pipeline
 {
@@ -62,7 +61,9 @@ pipeline
                 {
                     stage('Create Test Environment') {
                         timestamps { 
-                            // Start docker environment					
+                            // Start docker environment	
+                            
+                            def projectType = 'NETCORE2'				
                             def composeFolder = Utilities.getComposeFolder(this)
                             dir(composeFolder)
                             {
