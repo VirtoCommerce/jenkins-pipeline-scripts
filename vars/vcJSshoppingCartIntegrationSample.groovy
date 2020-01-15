@@ -27,7 +27,7 @@ def call(body){
 		SETTINGS.setEnvironment(env.BRANCH_NAME)
 
 		solution = "VirtoCommerce.JavaScriptShoppingCart.IntegrationSample.sln"
-		projectType = ""
+		projectType = "NETCORE2"
 
 		def websiteDir = 'VirtoCommerce.JavaScriptShoppingCart.IntegrationSample'
 		def webProject = 'JsShoppngCartIntergationSample\\VirtoCommerce.JavaScriptShoppingCart.IntegrationSample.csproj'
