@@ -62,9 +62,7 @@ pipeline
                     stage('Create Test Environment') {
                         timestamps { 
                             // Start docker environment	
-                            
-                            def projectType = 'NETCORE2'				
-                            def composeFolder = Utilities.getComposeFolder(this)
+		                    def composeFolder = "${env.WORKSPACE}@libs\\virto-shared-library\\resources\\docker.core\\windowsnano"
                             dir(composeFolder)
                             {
                                 DOCKER_SQL_PORT = Utilities.getSqlPort(this)
