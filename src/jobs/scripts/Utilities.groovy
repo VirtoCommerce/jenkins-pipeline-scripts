@@ -157,6 +157,13 @@ class Utilities {
         return tempFolder
     }
 
+    def static checkLogForWarnings(context){
+        if(context.env['WARNINGS'] && context.currentBuild.result != 'FAILED'){
+            context.currentBuild.result = 'UNSTABLE'
+            context.echo "WARNINGS:\n${context.env.WARNINGS}"
+        }
+    }
+
     def static notifyBuildStatus(context, webHook, message='', status = '')
     {
         def warnings = context.env.WARNINGS ? "WARNINGS:<br/>${context.env.WARNINGS}" : ''
