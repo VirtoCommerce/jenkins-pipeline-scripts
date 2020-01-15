@@ -106,7 +106,7 @@ pipeline
                     }
                     stage('Theme Install'){
                         def storefrontContainer = Utilities.getStorefrontContainer(this)
-                        def themeFolder = "${env.WORKSPACE}\\CS\\theme\\${REGION}"
+                        def themeFolder = "${env.WORKSPACE}\\CS\\theme"
                         Utilities.runSharedPS(this, "vc-install-theme.ps1", "-themeZip \"${themeFolder}\" -platformContainer ${storefrontContainer}")
                     }
                     
