@@ -4,7 +4,7 @@ Param(
     $PlatformContainer,
     $ModulesDir
 )
-. $PSScriptRoot\Utilities.ps1
+. $PSScriptRoot\..\Utilities.ps1
 
 if ([string]::IsNullOrWhiteSpace($hmacAppId)) {
     $hmacAppId = "${env:HMAC_APP_ID}"
