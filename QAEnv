@@ -55,57 +55,63 @@ pipeline
         }
         stage("Docker Environment")
         {
-            stage('Create Test Environment') {
-                timestamps { 
-                    // Start docker environment					
-                    def composeFolder = Utilities.getComposeFolder(this)
-                    dir(composeFolder)
-                    {
-                        DOCKER_SQL_PORT = Utilities.getSqlPort(this)
-                        DOCKER_PLATFORM_PORT = Utilities.getPlatformPort(this)
-                        DOCKER_STOREFRONT_PORT = Utilities.getStorefrontPort(this)
-                        DOCKER_PREFIX = SETTINGS['prefix']
-                        DOCKER_TAG = SETTINGS['dockerTag']
+            steps
+            {
+                script
+                {
+                    stage('Create Test Environment') {
+                        timestamps { 
+                            // Start docker environment					
+                            def composeFolder = Utilities.getComposeFolder(this)
+                            dir(composeFolder)
+                            {
+                                DOCKER_SQL_PORT = Utilities.getSqlPort(this)
+                                DOCKER_PLATFORM_PORT = Utilities.getPlatformPort(this)
+                                DOCKER_STOREFRONT_PORT = Utilities.getStorefrontPort(this)
+                                DOCKER_PREFIX = SETTINGS['prefix']
+                                DOCKER_TAG = SETTINGS['dockerTag']
 
-                        echo "DOCKER_PLATFORM_PORT=${DOCKER_PLATFORM_PORT}, DOCKER_STOREFRONT_PORT=${DOCKER_STOREFRONT_PORT}, DOCKER_SQL_PORT=${DOCKER_SQL_PORT}"
-                        // 1. stop containers
-                        // 2. remove instances including database
-                        // 3. start up new containers
-                        withEnv(["DOCKER_TAG=${DOCKER_TAG}", "DOCKER_PREFIX=${DOCKER_PREFIX}", "DOCKER_PLATFORM_PORT=${DOCKER_PLATFORM_PORT}", "DOCKER_STOREFRONT_PORT=${DOCKER_STOREFRONT_PORT}", "DOCKER_SQL_PORT=${DOCKER_SQL_PORT}", "COMPOSE_PROJECT_NAME=${env.BUILD_TAG}"]) {
-                            bat "docker-compose stop"
-                            bat "docker-compose rm -f -v"
-                            bat "docker-compose up -d"
+                                echo "DOCKER_PLATFORM_PORT=${DOCKER_PLATFORM_PORT}, DOCKER_STOREFRONT_PORT=${DOCKER_STOREFRONT_PORT}, DOCKER_SQL_PORT=${DOCKER_SQL_PORT}"
+                                // 1. stop containers
+                                // 2. remove instances including database
+                                // 3. start up new containers
+                                withEnv(["DOCKER_TAG=${DOCKER_TAG}", "DOCKER_PREFIX=${DOCKER_PREFIX}", "DOCKER_PLATFORM_PORT=${DOCKER_PLATFORM_PORT}", "DOCKER_STOREFRONT_PORT=${DOCKER_STOREFRONT_PORT}", "DOCKER_SQL_PORT=${DOCKER_SQL_PORT}", "COMPOSE_PROJECT_NAME=${env.BUILD_TAG}"]) {
+                                    bat "docker-compose stop"
+                                    bat "docker-compose rm -f -v"
+                                    bat "docker-compose up -d"
+                                }
+                            }			
                         }
-                    }			
-                }
-            }
-            stage('Install Modules'){
-                timestamps{
-                    def platformContainer = Utilities.getPlatformContainer(this)
-
-                    // install modules
-                    Utilities.runSharedPS(this, 'qaenv/install-modules.ps1', "-ApiUrl \"${Utilities.getPlatformHost(this)}\" -PlatformContainer ${platformContainer} -ModulesDir ${env.WORKSPACE}\\CS\\modules")
-                }
-            }
-            stage('Install Sample Data'){
-                timestamps{
-                    def sampleDataSrcParam = ""
-                    if(SETTINGS['sampledata'] != null){
-                        echo "sampledata url: ${SETTINGS['sampledata']}"
-                        sampleDataSrcParam = "-sampleDataSrc ${SETTINGS['sampledata']}"
-                        echo "using url from environment variable"
                     }
-                    Utilities.runSharedPS(this, "vc-setup-sampledata.ps1", "-apiurl \"http://localhost:${DOCKER_PLATFORM_PORT}\" ${sampleDataSrcParam}")
+                    stage('Install Modules'){
+                        timestamps{
+                            def platformContainer = Utilities.getPlatformContainer(this)
+
+                            // install modules
+                            Utilities.runSharedPS(this, 'qaenv/install-modules.ps1', "-ApiUrl \"${Utilities.getPlatformHost(this)}\" -PlatformContainer ${platformContainer} -ModulesDir ${env.WORKSPACE}\\CS\\modules")
+                        }
+                    }
+                    stage('Install Sample Data'){
+                        timestamps{
+                            def sampleDataSrcParam = ""
+                            if(SETTINGS['sampledata'] != null){
+                                echo "sampledata url: ${SETTINGS['sampledata']}"
+                                sampleDataSrcParam = "-sampleDataSrc ${SETTINGS['sampledata']}"
+                                echo "using url from environment variable"
+                            }
+                            Utilities.runSharedPS(this, "vc-setup-sampledata.ps1", "-apiurl \"http://localhost:${DOCKER_PLATFORM_PORT}\" ${sampleDataSrcParam}")
+                        }
+                    }
+                    stage('Theme Install'){
+                        def storefrontContainer = Utilities.getStorefrontContainer(this)
+                        def themeFolder = "${env.WORKSPACE}\\CS\\theme\\${REGION}"
+                        Utilities.runSharedPS(this, "vc-install-theme.ps1", "-themeZip \"${themeFolder}\" -platformContainer ${storefrontContainer}")
+                    }
+                    
+                    stage('Finish'){
+                        input('Finish')
+                    }
                 }
-            }
-            stage('Theme Install'){
-                def storefrontContainer = Utilities.getStorefrontContainer(this)
-                def themeFolder = "${env.WORKSPACE}\\CS\\theme\\${REGION}"
-                Utilities.runSharedPS(this, "vc-install-theme.ps1", "-themeZip \"${themeFolder}\" -platformContainer ${storefrontContainer}")
-            }
-            
-            stage('Finish'){
-                input('Finish')
             }
         }
     }
