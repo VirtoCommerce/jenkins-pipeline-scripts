@@ -579,4 +579,17 @@ class Utilities {
         context.bat "del ${outFile} /F /Q"
         return res
     }
+    
+    @NonCPS
+    def static getSubfolders(path){
+        def  dirsl = [] 
+        new File(path).eachDir()
+        {
+            dirs ->
+            if (!dirs.getName().startsWith('.')) {
+                dirsl.add(dirs.getName())
+            }
+        }
+        return dirsl
+    }
 }
