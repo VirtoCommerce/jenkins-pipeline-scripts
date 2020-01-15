@@ -26,10 +26,10 @@ def call(body){
 		SETTINGS.setRegion("vcJSshoppingCartIntegrationSample")
 		SETTINGS.setEnvironment(env.BRANCH_NAME)
 
-		solution = "JsShoppngCartIntergationSample\\VirtoCommerce.JavaScriptShoppingCart.IntegrationSample.sln"
+		solution = "VirtoCommerce.JavaScriptShoppingCart.IntegrationSample.sln"
 		projectType = ""
 
-		def websiteDir = 'JsShoppngCartIntergationSample\\VirtoCommerce.JavaScriptShoppingCart.IntegrationSample'
+		def websiteDir = 'VirtoCommerce.JavaScriptShoppingCart.IntegrationSample'
 		def webProject = 'JsShoppngCartIntergationSample\\VirtoCommerce.JavaScriptShoppingCart.IntegrationSample.csproj'
 		def prefix = '' //Utilities.getRepoNamePrefix(this)
 
@@ -53,11 +53,12 @@ def call(body){
 			stage('Build'){
 				timestamps{
 					Packaging.startAnalyzer(this)
-					Packaging.runBuild(this, solution)
+					def currentProjectDir = "${env.WORKSPACE}\\JsShoppngCartIntergationSample"
+					dir(currentProjectDir){
+						Packaging.runBuild(this, solution)
+					}
 				}
 			}
-
-			def dockerImage
 
 			stage('Packaging'){
 				timestamps{
