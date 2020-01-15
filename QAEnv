@@ -68,8 +68,8 @@ pipeline
                                 DOCKER_SQL_PORT = Utilities.getSqlPort(this)
                                 DOCKER_PLATFORM_PORT = Utilities.getPlatformPort(this)
                                 DOCKER_STOREFRONT_PORT = Utilities.getStorefrontPort(this)
-                                DOCKER_PREFIX = SETTINGS['prefix']
-                                DOCKER_TAG = SETTINGS['dockerTag']
+                                DOCKER_PREFIX = 'qaenv'
+                                DOCKER_TAG = BASE_BRANCH
 
                                 echo "DOCKER_PLATFORM_PORT=${DOCKER_PLATFORM_PORT}, DOCKER_STOREFRONT_PORT=${DOCKER_STOREFRONT_PORT}, DOCKER_SQL_PORT=${DOCKER_SQL_PORT}"
                                 // 1. stop containers
@@ -93,13 +93,7 @@ pipeline
                     }
                     stage('Install Sample Data'){
                         timestamps{
-                            def sampleDataSrcParam = ""
-                            if(SETTINGS['sampledata'] != null){
-                                echo "sampledata url: ${SETTINGS['sampledata']}"
-                                sampleDataSrcParam = "-sampleDataSrc ${SETTINGS['sampledata']}"
-                                echo "using url from environment variable"
-                            }
-                            Utilities.runSharedPS(this, "vc-setup-sampledata.ps1", "-apiurl \"http://localhost:${DOCKER_PLATFORM_PORT}\" ${sampleDataSrcParam}")
+                            Utilities.runSharedPS(this, "vc-setup-sampledata.ps1", "-apiurl \"http://localhost:${DOCKER_PLATFORM_PORT}\"")
                         }
                     }
                     stage('Theme Install'){
