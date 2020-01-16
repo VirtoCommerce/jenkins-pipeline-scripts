@@ -604,4 +604,16 @@ class Utilities {
         }
         return dirsl
     }
+
+    def static checkReleaseVersion(context, version){
+        if(Utilities.isReleaseBranch(context)){
+            def ghAssetNameStartsWith = "v"
+            def latestAsset = GithubRelease.getLatestGithubRelease(context, Utilities.getOrgName(context), Utilities.getRepoName(context), ghAssetNameStartsWith)
+            def versionOnGithub = latestAsset.tag_name.trim().replace(ghAssetNameStartsWith, '')
+            context.echo "version: ${version}, version on github ${versionOnGithub}"
+            if(version == versionOnGithub){
+                throw new Exception("Version: ${version} already exists on github")
+            }
+        }
+    }
 }
