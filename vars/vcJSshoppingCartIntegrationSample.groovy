@@ -47,7 +47,7 @@ def call(body){
 			}
 			def currentProjectDir = "${env.WORKSPACE}\\JsShoppngCartIntergationSample"
 			dir(currentProjectDir){
-				def version = 1.0.0 //Utilities.getAssemblyVersion(this, webProject)
+				def version = "1.0.0" //Utilities.getAssemblyVersion(this, webProject)
 				//Utilities.checkReleaseVersion(this, version)
 
 				stage('Build'){
