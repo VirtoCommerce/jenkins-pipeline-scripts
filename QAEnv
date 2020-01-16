@@ -112,7 +112,7 @@ pipeline
                             def themeFolder = "${env.WORKSPACE}\\CS\\theme"
                             //Utilities.runSharedPS(this, "vc-install-theme.ps1", "-themeZip \"${themeFolder}\" -platformContainer ${platformContainer}")
                             bat "docker exec ${platformContainer} powershell -Command \"Remove-Item C:\\vc-platform\\App_Data\\cms-content\\Themes -Force -Recurse\""
-                            bat "docker cp ${themeFolder} ${platformContainer}:/tmp/Themes"
+                            bat "docker cp ${themeFolder} ${platformContainer}:/Themes"
                             bat "docker exec ${platformContainer} powershell -Command \"Move-Item -Path \\Themes -Destination \\vc-platform\\App_Data\\cms-content\""
                         }
                     }
