@@ -105,9 +105,13 @@ pipeline
                         }
                     }
                     stage('Theme Install'){
-                        def storefrontContainer = Utilities.getStorefrontContainer(this)
-                        def themeFolder = "${env.WORKSPACE}\\CS\\theme"
-                        Utilities.runSharedPS(this, "vc-install-theme.ps1", "-themeZip \"${themeFolder}\" -platformContainer ${storefrontContainer}")
+                        timestamps 
+                        {
+                            //def storefrontContainer = Utilities.getStorefrontContainer(this)
+                            def platformContainer = Utilities.getPlatformContainer(this)
+                            def themeFolder = "${env.WORKSPACE}\\CS\\theme"
+                            Utilities.runSharedPS(this, "vc-install-theme.ps1", "-themeZip \"${themeFolder}\" -platformContainer ${platformContainer}")
+                        }
                     }
                     
                     stage('Finish'){
