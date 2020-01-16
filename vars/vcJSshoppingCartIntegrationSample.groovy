@@ -27,10 +27,9 @@ def call(body){
 		SETTINGS.setEnvironment(env.BRANCH_NAME)
 
 		solution = "VirtoCommerce.JavaScriptShoppingCart.IntegrationSample.sln"
-		projectType = "NETCORE2"
 
 		def websiteDir = 'VirtoCommerce.JavaScriptShoppingCart.IntegrationSample'
-		def webProject = 'VirtoCommerce.JavaScriptShoppingCart.IntegrationSample.csproj'
+		def webProject = 'VirtoCommerce.JavaScriptShoppingCart.IntegrationSample\\VirtoCommerce.JavaScriptShoppingCart.IntegrationSample.csproj'
 		def prefix = '' //Utilities.getRepoNamePrefix(this)
 
 		def zipArtifact = "${prefix}-sample"
