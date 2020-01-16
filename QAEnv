@@ -114,7 +114,7 @@ pipeline
                             bat "docker exec ${platformContainer} powershell -Command \"Remove-Item C:\\vc-platform\\App_Data\\cms-content\\Themes -Recurse -Force\""
                             bat "docker exec ${platformContainer} powershell -Command \"mkdir tmp\""
                             bat "docker cp ${themeFolder} ${platformContainer}:/tmp/Themes"
-                            bat "docker exec ${platformContainer} powershell -Command \"Move-Item -Path \\tmp\\Themes -Destination \\vc-platform\\App_Data\\cms-content -Force\""
+                            bat "docker exec ${platformContainer} powershell -Command \"Copy-Item -Path C:\\tmp\\Themes -Destination C:\\vc-platform\\App_Data\\cms-content\\Themes -Recurse -Force\""
                         }
                     }
                     
