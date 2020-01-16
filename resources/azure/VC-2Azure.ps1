@@ -15,13 +15,13 @@ $ApplicationID ="${env:AzureAppID}"
 $APIKey = ConvertTo-SecureString "${env:AzureAPIKey}" -AsPlainText -Force
 $psCred = New-Object System.Management.Automation.PSCredential($ApplicationID, $APIKey)
 $TenantID = "${env:AzureTenantID}"
-$SubscriptionID = Get-EnvVar -Prefix $Prefix -Name "AzureSubscriptionID"
+$SubscriptionID = "${env:AzureSubscriptionID}"
 
 Add-AzureRmAccount -Credential $psCred -TenantId $TenantID -ServicePrincipal
 Select-AzureRmSubscription -SubscriptionId $SubscriptionID
 
-$DestResourceGroupName = Get-EnvVar -Prefix $Prefix -Name "AzureResourceGroupName"
-$DestWebAppName = Get-EnvVar -Prefix $Prefix -Name "AzureWebAppName"
+$DestResourceGroupName = "${env:AzureResourceGroupName}"
+$DestWebAppName = "${env:AzureWebAppName}"
 $DestKuduPath = "https://$DestWebAppName.scm.azurewebsites.net/api/zip/site/wwwroot/"
 $DestKuduDelPath = "https://$DestWebAppName.scm.azurewebsites.net/api/vfs/site/wwwroot/?recursive=true"
 

@@ -86,10 +86,10 @@ def call(body){
 							def notes = Utilities.getReleaseNotes(this, webProject)
 							//Packaging.publishRelease(this, version, notes)
 
-							def subscriptionID = SETTINGS['subscriptionID']
-							def resourceGroupName = SETTINGS['resourceGroupName']
-							def webAppName = SETTINGS['webAppName-dev']
-							withEnv(["vcAzureSubscriptionID=${subscriptionID}", "vcAzureResourceGroupName=${resourceGroupName}", "vcAzureWebAppName=${webAppName}"]){
+							withEnv([	"AzureSubscriptionID=${SETTINGS['subscriptionID']}",
+										"AzureResourceGroupName=${SETTINGS['resourceGroupName']}",
+										"AzureWebAppName=${SETTINGS['webAppName-dev']}"
+										]){
 								Utilities.runSharedPS(this, "${deployScript}", "-Prefix ${prefix}")
 							}
 							webAppName = SETTINGS['webAppName-qa']
