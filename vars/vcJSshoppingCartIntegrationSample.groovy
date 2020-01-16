@@ -89,7 +89,7 @@ def call(body){
 							def subscriptionID = SETTINGS['subscriptionID']
 							def resourceGroupName = SETTINGS['resourceGroupName']
 							def webAppName = SETTINGS['webAppName-dev']
-							withEnv(["${prefix}AzureSubscriptionID=${subscriptionID}", "${prefix}AzureResourceGroupName=${resourceGroupName}", , "${prefix}AzureWebAppName=${webAppName}"]){
+							withEnv(["vcAzureSubscriptionID=${subscriptionID}", "vcAzureResourceGroupName=${resourceGroupName}", "vcAzureWebAppName=${webAppName}"]){
 								Utilities.runSharedPS(this, "${deployScript}", "-Prefix ${prefix}")
 							}
 							webAppName = SETTINGS['webAppName-qa']

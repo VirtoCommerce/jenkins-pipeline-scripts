@@ -7,7 +7,7 @@ param(
 
 # Get Storefront Zip File
 
-$Path2Zip = Get-Childitem -Recurse -Path "${env:WORKSPACE}\artifacts\" -File -Include *.zip
+$Path2Zip = Get-Childitem -Recurse -Path "${env:WORKSPACE}\JsShoppngCartIntergationSample\artifacts\" -File -Include *.zip
 
 # Upload Storefront Zip File to Azure
 
