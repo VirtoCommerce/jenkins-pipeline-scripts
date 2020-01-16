@@ -1,0 +1,132 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "appServicePlanName": {
+      "type": "string"
+    },
+    "appInsights": {
+      "type": "string"
+    },
+    "webAppName": {
+      "type": "string"
+    },
+    "VirtoCommerceApiKey": {
+      "type": "string"
+    },
+    "VirtoCommercePlatformUrl": {
+      "type": "string"
+    }
+  },
+  "variables": {
+    "webAppSize": "B1"
+  },
+  "resources": [
+    {
+      "name": "[parameters('appServicePlanName')]",
+      "type": "Microsoft.Web/serverfarms",
+      "apiVersion": "2018-02-01",
+      "kind": "app",
+      "location": "[resourceGroup().location]",
+      "sku": {
+        "name": "[variables('webAppSize')]"
+      },
+      "tags": {
+        "displayName": "appServicePlan"
+      }
+    },
+    {
+      "name": "[parameters('appInsights')]",
+      "type": "Microsoft.Insights/components",
+      "apiVersion": "2015-05-01",
+      "kind": "web",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "ApplicationId": "[parameters('appInsights')]",
+        "Application_Type": "web",
+        "Flow_Type": "Bluefield",
+        "Request_Source": "rest"
+      },
+      "tags": {
+        "displayName": "applicationInsights"
+      }
+    },
+    {
+      "name": "[parameters('webAppName')]",
+      "type": "Microsoft.Web/sites",
+      "apiVersion": "2018-11-01",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "displayName": "webApp"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/serverfarms', parameters('appServicePlanName'))]",
+        "[resourceId('Microsoft.Insights/components/', parameters('appinsights'))]"
+      ],
+      "properties": {
+        "enabled": true,
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('appServicePlanName'))]",
+        "siteConfig": {
+          "requestTracingEnabled": true,
+          "requestTracingExpirationTime": "9999-12-31T23:59:00Z",
+          "httpLoggingEnabled": true,
+          "logsDirectorySizeLimit": 100,
+          "detailedErrorLoggingEnabled": true,
+          "clientAffinityEnabled": true,
+          "use32BitWorkerProcess": false,
+          "alwaysOn": true,
+          "httpsOnly": true,
+          "http20Enabled": true,
+          "minTlsVersion": "1.2",
+          "ftpsState": "Disabled",
+          "appSettings": [
+            {
+              "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+              "value": "[reference(concat('Microsoft.Insights/components/', parameters('appInsights')), '2015-05-01').InstrumentationKey]"
+            },
+            {
+              "name": "ApplicationInsightsAgent_EXTENSION_VERSION",
+              "value": "~2"
+            },
+            {
+              "name": "InstrumentationEngine_EXTENSION_VERSION",
+              "value": "~1"
+            },
+            {
+              "name": "XDT_MicrosoftApplicationInsights_Mode",
+              "value": "recommended"
+            },
+            {
+              "name": "XDT_MicrosoftApplicationInsights_BaseExtensions",
+              "value": "~1"
+            },
+            {
+              "name": "WEBSITE_LOCAL_CACHE_OPTION",
+              "value": "Always"
+            },
+            {
+              "name": "VirtoCommerce:PlatformUrl",
+              "value": "[parameters('VirtoCommercePlatformUrl')]"
+            },
+            {
+              "name": "VirtoCommerce:ApiKey",
+              "value": "[parameters('VirtoCommerceApiKey')]"
+            }
+          ],
+          "connectionStrings": [
+          ],
+          "virtualApplications": [
+            {
+              "virtualPath": "/",
+              "physicalPath": "site\\wwwroot",
+              "preloadEnabled": false
+            }
+          ]
+        }
+      },
+      "resources": [
+      ]
+    }
+  ],
+  "outputs": {}
+}
