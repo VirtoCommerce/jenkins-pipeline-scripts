@@ -523,7 +523,7 @@ class Utilities {
             }
 
             if (project == "JS"){
-                Utilities.runSharedPS(context, "vc-CreateInfrastructure.ps1")
+                Utilities.runSharedPS(context, "vc-CreateInfrastructureJsShoppingCartIntegrationSample.ps1")
             }
         }
     }
