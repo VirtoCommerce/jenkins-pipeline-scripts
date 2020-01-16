@@ -110,7 +110,9 @@ pipeline
                             //def storefrontContainer = Utilities.getStorefrontContainer(this)
                             def platformContainer = Utilities.getPlatformContainer(this)
                             def themeFolder = "${env.WORKSPACE}\\CS\\theme"
-                            Utilities.runSharedPS(this, "vc-install-theme.ps1", "-themeZip \"${themeFolder}\" -platformContainer ${platformContainer}")
+                            //Utilities.runSharedPS(this, "vc-install-theme.ps1", "-themeZip \"${themeFolder}\" -platformContainer ${platformContainer}")
+                            bat "docker exec ${platformContainer} powershell -Command \"Remove-Item C:\\vc-platform\\App_Data\\cms-content\\Themes -Force -Recurse\""
+                            bat "docker cp ${themeFolder} ${platformContainer}:C:\\vc-platform\\App_Data\\cms-content\\Themes"
                         }
                     }
                     
