@@ -509,7 +509,7 @@ class Utilities {
         context.git credentialsId: context.env.GITHUB_CREDENTIALS_ID, url: "https://github.com/VirtoCommerce/${prefix}-arm-templates.git"
     }
 
-    def static createInfrastructure(context){
+    def static createInfrastructure(context, project = 'blank'){
         //def AzureTempDir = Utilities.getAzureTemplateDir(context)
         def AzureTempDir = "..\\workspace@libs\\virto-shared-library\\resources\\azure"
         context.dir(AzureTempDir){
@@ -521,7 +521,8 @@ class Utilities {
             else if (context.env.BRANCH_NAME == 'bulk-update/master'){
                 Utilities.runSharedPS(context, "vc-CreateInfrastructureBulkUpdateQA.ps1")
             }
-            else{
+
+            if (project == "JS"){
                 Utilities.runSharedPS(context, "vc-CreateInfrastructure.ps1")
             }
         }

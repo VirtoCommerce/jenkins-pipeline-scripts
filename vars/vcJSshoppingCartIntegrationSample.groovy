@@ -81,6 +81,14 @@ def call(body){
 				}
 
 				if (env.BRANCH_NAME == 'master'){
+					stage('ARM Deploy'){
+						timestamps{
+							Utilities.createInfrastructure(this, "JS")
+						}
+					}
+				}
+
+				if (env.BRANCH_NAME == 'master'){
 					stage('Publish'){
 						timestamps{
 							def notes = Utilities.getReleaseNotes(this, webProject)
@@ -92,8 +100,18 @@ def call(body){
 										]){
 								Utilities.runSharedPS(this, "${deployScript}", "-Prefix ${prefix}")
 							}
-							webAppName = SETTINGS['webAppName-qa']
-							webAppName = SETTINGS['webAppName-demo']
+							withEnv([	"AzureSubscriptionID=${SETTINGS['subscriptionID']}",
+										"AzureResourceGroupName=${SETTINGS['resourceGroupName']}",
+										"AzureWebAppName=${SETTINGS['webAppName-qa']}"
+										]){
+								Utilities.runSharedPS(this, "${deployScript}", "-Prefix ${prefix}")
+							}
+							withEnv([	"AzureSubscriptionID=${SETTINGS['subscriptionID']}",
+										"AzureResourceGroupName=${SETTINGS['resourceGroupName']}",
+										"AzureWebAppName=${SETTINGS['webAppName-demo']}"
+										]){
+								Utilities.runSharedPS(this, "${deployScript}", "-Prefix ${prefix}")
+							}
 						}
 					}
 				}
