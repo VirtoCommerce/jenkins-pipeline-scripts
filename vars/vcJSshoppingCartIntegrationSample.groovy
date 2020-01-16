@@ -30,7 +30,7 @@ def call(body){
 
 		def websiteDir = 'VirtoCommerce.JavaScriptShoppingCart.IntegrationSample'
 		def webProject = 'VirtoCommerce.JavaScriptShoppingCart.IntegrationSample\\VirtoCommerce.JavaScriptShoppingCart.IntegrationSample.csproj'
-		def prefix = '' //Utilities.getRepoNamePrefix(this)
+		def prefix = Utilities.getRepoNamePrefix(this)
 
 		def zipArtifact = "${prefix}-sample"
 		def deployScript = 'VC-2Azure.ps1'
@@ -89,7 +89,7 @@ def call(body){
 							def subscriptionID = SETTINGS['subscriptionID']
 							def resourceGroupName = SETTINGS['resourceGroupName']
 							def webAppName = SETTINGS['webAppName-dev']
-							withEnv(["AzureSubscriptionID=${subscriptionID}", "AzureResourceGroupName=${resourceGroupName}", , "AzureWebAppName=${webAppName}"]){
+							withEnv(["${prefix}AzureSubscriptionID=${subscriptionID}", "${prefix}AzureResourceGroupName=${resourceGroupName}", , "${prefix}AzureWebAppName=${webAppName}"]){
 								Utilities.runSharedPS(this, "${deployScript}", "-Prefix ${prefix}")
 							}
 							webAppName = SETTINGS['webAppName-qa']
