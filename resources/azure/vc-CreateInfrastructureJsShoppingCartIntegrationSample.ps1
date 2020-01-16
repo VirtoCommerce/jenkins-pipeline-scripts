@@ -10,8 +10,8 @@ Add-AzureRmAccount -Credential $psCred -TenantId $TenantID -ServicePrincipal
 Select-AzureRmSubscription -SubscriptionId $SubscriptionID
 
 $DestResourceGroupName = "DEV-JsShoppingCartIntegrationSample"
-$TemplateFile = 'azuredeploy_JsShoppingCartIntegrationSample.json'
-$TemplateParametersFile = 'azuredeploy_JsShoppingCartIntegrationSample_dev.json'
+$TemplateFile = "${env:WORKSPACE}@libs\virto-shared-library\resources\azure\azuredeploy_JsShoppingCartIntegrationSample.json"
+$TemplateParametersFile = "${env:WORKSPACE}@libs\virto-shared-library\resources\azure\azuredeploy_JsShoppingCartIntegrationSample_dev.json"
 
 New-AzureRmResourceGroupDeployment -Name ((Get-ChildItem $TemplateFile).BaseName + '-' + ((Get-Date).ToUniversalTime()).ToString('MMdd-HHmm')) `
 -ResourceGroupName $DestResourceGroupName `
@@ -20,7 +20,7 @@ New-AzureRmResourceGroupDeployment -Name ((Get-ChildItem $TemplateFile).BaseName
 -Force -Verbose `
 -ErrorVariable ErrorMessages
 
-$TemplateParametersFile = 'azuredeploy_JsShoppingCartIntegrationSample_qa.json'
+$TemplateParametersFile = "${env:WORKSPACE}@libs\virto-shared-library\resources\azure\azuredeploy_JsShoppingCartIntegrationSample_qa.json"
 New-AzureRmResourceGroupDeployment -Name ((Get-ChildItem $TemplateFile).BaseName + '-' + ((Get-Date).ToUniversalTime()).ToString('MMdd-HHmm')) `
 -ResourceGroupName $DestResourceGroupName `
 -TemplateFile $TemplateFile `
@@ -28,7 +28,7 @@ New-AzureRmResourceGroupDeployment -Name ((Get-ChildItem $TemplateFile).BaseName
 -Force -Verbose `
 -ErrorVariable ErrorMessages
 
-$TemplateParametersFile = 'azuredeploy_JsShoppingCartIntegrationSample_demo.json'
+$TemplateParametersFile = "${env:WORKSPACE}@libs\virto-shared-library\resources\azure\azuredeploy_JsShoppingCartIntegrationSample_demo.json"
 New-AzureRmResourceGroupDeployment -Name ((Get-ChildItem $TemplateFile).BaseName + '-' + ((Get-Date).ToUniversalTime()).ToString('MMdd-HHmm')) `
 -ResourceGroupName $DestResourceGroupName `
 -TemplateFile $TemplateFile `
