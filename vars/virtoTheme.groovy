@@ -73,7 +73,10 @@ def call(body) {
 			{
 				stage('Publish') {
 					timestamps {
-						Packaging.saveArtifact(this, 'vc', 'theme', config.sampleStore, artifacts[0].path)
+						if(!Utilities.isPullRequest(this))
+						{
+							Packaging.saveArtifact(this, 'vc', 'theme', config.sampleStore, artifacts[0].path)
+						}
 						if (Packaging.getShouldPublish(this)) {
 							Packaging.publishRelease(this, version, "")
 						}
