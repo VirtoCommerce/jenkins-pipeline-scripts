@@ -47,6 +47,9 @@
     "platformVirtoCommerce": {
       "type": "String"
     },
+    "platformAppinsightsInstrumentationKey": {
+      "type": "String"
+    },
     "frontContentConnectionString": {
       "type": "String"
     },
@@ -60,6 +63,9 @@
       "type": "String"
     },
     "frontVirtoCommerceEndpointUrl": {
+      "type": "String"
+    },
+    "frontAppinsightsInstrumentationKey": {
       "type": "String"
     }
   },
@@ -117,10 +123,7 @@
         },
         "enableNonSslPort": true,
         "redisConfiguration": {
-          "maxclients": "1000",
-          "maxmemory-reserved": "50",
-          "maxfragmentationmemory-reserved": "50",
-          "maxmemory-delta": "50"
+          "maxclients": "1000"
         }
       },
       "tags": {
@@ -217,7 +220,7 @@
           "appSettings": [
             {
               "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
-              "value": "[reference(concat('Microsoft.Insights/components/', parameters('frontAppInsights')), '2015-05-01').InstrumentationKey]"
+              "value": "[parameters('platformAppinsightsInstrumentationKey')]"
             },
             {
               "name": "InstrumentationEngine_EXTENSION_VERSION",
@@ -243,12 +246,12 @@
           "connectionStrings": [
             {
               "name": "AssetsConnectionString",
-              "value": "[parameters('platformAssetsConnectionString')]",
+              "connectionString": "[parameters('platformAssetsConnectionString')]",
               "type": "Custom"
             },
             {
               "name": "CmsContentConnectionString",
-              "value": "[parameters('platformCmsContentConnectionString')]",
+              "connectionString": "[parameters('platformCmsContentConnectionString')]",
               "type": "Custom"
             },
             {
@@ -258,7 +261,7 @@
             },
             {
               "name": "VirtoCommerce",
-              "value": "[parameters('platformVirtoCommerce')]",
+              "connectionString": "[parameters('platformVirtoCommerce')]",
               "type": "SQLAzure"
             }
           ],
@@ -342,7 +345,7 @@
           "appSettings": [
             {
               "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
-              "value": "[reference(concat('Microsoft.Insights/components/', parameters('frontAppInsights')), '2015-05-01').InstrumentationKey]"
+              "value": "[parameters('frontAppinsightsInstrumentationKey')]"
             },
             {
               "name": "APPINSIGHTS_PORTALINFO",
@@ -392,7 +395,7 @@
           "connectionStrings": [
             {
               "name": "ContentConnectionString",
-              "value": "[parameters('frontContentConnectionString')]",
+              "connectionString": "[parameters('frontContentConnectionString')]",
               "type": "Custom"
             }
           ],
