@@ -1,0 +1,47 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "sqlServerName": {
+      "value": "dev-vc"
+    },
+    "sqlAdministratorLogin": {
+      "value": "vc-admin"
+    },
+    "sqlAdministratorLoginPassword": {
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/14210edf-9112-4e67-8cf1-a02c0d7a0ee1/resourceGroups/DEV-VC/providers/Microsoft.KeyVault/vaults/tdev-vc"
+        },
+        "secretName": "sqlAdministratorLoginPassword-dev"
+      }
+    },
+    "sqlDatabaseName": {
+      "value": "dev-vc"
+    },
+    "redisCacheName": {
+      "value": "dev-vc"
+    },
+    "storageAccountName": {
+      "value": "dev4vc"
+    },
+    "platformAppServicePlanName": {
+      "value": "dev-vc-admin"
+    },
+    "frontAppServicePlanName": {
+      "value": "dev-vc-public"
+    },
+    "platformAppInsights": {
+      "value": "dev-vc-admin"
+    },
+    "frontAppInsights": {
+      "value": "dev-vc-public"
+    },
+    "platformWebAppName": {
+      "value": "dev-vc-admin"
+    },
+    "frontWebAppName": {
+      "value": "dev-vc-public"
+    }
+  }
+}
