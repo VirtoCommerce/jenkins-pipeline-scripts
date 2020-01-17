@@ -10,18 +10,15 @@ Add-AzureRmAccount -Credential $psCred -TenantId $TenantID -ServicePrincipal
 Select-AzureRmSubscription -SubscriptionId $SubscriptionID
 
 $DestResourceGroupName = "DEV-VC"
-$ResourceGroupLocation = "eastus"
+
 $TemplateFile = "azuredeployDEV-VC.json"
 $TemplateParametersFile = "azuredeployDEV-VC_parameters.json"
 
-$currentResourceDeploy = Get-AzureRmResourceGroup -Name $DestResourceGroupName -Location $ResourceGroupLocation -Verbose -ErrorAction SilentlyContinue
-If ($null -eq $currentResourceDeploy) {
-    New-AzureRmResourceGroupDeployment -Name ((Get-ChildItem $TemplateFile).BaseName + '-' + ((Get-Date).ToUniversalTime()).ToString('MMdd-HHmm')) `
-    -ResourceGroupName $DestResourceGroupName `
-    -TemplateFile $TemplateFile `
-    -TemplateParameterFile $TemplateParametersFile `
-    -Force -Verbose `
-    -ErrorVariable ErrorMessages
-}
+New-AzureRmResourceGroupDeployment -Name ((Get-ChildItem $TemplateFile).BaseName + '-' + ((Get-Date).ToUniversalTime()).ToString('MMdd-HHmm')) `
+-ResourceGroupName $DestResourceGroupName `
+-TemplateFile $TemplateFile `
+-TemplateParameterFile $TemplateParametersFile `
+-Force -Verbose `
+-ErrorVariable ErrorMessages
 
 Write-Host "Infrastructure Check and Deploy Finished"
