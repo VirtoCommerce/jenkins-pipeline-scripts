@@ -119,7 +119,7 @@ pipeline
                     }
                     
                     stage('Finish'){
-                        def message = "Platform url: http://ci.virtocommerce.com:${DOCKER_PLATFORM_PORT}<br>Storefront: http://ci.virtocommerce.com:${DOCKER_STOREFRONT_PORT}"
+                        def message = "Platform url: http://ci.virtocommerce.com:${DOCKER_PLATFORM_PORT}\nStorefront: http://ci.virtocommerce.com:${DOCKER_STOREFRONT_PORT}"
                         input(message)
                     }
                 }
