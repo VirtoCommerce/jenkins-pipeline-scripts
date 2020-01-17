@@ -154,7 +154,7 @@ def call(body) {
 				// }
 			}
 
-			if (env.BRANCH_NAME == '1.1.3' || env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'master'){
+			if (env.BRANCH_NAME == '1.1.3' || env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'dev-eventhandler-dynamicproperties'){
 				stage('Publish')
 				{
 					timestamps {
