@@ -24,7 +24,18 @@ node {
                 }
             }
         }
-        
+
+        stage('ARM Deploy'){
+            timestamps{
+                if(envChoices == ""){
+                    Utilities.createInfrastructure(this, "DEV-VC")  // DEV-VC ? PROD-VC
+                }
+                else {
+                    Utilities.createInfrastructure(this, "PROD-VC")
+                }
+            }
+        }
+
         stage('E2E'){
             timestamps{
                 timeout(time: 20, unit: 'MINUTES'){

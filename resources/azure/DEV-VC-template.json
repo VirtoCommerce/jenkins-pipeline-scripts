@@ -1,0 +1,393 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "sqlServerName": {
+      "type": "String"
+    },
+    "sqlAdministratorLogin": {
+      "type": "String"
+    },
+    "sqlAdministratorLoginPassword": {
+      "type": "SecureString"
+    },
+    "sqlDatabaseName": {
+      "type": "String"
+    },
+    "redisCacheName": {
+      "type": "String"
+    },
+    "storageAccountName": {
+      "type": "String"
+    },
+    "platformAppServicePlanName": {
+      "type": "String"
+    },
+    "frontAppServicePlanName": {
+      "type": "String"
+    },
+    "platformAppInsights": {
+      "type": "String"
+    },
+    "frontAppInsights": {
+      "type": "String"
+    },
+    "platformWebAppName": {
+      "type": "String"
+    },
+    "frontWebAppName": {
+      "type": "String"
+    }
+  },
+  "variables": {
+    "sqlDatabaseCollation": "SQL_Latin1_General_CP1_CI_AS",
+    "sqlDatabasePlan": "Basic",
+    "storageAccountType": "Standard_LRS",
+    "webAppSize": "B1"
+  },
+  "resources": [
+    {
+      "name": "[parameters('sqlServerName')]",
+      "type": "Microsoft.Sql/servers",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "displayName": "sqlServer"
+      },
+      "apiVersion": "2014-04-01",
+      "properties": {
+        "administratorLogin": "[parameters('sqlAdministratorLogin')]",
+        "administratorLoginPassword": "[concat(listKeys(parameters('storageAccountName'),'2015-05-01-preview').key2)]",
+        "version": "12.0"
+      },
+      "resources": [
+        {
+          "name": "[concat(parameters('sqlserverName'), '/', parameters('sqlDatabaseName'))]",
+          "type": "Microsoft.Sql/servers/databases",
+          "apiVersion": "2017-10-01-preview",
+          "location": "[resourceGroup().location]",
+          "sku": {
+            "name": "[variables('sqlDatabasePlan')]"
+          },
+          "tags": {
+            "displayName": "database"
+          },
+          "dependsOn": [
+            "[resourceId('Microsoft.Sql/servers/', parameters('sqlserverName'))]"
+          ],
+          "properties": {
+            "collation": "[variables('sqlDatabaseCollation')]"
+          }
+        }
+      ]
+    },
+    {
+      "type": "Microsoft.Cache/Redis",
+      "apiVersion": "2018-03-01",
+      "name": "[parameters('redisCacheName')]",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "sku": {
+          "name": "Basic",
+          "family": "C",
+          "capacity": 1
+        },
+        "enableNonSslPort": true,
+        "redisConfiguration": {
+          "maxclients": "1000",
+          "maxmemory-reserved": "50",
+          "maxfragmentationmemory-reserved": "50",
+          "maxmemory-delta": "50"
+        }
+      },
+      "tags": {
+        "displayName": "redisCache"
+      }
+    },
+    {
+      "name": "[parameters('storageAccountName')]",
+      "type": "Microsoft.Storage/storageAccounts",
+      "apiVersion": "2018-11-01",
+      "location": "[resourceGroup().location]",
+      "sku": {
+        "name": "[variables('storageAccountType')]"
+      },
+      "kind": "StorageV2",
+      "properties": {
+        "supportsHttpsTrafficOnly": true,
+        "encryption": {
+          "services": {
+            "blob": {
+              "enabled": true
+            },
+            "file": {
+              "enabled": true
+            }
+          },
+          "keySource": "Microsoft.Storage"
+        }
+      },
+      "tags": {
+        "displayName": "storageAccount"
+      }
+    },
+    {
+      "name": "[parameters('platformAppServicePlanName')]",
+      "type": "Microsoft.Web/serverfarms",
+      "apiVersion": "2018-02-01",
+      "kind": "app",
+      "location": "[resourceGroup().location]",
+      "sku": {
+        "name": "[variables('webAppSize')]"
+      },
+      "tags": {
+        "displayName": "platformServicePlan"
+      }
+    },
+    {
+      "name": "[parameters('platformAppInsights')]",
+      "type": "Microsoft.Insights/components",
+      "apiVersion": "2015-05-01",
+      "kind": "web",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "ApplicationId": "[parameters('platformAppInsights')]",
+        "Application_Type": "web",
+        "Flow_Type": "Bluefield",
+        "Request_Source": "rest"
+      },
+      "tags": {
+        "displayName": "platformApplicationInsights"
+      }
+    },
+    {
+      "name": "[parameters('platformWebAppName')]",
+      "type": "Microsoft.Web/sites",
+      "apiVersion": "2018-11-01",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "displayName": "platformWebApp"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/serverfarms', parameters('platformAppServicePlanName'))]",
+        "[resourceId('Microsoft.Sql/servers/', parameters('sqlserverName'))]",
+        "[resourceId('Microsoft.Storage/storageAccounts/', parameters('storageAccountName'))]",
+        "[resourceId('Microsoft.Insights/components/', parameters('platformAppInsights'))]"
+      ],
+      "properties": {
+        "enabled": true,
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('platformAppServicePlanName'))]",
+        "siteConfig": {
+          "requestTracingEnabled": true,
+          "requestTracingExpirationTime": "9999-12-31T23:59:00Z",
+          "httpLoggingEnabled": true,
+          "logsDirectorySizeLimit": 100,
+          "detailedErrorLoggingEnabled": true,
+          "clientAffinityEnabled": true,
+          "use32BitWorkerProcess": false,
+          "alwaysOn": true,
+          "httpsOnly": true,
+          "http20Enabled": true,
+          "minTlsVersion": "1.2",
+          "ftpsState": "Disabled",
+          "appSettings": [
+            {
+              "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+              "value": "[reference(concat('Microsoft.Insights/components/', parameters('frontAppInsights')), '2015-05-01').InstrumentationKey]"
+            },
+            {
+              "name": "ApplicationInsightsAgent_EXTENSION_VERSION",
+              "value": "~2"
+            },
+            {
+              "name": "InstrumentationEngine_EXTENSION_VERSION",
+              "value": "~1"
+            },
+            {
+              "name": "XDT_MicrosoftApplicationInsights_Mode",
+              "value": "recommended"
+            },
+            {
+              "name": "XDT_MicrosoftApplicationInsights_BaseExtensions",
+              "value": "~1"
+            },
+            {
+              "name": "VirtoCommerce:Authentication:DefaultTokenLifespan",
+              "value": "1.00:00:00"
+            },
+            {
+              "name": "VirtoCommerce:AutoInstallModuleBundles",
+              "value": ""
+            },
+            {
+              "name": "GitRepositoryPath",
+              "value": "D:\\home\\site\\wwwroot\\platform\\App_Data\\cms-content\\git"
+            }
+          ],
+          "connectionStrings": [
+            {
+              "name": "AssetsConnectionString",
+              "connectionString": "[concat('provider=AzureBlobStorage;rootPath=assets;DefaultEndpointsProtocol=https;AccountName=',parameters('storageAccountName'),';AccountKey=',concat(listKeys(parameters('storageAccountName'),'2015-05-01-preview').key1))]",
+              "type": "Custom"
+            },
+            {
+              "name": "CmsContentConnectionString",
+              "connectionString": "[concat('provider=AzureBlobStorage;rootPath=cms;DefaultEndpointsProtocol=https;AccountName=',parameters('storageAccountName'),';AccountKey=',concat(listKeys(parameters('storageAccountName'),'2015-05-01-preview').key1))]",
+              "type": "Custom"
+            },
+            {
+              "name": "SearchConnectionString",
+              "connectionString": "provider=Lucene;server=~/App_Data/Lucene;scope=default",
+              "type": "Custom"
+            },
+            {
+              "name": "VirtoCommerce",
+              "connectionString": "[concat('Server=tcp:', reference(concat('Microsoft.Sql/servers/', parameters('sqlserverName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', parameters('sqlDatabaseName'), ';User Id=', parameters('sqlAdministratorLogin'), '@', parameters('sqlserverName'), ';Password=', concat(listKeys(parameters('storageAccountName'),'2015-05-01-preview').key2), ';MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=90;')]",
+              "type": "SQLAzure"
+            }
+          ],
+          "virtualApplications": [
+            {
+              "virtualPath": "/",
+              "physicalPath": "site\\wwwroot\\platform",
+              "preloadEnabled": false,
+              "virtualDirectories": [
+                {
+                  "virtualPath": "/modules",
+                  "physicalPath": "site\\wwwroot\\modules"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "resources": [
+
+      ]
+    },
+    {
+      "name": "[parameters('frontAppServicePlanName')]",
+      "type": "Microsoft.Web/serverfarms",
+      "apiVersion": "2018-02-01",
+      "kind": "app",
+      "location": "[resourceGroup().location]",
+      "sku": {
+        "name": "[variables('webAppSize')]"
+      },
+      "tags": {
+        "displayName": "frontServicePlan"
+      }
+    },
+    {
+      "name": "[parameters('frontAppInsights')]",
+      "type": "Microsoft.Insights/components",
+      "apiVersion": "2015-05-01",
+      "kind": "web",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "ApplicationId": "[parameters('frontAppInsights')]",
+        "Application_Type": "web",
+        "Flow_Type": "Bluefield",
+        "Request_Source": "rest"
+      },
+      "tags": {
+        "displayName": "frontApplicationInsights"
+      }
+    },
+    {
+      "name": "[parameters('frontWebAppName')]",
+      "type": "Microsoft.Web/sites",
+      "apiVersion": "2018-11-01",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "displayName": "frontWebApp"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/serverfarms', parameters('frontAppServicePlanName'))]",
+        "[resourceId('Microsoft.Storage/storageAccounts/', parameters('storageAccountName'))]",
+        "[resourceId('Microsoft.Insights/components/', parameters('frontAppInsights'))]"
+      ],
+      "properties": {
+        "enabled": true,
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('frontAppServicePlanName'))]",
+        "siteConfig": {
+          "requestTracingEnabled": true,
+          "requestTracingExpirationTime": "9999-12-31T23:59:00Z",
+          "httpLoggingEnabled": true,
+          "logsDirectorySizeLimit": 100,
+          "detailedErrorLoggingEnabled": true,
+          "clientAffinityEnabled": true,
+          "use32BitWorkerProcess": false,
+          "alwaysOn": true,
+          "httpsOnly": true,
+          "http20Enabled": true,
+          "minTlsVersion": "1.2",
+          "ftpsState": "Disabled",
+          "appSettings": [
+            {
+              "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+              "value": "[reference(concat('Microsoft.Insights/components/', parameters('frontAppInsights')), '2015-05-01').InstrumentationKey]"
+            },
+            {
+              "name": "ApplicationInsightsAgent_EXTENSION_VERSION",
+              "value": "~2"
+            },
+            {
+              "name": "InstrumentationEngine_EXTENSION_VERSION",
+              "value": "~1"
+            },
+            {
+              "name": "XDT_MicrosoftApplicationInsights_Mode",
+              "value": "recommended"
+            },
+            {
+              "name": "XDT_MicrosoftApplicationInsights_BaseExtensions",
+              "value": "~1"
+            },
+            {
+              "name": "VirtoCommerce:Authentication:DefaultTokenLifespan",
+              "value": "1.00:00:00"
+            },
+            {
+              "name": "VirtoCommerce:AutoInstallModuleBundles",
+              "value": ""
+            }
+          ],
+          "connectionStrings": [
+            {
+              "name": "VirtoCommerce",
+              "connectionString": "[concat('Server=tcp:', reference(concat('Microsoft.Sql/servers/', parameters('sqlserverName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', parameters('sqlDatabaseName'), ';User Id=', parameters('sqlAdministratorLogin'), '@', parameters('sqlserverName'), ';Password=', concat(listKeys(parameters('storageAccountName'),'2015-05-01-preview').key2), ';MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=90;')]",
+              "type": "SQLAzure"
+            },
+            {
+              "name": "AssetsConnectionString",
+              "connectionString": "[concat('provider=AzureBlobStorage;rootPath=assets;DefaultEndpointsProtocol=https;AccountName=',parameters('storageAccountName'),';AccountKey=',concat(listKeys(parameters('storageAccountName'),'2015-05-01-preview').key1))]",
+              "type": "Custom"
+            },
+            {
+              "name": "CmsConnectionString",
+              "connectionString": "[concat('provider=AzureBlobStorage;rootPath=cms;DefaultEndpointsProtocol=https;AccountName=',parameters('storageAccountName'),';AccountKey=',concat(listKeys(parameters('storageAccountName'),'2015-05-01-preview').key1))]",
+              "type": "Custom"
+            }
+          ],
+          "virtualApplications": [
+            {
+              "virtualPath": "/",
+              "physicalPath": "site\\wwwroot\\front",
+              "preloadEnabled": false,
+              "virtualDirectories": [
+                {
+                  "virtualPath": "/modules",
+                  "physicalPath": "site\\wwwroot\\modules"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "resources": [
+
+      ]
+    }
+  ],
+  "outputs": {}
+}
