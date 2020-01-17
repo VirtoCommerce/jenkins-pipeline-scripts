@@ -11,8 +11,8 @@ Select-AzureRmSubscription -SubscriptionId $SubscriptionID
 
 $DestResourceGroupName = "PROD-VC"
 $ResourceGroupLocation = "eastus"
-$TemplateFile = "azuredeployPROD-VC.json"
-$TemplateParametersFile = "azuredeployPROD-VC_parameters.json"
+$TemplateFile = "${env:WORKSPACE}\resources\azure\azuredeployPROD-VC.json"
+$TemplateParametersFile = "${env:WORKSPACE}\resources\azure\azuredeployPROD-VC_parameters.json"
 
 $currentResourceDeploy = Get-AzureRmResourceGroup -Name $DestResourceGroupName -Location $ResourceGroupLocation -Verbose -ErrorAction SilentlyContinue
 If ($null -eq $currentResourceDeploy) {

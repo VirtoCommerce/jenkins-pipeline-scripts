@@ -11,8 +11,8 @@ Select-AzureRmSubscription -SubscriptionId $SubscriptionID
 
 $DestResourceGroupName = "DEV-VC"
 
-$TemplateFile = "azuredeployDEV-VC.json"
-$TemplateParametersFile = "azuredeployDEV-VC_parameters.json"
+$TemplateFile = "${env:WORKSPACE}\resources\azure\azuredeployDEV-VC.json"
+$TemplateParametersFile = "${env:WORKSPACE}\resources\azure\azuredeployDEV-VC_parameters.json"
 
 New-AzureRmResourceGroupDeployment -Name ((Get-ChildItem $TemplateFile).BaseName + '-' + ((Get-Date).ToUniversalTime()).ToString('MMdd-HHmm')) `
 -ResourceGroupName $DestResourceGroupName `
