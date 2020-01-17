@@ -11,8 +11,8 @@ Select-AzureRmSubscription -SubscriptionId $SubscriptionID
 
 $DestResourceGroupName = "PROD-VC"
 $ResourceGroupLocation = "eastus"
-$TemplateFile = "${env:WORKSPACE}@libs\virto-shared-library\resources\azure\PROD-VC-template.json"
-$TemplateParametersFile = "${env:WORKSPACE}@libs\virto-shared-library\resources\azure\PROD-VC-templatre-properties.json"
+$TemplateFile = "${env:WORKSPACE}\resources\azure\PROD-VC-template.json"
+$TemplateParametersFile = "${env:WORKSPACE}\resources\azure\PROD-VC-templatre-properties.json"
 
 $currentResourceDeploy = Get-AzureRmResourceGroup -Name $DestResourceGroupName -Location $ResourceGroupLocation -Verbose -ErrorAction SilentlyContinue
 If ($null -eq $currentResourceDeploy) {
