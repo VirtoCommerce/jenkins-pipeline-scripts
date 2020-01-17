@@ -16,11 +16,16 @@ node {
 
     psfolder = "${env.WORKSPACE}\\resources\\virtocommerce"
     dir(psfolder){
-         stage('Storefront Update'){
-            timestamps {
-                SETTINGS.setEnvironment('dev_storefront')
-                withEnv(["AzureSubscriptionIDProd=${SETTINGS['subscriptionID']}", "AzureResourceGroupNameProd=${SETTINGS['resourceGroupName']}", "AzureWebAppNameProd=${SETTINGS['appName']}"]){
-                    powershell "${psfolder}\\StorefrontUpdate.ps1"
+
+        def envChoices
+        stage('User Input'){
+            timeout(time: 30, unit: 'MINUTES'){
+                envChoices = input(message: "Choose environment to update", parameters: [choice(name: 'Environments', choices:"Dev\nProduction")])
+                if(envChoices == 'Dev'){
+                    envChoices = ""
+                }
+                else if (envChoices == 'Production'){
+                    envChoices = "staging"
                 }
             }
         }
@@ -32,6 +37,15 @@ node {
                 }
                 else {
                     Utilities.createInfrastructure(this, "PROD-VC")
+                }
+            }
+        }
+
+         stage('Storefront Update'){
+            timestamps {
+                SETTINGS.setEnvironment('dev_storefront')
+                withEnv(["AzureSubscriptionIDProd=${SETTINGS['subscriptionID']}", "AzureResourceGroupNameProd=${SETTINGS['resourceGroupName']}", "AzureWebAppNameProd=${SETTINGS['appName']}"]){
+                    powershell "${psfolder}\\StorefrontUpdate.ps1"
                 }
             }
         }
