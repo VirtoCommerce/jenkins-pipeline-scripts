@@ -37,6 +37,30 @@
     },
     "frontWebAppName": {
       "type": "String"
+    },
+    "platformAssetsConnectionString": {
+      "type": "String"
+    },
+    "platformCmsContentConnectionString": {
+      "type": "String"
+    },
+    "platformVirtoCommerce": {
+      "type": "String"
+    },
+    "frontContentConnectionString": {
+      "type": "String"
+    },
+    "frontVirtoCommerceAppSettingsPlatformUrlHost": {
+      "type": "String"
+    },
+    "frontVirtoCommerceEndpointAppId": {
+      "type": "String"
+    },
+    "frontVirtoCommerceEndpointSecretKey": {
+      "type": "String"
+    },
+    "frontVirtoCommerceEndpointUrl": {
+      "type": "String"
     }
   },
   "variables": {
@@ -184,19 +208,16 @@
           "detailedErrorLoggingEnabled": true,
           "clientAffinityEnabled": true,
           "use32BitWorkerProcess": false,
-          "alwaysOn": true,
-          "httpsOnly": true,
-          "http20Enabled": true,
+          "webSocketsEnabled": false,
+          "alwaysOn": false,
+          "httpsOnly": false,
+          "http20Enabled": false,
           "minTlsVersion": "1.2",
-          "ftpsState": "Disabled",
+          "ftpsState": "AllAllowed",
           "appSettings": [
             {
               "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
               "value": "[reference(concat('Microsoft.Insights/components/', parameters('frontAppInsights')), '2015-05-01').InstrumentationKey]"
-            },
-            {
-              "name": "ApplicationInsightsAgent_EXTENSION_VERSION",
-              "value": "~2"
             },
             {
               "name": "InstrumentationEngine_EXTENSION_VERSION",
@@ -211,10 +232,6 @@
               "value": "~1"
             },
             {
-              "name": "VirtoCommerce:Authentication:DefaultTokenLifespan",
-              "value": "1.00:00:00"
-            },
-            {
               "name": "VirtoCommerce:AutoInstallModuleBundles",
               "value": ""
             },
@@ -226,12 +243,12 @@
           "connectionStrings": [
             {
               "name": "AssetsConnectionString",
-              "connectionString": "[concat('provider=AzureBlobStorage;rootPath=assets;DefaultEndpointsProtocol=https;AccountName=',parameters('storageAccountName'),';AccountKey=',concat(listKeys(parameters('storageAccountName'),'2015-05-01-preview').key1))]",
+              "value": "[parameters('platformAssetsConnectionString')]",
               "type": "Custom"
             },
             {
               "name": "CmsContentConnectionString",
-              "connectionString": "[concat('provider=AzureBlobStorage;rootPath=cms;DefaultEndpointsProtocol=https;AccountName=',parameters('storageAccountName'),';AccountKey=',concat(listKeys(parameters('storageAccountName'),'2015-05-01-preview').key1))]",
+              "value": "[parameters('platformCmsContentConnectionString')]",
               "type": "Custom"
             },
             {
@@ -241,7 +258,7 @@
             },
             {
               "name": "VirtoCommerce",
-              "connectionString": "[concat('Server=tcp:', reference(concat('Microsoft.Sql/servers/', parameters('sqlserverName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', parameters('sqlDatabaseName'), ';User Id=', parameters('sqlAdministratorLogin'), '@', parameters('sqlserverName'), ';Password=', concat(listKeys(parameters('storageAccountName'),'2015-05-01-preview').key2), ';MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=90;')]",
+              "value": "[parameters('platformVirtoCommerce')]",
               "type": "SQLAzure"
             }
           ],
@@ -317,19 +334,31 @@
           "detailedErrorLoggingEnabled": true,
           "clientAffinityEnabled": true,
           "use32BitWorkerProcess": false,
-          "alwaysOn": true,
-          "httpsOnly": true,
-          "http20Enabled": true,
+          "alwaysOn": false,
+          "httpsOnly": false,
+          "http20Enabled": false,
           "minTlsVersion": "1.2",
-          "ftpsState": "Disabled",
+          "ftpsState": "AllAllowed",
           "appSettings": [
             {
               "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
               "value": "[reference(concat('Microsoft.Insights/components/', parameters('frontAppInsights')), '2015-05-01').InstrumentationKey]"
             },
             {
-              "name": "ApplicationInsightsAgent_EXTENSION_VERSION",
-              "value": "~2"
+              "name": "APPINSIGHTS_PORTALINFO",
+              "value": "ASP.NETCORE"
+            },
+            {
+              "name": "APPINSIGHTS_PROFILERFEATURE_VERSION",
+              "value": "1.0.0"
+            },
+            {
+              "name": "APPINSIGHTS_SNAPSHOTFEATURE_VERSION",
+              "value": "1.0.0"
+            },
+            {
+              "name": "ASPNETCORE_ENVIRONMENT",
+              "value": "Development"
             },
             {
               "name": "InstrumentationEngine_EXTENSION_VERSION",
@@ -344,42 +373,34 @@
               "value": "~1"
             },
             {
-              "name": "VirtoCommerce:Authentication:DefaultTokenLifespan",
-              "value": "1.00:00:00"
+              "name": "VirtoCommerce:AppSettings:PlatformUrlHost",
+              "value": "[parameters('frontVirtoCommerceAppSettingsPlatformUrlHost')]"
             },
             {
-              "name": "VirtoCommerce:AutoInstallModuleBundles",
-              "value": ""
+              "name": "VirtoCommerce:Endpoint:AppId",
+              "value": "[parameters('frontVirtoCommerceEndpointAppId')]"
+            },
+            {
+              "name": "VirtoCommerce:Endpoint:SecretKey",
+              "value": "[parameters('frontVirtoCommerceEndpointSecretKey')]"
+            },
+            {
+              "name": "VirtoCommerce:Endpoint:Url",
+              "value": "[parameters('frontVirtoCommerceEndpointUrl')]"
             }
           ],
           "connectionStrings": [
             {
-              "name": "VirtoCommerce",
-              "connectionString": "[concat('Server=tcp:', reference(concat('Microsoft.Sql/servers/', parameters('sqlserverName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', parameters('sqlDatabaseName'), ';User Id=', parameters('sqlAdministratorLogin'), '@', parameters('sqlserverName'), ';Password=', concat(listKeys(parameters('storageAccountName'),'2015-05-01-preview').key2), ';MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=90;')]",
-              "type": "SQLAzure"
-            },
-            {
-              "name": "AssetsConnectionString",
-              "connectionString": "[concat('provider=AzureBlobStorage;rootPath=assets;DefaultEndpointsProtocol=https;AccountName=',parameters('storageAccountName'),';AccountKey=',concat(listKeys(parameters('storageAccountName'),'2015-05-01-preview').key1))]",
-              "type": "Custom"
-            },
-            {
-              "name": "CmsConnectionString",
-              "connectionString": "[concat('provider=AzureBlobStorage;rootPath=cms;DefaultEndpointsProtocol=https;AccountName=',parameters('storageAccountName'),';AccountKey=',concat(listKeys(parameters('storageAccountName'),'2015-05-01-preview').key1))]",
+              "name": "ContentConnectionString",
+              "value": "[parameters('frontContentConnectionString')]",
               "type": "Custom"
             }
           ],
           "virtualApplications": [
             {
               "virtualPath": "/",
-              "physicalPath": "site\\wwwroot\\front",
-              "preloadEnabled": false,
-              "virtualDirectories": [
-                {
-                  "virtualPath": "/modules",
-                  "physicalPath": "site\\wwwroot\\modules"
-                }
-              ]
+              "physicalPath": "site\\wwwroot",
+              "preloadEnabled": false
             }
           ]
         }

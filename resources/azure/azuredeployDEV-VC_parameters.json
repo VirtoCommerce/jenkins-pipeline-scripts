@@ -1,0 +1,111 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "sqlServerName": {
+      "value": "dev-vc"
+    },
+    "sqlAdministratorLogin": {
+      "value": "vc-admin"
+    },
+    "sqlAdministratorLoginPassword": {
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/973d0b8c-44bf-438d-a4b7-1c4162d3ccba/resourceGroups/DEV-VC/providers/Microsoft.KeyVault/vaults/dev-vc"
+        },
+        "secretName": "sqlAdministratorLoginPassword-dev"
+      }
+    },
+    "sqlDatabaseName": {
+      "value": "dev-vc"
+    },
+    "redisCacheName": {
+      "value": "dev-vc"
+    },
+    "storageAccountName": {
+      "value": "dev4vc"
+    },
+    "platformAppServicePlanName": {
+      "value": "dev-vc-admin"
+    },
+    "frontAppServicePlanName": {
+      "value": "dev-vc-public"
+    },
+    "platformAppInsights": {
+      "value": "dev-vc-admin"
+    },
+    "frontAppInsights": {
+      "value": "dev-vc-public"
+    },
+    "platformWebAppName": {
+      "value": "dev-vc-admin"
+    },
+    "frontWebAppName": {
+      "value": "dev-vc-public"
+    },
+    "platformAssetsConnectionString": {
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/973d0b8c-44bf-438d-a4b7-1c4162d3ccba/resourceGroups/DEV-VC/providers/Microsoft.KeyVault/vaults/dev-vc"
+        },
+        "secretName": "platformAssetsConnectionString-dev"
+      }
+    },
+    "platformCmsContentConnectionString": {
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/973d0b8c-44bf-438d-a4b7-1c4162d3ccba/resourceGroups/DEV-VC/providers/Microsoft.KeyVault/vaults/dev-vc"
+        },
+        "secretName": "platformCmsContentConnectionString-dev"
+      }
+    },
+    "platformVirtoCommerce": {
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/973d0b8c-44bf-438d-a4b7-1c4162d3ccba/resourceGroups/DEV-VC/providers/Microsoft.KeyVault/vaults/dev-vc"
+        },
+        "secretName": "platformVirtoCommerce-dev"
+      }
+    },
+    "frontContentConnectionString": {
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/973d0b8c-44bf-438d-a4b7-1c4162d3ccba/resourceGroups/DEV-VC/providers/Microsoft.KeyVault/vaults/dev-vc"
+        },
+        "secretName": "frontContentConnectionString-dev"
+      }
+    },
+    "frontVirtoCommerceAppSettingsPlatformUrlHost": {
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/973d0b8c-44bf-438d-a4b7-1c4162d3ccba/resourceGroups/DEV-VC/providers/Microsoft.KeyVault/vaults/dev-vc"
+        },
+        "secretName": "frontVirtoCommerceAppSettingsPlatformUrlHost-dev"
+      }
+    },
+    "frontVirtoCommerceEndpointAppId": {
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/973d0b8c-44bf-438d-a4b7-1c4162d3ccba/resourceGroups/DEV-VC/providers/Microsoft.KeyVault/vaults/dev-vc"
+        },
+        "secretName": "frontVirtoCommerceEndpointAppId-dev"
+      }
+    },
+    "frontVirtoCommerceEndpointSecretKey": {
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/973d0b8c-44bf-438d-a4b7-1c4162d3ccba/resourceGroups/DEV-VC/providers/Microsoft.KeyVault/vaults/dev-vc"
+        },
+        "secretName": "frontVirtoCommerceEndpointSecretKey-dev"
+      }
+    },
+    "frontVirtoCommerceEndpointUrl": {
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/973d0b8c-44bf-438d-a4b7-1c4162d3ccba/resourceGroups/DEV-VC/providers/Microsoft.KeyVault/vaults/dev-vc"
+        },
+        "secretName": "frontVirtoCommerceEndpointUrl-dev"
+      }
+    }
+  }
+}

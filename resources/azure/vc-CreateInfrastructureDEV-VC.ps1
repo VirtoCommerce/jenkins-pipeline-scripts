@@ -10,18 +10,15 @@ Add-AzureRmAccount -Credential $psCred -TenantId $TenantID -ServicePrincipal
 Select-AzureRmSubscription -SubscriptionId $SubscriptionID
 
 $DestResourceGroupName = "DEV-VC"
-$ResourceGroupLocation = "eastus"
-$TemplateFile = "DEV-VC-template.json"
-$TemplateParametersFile = "DEV-VC-templatre-properties.json"
 
-$currentResourceDeploy = Get-AzureRmResourceGroup -Name $DestResourceGroupName -Location $ResourceGroupLocation -Verbose -ErrorAction SilentlyContinue
-If ($null -eq $currentResourceDeploy) {
-    New-AzureRmResourceGroupDeployment -Name ((Get-ChildItem $TemplateFile).BaseName + '-' + ((Get-Date).ToUniversalTime()).ToString('MMdd-HHmm')) `
-    -ResourceGroupName $DestResourceGroupName `
-    -TemplateFile $TemplateFile `
-    -TemplateParameterFile $TemplateParametersFile `
-    -Force -Verbose `
-    -ErrorVariable ErrorMessages
-}
+$TemplateFile = "${env:WORKSPACE}\resources\azure\azuredeployDEV-VC.json"
+$TemplateParametersFile = "${env:WORKSPACE}\resources\azure\azuredeployDEV-VC_parameters.json"
+
+New-AzureRmResourceGroupDeployment -Name ((Get-ChildItem $TemplateFile).BaseName + '-' + ((Get-Date).ToUniversalTime()).ToString('MMdd-HHmm')) `
+-ResourceGroupName $DestResourceGroupName `
+-TemplateFile $TemplateFile `
+-TemplateParameterFile $TemplateParametersFile `
+-Force -Verbose `
+-ErrorVariable ErrorMessages
 
 Write-Host "Infrastructure Check and Deploy Finished"
