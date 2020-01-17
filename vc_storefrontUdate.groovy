@@ -16,6 +16,20 @@ node {
 
     psfolder = "${env.WORKSPACE}\\resources\\virtocommerce"
     dir(psfolder){
+        
+        def envChoices
+        stage('User Input'){
+            timeout(time: 30, unit: 'MINUTES'){
+                envChoices = input(message: "Choose environment to update", parameters: [choice(name: 'Environments', choices:"Dev\nProduction")])
+                if(envChoices == 'Dev'){
+                    envChoices = ""
+                }
+                else if (envChoices == 'Production'){
+                    envChoices = "staging"
+                }
+            }
+        }
+
          stage('Storefront Update'){
             timestamps {
                 SETTINGS.setEnvironment('dev_storefront')
