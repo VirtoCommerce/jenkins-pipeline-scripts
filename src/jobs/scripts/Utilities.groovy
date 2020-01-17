@@ -46,7 +46,7 @@ class Utilities {
 
     def static runSharedPS(context, scriptName, args = '')
     {
- 	    context.bat "powershell.exe -File \"${context.env.WORKSPACE}@libs\\${DefaultSharedLibName}\\resources\\azure\\${scriptName}\" ${args} -ErrorAction Stop".replaceAll('%', '%%')
+ 	    context.bat "powershell.exe -File \"${context.env.WORKSPACE}\\..\\workspace@libs\\${DefaultSharedLibName}\\resources\\azure\\${scriptName}\" ${args} -ErrorAction Stop".replaceAll('%', '%%')
     }
 
     def static getAssemblyVersion(context, projectFile)
@@ -524,12 +524,6 @@ class Utilities {
 
             if (project == "JS"){
                 Utilities.runSharedPS(context, "vc-CreateInfrastructureJsShoppingCartIntegrationSample.ps1")
-            }
-            else if (project == "DEV-VC"){
-                Utilities.runSharedPS(context, "vc-CreateInfrastructureDEV-VC.ps1")
-            }
-            else if (project == "PROD-VC"){
-                Utilities.runSharedPS(context, "vc-CreateInfrastructurePROD-VC.ps1")
             }
         }
     }
