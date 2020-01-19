@@ -73,7 +73,7 @@
     "sqlDatabaseCollation": "SQL_Latin1_General_CP1_CI_AS",
     "sqlDatabasePlan": "Basic",
     "storageAccountType": "Standard_LRS",
-    "webAppSize": "B1"
+    "webAppSize": "S1"
   },
   "resources": [
     {
@@ -281,7 +281,20 @@
         }
       },
       "resources": [
-
+        {
+          "name": "[concat(parameters('platformWebAppName'), '/staging')]",
+          "type": "Microsoft.Web/sites/slots",
+          "apiVersion": "2018-11-01",
+          "location": "[resourceGroup().location]",
+          "tags": {
+            "displayName": "platformWebAppSlot"
+          },
+          "dependsOn": [
+            "[resourceId('Microsoft.Web/serverfarms', parameters('platformAppServicePlanName'))]",
+            "[resourceId('Microsoft.Web/sites', parameters('platformWebAppName'))]"
+          ],
+          "properties": {}
+        }
       ]
     },
     {
@@ -409,7 +422,20 @@
         }
       },
       "resources": [
-
+        {
+          "name": "[concat(parameters('frontWebAppName'), '/staging')]",
+          "type": "Microsoft.Web/sites/slots",
+          "apiVersion": "2018-11-01",
+          "location": "[resourceGroup().location]",
+          "tags": {
+            "displayName": "frontWebAppSlot"
+          },
+          "dependsOn": [
+            "[resourceId('Microsoft.Web/serverfarms', parameters('frontAppServicePlanName'))]",
+            "[resourceId('Microsoft.Web/sites', parameters('frontWebAppName'))]"
+          ],
+          "properties": {}
+        }
       ]
     }
   ],

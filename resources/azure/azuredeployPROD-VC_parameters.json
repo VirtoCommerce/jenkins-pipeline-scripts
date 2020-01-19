@@ -1,0 +1,127 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "sqlServerName": {
+      "value": "vc-srv-pro"
+    },
+    "sqlAdministratorLogin": {
+      "value": "vc-admin"
+    },
+    "sqlAdministratorLoginPassword": {
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/973d0b8c-44bf-438d-a4b7-1c4162d3ccba/resourceGroups/PROD-VC/providers/Microsoft.KeyVault/vaults/prod-vc"
+        },
+        "secretName": "sqlAdministratorLoginPassword-prod"
+      }
+    },
+    "sqlDatabaseName": {
+      "value": "vc-db-pro"
+    },
+    "redisCacheName": {
+      "value": "vc-pro"
+    },
+    "storageAccountName": {
+      "value": "vcpro"
+    },
+    "platformAppServicePlanName": {
+      "value": "vc-admin-pro"
+    },
+    "frontAppServicePlanName": {
+      "value": "vc-public-pro"
+    },
+    "platformAppInsights": {
+      "value": "vc-admin-pro"
+    },
+    "frontAppInsights": {
+      "value": "vc-public-pro"
+    },
+    "platformWebAppName": {
+      "value": "vc-admin-pro"
+    },
+    "frontWebAppName": {
+      "value": "vc-public-pro"
+    },
+    "platformAssetsConnectionString": {
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/973d0b8c-44bf-438d-a4b7-1c4162d3ccba/resourceGroups/PROD-VC/providers/Microsoft.KeyVault/vaults/prod-vc"
+        },
+        "secretName": "platformAssetsConnectionString-prod"
+      }
+    },
+    "platformCmsContentConnectionString": {
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/973d0b8c-44bf-438d-a4b7-1c4162d3ccba/resourceGroups/PROD-VC/providers/Microsoft.KeyVault/vaults/prod-vc"
+        },
+        "secretName": "platformCmsContentConnectionString-prod"
+      }
+    },
+    "platformVirtoCommerce": {
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/973d0b8c-44bf-438d-a4b7-1c4162d3ccba/resourceGroups/PROD-VC/providers/Microsoft.KeyVault/vaults/prod-vc"
+        },
+        "secretName": "platformVirtoCommerce-prod"
+      }
+    },
+    "platformAppinsightsInstrumentationKey": {
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/973d0b8c-44bf-438d-a4b7-1c4162d3ccba/resourceGroups/PROD-VC/providers/Microsoft.KeyVault/vaults/prod-vc"
+        },
+        "secretName": "platformAppinsightsInstrumentationKey-prod"
+      }
+    },
+    "frontContentConnectionString": {
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/973d0b8c-44bf-438d-a4b7-1c4162d3ccba/resourceGroups/PROD-VC/providers/Microsoft.KeyVault/vaults/prod-vc"
+        },
+        "secretName": "frontContentConnectionString-prod"
+      }
+    },
+    "frontVirtoCommerceAppSettingsPlatformUrlHost": {
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/973d0b8c-44bf-438d-a4b7-1c4162d3ccba/resourceGroups/PROD-VC/providers/Microsoft.KeyVault/vaults/prod-vc"
+        },
+        "secretName": "frontVirtoCommerceAppSettingsPlatformUrlHost-prod"
+      }
+    },
+    "frontVirtoCommerceEndpointAppId": {
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/973d0b8c-44bf-438d-a4b7-1c4162d3ccba/resourceGroups/PROD-VC/providers/Microsoft.KeyVault/vaults/prod-vc"
+        },
+        "secretName": "frontVirtoCommerceEndpointAppId-prod"
+      }
+    },
+    "frontVirtoCommerceEndpointSecretKey": {
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/973d0b8c-44bf-438d-a4b7-1c4162d3ccba/resourceGroups/PROD-VC/providers/Microsoft.KeyVault/vaults/prod-vc"
+        },
+        "secretName": "frontVirtoCommerceEndpointSecretKey-prod"
+      }
+    },
+    "frontVirtoCommerceEndpointUrl": {
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/973d0b8c-44bf-438d-a4b7-1c4162d3ccba/resourceGroups/PROD-VC/providers/Microsoft.KeyVault/vaults/prod-vc"
+        },
+        "secretName": "frontVirtoCommerceEndpointUrl-prod"
+      }
+    },
+    "frontAppinsightsInstrumentationKey": {
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/973d0b8c-44bf-438d-a4b7-1c4162d3ccba/resourceGroups/PROD-VC/providers/Microsoft.KeyVault/vaults/prod-vc"
+        },
+        "secretName": "frontAppinsightsInstrumentationKey-prod"
+      }
+    }
+  }
+}
