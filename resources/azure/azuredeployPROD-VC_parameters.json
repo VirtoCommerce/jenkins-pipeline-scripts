@@ -122,6 +122,14 @@
         },
         "secretName": "frontAppinsightsInstrumentationKey-prod"
       }
+    },
+    "thumbprintHostNameSsl": {
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/973d0b8c-44bf-438d-a4b7-1c4162d3ccba/resourceGroups/PROD-VC/providers/Microsoft.KeyVault/vaults/prod-vc"
+        },
+        "secretName": "thumbprintHostNameSsl-prod"
+      }
     }
   }
 }

@@ -67,6 +67,9 @@
     },
     "frontAppinsightsInstrumentationKey": {
       "type": "String"
+    },
+    "thumbprintHostNameSsl": {
+      "type": "String"
     }
   },
   "variables": {
@@ -202,14 +205,23 @@
       ],
       "properties": {
         "enabled": true,
+        "hostNameSslStates": [
+          {
+            "name": "admin.virtocommerce.com",
+            "sslState": "SniEnabled",
+            "thumbprint": "[parameters('thumbprintHostNameSsl')]",
+            "hostType": "Standard"
+          }
+        ],
         "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('platformAppServicePlanName'))]",
         "siteConfig": {
-          "requestTracingEnabled": true,
+          "netFrameworkVersion": "v4.0",
+          "requestTracingEnabled": false,
           "requestTracingExpirationTime": "9999-12-31T23:59:00Z",
-          "httpLoggingEnabled": true,
+          "httpLoggingEnabled": false,
           "logsDirectorySizeLimit": 100,
-          "detailedErrorLoggingEnabled": true,
-          "clientAffinityEnabled": true,
+          "detailedErrorLoggingEnabled": false,
+          "clientAffinityEnabled": false,
           "use32BitWorkerProcess": false,
           "webSocketsEnabled": false,
           "alwaysOn": false,
@@ -341,6 +353,20 @@
       ],
       "properties": {
         "enabled": true,
+        "hostNameSslStates": [
+          {
+            "name": "virtocommerce.com",
+            "sslState": "SniEnabled",
+            "thumbprint": "[parameters('thumbprintHostNameSsl')]",
+            "hostType": "Standard"
+          },
+          {
+            "name": "www.virtocommerce.com",
+            "sslState": "SniEnabled",
+            "thumbprint": "[parameters('thumbprintHostNameSsl')]",
+            "hostType": "Standard"
+          }
+        ],
         "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('frontAppServicePlanName'))]",
         "siteConfig": {
           "requestTracingEnabled": true,
