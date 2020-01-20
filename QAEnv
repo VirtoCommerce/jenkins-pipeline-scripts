@@ -45,10 +45,16 @@ pipeline
             {
                 script
                 {
-                    def csSrc = "${env.SOLUTION_FOLDER}\\vc\\${BRANCH_NAME}"
+                    def csSrc = "${env.SOLUTION_FOLDER}\\vc\\${BASE_BRANCH}"
+                    def csTarget = "${env.SOLUTION_FOLDER}\\vc\\${BRANCH_NAME}"
                     def modulesRoot = "${env.WORKSPACE}\\CS\\module"
                     powershell "Remove-Item -Path ${env.WORKSPACE}\\CS\\* -Recurse -Force -ErrorAction Continue"
                     powershell "Copy-Item -Path ${csSrc}\\* -Destination ${env.WORKSPACE}\\CS -Recurse -Force"
+                    dir(modulesRoot)
+                    {
+                        powershell "Get-ChildItem ${csTarget}\\module -Name | Remove-Item -ErrorAction SilentlyContinue -Force -Recurse"
+                    }
+                    powershell "Copy-Item -Path ${csTarget}\\* -Destination ${env.WORKSPACE}\\CS -Recurse -Force"
                     powershell "Rename-Item -Path ${modulesRoot} -NewName modules"
                 }
             }
