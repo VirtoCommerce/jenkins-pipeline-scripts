@@ -23,7 +23,7 @@ $SourceDir = "${env:WORKSPACE}\artifacts"
 
 # Upload Zip File to Azure
 $ConnectionString = "DefaultEndpointsProtocol=https;AccountName={0};AccountKey={1};EndpointSuffix=core.windows.net"
-if ($StagingName -eq "deploy" -or $StagingName -eq "dev-vc-new-design"){
+if ($StagingName -eq "deploy"){
     $ConnectionString = $ConnectionString -f $AzureBlobName, $AzureBlobKey
 }
 $BlobContext = New-AzureStorageContext -ConnectionString $ConnectionString
