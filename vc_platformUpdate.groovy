@@ -20,7 +20,8 @@ node {
 
         def envChoices
         stage('User Input'){
-            timeout(time: 30, unit: 'MINUTES'){
+            SETTINGS.setEnvironment('platform')
+            timeout(time: "${SETTINGS['timeoutMinutes']}", unit: 'MINUTES'){
                 envChoices = input(message: "Choose environment to update", parameters: [choice(name: 'Environments', choices:"Dev\nProduction")])
                 if(envChoices == 'Dev'){
                     envChoices = ""
@@ -55,7 +56,8 @@ node {
 
         stage('E2E'){
             timestamps{
-                timeout(time: 20, unit: 'MINUTES'){
+                SETTINGS.setEnvironment('platform')
+                timeout(time: "${SETTINGS['timeoutMinutes']}", unit: 'MINUTES'){
                     try{
                         Utilities.runE2E(this)
                         def e2eStatus = "E2E Success"
