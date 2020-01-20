@@ -78,8 +78,8 @@ node {
             timestamps{
                 SETTINGS.setEnvironment('platform')
                 withEnv([
-                    "SubscriptionID=${SETTINGS['subscriptionID']}", "DestResourceGroupName=${SETTINGS['resourceGroupName']}",
-                    "WebSiteName=${SETTINGS['appName']}", "SlotName=${SETTINGS['slotName']}"]){
+                    "AzureSubscriptionIDProd=${SETTINGS['subscriptionID']}", "AzureResourceGroupNameProd=${SETTINGS['resourceGroupName']}",
+                    "AzureWebAppAdminNameProd=${SETTINGS['appName']}", "AzureSlotNameProd=${SETTINGS['slotName']}"]){
                     powershell "${psfolder}\\SwapSlot.ps1"
                 }
             }
