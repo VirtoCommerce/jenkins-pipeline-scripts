@@ -51,7 +51,7 @@ pipeline
                     def csTarget = "${env.SOLUTION_FOLDER}\\vc\\${BRANCH_NAME}"
                     def modulesRoot = "${env.WORKSPACE}\\CS\\module"
                     powershell "Remove-Item -Path ${env.WORKSPACE}\\CS\\* -Recurse -Force -ErrorAction Continue"
-                    powershell "Copy-Item -Path ${csSrc}\\modules -Destination ${env.WORKSPACE}\\CS -Recurse -Force"
+                    powershell "Copy-Item -Path ${csSrc}\\module -Destination ${env.WORKSPACE}\\CS -Recurse -Force"
                     def themeTargetBranchExists = new File("${csTarget}\\theme").exists()
                     powershell "Copy-Item -Path ${themeTargetBranchExists ? csTarget : csSrc}\\theme -Destination ${env.WORKSPACE}\\CS -Recurse -Force"
                     if(new File("${csTarget}\\storefront").exists())
