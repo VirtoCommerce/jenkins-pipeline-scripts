@@ -525,6 +525,14 @@ class Utilities {
             if (project == "JS"){
                 Utilities.runSharedPS(context, "vc-CreateInfrastructureJsShoppingCartIntegrationSample.ps1")
             }
+            else if (project == "DEV-VC"){
+                Utilities.runSharedPS(context, "vc-CreateInfrastructureDEV-VC.ps1")
+            }
+            else if (project == "PROD-VC"){
+                Utilities.runSharedPS(context, "vc-CreateInfrastructurePROD-VC.ps1")
+            }
+
+
         }
     }
 

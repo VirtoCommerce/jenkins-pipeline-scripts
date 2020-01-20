@@ -15,6 +15,10 @@ $TemplateFile = "${env:WORKSPACE}\resources\azure\azuredeployPROD-VC.json"
 $TemplateParametersFile = "${env:WORKSPACE}\resources\azure\azuredeployPROD-VC_parameters.json"
 
 $currentResourceDeploy = Get-AzureRmResourceGroup -Name $DestResourceGroupName -Location $ResourceGroupLocation -Verbose -ErrorAction SilentlyContinue
+Test-AzureRmResourceGroupDeployment -ResourceGroupName $DestResourceGroupName `
+-TemplateFile $TemplateFile `
+-TemplateParameterFile $TemplateParametersFile `
+-Verbose -ErrorVariable ErrorMessages
 If ($null -eq $currentResourceDeploy) {
     New-AzureRmResourceGroupDeployment -Name ((Get-ChildItem $TemplateFile).BaseName + '-' + ((Get-Date).ToUniversalTime()).ToString('MMdd-HHmm')) `
     -ResourceGroupName $DestResourceGroupName `

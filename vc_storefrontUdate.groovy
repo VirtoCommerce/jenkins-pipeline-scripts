@@ -1,8 +1,10 @@
 import jobs.scripts.*
 
 node {
+    properties([disableConcurrentBuilds()])
+
     def SETTINGS
-    
+
     stage('Init'){
         deleteDir()
         checkout scm
