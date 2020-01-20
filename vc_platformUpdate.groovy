@@ -76,10 +76,15 @@ node {
 
         stage('SwapSlot'){
             timestamps{
-                powershell "${psfolder}\\SwapSlot.ps1"
+                SETTINGS.setEnvironment('platform')
+                withEnv([
+                    "SubscriptionID=${SETTINGS['subscriptionID']}", "DestResourceGroupName=${SETTINGS['resourceGroupName']}",
+                    "WebSiteName=${SETTINGS['appName']}", "SlotName=${SETTINGS['slotName']}"]){
+                    powershell "${psfolder}\\SwapSlot.ps1"
+                }
             }
         }
-        
+
         stage('Cleanup'){
             timestamps{
                 Packaging.cleanSolutions(this)
