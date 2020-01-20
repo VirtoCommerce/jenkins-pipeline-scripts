@@ -71,9 +71,12 @@ import jobs.scripts.*
 				}
 			}
 
-			if (env.BRANCH_NAME == 'bulk-update/dev' || env.BRANCH_NAME == 'bulk-update/master'){
-				stage('ARM deploy'){
-					Utilities.createInfrastructure(this)
+			stage('ARM deploy'){
+				if(env.BRANCH_NAME == 'bulk-update/dev'){
+					Utilities.createInfrastructure(this, "bulk-update/dev")
+				}
+				else if(env.BRANCH_NAME == 'bulk-update/master'){
+					Utilities.createInfrastructure(this, "bulk-update/master")
 				}
 			}
 

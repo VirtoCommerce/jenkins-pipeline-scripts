@@ -513,26 +513,29 @@ class Utilities {
         //def AzureTempDir = Utilities.getAzureTemplateDir(context)
         def AzureTempDir = "..\\workspace@libs\\virto-shared-library\\resources\\azure"
         context.dir(AzureTempDir){
-            //context.deleteDir()
-            //getAzureTemplate(context)
-            if (context.env.BRANCH_NAME == 'bulk-update/dev'){
-                Utilities.runSharedPS(context, "vc-CreateInfrastructureBulkUpdateDev.ps1")
+            switch(project){
+                case 'bulk-update/dev':
+                    Utilities.runSharedPS(context, "vc-CreateInfrastructureBulkUpdateDev.ps1")
+                    break
+                case 'bulk-update/master':
+                    Utilities.runSharedPS(context, "vc-CreateInfrastructureBulkUpdateQA.ps1")
+                    break
+                case 'JS':
+                    Utilities.runSharedPS(context, "vc-CreateInfrastructureJsShoppingCartIntegrationSample.ps1")
+                    break
+                case 'DEV-VC':
+                    Utilities.runSharedPS(context, "vc-CreateInfrastructureDEV-VC.ps1")
+                    break
+                case 'PROD-VC':
+                    Utilities.runSharedPS(context, "vc-CreateInfrastructurePROD-VC.ps1")
+                    break
+                case 'DEV-demoVC':
+                    Utilities.runSharedPS(context, "vc-CreateInfrastructureDEV-demoVC.ps1")
+                    break
+                case 'QA-demoVC':
+                    Utilities.runSharedPS(context, "vc-CreateInfrastructureQA-demoVC.ps1")
+                    break
             }
-            else if (context.env.BRANCH_NAME == 'bulk-update/master'){
-                Utilities.runSharedPS(context, "vc-CreateInfrastructureBulkUpdateQA.ps1")
-            }
-
-            if (project == "JS"){
-                Utilities.runSharedPS(context, "vc-CreateInfrastructureJsShoppingCartIntegrationSample.ps1")
-            }
-            else if (project == "DEV-VC"){
-                Utilities.runSharedPS(context, "vc-CreateInfrastructureDEV-VC.ps1")
-            }
-            else if (project == "PROD-VC"){
-                Utilities.runSharedPS(context, "vc-CreateInfrastructurePROD-VC.ps1")
-            }
-
-
         }
     }
 
