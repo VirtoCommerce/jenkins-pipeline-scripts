@@ -53,7 +53,7 @@
     "frontContentConnectionString": {
       "type": "String"
     },
-    "frontVirtoCommerceAppSettingsPlatformUrlHost": {
+    "frontVirtoCommerceDefaultStore": {
       "type": "String"
     },
     "frontVirtoCommerceEndpointAppId": {
@@ -415,8 +415,8 @@
               "value": "~1"
             },
             {
-              "name": "VirtoCommerce:AppSettings:PlatformUrlHost",
-              "value": "[parameters('frontVirtoCommerceAppSettingsPlatformUrlHost')]"
+              "name": "VirtoCommerce:DefaultStore",
+              "value": "[parameters('frontVirtoCommerceDefaultStore')]"
             },
             {
               "name": "VirtoCommerce:Endpoint:AppId",
