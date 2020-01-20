@@ -15,10 +15,6 @@ if ($StagingName -eq "deploy"){
     Copy-Item .\theme .\artifacts\Themes\vccom\default -Recurse -Force
     $DestDirPath = "$StoreName"
 }
-elseif ($StagingName -eq "dev-vc-new-design"){
-    Copy-Item .\theme .\artifacts -Recurse -Force
-    $DestDirPath = "Themes/vccom/default"
-}
 
 $SourceDir = "${env:WORKSPACE}\artifacts"
 
@@ -51,7 +47,6 @@ Get-AzureStorageBlob -Container $StoreName -Context $BlobContext | Start-AzureSt
 
 Write-Host "Sync $StoreName"
 $token = $env:AzureBlobToken
-#& "${env:Utils}\AzCopy10\AzCopy" sync $SourceDir https://$($AzureBlobName).blob.core.windows.net/$StoreName/$($DestDirPath)$token --delete-destination=true
 & "${env:Utils}\AzCopy10\AzCopy" sync $SourceDir https://$($AzureBlobName).blob.core.windows.net/$StoreName/$($DestDirPath)$token --recursive --exclude="*.page" --delete-destination=true
 
 Write-Host "Start $DestWebAppName"

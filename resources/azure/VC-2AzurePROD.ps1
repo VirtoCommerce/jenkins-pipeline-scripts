@@ -11,12 +11,9 @@
 $ErrorActionPreference = "Stop"
 
 if ($StagingName -eq "deploy"){
-    Copy-Item .\pages\docs .\artifacts -Recurse -Force
-    $DestDirPath = "Pages/vccom/docs"
-}
-elseif ($StagingName -eq "dev-vc-new-design"){
-    Copy-Item .\theme .\artifacts -Recurse -Force
-    $DestDirPath = "Themes/vccom/default"
+    Copy-Item .\pages .\artifacts\Pages\vccom -Recurse -Force
+    Copy-Item .\theme .\artifacts\Themes\vccom\default -Recurse -Force
+    $DestDirPath = "$StoreName"
 }
 
 $SourceDir = "${env:WORKSPACE}\artifacts"
@@ -51,7 +48,7 @@ Get-AzureStorageBlob -Container $StoreName -Context $BlobContext | Start-AzureSt
 
 Write-Host "Sync $StoreName"
 $token = $env:AzureBlobToken
-& "${env:Utils}\AzCopy10\AzCopy" sync $SourceDir https://$($AzureBlobName).blob.core.windows.net/$StoreName/$($DestDirPath)$token --delete-destination=true
+& "${env:Utils}\AzCopy10\AzCopy" sync $SourceDir https://$($AzureBlobName).blob.core.windows.net/$StoreName/$($DestDirPath)$token --recursive --exclude="*.page" --delete-destination=true
 
 Write-Output "Restarting web site $DestWebAppName slot $SlotName"
 Start-AzureRmWebAppSlot -ResourceGroupName $DestResourceGroupName -Name $DestWebAppName -Slot $SlotName
