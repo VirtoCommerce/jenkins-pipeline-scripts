@@ -5,14 +5,14 @@ $ApplicationID ="${env:AzureAppID}"
 $APIKey = ConvertTo-SecureString "${env:AzureAPIKey}" -AsPlainText -Force
 $psCred = New-Object System.Management.Automation.PSCredential($ApplicationID, $APIKey)
 $TenantID = "${env:AzureTenantID}"
-$SubscriptionID = "CloudPlatform"
+
+$SubscriptionID = "${env:AzureSubscriptionIDProd}"
+$WebSiteName = "${env:AzureWebAppAdminNameProd}"
+$SlotName = "${env:AzureSlotNameProd}"
+$DestResourceGroupName = "${env:AzureResourceGroupNameProd}"
 
 Add-AzureRmAccount -Credential $psCred -TenantId $TenantID -ServicePrincipal
 Select-AzureRmSubscription -SubscriptionId $SubscriptionID
-
-$WebSiteName = "vc-admin-pro"
-$SlotName = "staging"
-$DestResourceGroupName = "PROD-VC"
 
 # Swap web site slots
 Start-Sleep -s 11

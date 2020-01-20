@@ -28,13 +28,13 @@ import jobs.scripts.*
 		SETTINGS.setRegion('virtocommerce')
 		SETTINGS.setEnvironment(env.BRANCH_NAME)
 
-		if (env.BRANCH_NAME == 'deploy' || env.BRANCH_NAME == 'dev-vc-new-design'){
+		if (env.BRANCH_NAME == 'deploy'){
 			deployScript = 'VC-2AzureDEV.ps1'
 			dockerTag = "latest"
 		}
 
 		try{
-			//Utilities.notifyBuildStatus(this, "started")
+			Utilities.notifyBuildStatus(this, "started")
 			stage('Checkout'){
 				timestamps{
 					deleteDir()
@@ -49,40 +49,25 @@ import jobs.scripts.*
 
 			stage('Copy to DEV-VC') {
 				timestamps {
-					switch(env.BRANCH_NAME) {
-						case 'deploy':
-							def stagingName = "deploy"
-							def storeName = "cms-content"
-							def azureBlobName = SETTINGS['azureBlobName']
-							def azureBlobKey = SETTINGS['azureBlobKey']
-							def webAppName = SETTINGS['webAppName']
-							def resourceGroupName = SETTINGS['resourceGroupName']
-							def subscriptionID = SETTINGS['subscriptionID']
-							def blobToken = SETTINGS['tokenSas']
-							withEnv(["AzureBlobToken=${blobToken}"]){
-								Utilities.runSharedPS(this, "${deployScript}", "-StagingName ${stagingName} -StoreName ${storeName} -AzureBlobName ${azureBlobName} -AzureBlobKey ${azureBlobKey} -WebAppName ${webAppName} -ResourceGroupName ${resourceGroupName} -SubscriptionID ${subscriptionID}")
-							}
-							break
-						case 'dev-vc-new-design':
-							def stagingName = "dev-vc-new-design"
-							def storeName = "cms-content"
-							def azureBlobName = SETTINGS['azureBlobName']
-							def azureBlobKey = SETTINGS['azureBlobKey']
-							def webAppName = SETTINGS['webAppName']
-							def resourceGroupName = SETTINGS['resourceGroupName']
-							def subscriptionID = SETTINGS['subscriptionID']
-							def blobToken = SETTINGS['tokenSas']
-							withEnv(["AzureBlobToken=${blobToken}"]){
-								Utilities.runSharedPS(this, "${deployScript}", "-StagingName ${stagingName} -StoreName ${storeName} -AzureBlobName ${azureBlobName} -AzureBlobKey ${azureBlobKey} -WebAppName ${webAppName} -ResourceGroupName ${resourceGroupName} -SubscriptionID ${subscriptionID}")
-							}
-							break
+					if(env.BRANCH_NAME == 'deploy'){
+						def stagingName = "deploy"
+						def storeName = "cms-content"
+						def azureBlobName = SETTINGS['azureBlobName']
+						def azureBlobKey = SETTINGS['azureBlobKey']
+						def webAppName = SETTINGS['webAppName']
+						def resourceGroupName = SETTINGS['resourceGroupName']
+						def subscriptionID = SETTINGS['subscriptionID']
+						def blobToken = SETTINGS['tokenSas']
+						withEnv(["AzureBlobToken=${blobToken}"]){
+							Utilities.runSharedPS(this, "${deployScript}", "-StagingName ${stagingName} -StoreName ${storeName} -AzureBlobName ${azureBlobName} -AzureBlobKey ${azureBlobKey} -WebAppName ${webAppName} -ResourceGroupName ${resourceGroupName} -SubscriptionID ${subscriptionID}")
+						}
 					}
 				}
 			}
 
 			stage('E2E'){
 				timestamps{
-					timeout(time: 20, unit: 'MINUTES'){
+					timeout(time: "${SETTINGS['timeoutMinutes']}", unit: 'MINUTES'){
 						try{
 							Utilities.runE2E(this)
 							def e2eStatus = "E2E Success"
@@ -94,9 +79,9 @@ import jobs.scripts.*
 							def allureReportAddress = "${env.BUILD_URL}/allure"
 							//Utilities.notifyBuildStatus(this, SETTINGS['of365hook'], "${allureReportAddress}", "${e2eStatus}")
 							msg = "${e2eStatus}."
-							if(!(e2eStatus == 'E2E Success')) {
-								input(message: msg, submitter: env.APPROVERS)
-							}
+							// if(!(e2eStatus == 'E2E Success')) {
+							// 	input(message: msg, submitter: env.APPROVERS)
+							// }
 						}
 					}
 				}
@@ -105,37 +90,22 @@ import jobs.scripts.*
 			stage('Copy to PROD-VC') {
 				timestamps {
 					deployScript = 'VC-2AzurePROD.ps1'
-					switch(env.BRANCH_NAME){
-						case 'deploy':
-							def stagingName = "deploy"
-							def storeName = "cms-content"
-							def azureBlobName = SETTINGS['azureBlobNameProd']
-							def azureBlobKey = SETTINGS['azureBlobKeyProd']
-							def webAppName = SETTINGS['webAppNameProd']
-							def resourceGroupName = SETTINGS['resourceGroupNameProd']
-							def subscriptionID = SETTINGS['subscriptionID']
-							def blobToken = SETTINGS['tokenSasProd']
-							withEnv(["AzureBlobToken=${blobToken}"]){
-								Utilities.runSharedPS(this, "${deployScript}", "-StagingName ${stagingName} -StoreName ${storeName} -AzureBlobName ${azureBlobName} -AzureBlobKey ${azureBlobKey} -WebAppName ${webAppName} -ResourceGroupName ${resourceGroupName} -SubscriptionID ${subscriptionID}")
-							}
-							break
-						case 'dev-vc-new-design':
-							def stagingName = "dev-vc-new-design"
-							def storeName = "cms-content"
-							def azureBlobName = SETTINGS['azureBlobNameProd']
-							def azureBlobKey = SETTINGS['azureBlobKeyProd']
-							def webAppName = SETTINGS['webAppNameProd']
-							def resourceGroupName = SETTINGS['resourceGroupNameProd']
-							def subscriptionID = SETTINGS['subscriptionID']
-							def blobToken = SETTINGS['tokenSasProd']
-							withEnv(["AzureBlobToken=${blobToken}"]){
-								Utilities.runSharedPS(this, "${deployScript}", "-StagingName ${stagingName} -StoreName ${storeName} -AzureBlobName ${azureBlobName} -AzureBlobKey ${azureBlobKey} -WebAppName ${webAppName} -ResourceGroupName ${resourceGroupName} -SubscriptionID ${subscriptionID}")
-							}
-							break
+					if(env.BRANCH_NAME == 'deploy'){
+						def stagingName = "deploy"
+						def storeName = "cms-content"
+						def azureBlobName = SETTINGS['azureBlobNameProd']
+						def azureBlobKey = SETTINGS['azureBlobKeyProd']
+						def webAppName = SETTINGS['webAppNameProd']
+						def resourceGroupName = SETTINGS['resourceGroupNameProd']
+						def subscriptionID = SETTINGS['subscriptionID']
+						def blobToken = SETTINGS['tokenSasProd']
+						withEnv(["AzureBlobToken=${blobToken}"]){
+							Utilities.runSharedPS(this, "${deployScript}", "-StagingName ${stagingName} -StoreName ${storeName} -AzureBlobName ${azureBlobName} -AzureBlobKey ${azureBlobKey} -WebAppName ${webAppName} -ResourceGroupName ${resourceGroupName} -SubscriptionID ${subscriptionID}")
+						}
 					}
 				}
 			}
-			
+
 			stage('Cleanup') {
 				timestamps { 
 					Packaging.cleanSolutions(this)
@@ -144,7 +114,7 @@ import jobs.scripts.*
 		}
 		catch (any) {
 			currentBuild.result = 'FAILURE'
-			//Utilities.notifyBuildStatus(this, currentBuild.result)
+			Utilities.notifyBuildStatus(this, currentBuild.result)
 			throw any //rethrow exception to prevent the build from proceeding
 		}
 		finally {

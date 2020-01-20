@@ -400,7 +400,7 @@
             },
             {
               "name": "ASPNETCORE_ENVIRONMENT",
-              "value": "Development"
+              "value": "Production"
             },
             {
               "name": "InstrumentationEngine_EXTENSION_VERSION",
