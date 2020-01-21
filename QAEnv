@@ -43,7 +43,7 @@ pipeline
                     def branches = Utilities.getSubfolders("${env.SOLUTION_FOLDER}\\${params.PREFIX}").join("\n")
                     def userInput = input message: "Select Branch", parameters: 
                     [
-                        choice(name:'Source Branch', choices:"dev\nmaster"),
+                        choice(name:'Source Branch', choices:params.SourceBranches),
                         choice(name:'Target Branch', choices:branches),
                         booleanParam(defaultValue: false, name: 'Delviery to Azure')
                     ]
