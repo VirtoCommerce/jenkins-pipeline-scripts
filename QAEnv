@@ -198,7 +198,7 @@ pipeline
         {
             script
             {
-                def composeFolder = "${env.WORKSPACE}@libs\\virto-shared-library\\resources\\docker.core\\windowsnano"
+                def composeFolder = "${env.WORKSPACE}@libs\\${params.ComposeDir}"
                 dir(composeFolder)
                 {
                     withEnv(["DOCKER_TAG=${DOCKER_TAG}", "DOCKER_PREFIX=${DOCKER_PREFIX}", "DOCKER_PLATFORM_PORT=${DOCKER_PLATFORM_PORT}", "DOCKER_STOREFRONT_PORT=${DOCKER_STOREFRONT_PORT}", "DOCKER_SQL_PORT=${DOCKER_SQL_PORT}", "COMPOSE_PROJECT_NAME=${env.BUILD_TAG}"]){
