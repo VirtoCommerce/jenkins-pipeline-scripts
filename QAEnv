@@ -19,12 +19,12 @@ pipeline
     agent any
 
     
-    parameters
-    {
-        string defaultValue: 'http://ci.virtocommerce.com', description: '', name: 'PLATFORM_CONTAINER_URL', trim: false
-        string defaultValue: 'vc', description: '', name: 'PREFIX', trim: false
-        string defaultValue: 'http://ci.virtocommerce.com', description: '', name: 'STOREFRONT_CONTAINER_URL', trim: false
-    }
+    // parameters
+    // {
+    //     string defaultValue: 'http://ci.virtocommerce.com', description: '', name: 'PLATFORM_CONTAINER_URL', trim: false
+    //     string defaultValue: 'vc', description: '', name: 'PREFIX', trim: false
+    //     string defaultValue: 'http://ci.virtocommerce.com', description: '', name: 'STOREFRONT_CONTAINER_URL', trim: false
+    // }
 
     options
     {
