@@ -39,6 +39,7 @@ pipeline
                     ]
                     BASE_BRANCH = userInput["Source Branch"]
                     BRANCH_NAME = userInput["Target Branch"]
+                    echo "Source Branch: ${BASE_BRANCH}; Target Branch: ${BRANCH_NAME};"
                 }
             }
         }
