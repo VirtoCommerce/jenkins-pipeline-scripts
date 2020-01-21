@@ -20,7 +20,7 @@ pipeline
 
     properties
     ([
-        buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '5', numToKeepStr: '')),
+        buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '', numToKeepStr: '10')),
         disableConcurrentBuilds(),
         parameters([
             string(defaultValue: 'http://ci.virtocommerce.com', description: '', name: 'PLATFORM_CONTAINER_URL', trim: false), 
