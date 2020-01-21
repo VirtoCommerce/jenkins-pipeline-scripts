@@ -137,7 +137,7 @@ pipeline
                                 def storefrontDir = "${env.WORKSPACE}\\CS\\storefront"
                                 //bat "docker exec ${storefrontContainer} cmd /c \"rmdir /S /Q C:\\vc-storefront\""
                                 bat "docker stop ${storefrontContainer}"
-                                bat "docker cp ${storefrontDir} ${storefrontContainer}:/vc-storefront"
+                                bat "docker cp ${storefrontDir} ${storefrontContainer}:/vc-storefront/."
                                 bat "docker start ${storefrontContainer}"
                             }
                         }
