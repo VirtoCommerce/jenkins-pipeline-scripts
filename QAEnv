@@ -40,7 +40,7 @@ pipeline
                 script
                 {
                     checkout scm
-                    def branches = Utilities.getSubfolders("${env.SOLUTION_FOLDER}\\${PREFIX}").join("\n")
+                    def branches = Utilities.getSubfolders("${env.SOLUTION_FOLDER}\\${params.PREFIX}").join("\n")
                     def userInput = input message: "Select Branch", parameters: 
                     [
                         choice(name:'Source Branch', choices:"dev\nmaster"),
@@ -59,8 +59,8 @@ pipeline
             {
                 script
                 {
-                    def csSrc = "${env.SOLUTION_FOLDER}\\${PREFIX}\\${BASE_BRANCH}"
-                    def csTarget = "${env.SOLUTION_FOLDER}\\${PREFIX}\\${BRANCH_NAME}"
+                    def csSrc = "${env.SOLUTION_FOLDER}\\${params.PREFIX}\\${BASE_BRANCH}"
+                    def csTarget = "${env.SOLUTION_FOLDER}\\${params.PREFIX}\\${BRANCH_NAME}"
                     def modulesRoot = "${env.WORKSPACE}\\CS\\module"
                     powershell "Remove-Item -Path ${env.WORKSPACE}\\CS\\* -Recurse -Force -ErrorAction Continue"
                     powershell "Copy-Item -Path ${csSrc}\\module -Destination ${env.WORKSPACE}\\CS -Recurse -Force"
@@ -169,7 +169,7 @@ pipeline
                     }
                     
                     stage('Awaiting Proceed'){
-                        def message = "Platform url: ${PLATFORM_CONTAINER_URL}:${DOCKER_PLATFORM_PORT}\nStorefront: ${STOREFRONT_CONTAINER_URL}:${DOCKER_STOREFRONT_PORT}"
+                        def message = "Platform url: ${params.PLATFORM_CONTAINER_URL}:${DOCKER_PLATFORM_PORT}\nStorefront: ${params.STOREFRONT_CONTAINER_URL}:${DOCKER_STOREFRONT_PORT}"
                         input(message)
                     }
                 }
