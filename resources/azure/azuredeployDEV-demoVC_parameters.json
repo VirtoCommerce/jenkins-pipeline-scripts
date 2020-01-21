@@ -94,30 +94,6 @@
         "secretName": "frontContentConnectionString-dev"
       }
     },
-    "frontVirtoCommerceAppSettingsPlatformUrlHost": {
-      "reference": {
-        "keyVault": {
-          "id": "/subscriptions/973d0b8c-44bf-438d-a4b7-1c4162d3ccba/resourceGroups/DEV-demoVC/providers/Microsoft.KeyVault/vaults/dev-demovc"
-        },
-        "secretName": "frontVirtoCommerceAppSettingsPlatformUrlHost-dev"
-      }
-    },
-    "frontVirtoCommerceEndpointAppId": {
-      "reference": {
-        "keyVault": {
-          "id": "/subscriptions/973d0b8c-44bf-438d-a4b7-1c4162d3ccba/resourceGroups/DEV-demoVC/providers/Microsoft.KeyVault/vaults/dev-demovc"
-        },
-        "secretName": "frontVirtoCommerceEndpointAppId-dev"
-      }
-    },
-    "frontVirtoCommerceEndpointSecretKey": {
-      "reference": {
-        "keyVault": {
-          "id": "/subscriptions/973d0b8c-44bf-438d-a4b7-1c4162d3ccba/resourceGroups/DEV-demoVC/providers/Microsoft.KeyVault/vaults/dev-demovc"
-        },
-        "secretName": "frontVirtoCommerceEndpointSecretKey-dev"
-      }
-    },
     "frontVirtoCommerceEndpointUrl": {
       "reference": {
         "keyVault": {

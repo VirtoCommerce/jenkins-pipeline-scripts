@@ -59,15 +59,6 @@
     "frontContentConnectionString": {
       "type": "String"
     },
-    "frontVirtoCommerceAppSettingsPlatformUrlHost": {
-      "type": "String"
-    },
-    "frontVirtoCommerceEndpointAppId": {
-      "type": "String"
-    },
-    "frontVirtoCommerceEndpointSecretKey": {
-      "type": "String"
-    },
     "frontVirtoCommerceEndpointUrl": {
       "type": "String"
     },
@@ -141,10 +132,10 @@
       "type": "Microsoft.Search/searchServices",
       "apiVersion": "2015-08-19",
       "location": "[resourceGroup().location]",
+      "sku": {
+        "name": "free"
+      },
       "properties": {
-        "sku": {
-          "name": "free"
-        }
       },
       "tags": {
         "displayName": "searchServices"
@@ -224,17 +215,23 @@
         "enabled": true,
         "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('platformAppServicePlanName'))]",
         "siteConfig": {
-          "requestTracingEnabled": true,
+          "requestTracingEnabled": false,
           "requestTracingExpirationTime": "9999-12-31T23:59:00Z",
-          "httpLoggingEnabled": true,
+          "httpLoggingEnabled": false,
           "logsDirectorySizeLimit": 100,
-          "detailedErrorLoggingEnabled": true,
+          "detailedErrorLoggingEnabled": false,
           "clientAffinityEnabled": true,
           "use32BitWorkerProcess": false,
           "webSocketsEnabled": false,
           "alwaysOn": true,
           "httpsOnly": true,
           "http20Enabled": false,
+          "cors": {
+            "allowedOrigins": [
+              "*"
+            ],
+            "supportCredentials": false
+          },
           "minTlsVersion": "1.2",
           "ftpsState": "AllAllowed",
           "appSettings": [
@@ -354,11 +351,11 @@
         "enabled": true,
         "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('frontAppServicePlanName'))]",
         "siteConfig": {
-          "requestTracingEnabled": true,
+          "requestTracingEnabled": false,
           "requestTracingExpirationTime": "9999-12-31T23:59:00Z",
-          "httpLoggingEnabled": true,
+          "httpLoggingEnabled": false,
           "logsDirectorySizeLimit": 100,
-          "detailedErrorLoggingEnabled": true,
+          "detailedErrorLoggingEnabled": false,
           "clientAffinityEnabled": true,
           "use32BitWorkerProcess": false,
           "alwaysOn": false,
@@ -372,10 +369,6 @@
               "value": "[parameters('frontAppinsightsInstrumentationKey')]"
             },
             {
-              "name": "APPINSIGHTS_PORTALINFO",
-              "value": "ASP.NETCORE"
-            },
-            {
               "name": "APPINSIGHTS_PROFILERFEATURE_VERSION",
               "value": "1.0.0"
             },
@@ -384,36 +377,44 @@
               "value": "1.0.0"
             },
             {
+              "name": "ApplicationInsightsAgent_EXTENSION_VERSION",
+              "value": "~2"
+            },
+            {
               "name": "ASPNETCORE_ENVIRONMENT",
               "value": "Development"
+            },
+            {
+              "name": "DiagnosticServices_EXTENSION_VERSION",
+              "value": "~3"
             },
             {
               "name": "InstrumentationEngine_EXTENSION_VERSION",
               "value": "~1"
             },
             {
-              "name": "XDT_MicrosoftApplicationInsights_Mode",
-              "value": "recommended"
+              "name": "MobileAppsManagement_EXTENSION_VERSION",
+              "value": "latest"
             },
             {
-              "name": "XDT_MicrosoftApplicationInsights_BaseExtensions",
+              "name": "SnapshotDebugger_EXTENSION_VERSION",
               "value": "~1"
-            },
-            {
-              "name": "VirtoCommerce:AppSettings:PlatformUrlHost",
-              "value": "[parameters('frontVirtoCommerceAppSettingsPlatformUrlHost')]"
-            },
-            {
-              "name": "VirtoCommerce:Endpoint:AppId",
-              "value": "[parameters('frontVirtoCommerceEndpointAppId')]"
-            },
-            {
-              "name": "VirtoCommerce:Endpoint:SecretKey",
-              "value": "[parameters('frontVirtoCommerceEndpointSecretKey')]"
             },
             {
               "name": "VirtoCommerce:Endpoint:Url",
               "value": "[parameters('frontVirtoCommerceEndpointUrl')]"
+            },
+            {
+              "name": "VirtoCommerce:RequestTimeout",
+              "value": "0:5:40"
+            },
+            {
+              "name": "WEBSITE_HTTPLOGGING_RETENTION_DAYS",
+              "value": "5"
+            },
+            {
+              "name": "XDT_MicrosoftApplicationInsights_BaseExtensions",
+              "value": "~1"
             }
           ],
           "connectionStrings": [
