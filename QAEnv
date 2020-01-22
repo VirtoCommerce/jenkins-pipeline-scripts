@@ -42,13 +42,14 @@ pipeline
                 script
                 {
                     checkout scm
-                    configFileProvider([configFile(fileId: 'shared_lib_settings', variable: 'SETTINGS_FILE')]) {
+                    configFileProvider([configFile(fileId: 'qaenv', variable: 'SETTINGS_FILE')]) {
                         SETTINGS = globalLib.Settings.new(readFile(SETTINGS_FILE))
                     }
-                    def branches = Utilities.getSubfolders("${env.SOLUTION_FOLDER}\\${params.PREFIX}").join("\n")
+                    SETTINGS.setBranch("master")
+                    def branches = Utilities.getSubfolders("${env.SOLUTION_FOLDER}\\${SETTINGS['prefix']}").join("\n")
                     def userInput = input message: "Select Branch", parameters: 
                     [
-                        choice(name:'Source Branch', choices:params.SourceBranches),
+                        choice(name:'Source Branch', choices:SETTINGS['sourceBranches']),
                         choice(name:'Target Branch', choices:branches),
                         booleanParam(defaultValue: false, name: 'Delviery to Azure')
                     ]
@@ -64,8 +65,8 @@ pipeline
             {
                 script
                 {
-                    def csSrc = "${env.SOLUTION_FOLDER}\\${params.PREFIX}\\${BASE_BRANCH}"
-                    def csTarget = "${env.SOLUTION_FOLDER}\\${params.PREFIX}\\${BRANCH_NAME}"
+                    def csSrc = "${env.SOLUTION_FOLDER}\\${SETTINGS['prefix']}\\${BASE_BRANCH}"
+                    def csTarget = "${env.SOLUTION_FOLDER}\\${SETTINGS['ptrfix']}\\${BRANCH_NAME}"
                     def modulesRoot = "${env.WORKSPACE}\\CS\\module"
                     powershell "Remove-Item -Path ${env.WORKSPACE}\\CS\\* -Recurse -Force -ErrorAction Continue"
                     powershell "Copy-Item -Path ${csSrc}\\module -Destination ${env.WORKSPACE}\\CS -Recurse -Force"
@@ -174,7 +175,7 @@ pipeline
                     }
                     
                     stage('Awaiting Proceed'){
-                        def message = "Platform url: ${params.PLATFORM_CONTAINER_URL}:${DOCKER_PLATFORM_PORT}\nStorefront: ${params.STOREFRONT_CONTAINER_URL}:${DOCKER_STOREFRONT_PORT}"
+                        def message = "Platform url: ${SETTINGS["platformContainerUrl"]}:${DOCKER_PLATFORM_PORT}\nStorefront: ${SETTINGS["storefrontContainerUrl"]}:${DOCKER_STOREFRONT_PORT}"
                         input(message)
                     }
                 }
@@ -203,7 +204,7 @@ pipeline
         {
             script
             {
-                def composeFolder = "${env.WORKSPACE}@libs\\${params.ComposeDir}"
+                def composeFolder = "${env.WORKSPACE}@libs\\${SETTINGS["composeDir"]}"
                 dir(composeFolder)
                 {
                     withEnv(["DOCKER_TAG=${DOCKER_TAG}", "DOCKER_PREFIX=${DOCKER_PREFIX}", "DOCKER_PLATFORM_PORT=${DOCKER_PLATFORM_PORT}", "DOCKER_STOREFRONT_PORT=${DOCKER_STOREFRONT_PORT}", "DOCKER_SQL_PORT=${DOCKER_SQL_PORT}", "COMPOSE_PROJECT_NAME=${env.BUILD_TAG}"]){
