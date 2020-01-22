@@ -535,6 +535,9 @@ class Utilities {
                 case 'QA-demoVC':
                     Utilities.runSharedPS(context, "vc-CreateInfrastructureQA-demoVC.ps1")
                     break
+                case 'PROD-demoVC':
+                    Utilities.runSharedPS(context, "vc-CreateInfrastructurePROD-demoVC.ps1")
+                    break
             }
         }
     }
