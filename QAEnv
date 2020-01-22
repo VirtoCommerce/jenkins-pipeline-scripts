@@ -1,5 +1,7 @@
-def Utilities = library('virto-shared-library').jobs.scripts.Utilities
-def Packaging = library('virto-shared-library').jobs.scripts.Packaging
+def globalLib = library('virto-shared-library').jobs.scripts
+def Utilities = globalLib.Utilities
+def Packaging = globalLib.Packaging
+def SETTINGS
 import groovy.json.JsonSlurperClassic
 
 def BRANCH_NAME
@@ -40,6 +42,9 @@ pipeline
                 script
                 {
                     checkout scm
+                    configFileProvider([configFile(fileId: 'shared_lib_settings', variable: 'SETTINGS_FILE')]) {
+                        SETTINGS = globalLib.Settings.new(readFile(SETTINGS_FILE))
+                    }
                     def branches = Utilities.getSubfolders("${env.SOLUTION_FOLDER}\\${params.PREFIX}").join("\n")
                     def userInput = input message: "Select Branch", parameters: 
                     [
