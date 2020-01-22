@@ -196,9 +196,14 @@ pipeline {
         //     }
         // }
 
-        stage('ARM Deploy'){
-            timestamps{
-                Utilities.createInfrastructure(this, "QA-demoVC")
+        stage('ARM Deploy')
+        {
+            steps
+            {
+                script
+                {
+                    Utilities.createInfrastructure(this, "QA-demoVC")
+                }
             }
         }
 
