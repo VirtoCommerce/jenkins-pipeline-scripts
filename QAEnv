@@ -1,4 +1,4 @@
-def globalLib = library('global-shared-library').jobs.scripts
+def globalLib = library('global-shared-lib').jobs.scripts
 def Utilities = globalLib.Utilities
 def Packaging = globalLib.Packaging
 def SETTINGS
