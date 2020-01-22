@@ -1,6 +1,6 @@
-def globalLib = library('global-shared-lib').jobs.scripts
-def Utils = globalLib.Utilities
-def Packaging = globalLib.Packaging
+def globalLib = library('global-shared-lib')
+def Utils = globalLib.jobs.scripts.Utilities
+def Packaging = globalLib.jobs.scripts.Packaging
 def SETTINGS
 import groovy.json.JsonSlurperClassic
 
@@ -43,7 +43,7 @@ pipeline
                 {
                     checkout scm
                     configFileProvider([configFile(fileId: 'qaenv', variable: 'SETTINGS_FILE')]) {
-                        SETTINGS = globalLib.Settings.new(readFile(SETTINGS_FILE))
+                        SETTINGS = globalLib.jobs.scripts.Settings.new(readFile(SETTINGS_FILE))
                     }
                     SETTINGS.setBranch("master")
                     def branches = Utils.getSubfolders("${env.SOLUTION_FOLDER}\\${SETTINGS['prefix']}").join("\n")
