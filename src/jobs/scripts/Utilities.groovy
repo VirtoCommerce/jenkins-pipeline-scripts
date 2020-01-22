@@ -2,7 +2,8 @@ package jobs.scripts;
 
 import groovy.io.FileType
 
-class Utilities {
+class Utilities
+{
 
     private static String DefaultSharedLibName = 'virto-shared-library'
     private static String DefaultAdminDockerPrefix = 'http://localhost'
@@ -475,7 +476,8 @@ class Utilities {
         context.git credentialsId: 'github', url: 'https://github.com/VirtoCommerce/vc-com-qg.git', branch: 'dev'
     }
 
-    def static runE2E(context){
+    def static runE2E(context)
+    {
         def e2eDir = Utilities.getE2EDir(context)
         context.dir(e2eDir){
             context.deleteDir()
@@ -490,30 +492,37 @@ class Utilities {
             }
             def allureResultsEsc = allureResultsPath.replace("\\", "\\\\")
             def jsonConf = "{\\\"output\\\":\\\"${allureResultsEsc}\\\",\\\"helpers\\\":{\\\"REST\\\":{\\\"endpoint\\\":\\\"${autoPilot}\\\"},\\\"WebDriver\\\":{\\\"url\\\":\\\"${DefaultAdminDockerPrefix}\\\"}}}"
-            context.withEnv(["vcapikey=${context.env.vcapikey_e2e}"]){
+            context.withEnv(["vcapikey=${context.env.vcapikey_e2e}"])
+            {
                 context.bat "${context.env.NODE_MODULES}\\.bin\\codeceptjs.cmd run -o \"${jsonConf}\""
             }
         }
     }
-    def static generateAllureReport(context){
+    def static generateAllureReport(context)
+    {
         context.allure includeProperties: false, jdk: '', results: [[path: "./../workspace@tmp/output"]]
     }
 
-    def static getAzureTemplateDir(context) {
+    def static getAzureTemplateDir(context)
+    {
         def tmp = Utilities.getTempFolder(context)
 		return "${tmp}\\azure_template"
     }
 
-    def static getAzureTemplate(context) {
+    def static getAzureTemplate(context)
+    {
         def prefix = getRepoNamePrefix(context)
         context.git credentialsId: context.env.GITHUB_CREDENTIALS_ID, url: "https://github.com/VirtoCommerce/${prefix}-arm-templates.git"
     }
 
-    def static createInfrastructure(context, project = 'blank'){
+    def static createInfrastructure(context, project = 'blank')
+    {
         //def AzureTempDir = Utilities.getAzureTemplateDir(context)
         def AzureTempDir = "..\\workspace@libs\\virto-shared-library\\resources\\azure"
-        context.dir(AzureTempDir){
-            switch(project){
+        context.dir(AzureTempDir)
+        {
+            switch(project)
+            {
                 case 'bulk-update/dev':
                     Utilities.runSharedPS(context, "vc-CreateInfrastructureBulkUpdateDev.ps1")
                     break
