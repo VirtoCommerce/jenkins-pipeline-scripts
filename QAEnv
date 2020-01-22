@@ -1,8 +1,7 @@
-def globalLib = library('global-shared-lib')
-def Utils = globalLib.jobs.scripts.Utilities
-def Packaging = globalLib.jobs.scripts.Packaging
-def SETTINGS
+import jobs.scripts.*
 import groovy.json.JsonSlurperClassic
+
+def SETTINGS
 
 def BRANCH_NAME
 def BASE_BRANCH
@@ -43,10 +42,10 @@ pipeline
                 {
                     checkout scm
                     configFileProvider([configFile(fileId: 'qaenv', variable: 'SETTINGS_FILE')]) {
-                        SETTINGS = globalLib.jobs.scripts.Settings.new(readFile(SETTINGS_FILE))
+                        SETTINGS = new Settings(readFile(SETTINGS_FILE))
                     }
                     SETTINGS.setBranch("master")
-                    def branches = Utils.getSubfolders("${env.SOLUTION_FOLDER}\\${SETTINGS['prefix']}").join("\n")
+                    def branches = Utilities.getSubfolders("${env.SOLUTION_FOLDER}\\${SETTINGS['prefix']}").join("\n")
                     def userInput = input message: "Select Branch", parameters: 
                     [
                         choice(name:'Source Branch', choices:SETTINGS['sourceBranches']),
@@ -100,9 +99,9 @@ pipeline
 		                    def composeFolder = "${env.WORKSPACE}@libs\\virto-shared-library\\resources\\docker.core\\windowsnano"
                             dir(composeFolder)
                             {
-                                DOCKER_SQL_PORT = Utils.getSqlPort(this)
-                                DOCKER_PLATFORM_PORT = Utils.getPlatformPort(this)
-                                DOCKER_STOREFRONT_PORT = Utils.getStorefrontPort(this)
+                                DOCKER_SQL_PORT = Utilities.getSqlPort(this)
+                                DOCKER_PLATFORM_PORT = Utilities.getPlatformPort(this)
+                                DOCKER_STOREFRONT_PORT = Utilities.getStorefrontPort(this)
                                 DOCKER_PREFIX = 'qaenv'
                                 switch(BASE_BRANCH)
                                 {
@@ -131,17 +130,17 @@ pipeline
                     {
                         timestamps
                         {
-                            def platformContainer = Utils.getPlatformContainer(this)
+                            def platformContainer = Utilities.getPlatformContainer(this)
 
                             // install modules
-                            Utils.runSharedPS(this, 'qaenv/install-modules.ps1', "-ApiUrl \"${Utils.getPlatformHost(this)}\" -PlatformContainer ${platformContainer} -ModulesDir ${env.WORKSPACE}\\CS\\modules")
+                            Utilities.runSharedPS(this, 'qaenv/install-modules.ps1', "-ApiUrl \"${Utilities.getPlatformHost(this)}\" -PlatformContainer ${platformContainer} -ModulesDir ${env.WORKSPACE}\\CS\\modules")
                         }
                     }
                     stage('Install Sample Data')
                     {
                         timestamps
                         {
-                            Utils.runSharedPS(this, "vc-setup-sampledata.ps1", "-apiurl \"http://localhost:${DOCKER_PLATFORM_PORT}\"")
+                            Utilities.runSharedPS(this, "vc-setup-sampledata.ps1", "-apiurl \"http://localhost:${DOCKER_PLATFORM_PORT}\"")
                         }
                     }
                     stage('Storefront Install')
@@ -150,7 +149,7 @@ pipeline
                         {
                             if(STOREFRONT_INSTALL)
                             {
-                                def storefrontContainer = Utils.getStorefrontContainer(this)
+                                def storefrontContainer = Utilities.getStorefrontContainer(this)
                                 def storefrontDir = "${env.WORKSPACE}\\CS\\storefront"
                                 //bat "docker exec ${storefrontContainer} cmd /c \"rmdir /S /Q C:\\vc-storefront\""
                                 bat "docker stop ${storefrontContainer}"
@@ -163,10 +162,10 @@ pipeline
                     {
                         timestamps 
                         {
-                            //def storefrontContainer = Utils.getStorefrontContainer(this)
-                            def platformContainer = Utils.getPlatformContainer(this)
+                            //def storefrontContainer = Utilities.getStorefrontContainer(this)
+                            def platformContainer = Utilities.getPlatformContainer(this)
                             def themeFolder = "${env.WORKSPACE}\\CS\\theme"
-                            //Utils.runSharedPS(this, "vc-install-theme.ps1", "-themeZip \"${themeFolder}\" -platformContainer ${platformContainer}")
+                            //Utilities.runSharedPS(this, "vc-install-theme.ps1", "-themeZip \"${themeFolder}\" -platformContainer ${platformContainer}")
                             bat "docker exec ${platformContainer} powershell -Command \"Remove-Item C:\\vc-platform\\App_Data\\cms-content\\Themes -Recurse -Force\""
                             bat "docker exec ${platformContainer} powershell -Command \"mkdir tmp\""
                             bat "docker cp ${themeFolder} ${platformContainer}:/tmp/Themes"
