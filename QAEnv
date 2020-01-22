@@ -44,8 +44,8 @@ pipeline
                     configFileProvider([configFile(fileId: 'qaenv', variable: 'SETTINGS_FILE')]) {
                         SETTINGS = new Settings(readFile(SETTINGS_FILE))
                     }
-                    SETTINGS.setEnvironment("qaenv")
-                    SETTINGS.setRegion("master")
+                    SETTINGS.setRegion("qaenv")
+                    SETTINGS.setEnvironment("master")
                     def branches = Utilities.getSubfolders("${env.SOLUTION_FOLDER}\\${SETTINGS['prefix']}").join("\n")
                     def userInput = input message: "Select Branch", parameters: 
                     [
