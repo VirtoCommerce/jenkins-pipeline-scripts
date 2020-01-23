@@ -23,10 +23,8 @@ node
         {
             timestamps
             {
-                SETTINGS.setEnvironment('platform')
-                //withEnv(["AzureSubscriptionIDProd=${SETTINGS['subscriptionID']}", "AzureResourceGroupNameProd=${SETTINGS['resourceGroupName']}", "AzureWebAppAdminNameProd=${SETTINGS['appName']}"])
                 {
-                    //powershell "${psfolder}\\vc-CreateInfrastructurePROD-demoVC.ps1"
+                    // powershell "${psfolder}\\vc-CreateInfrastructurePROD-demoVC.ps1"
                 }
             }
         }
