@@ -1,62 +1,46 @@
 import jobs.scripts.*
 
-node
-{
+node {
     def SETTINGS
-
-    stage('Init')
-    {
+    
+    stage('Init'){
         deleteDir()
         checkout scm
         def settingsFileContent
-		configFileProvider([configFile(fileId: 'shared_lib_settings', variable: 'SETTINGS_FILE')])
-        {
+		configFileProvider([configFile(fileId: 'shared_lib_settings', variable: 'SETTINGS_FILE')]) {
 			settingsFileContent = readFile(SETTINGS_FILE)
 		}
 		SETTINGS = new Settings(settingsFileContent)
 		SETTINGS.setRegion('demo')
     }
     psfolder = "${env.WORKSPACE}\\resources\\demoVC"
-    dir(psfolder)
-    {
-        stage('ARM Deploy')
-        {
-            timestamps
-            {
-                {
-                    powershell "echo test"
-                }
-            }
-        }
+    dir(psfolder){
+		stage('ARM deploy'){
+			timestamps {
+			SETTINGS.setEnvironment('platform')
+			}
+		}
 
-        stage('Platform Update')
-        {
-            timestamps
-            {
+        stage('Platform Update'){
+            timestamps {
                 SETTINGS.setEnvironment('platform')
-                withEnv(["AzureSubscriptionIDProd=${SETTINGS['subscriptionID']}", "AzureResourceGroupNameProd=${SETTINGS['resourceGroupName']}", "AzureWebAppAdminNameProd=${SETTINGS['appName']}"])
-                {
+                withEnv(["AzureSubscriptionIDProd=${SETTINGS['subscriptionID']}", "AzureResourceGroupNameProd=${SETTINGS['resourceGroupName']}", "AzureWebAppAdminNameProd=${SETTINGS['appName']}"]){
                     powershell "${psfolder}\\PlatformUpdate.ps1"
                 }
             }
         }
 
-        stage('Storefront Update')
-        {
-            timestamps
-            {
+        stage('Storefront Update'){
+            timestamps {
                 SETTINGS.setEnvironment('storefront')
-                withEnv(["AzureSubscriptionIDProd=${SETTINGS['subscriptionID']}", "AzureResourceGroupNameProd=${SETTINGS['resourceGroupName']}", "AzureWebAppNameProd=${SETTINGS['appName']}"])
-                {
+                withEnv(["AzureSubscriptionIDProd=${SETTINGS['subscriptionID']}", "AzureResourceGroupNameProd=${SETTINGS['resourceGroupName']}", "AzureWebAppNameProd=${SETTINGS['appName']}"]){
                     powershell "${psfolder}\\StorefrontUpdate.ps1"
                 }
             }
         }
 
-        stage('Recreate DB')
-        {
-            timestamps
-            {
+        stage('Recreate DB'){
+            timestamps{
                 powershell "${psfolder}\\RecreateDB.ps1"
             }
         }
