@@ -3,7 +3,7 @@ import jobs.scripts.*
 node
 {
     def SETTINGS
-    
+
     stage('Init')
     {
         deleteDir()
@@ -24,7 +24,7 @@ node
             timestamps
             {
                 {
-                    // powershell "${psfolder}\\vc-CreateInfrastructurePROD-demoVC.ps1"
+                    powershell "echo test"
                 }
             }
         }
