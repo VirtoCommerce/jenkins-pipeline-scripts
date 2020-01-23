@@ -90,6 +90,7 @@ def call(body) {
                                 UNSTABLE_CAUSES.add("Nuget package already exists.")
                             }
                             else{
+                                echo "${ghReleaseResult['stdout']}"
                                 throw new Exception("ERROR: script returned exit code -1")
                             }
                         }
