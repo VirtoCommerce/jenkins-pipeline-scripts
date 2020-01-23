@@ -15,6 +15,12 @@ node {
     }
     psfolder = "${env.WORKSPACE}\\resources\\demoVC"
     dir(psfolder){
+		stage('ARM deploy'){
+			timestamps {
+			SETTINGS.setEnvironment('platform')
+			}
+		}
+
         stage('Platform Update'){
             timestamps {
                 SETTINGS.setEnvironment('platform')
