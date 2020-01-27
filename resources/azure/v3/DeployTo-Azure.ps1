@@ -26,7 +26,7 @@ Write-Host "Stop WebApp $DestWebAppName"
 
 Stop-AzureRmWebApp -ResourceGroupName $DestResourceGroupName -Name $DestWebAppName
 
-Start-Sleep -s 15
+Start-Sleep -s 35
 
 # Getting Publish Profile
 Write-Output "Getting publishing profile for $DestWebAppName app"
