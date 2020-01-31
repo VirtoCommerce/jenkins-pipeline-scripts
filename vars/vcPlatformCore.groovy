@@ -43,6 +43,7 @@ def call(body) {
                 }
                 
                 stage('Unit Tests'){
+                    dir("${workspace}\\artifacts"){}
                     bat "vc-build Test -skip Restore+Compile"
                 } 
 
