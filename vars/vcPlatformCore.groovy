@@ -43,7 +43,7 @@ def call(body) {
                 }
                 
                 stage('Unit Tests'){
-                    dif artifactsDir = "${workspace}\\artifacts"
+                    def artifactsDir = "${workspace}\\artifacts"
                     bat "if not exist ${artifactsDir} mkdir ${artifactsDir}"
                     bat "vc-build Test -skip Restore+Compile"
                 } 
