@@ -227,15 +227,15 @@ class Packaging {
         def sqScannerMsBuildHome = context.tool 'Scanner for MSBuild'
         def fullJobName = Utilities.getRepoName(context)
         def coverageFolder = Utilities.getCoverageFolder(context)
-        def coverageReportType = 'vscoveragexml'
+        def coverageReportType = 'opencover'
         def scannerPath = "\"${sqScannerMsBuildHome}\\SonarScanner.MSBuild.exe\""
         if(dotnet)
         {
             scannerPath = "dotnet sonarscanner"
         }
-        if(Utilities.isNetCore(context.projectType)){
-            coverageReportType = 'opencover'
-        }
+        // if(Utilities.isNetCore(context.projectType)){
+        //     coverageReportType = 'opencover'
+        // }
         context.withSonarQubeEnv('VC Sonar Server') {
             def repoName = Utilities.getRepoName(context)
             def prNumber = Utilities.getPullRequestNumber(context)

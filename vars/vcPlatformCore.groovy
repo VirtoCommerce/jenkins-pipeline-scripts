@@ -26,6 +26,7 @@ def call(body) {
             SETTINGS.setRegion('platform-core')
             SETTINGS.setEnvironment(env.BRANCH_NAME)
             Utilities.notifyBuildStatus(this, SETTINGS['of365hook'], '', 'STARTED')
+            def coverageFolder = Utilities.getCoverageFolder(this)
 
             try {
                 stage('Checkout'){
@@ -34,22 +35,24 @@ def call(body) {
                 }
 
                 stage('Build'){
-                    // withSonarQubeEnv('VC Sonar Server'){
-                    //     bat "vc-build SonarQubeStart -SonarUrl ${env.SONAR_HOST_URL} -SonarAuthToken \"${env.SONAR_AUTH_TOKEN}\" "// %SONAR_HOST_URL% %SONAR_AUTH_TOKEN%
-                    //     bat "vc-build SonarQubeEnd -SonarUrl ${env.SONAR_HOST_URL} -SonarAuthToken ${env.SONAR_AUTH_TOKEN}"
-                    // }
-                    Packaging.startAnalyzer(this, true)
+                    withSonarQubeEnv('VC Sonar Server'){
+                        bat "vc-build SonarQubeStart -SonarUrl ${env.SONAR_HOST_URL} -SonarAuthToken \"${env.SONAR_AUTH_TOKEN}\" -skip Restore+Compile"// %SONAR_HOST_URL% %SONAR_AUTH_TOKEN%
+                    }
+                    //Packaging.startAnalyzer(this, true)
                     bat "vc-build Compile"
                 }
-
-                stage('Quality Gate'){
-                    Packaging.endAnalyzer(this)
-                    Packaging.checkAnalyzerGate(this)
-                }
-
+                
                 stage('Unit Tests'){
                     bat "vc-build Test -skip Restore+Compile"
-                }   
+                } 
+
+                stage('Quality Gate'){
+                    //Packaging.endAnalyzer(this)
+                    withSonarQubeEnv('VC Sonar Server'){
+                        bat "vc-build SonarQubeEnd -SonarUrl ${env.SONAR_HOST_URL} -SonarAuthToken ${env.SONAR_AUTH_TOKEN} -skip Restore+Compile+SonarQubeStart"
+                    }
+                    Packaging.checkAnalyzerGate(this)
+                }  
 
                 // stage('Swagger')
                 // {
