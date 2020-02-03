@@ -1,3 +1,5 @@
+import jobs.scripts.Settings
+
 def TMP_DIR
 def ZIP_NAME
 def SETTINGS
