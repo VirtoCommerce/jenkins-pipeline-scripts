@@ -25,7 +25,7 @@ pipeline {
                     configFileProvider([configFile(fileId: 'shared_lib_settings', variable: 'SETTINGS_FILE')]) {
                         SETTINGS = new Settings(readFile(SETTINGS_FILE))
                     }
-                    SETTINGS.setRegion("qaenv")
+                    SETTINGS.setRegion("backup")
                     SETTINGS.setEnvironment("master")
                 }
             }
