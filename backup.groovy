@@ -57,7 +57,7 @@ pipeline {
             {
                 script
                 {
-                    powershell script: "${env.Utils}\\AzCopy10\\AzCopy copy ${ZIP_PATH} ${SETTINGS['blobUrl']}", label: "AzCopy"
+                    powershell script: "${env.Utils}\\AzCopy10\\AzCopy copy ${ZIP_PATH} \"${SETTINGS['blobUrl']}\"", label: "AzCopy"
                 }
             }
         }
