@@ -38,7 +38,7 @@ pipeline {
             {
                 script
                 {
-                    
+                    echo "stub"
                 }
             }
         }
