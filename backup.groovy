@@ -1,5 +1,6 @@
 def TMP_DIR
 def ZIP_NAME
+def SETTINGS
 
 pipeline {
     agent any
@@ -11,6 +12,23 @@ pipeline {
 
     stages
     {
+        stage('Init')
+        {
+            steps
+            {
+                script
+                {
+                    ZIP_NAME = "${currentBuild.startTimeInMillis}_${env.BUILD_ID}.zip"
+                    ZIP_PATH = "${env.WORKSPACE}@tmp\\${ZIP_NAME}"
+                    configFileProvider([configFile(fileId: 'shared_lib_settings', variable: 'SETTINGS_FILE')]) {
+                        SETTINGS = new Settings(readFile(SETTINGS_FILE))
+                    }
+                    SETTINGS.setRegion("qaenv")
+                    SETTINGS.setEnvironment("master")
+                }
+            }
+        }
+
         stage("Collecting Data")
         {
             steps
@@ -24,10 +42,9 @@ pipeline {
                     dir(tmpDir)
                     {
                         deleteDir()
-                        powershell "Copy-Item -Path \"${targetFiles.join(',')}\" -Destination ${tmpDir} -Recurse -Force"
+                        powershell script: "Copy-Item -Path \"${targetFiles.join(',')}\" -Destination ${tmpDir} -Recurse -Force", label: "Copy"
                     }
-                    ZIP_NAME = "${env.BUILD_ID}.zip"
-                    zip zipFile: ZIP_NAME, dir: tmpDir
+                    zip zipFile: ZIP_PATH, dir: tmpDir
                 }
             }
         }
@@ -38,7 +55,7 @@ pipeline {
             {
                 script
                 {
-                    echo "stub"
+                    powershell script: "${env.Utils}\\AzCopy10\\AzCopy copy ${ZIP_PATH} ${SETTINGS['blobUrl']}", label: "AzCopy"
                 }
             }
         }
