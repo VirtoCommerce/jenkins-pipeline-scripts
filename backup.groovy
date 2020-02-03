@@ -24,7 +24,7 @@ pipeline {
                     dir(tmpDir)
                     {
                         deleteDir()
-                        powershell "Copy-Item -Path ${targetFiles.join(',')} -Destination ${tmpDir} -Recurse -Force"
+                        powershell "Copy-Item -Path \"${targetFiles.join(',')}\" -Destination ${tmpDir} -Recurse -Force"
                     }
                     ZIP_NAME = "${env.BUILD_ID}.zip"
                     zip zipFile: ZIP_NAME, dir: tmpDir
