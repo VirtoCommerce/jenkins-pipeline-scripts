@@ -1,0 +1,111 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "sqlServerName": {
+      "value": "qa-vc"
+    },
+    "sqlAdministratorLogin": {
+      "value": "vc-admin"
+    },
+    "sqlAdministratorLoginPassword": {
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/b642c224-6757-4aac-ba9a-f6b267286970/resourceGroups/QA-VC/providers/Microsoft.KeyVault/vaults/qa-vc"
+        },
+        "secretName": "sqlAdministratorLoginPassword-qa"
+      }
+    },
+    "sqlDatabaseName": {
+      "value": "qa-vc"
+    },
+    "redisCacheName": {
+      "value": "qa-vc"
+    },
+    "storageAccountName": {
+      "value": "qa4vc"
+    },
+    "platformAppServicePlanName": {
+      "value": "qa-vc-admin"
+    },
+    "frontAppServicePlanName": {
+      "value": "qa-vc-public"
+    },
+    "platformAppInsights": {
+      "value": "qa-vc-admin"
+    },
+    "frontAppInsights": {
+      "value": "qa-vc-public"
+    },
+    "platformWebAppName": {
+      "value": "qa-vc-admin"
+    },
+    "frontWebAppName": {
+      "value": "qa-vc-public"
+    },
+    "platformAssetsConnectionString": {
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/b642c224-6757-4aac-ba9a-f6b267286970/resourceGroups/QA-VC/providers/Microsoft.KeyVault/vaults/qa-vc"
+        },
+        "secretName": "platformAssetsConnectionString-qa"
+      }
+    },
+    "platformCmsContentConnectionString": {
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/b642c224-6757-4aac-ba9a-f6b267286970/resourceGroups/QA-VC/providers/Microsoft.KeyVault/vaults/qa-vc"
+        },
+        "secretName": "platformCmsContentConnectionString-qa"
+      }
+    },
+    "platformVirtoCommerce": {
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/b642c224-6757-4aac-ba9a-f6b267286970/resourceGroups/QA-VC/providers/Microsoft.KeyVault/vaults/qa-vc"
+        },
+        "secretName": "platformVirtoCommerce-qa"
+      }
+    },
+    "frontContentConnectionString": {
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/b642c224-6757-4aac-ba9a-f6b267286970/resourceGroups/QA-VC/providers/Microsoft.KeyVault/vaults/qa-vc"
+        },
+        "secretName": "frontContentConnectionString-qa"
+      }
+    },
+    "frontVirtoCommerceAppSettingsPlatformUrlHost": {
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/b642c224-6757-4aac-ba9a-f6b267286970/resourceGroups/QA-VC/providers/Microsoft.KeyVault/vaults/qa-vc"
+        },
+        "secretName": "frontVirtoCommerceAppSettingsPlatformUrlHost-qa"
+      }
+    },
+    "frontVirtoCommerceEndpointAppId": {
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/b642c224-6757-4aac-ba9a-f6b267286970/resourceGroups/QA-VC/providers/Microsoft.KeyVault/vaults/qa-vc"
+        },
+        "secretName": "frontVirtoCommerceEndpointAppId-qa"
+      }
+    },
+    "frontVirtoCommerceEndpointSecretKey": {
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/b642c224-6757-4aac-ba9a-f6b267286970/resourceGroups/QA-VC/providers/Microsoft.KeyVault/vaults/qa-vc"
+        },
+        "secretName": "frontVirtoCommerceEndpointSecretKey-qa"
+      }
+    },
+    "frontVirtoCommerceEndpointUrl": {
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/b642c224-6757-4aac-ba9a-f6b267286970/resourceGroups/QA-VC/providers/Microsoft.KeyVault/vaults/qa-vc"
+        },
+        "secretName": "frontVirtoCommerceEndpointUrl-qa"
+      }
+    }
+  }
+}

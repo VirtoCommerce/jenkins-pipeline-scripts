@@ -141,7 +141,7 @@ def call(body)
 						Packaging.saveArtifact(this, 'vc', 'theme', "${config.sampleStore}\\default", zipFile)
 						if (Packaging.getShouldPublish(this))
 						{
-							//Packaging.publishRelease(this, version, "")
+							Packaging.publishRelease(this, version, "")
 						}
 						if (env.BRANCH_NAME == 'dev' || 'master')
 						{

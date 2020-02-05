@@ -11,7 +11,7 @@
     "sqlAdministratorLoginPassword": {
       "reference": {
         "keyVault": {
-          "id": "/subscriptions/973d0b8c-44bf-438d-a4b7-1c4162d3ccba/resourceGroups/PROD-VC/providers/Microsoft.KeyVault/vaults/prod-vc"
+          "id": "/subscriptions/b642c224-6757-4aac-ba9a-f6b267286970/resourceGroups/PROD-VC/providers/Microsoft.KeyVault/vaults/prod-vc"
         },
         "secretName": "sqlAdministratorLoginPassword-prod"
       }
@@ -46,7 +46,7 @@
     "platformAssetsConnectionString": {
       "reference": {
         "keyVault": {
-          "id": "/subscriptions/973d0b8c-44bf-438d-a4b7-1c4162d3ccba/resourceGroups/PROD-VC/providers/Microsoft.KeyVault/vaults/prod-vc"
+          "id": "/subscriptions/b642c224-6757-4aac-ba9a-f6b267286970/resourceGroups/PROD-VC/providers/Microsoft.KeyVault/vaults/prod-vc"
         },
         "secretName": "platformAssetsConnectionString-prod"
       }
@@ -54,7 +54,7 @@
     "platformCmsContentConnectionString": {
       "reference": {
         "keyVault": {
-          "id": "/subscriptions/973d0b8c-44bf-438d-a4b7-1c4162d3ccba/resourceGroups/PROD-VC/providers/Microsoft.KeyVault/vaults/prod-vc"
+          "id": "/subscriptions/b642c224-6757-4aac-ba9a-f6b267286970/resourceGroups/PROD-VC/providers/Microsoft.KeyVault/vaults/prod-vc"
         },
         "secretName": "platformCmsContentConnectionString-prod"
       }
@@ -62,7 +62,7 @@
     "platformVirtoCommerce": {
       "reference": {
         "keyVault": {
-          "id": "/subscriptions/973d0b8c-44bf-438d-a4b7-1c4162d3ccba/resourceGroups/PROD-VC/providers/Microsoft.KeyVault/vaults/prod-vc"
+          "id": "/subscriptions/b642c224-6757-4aac-ba9a-f6b267286970/resourceGroups/PROD-VC/providers/Microsoft.KeyVault/vaults/prod-vc"
         },
         "secretName": "platformVirtoCommerce-prod"
       }
@@ -70,7 +70,7 @@
     "platformAppinsightsInstrumentationKey": {
       "reference": {
         "keyVault": {
-          "id": "/subscriptions/973d0b8c-44bf-438d-a4b7-1c4162d3ccba/resourceGroups/PROD-VC/providers/Microsoft.KeyVault/vaults/prod-vc"
+          "id": "/subscriptions/b642c224-6757-4aac-ba9a-f6b267286970/resourceGroups/PROD-VC/providers/Microsoft.KeyVault/vaults/prod-vc"
         },
         "secretName": "platformAppinsightsInstrumentationKey-prod"
       }
@@ -78,7 +78,7 @@
     "frontContentConnectionString": {
       "reference": {
         "keyVault": {
-          "id": "/subscriptions/973d0b8c-44bf-438d-a4b7-1c4162d3ccba/resourceGroups/PROD-VC/providers/Microsoft.KeyVault/vaults/prod-vc"
+          "id": "/subscriptions/b642c224-6757-4aac-ba9a-f6b267286970/resourceGroups/PROD-VC/providers/Microsoft.KeyVault/vaults/prod-vc"
         },
         "secretName": "frontContentConnectionString-prod"
       }
@@ -86,7 +86,7 @@
     "frontVirtoCommerceDefaultStore": {
       "reference": {
         "keyVault": {
-          "id": "/subscriptions/973d0b8c-44bf-438d-a4b7-1c4162d3ccba/resourceGroups/PROD-VC/providers/Microsoft.KeyVault/vaults/prod-vc"
+          "id": "/subscriptions/b642c224-6757-4aac-ba9a-f6b267286970/resourceGroups/PROD-VC/providers/Microsoft.KeyVault/vaults/prod-vc"
         },
         "secretName": "frontVirtoCommerceDefaultStore-prod"
       }
@@ -94,7 +94,7 @@
     "frontVirtoCommerceEndpointAppId": {
       "reference": {
         "keyVault": {
-          "id": "/subscriptions/973d0b8c-44bf-438d-a4b7-1c4162d3ccba/resourceGroups/PROD-VC/providers/Microsoft.KeyVault/vaults/prod-vc"
+          "id": "/subscriptions/b642c224-6757-4aac-ba9a-f6b267286970/resourceGroups/PROD-VC/providers/Microsoft.KeyVault/vaults/prod-vc"
         },
         "secretName": "frontVirtoCommerceEndpointAppId-prod"
       }
@@ -102,7 +102,7 @@
     "frontVirtoCommerceEndpointSecretKey": {
       "reference": {
         "keyVault": {
-          "id": "/subscriptions/973d0b8c-44bf-438d-a4b7-1c4162d3ccba/resourceGroups/PROD-VC/providers/Microsoft.KeyVault/vaults/prod-vc"
+          "id": "/subscriptions/b642c224-6757-4aac-ba9a-f6b267286970/resourceGroups/PROD-VC/providers/Microsoft.KeyVault/vaults/prod-vc"
         },
         "secretName": "frontVirtoCommerceEndpointSecretKey-prod"
       }
@@ -110,7 +110,7 @@
     "frontVirtoCommerceEndpointUrl": {
       "reference": {
         "keyVault": {
-          "id": "/subscriptions/973d0b8c-44bf-438d-a4b7-1c4162d3ccba/resourceGroups/PROD-VC/providers/Microsoft.KeyVault/vaults/prod-vc"
+          "id": "/subscriptions/b642c224-6757-4aac-ba9a-f6b267286970/resourceGroups/PROD-VC/providers/Microsoft.KeyVault/vaults/prod-vc"
         },
         "secretName": "frontVirtoCommerceEndpointUrl-prod"
       }
@@ -118,7 +118,7 @@
     "frontAppinsightsInstrumentationKey": {
       "reference": {
         "keyVault": {
-          "id": "/subscriptions/973d0b8c-44bf-438d-a4b7-1c4162d3ccba/resourceGroups/PROD-VC/providers/Microsoft.KeyVault/vaults/prod-vc"
+          "id": "/subscriptions/b642c224-6757-4aac-ba9a-f6b267286970/resourceGroups/PROD-VC/providers/Microsoft.KeyVault/vaults/prod-vc"
         },
         "secretName": "frontAppinsightsInstrumentationKey-prod"
       }
@@ -126,7 +126,7 @@
     "thumbprintHostNameSsl": {
       "reference": {
         "keyVault": {
-          "id": "/subscriptions/973d0b8c-44bf-438d-a4b7-1c4162d3ccba/resourceGroups/PROD-VC/providers/Microsoft.KeyVault/vaults/prod-vc"
+          "id": "/subscriptions/b642c224-6757-4aac-ba9a-f6b267286970/resourceGroups/PROD-VC/providers/Microsoft.KeyVault/vaults/prod-vc"
         },
         "secretName": "thumbprintHostNameSsl-prod"
       }
