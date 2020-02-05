@@ -30,6 +30,16 @@ def call(body)
 		SETTINGS.setEnvironment(env.BRANCH_NAME)
 		SETTINGS.setRegion('themeMix')
 
+		def themeStyleAndJs
+		if(storeName == 'odt')
+		{
+			themeStyleAndJs = "${env.WORKSPACE}\\client-app"
+		}
+		else
+		{
+			themeStyleAndJs = "${env.WORKSPACE}\\ng-app"
+		}
+
 		try
 		{
 			echo "Building branch ${env.BRANCH_NAME}"
@@ -65,10 +75,22 @@ def call(body)
 			{
 				timestamps
 				{
-					dir("${env.WORKSPACE}\\ng-app")
+					if(storeName == 'odt')
 					{
-						bat "npm install --prefer-offline"
-						bat "npm run build-prod"
+						dir("${themeStyleAndJs}")
+						{
+							bat "npm install --prefer-offline"
+							bat "npm run build"
+							bat "npm run lint"
+						}
+					}
+					else
+					{
+						dir("${themeStyleAndJs}")
+						{
+							bat "npm install --prefer-offline"
+							bat "npm run build-prod"
+						}
 					}
 				}
 			}
@@ -79,7 +101,7 @@ def call(body)
 				{
 					withSonarQubeEnv("VC Sonar Server")
 					{
-						dir("${env.WORKSPACE}\\ng-app")
+						dir("${themeStyleAndJs}")
 						{
 							Packaging.checkAnalyzerGate(this)
 						}
@@ -88,7 +110,7 @@ def call(body)
             }
 
 			def version
-			dir("${env.WORKSPACE}\\ng-app")
+			dir("${themeStyleAndJs}")
 			{
 				version = Utilities.getPackageVersion(this)
 			}
