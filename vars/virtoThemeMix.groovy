@@ -19,7 +19,7 @@ def call(body)
 		{
 			projectType = 'Theme'
 		}
-
+		def themeStyleAndJs
 		def SETTINGS
 		def settingsFileContent
 		configFileProvider([configFile(fileId: 'shared_lib_settings', variable: 'SETTINGS_FILE')])
@@ -28,15 +28,14 @@ def call(body)
 		}
 		SETTINGS = new Settings(settingsFileContent)
 		SETTINGS.setEnvironment(env.BRANCH_NAME)
-		SETTINGS.setRegion('themeMix')
-
-		def themeStyleAndJs
 		if(storeName == 'odt')
 		{
+			SETTINGS.setRegion('themeMixOdt')
 			themeStyleAndJs = "${env.WORKSPACE}\\client-app"
 		}
 		else
 		{
+			SETTINGS.setRegion('themeMix')
 			themeStyleAndJs = "${env.WORKSPACE}\\ng-app"
 		}
 
@@ -80,9 +79,8 @@ def call(body)
 						dir("${themeStyleAndJs}")
 						{
 							bat "npm install"
-							bat "npm run serve"
-							bat "npm run build"
 							bat "npm run lint"
+							bat "npm run build"
 						}
 					}
 					else
