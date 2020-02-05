@@ -113,18 +113,18 @@ def call(body)
 			{
 				version = Utilities.getPackageVersion(this)
 			}
-			def exclude_folder_list = "@(\"artifacts\", \".git\", \".vs\", \".vscode\", \".scannerwork\", \"node_modules\", \"ng-app@tmp\", \"ng-app\\node_modules\")"
-			def exclude_list = "@(\"artifacts\", \".git\", \".vs\", \".vscode\", \".scannerwork\", \"node_modules\", \"ng-app@tmp\", \"ng-app\\node_modules\", \".deployment\", \".gitignore\", \"Jenkinsfile\", \"package-lock.json\", \"deploy.cmd\")"
-			powershell returnStatus: true, script: "foreach(\$path in $exclude_folder_list){ robocopy C:\\tmp\\mir ${env.WORKSPACE}\\\$path /MIR }"
-			powershell "Get-Item ${env.WORKSPACE} -Recurse -Include $exclude_list | Remove-Item -Recurse -Force"
-			def zipFile
+
 			if(storeName == 'odt')
 			{
-				zipFile = "${env.WORKSPACE}\\artifacts\\${storeName}-theme-${version}.zip"
+				echo "${themeStyleAndJs}"
 			}
 			else
 			{
-				zipFile = "${env.WORKSPACE}\\artifacts\\dental-theme-${version}.zip"
+				def exclude_folder_list = "@(\"artifacts\", \".git\", \".vs\", \".vscode\", \".scannerwork\", \"node_modules\", \"ng-app@tmp\", \"ng-app\\node_modules\")"
+				def exclude_list = "@(\"artifacts\", \".git\", \".vs\", \".vscode\", \".scannerwork\", \"node_modules\", \"ng-app@tmp\", \"ng-app\\node_modules\", \".deployment\", \".gitignore\", \"Jenkinsfile\", \"package-lock.json\", \"deploy.cmd\")"
+				powershell returnStatus: true, script: "foreach(\$path in $exclude_folder_list){ robocopy C:\\tmp\\mir ${env.WORKSPACE}\\\$path /MIR }"
+				powershell "Get-Item ${env.WORKSPACE} -Recurse -Include $exclude_list | Remove-Item -Recurse -Force"
+				def zipFile = "${env.WORKSPACE}\\artifacts\\${storeName}-theme-${version}.zip"
 			}
 
 			stage('Packaging')
