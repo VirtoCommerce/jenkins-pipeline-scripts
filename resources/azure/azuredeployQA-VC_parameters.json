@@ -67,6 +67,14 @@
         "secretName": "platformVirtoCommerce-qa"
       }
     },
+    "platformAppinsightsInstrumentationKey": {
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/b642c224-6757-4aac-ba9a-f6b267286970/resourceGroups/QA-VC/providers/Microsoft.KeyVault/vaults/qa-vc"
+        },
+        "secretName": "platformAppinsightsInstrumentationKey-qa"
+      }
+    },	
     "frontContentConnectionString": {
       "reference": {
         "keyVault": {
@@ -105,6 +113,14 @@
           "id": "/subscriptions/b642c224-6757-4aac-ba9a-f6b267286970/resourceGroups/QA-VC/providers/Microsoft.KeyVault/vaults/qa-vc"
         },
         "secretName": "frontVirtoCommerceEndpointUrl-qa"
+      }
+    },
+    "frontAppinsightsInstrumentationKey": {
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/b642c224-6757-4aac-ba9a-f6b267286970/resourceGroups/QA-VC/providers/Microsoft.KeyVault/vaults/qa-vc"
+        },
+        "secretName": "frontAppinsightsInstrumentationKey-qa"
       }
     }
   }

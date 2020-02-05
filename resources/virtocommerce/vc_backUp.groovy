@@ -16,7 +16,7 @@ node {
 
     psfolder = "${env.WORKSPACE}\\resources\\virtocommerce"
     dir(psfolder){
-         stage('Content backup to DEV'){
+         stage('Content backup to staging (QA)'){
             timestamps {
                 SETTINGS.setEnvironment('backUp')
                 withEnv([
