@@ -36,7 +36,7 @@ import jobs.scripts.*
 
 		try
 		{
-			Utilities.notifyBuildStatus(this, "started")
+			//Utilities.notifyBuildStatus(this, "started")
 			stage('Checkout')
 			{
 				timestamps
@@ -55,9 +55,9 @@ import jobs.scripts.*
 			{
 				timestamps
 				{
-					if(env.BRANCH_NAME == 'deploy')
+					if(env.BRANCH_NAME == 'dev')
 					{
-						def stagingName = "deploy"
+						def stagingName = "dev"
 						def storeName = "cms-content"
 						def azureBlobName = SETTINGS['azureBlobName']
 						def azureBlobKey = SETTINGS['azureBlobKey']
@@ -65,57 +65,6 @@ import jobs.scripts.*
 						def resourceGroupName = SETTINGS['resourceGroupName']
 						def subscriptionID = SETTINGS['subscriptionID']
 						def blobToken = SETTINGS['tokenSas']
-						withEnv(["AzureBlobToken=${blobToken}"]){
-							Utilities.runSharedPS(this, "${deployScript}", "-StagingName ${stagingName} -StoreName ${storeName} -AzureBlobName ${azureBlobName} -AzureBlobKey ${azureBlobKey} -WebAppName ${webAppName} -ResourceGroupName ${resourceGroupName} -SubscriptionID ${subscriptionID}")
-						}
-					}
-				}
-			}
-
-			stage('E2E')
-			{
-				timestamps
-				{
-					timeout(time: "${SETTINGS['timeoutMinutes']}", unit: 'MINUTES')
-					{
-						try
-						{
-							Utilities.runE2E(this)
-							def e2eStatus = "E2E Success"
-						}
-						catch(any)
-						{
-							e2eStatus = "E2E Failed"
-						}
-						finally
-						{
-							def allureReportAddress = "${env.BUILD_URL}/allure"
-							//Utilities.notifyBuildStatus(this, SETTINGS['of365hook'], "${allureReportAddress}", "${e2eStatus}")
-							msg = "${e2eStatus}."
-							if(!(e2eStatus == 'E2E Success'))
-							{
-								input(message: msg, submitter: env.APPROVERS)
-							}
-						}
-					}
-				}
-			}
-
-			stage('Copy to PROD-VC')
-			{
-				timestamps
-				{
-					deployScript = 'VC-2AzurePROD.ps1'
-					if(env.BRANCH_NAME == 'deploy')
-					{
-						def stagingName = "deploy"
-						def storeName = "cms-content"
-						def azureBlobName = SETTINGS['azureBlobNameProd']
-						def azureBlobKey = SETTINGS['azureBlobKeyProd']
-						def webAppName = SETTINGS['webAppNameProd']
-						def resourceGroupName = SETTINGS['resourceGroupNameProd']
-						def subscriptionID = SETTINGS['subscriptionID']
-						def blobToken = SETTINGS['tokenSasProd']
 						withEnv(["AzureBlobToken=${blobToken}"]){
 							Utilities.runSharedPS(this, "${deployScript}", "-StagingName ${stagingName} -StoreName ${storeName} -AzureBlobName ${azureBlobName} -AzureBlobKey ${azureBlobKey} -WebAppName ${webAppName} -ResourceGroupName ${resourceGroupName} -SubscriptionID ${subscriptionID}")
 						}

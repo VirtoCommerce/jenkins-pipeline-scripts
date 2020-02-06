@@ -10,7 +10,7 @@
 
 $ErrorActionPreference = "Stop"
 
-if ($StagingName -eq "deploy"){
+if ($StagingName -eq "dev"){
     Copy-Item .\pages .\artifacts\Pages\vccom -Recurse -Force
     Copy-Item .\theme .\artifacts\Themes\vccom\default -Recurse -Force
 }
@@ -42,7 +42,7 @@ Write-Host "Stop $DestWebAppName"
 Stop-AzureRmWebApp -ResourceGroupName $DestResourceGroupName -Name $DestWebAppName
 
 New-AzureStorageContainer -Name $DestContainer -Context $BlobContext -Permission Container
-Get-AzureStorageBlob -Container $StoreName -Context $BlobContext #| Start-AzureStorageBlobCopy -DestContainer "$DestContainer" -Force
+Get-AzureStorageBlob -Container $StoreName -Context $BlobContext | Start-AzureStorageBlobCopy -DestContainer "$DestContainer" -Force
 
 Write-Host "Sync $StoreName"
 $token = $env:AzureBlobToken
