@@ -14,7 +14,7 @@ import jobs.scripts.*
 	node
 	{
 		properties([disableConcurrentBuilds()])
-	    def deployScript = 'VC-2AzureQA.ps1'
+	    def deployScript = 'VC-2AzureDEV.ps1'
 		def dockerTag = "${env.BRANCH_NAME}-branch"
 		def buildOrder = Utilities.getNextBuildOrder(this)
 		projectType = config.projectType
@@ -30,7 +30,6 @@ import jobs.scripts.*
 
 		if (env.BRANCH_NAME == 'deploy')
 		{
-			deployScript = 'VC-2AzureDEV.ps1'
 			dockerTag = "latest"
 		}
 
