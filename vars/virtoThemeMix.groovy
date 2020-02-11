@@ -143,12 +143,38 @@ def call(body)
 						{
 							Packaging.publishRelease(this, version, "")
 						}
-						if (env.BRANCH_NAME == 'dev' || 'master')
+						if (env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'master')
 						{
 							def stagingName = Utilities.getStagingNameFromBranchName(this)
 							withEnv(["AzureBlobName=${SETTINGS['azureBlobName']}", "AzureBlobKey=${SETTINGS['azureBlobKey']}"])
 							{
 								Utilities.runSharedPS(this, "VC-ThemeMix2Azure.ps1", "-StagingName ${stagingName} -StoreName ${storeName}")
+							}
+							if(storeName == 'odt' && env.BRANCH_NAME == 'dev')
+							{
+								timestamps
+								{
+									timeout(time: 15)
+									{
+										def regionAndEnvChoices = input message: "Make punlish for: ", parameters: [
+                        					choice(name: 'qa', choices:"cancel")
+                    					]
+										if (regionAndEnvChoices == 'cancel') { return }
+										SETTINGS.setEnvironment(regionAndEnvChoices)
+										withEnv(["AzureBlobName=${SETTINGS['azureBlobName']}", "AzureBlobKey=${SETTINGS['azureBlobKey']}"])
+										{
+											Utilities.runSharedPS(this, "VC-ThemeMix2Azure.ps1", "-StagingName ${stagingName} -StoreName ${storeName}")
+										}
+									}
+								}
+							}
+							else if(storeName == 'odt' && env.BRANCH_NAME == 'master')
+							{
+								SETTINGS.setEnvironment('master')
+								withEnv(["AzureBlobName=${SETTINGS['azureBlobName']}", "AzureBlobKey=${SETTINGS['azureBlobKey']}"])
+								{
+									Utilities.runSharedPS(this, "VC-ThemeMix2Azure.ps1", "-StagingName ${stagingName} -StoreName ${storeName}")
+								}
 							}
 						}
 					}
