@@ -7,7 +7,7 @@
 $AzureBlobName = $env:AzureBlobName
 $AzureBlobKey = $env:AzureBlobKey
 
-$ErrorActionPreference = "Stop"
+$ErrorActionPreference = "Continue"
 
 # Get Theme Zip File
 

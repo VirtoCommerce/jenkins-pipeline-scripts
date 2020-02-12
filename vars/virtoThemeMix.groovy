@@ -141,7 +141,7 @@ def call(body)
 						Packaging.saveArtifact(this, 'vc', 'theme', "${config.sampleStore}\\default", zipFile)
 						if (Packaging.getShouldPublish(this))
 						{
-							//Packaging.publishRelease(this, version, "")
+							Packaging.publishRelease(this, version, "")
 						}
 						if (env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'master')
 						{
@@ -150,6 +150,7 @@ def call(body)
 							{
 								Utilities.runSharedPS(this, "VC-ThemeMix2Azure.ps1", "-StagingName ${stagingName} -StoreName ${storeName}")
 							}
+
 							if(storeName == 'odt' && env.BRANCH_NAME == 'dev')
 							{
 								timestamps
@@ -159,7 +160,8 @@ def call(body)
 										def regionAndEnvChoices = input message: "Make publish for ", parameters: [
                         					choice(name: 'QA', choices:"qa\n")
                     					]
-
+										echo "regionAndEnvChoices: ${regionAndEnvChoices}"
+										stagingName = "${env.BRANCH_NAME}"
 										SETTINGS.setEnvironment(regionAndEnvChoices)
 										withEnv(["AzureBlobName=${SETTINGS['azureBlobName']}", "AzureBlobKey=${SETTINGS['azureBlobKey']}"])
 										{
@@ -170,6 +172,7 @@ def call(body)
 							}
 							else if(storeName == 'odt' && env.BRANCH_NAME == 'master')
 							{
+								stagingName = "${env.BRANCH_NAME}"
 								SETTINGS.setEnvironment('master')
 								withEnv(["AzureBlobName=${SETTINGS['azureBlobName']}", "AzureBlobKey=${SETTINGS['azureBlobKey']}"])
 								{
