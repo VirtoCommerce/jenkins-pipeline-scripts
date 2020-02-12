@@ -141,7 +141,7 @@ def call(body)
 						Packaging.saveArtifact(this, 'vc', 'theme', "${config.sampleStore}\\default", zipFile)
 						if (Packaging.getShouldPublish(this))
 						{
-							Packaging.publishRelease(this, version, "")
+							//Packaging.publishRelease(this, version, "")
 						}
 						if (env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'master')
 						{
@@ -154,12 +154,12 @@ def call(body)
 							{
 								timestamps
 								{
-									timeout(time: 15)
+									timeout(time: 15, unit: 'MINUTES')
 									{
-										def regionAndEnvChoices = input message: "Make punlish for: ", parameters: [
-                        					choice(name: 'qa', choices:"cancel")
+										def regionAndEnvChoices = input message: "Make publish for ", parameters: [
+                        					choice(name: 'QA', choices:"qa\n")
                     					]
-										if (regionAndEnvChoices == 'cancel') { return }
+
 										SETTINGS.setEnvironment(regionAndEnvChoices)
 										withEnv(["AzureBlobName=${SETTINGS['azureBlobName']}", "AzureBlobKey=${SETTINGS['azureBlobKey']}"])
 										{
