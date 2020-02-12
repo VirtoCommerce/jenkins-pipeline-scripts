@@ -35,6 +35,7 @@ def call(body) {
                         bat "vc-build SonarQubeStart -SonarUrl ${env.SONAR_HOST_URL} -SonarAuthToken \"${env.SONAR_AUTH_TOKEN}\" -skip Restore+Compile"// %SONAR_HOST_URL% %SONAR_AUTH_TOKEN%
                     }
                     //Packaging.startAnalyzer(this, true)
+                    bat "dotnet restore"
                     bat "vc-build Compile"
                 }
 
