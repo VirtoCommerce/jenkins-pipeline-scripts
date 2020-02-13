@@ -80,6 +80,8 @@ def call(body) {
                 {
                     stage('Publish')
                     {
+                        def artifacts = findFiles(glob: 'artifacts\\*.zip')
+						Packaging.saveArtifact(this, 'vc', '', '', artifacts[0].path)
                         // powershell "vc-build PublishPackages -ApiKey ${env.NUGET_KEY} -skip Clean+Restore+Compile+Test"
                         def ghReleaseResult = Utilities.runBatchScript(this, "@vc-build PublishPackages -ApiKey ${env.NUGET_KEY} -skip Clean+Restore+Compile+Test")
                         if(ghReleaseResult['status'] != 0){
@@ -97,11 +99,10 @@ def call(body) {
                                 throw new Exception("ERROR: script returned exit code -1")
                             }
                         }
-
-
                     //     def orgName = Utilities.getOrgName(this)
                     //     powershell "vc-build Release -GitHubUser ${orgName} -GitHubToken ${env.GITHUB_TOKEN} -PreRelease -skip Clean+Restore+Compile+Test"
                     }
+
                     stage('Deploy')
                     {
                         // $ZipFile,

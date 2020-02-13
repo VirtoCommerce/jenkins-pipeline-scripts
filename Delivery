@@ -55,7 +55,7 @@ pipeline {
                     SETTINGS = new Settings(settingsFileContent)
                     def buildOrder = Utilities.getNextBuildOrder(this)
                     def regionAndEnvChoices = input message: "Select Environment", parameters: [
-                        choice(name: 'Environments', choices:"DEV\n")
+                        choice(name: 'Environments', choices:"DEV\nrelease/3.0.0")
                     ]
                     PROJECT_TYPE = 'SOLUTION'
                     UPDATE_CS = true
