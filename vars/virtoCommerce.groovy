@@ -30,6 +30,7 @@ import jobs.scripts.*
 
 		if (env.BRANCH_NAME == 'deploy')
 		{
+			deployScript = 'VC-2AzurePROD.ps1'
 			dockerTag = "latest"
 		}
 
@@ -81,7 +82,7 @@ import jobs.scripts.*
 						def storeName = "cms-content-staging"
 						def azureBlobName = SETTINGS['azureBlobNameProd']
 						def azureBlobKey = SETTINGS['azureBlobKeyProd']
-						def webAppName = SETTINGS['webAppNameStage']
+						def webAppName = SETTINGS['webAppNameProd']
 						def resourceGroupName = SETTINGS['resourceGroupNameProd']
 						def subscriptionID = SETTINGS['subscriptionID']
 						def blobToken = SETTINGS['tokenSasStage']

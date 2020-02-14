@@ -54,6 +54,6 @@ Start-AzureRmWebAppSlot -ResourceGroupName $DestResourceGroupName -Name $DestWeb
 Start-Sleep -s 66
 
 Write-Output "Switching $DestWebAppName slot"
-Switch-AzureRmWebAppSlot -Name $DestWebAppName -ResourceGroupName $DestResourceGroupName -SourceSlotName "staging" -DestinationSlotName "production"
+#Switch-AzureRmWebAppSlot -Name $DestWebAppName -ResourceGroupName $DestResourceGroupName -SourceSlotName "staging" -DestinationSlotName "production"
 
-Stop-AzureRmWebAppSlot -ResourceGroupName $DestResourceGroupName -Name $DestWebAppName -Slot $SlotName
+#Stop-AzureRmWebAppSlot -ResourceGroupName $DestResourceGroupName -Name $DestWebAppName -Slot $SlotName
