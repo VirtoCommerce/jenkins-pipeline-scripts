@@ -78,16 +78,19 @@ import jobs.scripts.*
 				{
 					if(env.BRANCH_NAME == 'deploy')
 					{
-						def stagingName = "deploy"
-						def storeName = "cms-content-staging"
-						def azureBlobName = SETTINGS['azureBlobNameProd']
-						def azureBlobKey = SETTINGS['azureBlobKeyProd']
-						def webAppName = SETTINGS['webAppNameProd']
-						def resourceGroupName = SETTINGS['resourceGroupNameProd']
-						def subscriptionID = SETTINGS['subscriptionID']
-						def blobToken = SETTINGS['tokenSasStage']
-						withEnv(["AzureBlobToken=${blobToken}"]){
-							Utilities.runSharedPS(this, "${deployScript}", "-StagingName ${stagingName} -StoreName ${storeName} -AzureBlobName ${azureBlobName} -AzureBlobKey ${azureBlobKey} -WebAppName ${webAppName} -ResourceGroupName ${resourceGroupName} -SubscriptionID ${subscriptionID}")
+						timeout(time: "${SETTINGS['timeoutMinutes']}", unit: 'MINUTES')
+						{
+							def stagingName = "deploy"
+							def storeName = "cms-content-staging"
+							def azureBlobName = SETTINGS['azureBlobNameProd']
+							def azureBlobKey = SETTINGS['azureBlobKeyProd']
+							def webAppName = SETTINGS['webAppNameProd']
+							def resourceGroupName = SETTINGS['resourceGroupNameProd']
+							def subscriptionID = SETTINGS['subscriptionID']
+							def blobToken = SETTINGS['tokenSasStage']
+							withEnv(["AzureBlobToken=${blobToken}"]){
+								Utilities.runSharedPS(this, "${deployScript}", "-StagingName ${stagingName} -StoreName ${storeName} -AzureBlobName ${azureBlobName} -AzureBlobKey ${azureBlobKey} -WebAppName ${webAppName} -ResourceGroupName ${resourceGroupName} -SubscriptionID ${subscriptionID}")
+							}
 						}
 					}
 				}
@@ -96,7 +99,23 @@ import jobs.scripts.*
 			stage('Deploy to PROD')
 			{
 				input(message: "Stage looks fine?", submitter:SETTINGS['releaseApprovers'])
-				echo "Copy from cms-content-staging to cms-content and swap slot"
+				timestamps
+				{
+					if(env.BRANCH_NAME == 'deploy')
+					{
+						def stagingName = "prod"
+						def storeName = "cms-content"
+						def azureBlobName = SETTINGS['azureBlobNameProd']
+						def azureBlobKey = SETTINGS['azureBlobKeyProd']
+						def webAppName = SETTINGS['webAppNameProd']
+						def resourceGroupName = SETTINGS['resourceGroupNameProd']
+						def subscriptionID = SETTINGS['subscriptionID']
+						def blobToken = SETTINGS['tokenSasProd']
+						withEnv(["AzureBlobToken=${blobToken}"]){
+							Utilities.runSharedPS(this, "${deployScript}", "-StagingName ${stagingName} -StoreName ${storeName} -AzureBlobName ${azureBlobName} -AzureBlobKey ${azureBlobKey} -WebAppName ${webAppName} -ResourceGroupName ${resourceGroupName} -SubscriptionID ${subscriptionID}")
+						}
+					}
+				}
 			}
 
 			stage('Cleanup')
