@@ -71,6 +71,33 @@ import jobs.scripts.*
 				}
 			}
 
+			stage('Copy to Slot')
+			{
+				timestamps
+				{
+					if(env.BRANCH_NAME == 'deploy')
+					{
+						def stagingName = "deploy"
+						def storeName = "cms-content-staging"
+						def azureBlobName = SETTINGS['azureBlobNameProd']
+						def azureBlobKey = SETTINGS['azureBlobKeyProd']
+						def webAppName = SETTINGS['webAppNameStage']
+						def resourceGroupName = SETTINGS['resourceGroupNameProd']
+						def subscriptionID = SETTINGS['subscriptionID']
+						def blobToken = SETTINGS['tokenSasStage']
+						withEnv(["AzureBlobToken=${blobToken}"]){
+							Utilities.runSharedPS(this, "${deployScript}", "-StagingName ${stagingName} -StoreName ${storeName} -AzureBlobName ${azureBlobName} -AzureBlobKey ${azureBlobKey} -WebAppName ${webAppName} -ResourceGroupName ${resourceGroupName} -SubscriptionID ${subscriptionID}")
+						}
+					}
+				}
+			}
+
+			stage('Deploy to PROD')
+			{
+				input(message: "Stage looks fine?", submitter:SETTINGS['releaseApprovers'])
+				echo "Copy from cms-content-staging to cms-content and swap slot"
+			}
+
 			stage('Cleanup')
 			{
 				timestamps
