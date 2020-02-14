@@ -10,7 +10,8 @@
 
 $ErrorActionPreference = "Stop"
 
-if ($StagingName -eq "deploy"){
+if($StagingName -eq "deploy")
+{
     Copy-Item .\pages .\artifacts\Pages\vccom -Recurse -Force
     Copy-Item .\theme .\artifacts\Themes\vccom\default -Recurse -Force
 }
@@ -19,9 +20,9 @@ $SourceDir = "${env:WORKSPACE}\artifacts"
 
 # Upload Zip File to Azure
 $ConnectionString = "DefaultEndpointsProtocol=https;AccountName={0};AccountKey={1};EndpointSuffix=core.windows.net"
-if ($StagingName -eq "deploy"){
-    $ConnectionString = $ConnectionString -f $AzureBlobName, $AzureBlobKey
-}
+
+$ConnectionString = $ConnectionString -f $AzureBlobName, $AzureBlobKey
+
 $BlobContext = New-AzureStorageContext -ConnectionString $ConnectionString
 
 $SlotName = "staging"
@@ -53,7 +54,10 @@ Write-Output "Restarting web site $DestWebAppName slot $SlotName"
 Start-AzureRmWebAppSlot -ResourceGroupName $DestResourceGroupName -Name $DestWebAppName -Slot $SlotName
 Start-Sleep -s 66
 
-Write-Output "Switching $DestWebAppName slot"
-Switch-AzureRmWebAppSlot -Name $DestWebAppName -ResourceGroupName $DestResourceGroupName -SourceSlotName "staging" -DestinationSlotName "production"
+if($StagingName -eq "prod")
+{
+    Write-Output "Switching $DestWebAppName slot"
 
-Stop-AzureRmWebAppSlot -ResourceGroupName $DestResourceGroupName -Name $DestWebAppName -Slot $SlotName
+    Switch-AzureRmWebAppSlot -Name $DestWebAppName -ResourceGroupName $DestResourceGroupName -SourceSlotName "staging" -DestinationSlotName "production"
+    Stop-AzureRmWebAppSlot -ResourceGroupName $DestResourceGroupName -Name $DestWebAppName -Slot $SlotName
+}
