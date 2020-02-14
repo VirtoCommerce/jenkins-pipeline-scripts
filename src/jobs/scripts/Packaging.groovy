@@ -482,7 +482,8 @@ class Packaging {
     }
 
     def static saveArtifact(context, prefix, projectType, id, artifact){
-        def destinationFolderPath = "${context.env.SOLUTION_FOLDER}\\${prefix}\\${context.env.BRANCH_NAME}\\${projectType}"
+        def branchEscaped = context.env.BRANCH_NAME.replaceAll('/', '_')
+        def destinationFolderPath = "${context.env.SOLUTION_FOLDER}\\${prefix}\\${branchEscaped}\\${projectType}"
         switch(projectType){
             case ['module','theme']:
                 destinationFolderPath = destinationFolderPath + "\\${id}"

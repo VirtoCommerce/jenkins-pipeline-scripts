@@ -10,18 +10,16 @@
 
 $ErrorActionPreference = "Stop"
 
-if ($StagingName -eq "dev"){
-    Copy-Item .\pages .\artifacts\Pages\vccom -Recurse -Force
-    Copy-Item .\theme .\artifacts\Themes\vccom\default -Recurse -Force
-}
+Copy-Item .\pages .\artifacts\Pages\vccom -Recurse -Force
+Copy-Item .\theme .\artifacts\Themes\vccom\default -Recurse -Force
 
 $SourceDir = "${env:WORKSPACE}\artifacts"
 
 # Upload Zip File to Azure
 $ConnectionString = "DefaultEndpointsProtocol=https;AccountName={0};AccountKey={1};EndpointSuffix=core.windows.net"
-if ($StagingName -eq "dev"){
-    $ConnectionString = $ConnectionString -f $AzureBlobName, $AzureBlobKey
-}
+
+$ConnectionString = $ConnectionString -f $AzureBlobName, $AzureBlobKey
+
 $BlobContext = New-AzureStorageContext -ConnectionString $ConnectionString
 
 $Now = Get-Date -format yyyyMMdd-HHmmss
