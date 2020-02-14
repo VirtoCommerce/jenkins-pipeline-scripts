@@ -98,9 +98,7 @@ import jobs.scripts.*
 
 			stage('Deploy to PROD')
 			{
-				def releaseApprovers = SETTINGS['releaseApprovers']
-				echo "releaseApprovers: ${releaseApprovers}"
-				input(message: "Stage looks fine?", submitter: "${releaseApprovers}")
+				input(message: "Stage looks fine?", submitter: env.APPROVERS)
 				timestamps
 				{
 					if(env.BRANCH_NAME == 'deploy')
