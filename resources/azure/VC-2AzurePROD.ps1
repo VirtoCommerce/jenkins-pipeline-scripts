@@ -12,8 +12,11 @@ $ErrorActionPreference = "Stop"
 
 if($StagingName -eq "deploy")
 {
-    Copy-Item .\pages .\artifacts\Pages\vccom -Recurse -Force
+    Copy-Item .\pages .\artifacts\Pages\vccom -Recurse -Force    
     Copy-Item .\theme .\artifacts\Themes\vccom\default -Recurse -Force
+
+    Copy-Item .\pages .\artifacts\Pages\vccom-staging -Recurse -Force
+    Copy-Item .\theme .\artifacts\Themes\vccom-staging\default -Recurse -Force
 }
 
 $SourceDir = "${env:WORKSPACE}\artifacts"
