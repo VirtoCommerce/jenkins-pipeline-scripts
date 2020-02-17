@@ -37,12 +37,15 @@ import jobs.scripts.*
 		try
 		{
 			//Utilities.notifyBuildStatus(this, "started")
-			stage('Checkout')
+			if(env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'deploy')
 			{
-				timestamps
+				stage('Checkout')
 				{
-					deleteDir()
-					checkout scm
+					timestamps
+					{
+						deleteDir()
+						checkout scm
+					}
 				}
 			}
 
@@ -51,11 +54,11 @@ import jobs.scripts.*
 				return true
 			}
 
-			stage('Copy to DEV-VC')
+			if(env.BRANCH_NAME == 'dev')
 			{
-				timestamps
+				stage('Copy to DEV-VC')
 				{
-					if(env.BRANCH_NAME == 'dev')
+					timestamps
 					{
 						def stagingName = "dev"
 						def storeName = "cms-content"
@@ -72,11 +75,11 @@ import jobs.scripts.*
 				}
 			}
 
-			stage('Copy to Slot')
+			if(env.BRANCH_NAME == 'deploy')
 			{
-				timestamps
+				stage('Copy to Slot')
 				{
-					if(env.BRANCH_NAME == 'deploy')
+					timestamps
 					{
 						timeout(time: "${SETTINGS['timeoutMinutes']}", unit: 'MINUTES')
 						{
@@ -96,14 +99,14 @@ import jobs.scripts.*
 				}
 			}
 
-			stage('Deploy to PROD')
+			if(env.BRANCH_NAME == 'deploy')
 			{
-				def releaseApprovers = SETTINGS['releaseApprovers']
-				echo "releaseApprovers: ${releaseApprovers}"
-				input(message: "Stage looks fine?", submitter: "${releaseApprovers}")
-				timestamps
+				stage('Deploy to PROD')
 				{
-					if(env.BRANCH_NAME == 'deploy')
+					def releaseApprovers = SETTINGS['releaseApprovers']
+					echo "releaseApprovers: ${releaseApprovers}"
+					input(message: "Stage looks fine?", submitter: "${releaseApprovers}")
+					timestamps
 					{
 						def stagingName = "prod"
 						def storeName = "cms-content"
