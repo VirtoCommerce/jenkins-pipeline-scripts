@@ -100,12 +100,12 @@ import jobs.scripts.*
 			{
 				stage('Deploy to PROD')
 				{
-					def releaseApprovers = SETTINGS['releaseApprovers']
-					echo "releaseApprovers: ${releaseApprovers}"
-					input(message: "Stage looks fine?", submitter: "${releaseApprovers}")
-					timestamps
+					timeout(time: "${SETTINGS['timeoutMinutes']}", unit: 'MINUTES')
 					{
-						timeout(time: "${SETTINGS['timeoutMinutes']}", unit: 'MINUTES')
+						def releaseApprovers = SETTINGS['releaseApprovers']
+						echo "releaseApprovers: ${releaseApprovers}"
+						input(message: "Stage looks fine?", submitter: "${releaseApprovers}")
+						timestamps
 						{
 							def stagingName = "prod"
 							def storeName = "cms-content"
