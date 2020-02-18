@@ -50,7 +50,7 @@ New-AzureStorageContainer -Name $DestContainer -Context $BlobContext -Permission
 Get-AzureStorageBlob -Container $StoreName -Context $BlobContext | Start-AzureStorageBlobCopy -DestContainer "$DestContainer" -Force
 if($StagingName -eq "deploy")
 {
-    Get-AzureStorageBlob -Container "cms-content" -Context $BlobContext | Start-AzureStorageBlobCopy -DestContainer "cmd-content-staging" -Force
+    Get-AzureStorageBlob -Container "cms-content" -Context $BlobContext | Start-AzureStorageBlobCopy -DestContainer "cms-content-staging" -Force
 }
 
 Write-Host "Sync $StoreName"
