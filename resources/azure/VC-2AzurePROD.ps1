@@ -48,6 +48,10 @@ Stop-AzureRmWebAppSlot -ResourceGroupName $DestResourceGroupName -Name $DestWebA
 
 New-AzureStorageContainer -Name $DestContainer -Context $BlobContext -Permission Container
 Get-AzureStorageBlob -Container $StoreName -Context $BlobContext | Start-AzureStorageBlobCopy -DestContainer "$DestContainer" -Force
+if($StagingName -eq "prod")
+{
+    Get-AzureStorageBlob -Container "cms-content" -Context $BlobContext | Start-AzureStorageBlobCopy -DestContainer "cmd-content-staging" -Force
+}
 
 Write-Host "Sync $StoreName"
 $token = $env:AzureBlobToken
