@@ -35,7 +35,7 @@ class Settings implements Serializable
     {
         return _settings.keySet() as String[]
     }
-    def getEnvironments(String region = '')
+    def getEnvironments(String region = null)
     {
         if(region == '' && _region.trim()){
             return _settings[_region].keySet() as String[]
