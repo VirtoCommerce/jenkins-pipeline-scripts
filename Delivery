@@ -17,6 +17,10 @@ def LOGIC_APPS = false
 def UNSTABLE = false
 def CAUSES = []
 
+def REGION
+def BRANCH_NAME
+def ENV_NAME
+
 def PLATFORM_VERSION
 def PROJECT_TYPE
 def BACKEND_FILE
@@ -24,7 +28,6 @@ def FRONTEND_FILE
 def THEME_FILE
 def MODULE_ID
 def MODULE_FILE
-def ENV_NAME
 def LOGICAPP_FILE
 def LOGICAPP_NAME
 
@@ -53,16 +56,25 @@ pipeline {
                         settingsFileContent = readFile(SETTINGS_FILE)
                     }
                     SETTINGS = new Settings(settingsFileContent)
+                    def regionChoices = SETTINGS.getRegions().join("\n")
                     def buildOrder = Utilities.getNextBuildOrder(this)
-                    def regionAndEnvChoices = input message: "Select Environment", parameters: [
-                        choice(name: 'Environments', choices:"DEV\n")
+                    def userInput = input message: "Region and Branch", parameters: [
+                        choice(name: 'Region', choices: regionChoices),
+                        choice(name: 'Branch', choices: "dev\nmaster\nrelease_3.0.0")
                     ]
                     PROJECT_TYPE = 'SOLUTION'
+                    REGION = userInput['Region']
+                    BRANCH_NAME = userInput['Branch']
                     UPDATE_CS = true
-                    ENV_NAME = regionAndEnvChoices.trim()//['Environments']
-                    SETTINGS.setRegion(PROJECT_TYPE)
+                    SETTINGS.setRegion(REGION)
+
+                    def envChoices = SETTINGS.getEnvironments().join("\n")
+                    def userEnvInput = input message: "Select Environment", parameters: [
+                        choice(name: 'Environments', choices: envChoices)
+                    ]
+                    ENV_NAME = userEnvInput
                     SETTINGS.setEnvironment(ENV_NAME)
-                    echo "Vars: PROJECT_TYPE - ${PROJECT_TYPE}, UPDATE_CS - ${UPDATE_CS}, ENV_NAME - ${ENV_NAME}"
+                    echo "Vars: PROJECT_TYPE - ${PROJECT_TYPE}, UPDATE_CS - ${UPDATE_CS}, ENV_NAME - ${ENV_NAME}, BRANCH_NAME - ${BRANCH_NAME}"
                     def msgToHook = "Delivery Option ${PROJECT_TYPE}<br/>Environment ${ENV_NAME}<br/>${UPDATE_CS ? "Update Solution<br/>":""}"
                     //Utilities.notifyBuildStatus(this, SETTINGS['prefix'], SETTINGS['of365hook'], msgToHook, 'STARTED')
                 }
@@ -80,7 +92,7 @@ pipeline {
             steps{
                 script{
                     checkout scm
-                    def csSrc = "${env.SOLUTION_FOLDER}\\vc\\${ENV_NAME}"
+                    def csSrc = "${env.SOLUTION_FOLDER}\\vc\\${BRANCH_NAME}"
                     def modulesRoot = "${env.WORKSPACE}\\CS\\module"
                     def platformRoot = "${env.WORKSPACE}\\CS\\platform"
                     powershell "Remove-Item -Path ${env.WORKSPACE}\\CS\\* -Recurse -Force -ErrorAction Continue"
@@ -196,16 +208,16 @@ pipeline {
         //     }
         // }
 
-        stage('ARM Deploy')
-        {
-            steps
-            {
-                script
-                {
-                    Utilities.createInfrastructure(this, "QA-demoVC")
-                }
-            }
-        }
+        // stage('ARM Deploy')
+        // {
+        //     steps
+        //     {
+        //         script
+        //         {
+        //             Utilities.createInfrastructure(this, "QA-demoVC")
+        //         }
+        //     }
+        // }
 
         stage("Update Solution"){
             when {
@@ -256,7 +268,8 @@ pipeline {
         }
         stage("Delivering Storefront"){
             when{
-                expression{
+                expression
+                {
                     DELIVERY_FRONTEND
                 }
             }
