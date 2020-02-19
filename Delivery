@@ -68,7 +68,7 @@ pipeline {
                     UPDATE_CS = true
                     SETTINGS.setRegion(REGION)
 
-                    def envChoices = SETTINGS.getEnvironments(REGION).join("\n")
+                    def envChoices = SETTINGS.getEnvironments().join("\n")
                     def userEnvInput = input message: "Select Environment", parameters: [
                         choice(name: 'Environments', choices: envChoices)
                     ]
