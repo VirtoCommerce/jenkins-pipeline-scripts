@@ -2,14 +2,16 @@ package jobs.scripts
 
 import groovy.json.JsonSlurperClassic
 
-class Settings implements Serializable{
+class Settings implements Serializable
+{
     private Object _settings
     private String _environment
     private String _region
     Settings(String json){
         _settings = new JsonSlurperClassic().parseText(json)
     }
-    def getAt(String item){
+    def getAt(String item)
+    {
         if(_region == null)
             throw new Exception("Settings error: Region is not set")
         if(_environment == null)
@@ -21,16 +23,27 @@ class Settings implements Serializable{
         }
         return _settings[_region][_environment][item]
     }
-    def setRegion(String region){
+    def setRegion(String region)
+    {
         _region = region
     }
-    def setEnvironment(String environment){
+    def setEnvironment(String environment)
+    {
         _environment = environment
     }
-    def getRegions(){
+    def getRegions()
+    {
         return _settings.keySet() as String[]
     }
-    def containsRegion(String region){
+    def getEnvironments(String region = null)
+    {
+        if(region == '' && _region.trim()){
+            return _settings[_region].keySet() as String[]
+        }
+        return _settings[region].keySet() as String[]
+    }
+    def containsRegion(String region)
+    {
         return _settings.containsKey(region)
     }
 }
