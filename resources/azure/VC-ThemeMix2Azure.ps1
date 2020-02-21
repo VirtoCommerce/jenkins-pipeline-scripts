@@ -11,7 +11,7 @@ $ErrorActionPreference = "Continue"
 
 # Get Theme Zip File
 
-$Path2Zip = Get-Childitem -Recurse -Path "${env:WORKSPACE}\artifacts\" -File -Include *.zip
+$Path2Zip = Get-Childitem -Path "${env:WORKSPACE}\artifacts\" -File -Include *.zip -Recurse
 
 # Unzip Theme Zip File
 
@@ -41,5 +41,5 @@ else
     Get-AzureStorageBlob -Blob ("$AzureBlobName*") -Container "cms" -Context $BlobContext  | ForEach-Object { Remove-AzureStorageBlob -Blob $_.Name -Container "cms" -Context $BlobContext } -ErrorAction Continue
 
     Write-Host "Upload to $StoreName"
-    Get-ChildItem -File -Recurse -Path $Path | ForEach-Object { Set-AzureStorageBlobContent -File $_.FullName -Blob ("$AzureBlobName/" + (([System.Uri]("$Path/")).MakeRelativeUri([System.Uri]($_.FullName))).ToString()) -Container "cms" -Context $BlobContext }
+    Get-ChildItem -Path $Path -File -Recurse | ForEach-Object { Set-AzureStorageBlobContent -File $_.FullName -Blob ("$AzureBlobName/" + (([System.Uri]("$Path/")).MakeRelativeUri([System.Uri]($_.FullName))).ToString()) -Container "cms" -Context $BlobContext }
 }
