@@ -6,7 +6,9 @@ param(
     $WebAppName,
     $WebAppPublicName,
     $ResourceGroupName,
-    $SubscriptionID
+    $SubscriptionID,
+    $StorageAccount = "qademovc",
+    $BlobContainerName = "cms"
 )
 
 # Upload Storefront Zip File to Azure
@@ -69,14 +71,12 @@ if($StorefrontDir){
 #    Write-Output "Upload Theme"
 #    & $msdeploy -verb:sync -dest:contentPath="D:\home\site\wwwroot\wwwroot\theme",computerName=$sourcewebapp_msdeployUrl,publishSettings=$FrontendPublishProfile -source:contentPath=$ThemeDir
 #}
-$ContainerName = "cms"
 $dirpath = "Themes"
 
 
 Write-Output "AzCopy $elecPath"
-$accountname = "qademovc"
 $token = $env:AzureBlobToken
-& "${env:Utils}\AzCopy10\AzCopy" sync $ThemeDir https://$($accountname).blob.core.windows.net/$ContainerName/$($dirpath)$token --delete-destination=true #/DestKey:$accountKey /S
+& "${env:Utils}\AzCopy10\AzCopy" sync $ThemeDir https://$($StorageAccount).blob.core.windows.net/$BlobContainerName/$($dirpath)$token --delete-destination=true #/DestKey:$accountKey /S
 
 Write-Host "Start Backend $WebAppName"
 
