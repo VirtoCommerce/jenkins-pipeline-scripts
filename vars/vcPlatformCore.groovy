@@ -80,6 +80,8 @@ def call(body) {
                 {
                     stage('Publish')
                     {
+						def artifacts = findFiles(glob: 'artifacts\\*.zip')
+						Packaging.saveArtifact(this, 'vc', Utilities.getProjectType(this), '', artifacts[0].path)
                         // powershell "vc-build PublishPackages -ApiKey ${env.NUGET_KEY} -skip Clean+Restore+Compile+Test"
                         def ghReleaseResult = Utilities.runBatchScript(this, "@vc-build PublishPackages -ApiKey ${env.NUGET_KEY} -skip Clean+Restore+Compile+Test")
                         if(ghReleaseResult['status'] != 0){
