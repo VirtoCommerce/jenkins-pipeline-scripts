@@ -100,7 +100,7 @@ pipeline {
                     if(BRANCH_NAME == 'release_3.0.0')
                     {
                         //theme
-                        def themeIncludeParam = SETTINGS['themeName'] == null ? '', "-Include ${SETTINGS['themeName']}"
+                        def themeIncludeParam = SETTINGS['themeName'] == null ? '' : "-Include ${SETTINGS['themeName']}"
                         def themeSrc = "${solutionRoot}\\${SETTINGS['themeBranch']}\\theme"
                         powershell "Copy-Item -Path ${themeSrc}\\* -Destination ${env.WORKSPACE}\\CS ${themeIncludeParam} -Recurse -Force"
                         //storefront
