@@ -28,8 +28,18 @@ $BlobContext = New-AzureStorageContext -ConnectionString $ConnectionString
 
 $AzureBlobName = "Themes/$StoreName/default"
 
-Write-Host "Remove from $StoreName"
-Get-AzureStorageBlob -Blob ("$AzureBlobName*") -Container "cms" -Context $BlobContext  | ForEach-Object { Remove-AzureStorageBlob -Blob $_.Name -Container "cms" -Context $BlobContext } -ErrorAction Continue
+if($StoreName -eq "odt")
+{
+    $accountname = $env:AzureBlobName
+    $token = $env:AzureBlobToken
+    $dirpath = "Themes/$StoreName"
+    & "${env:Utils}\AzCopy10\AzCopy" sync $ThemeDir https://$($accountname).blob.core.windows.net/cms/$($dirpath)$token --delete-destination=true
+} 
+else
+{
+    Write-Host "Remove from $StoreName"
+    Get-AzureStorageBlob -Blob ("$AzureBlobName*") -Container "cms" -Context $BlobContext  | ForEach-Object { Remove-AzureStorageBlob -Blob $_.Name -Container "cms" -Context $BlobContext } -ErrorAction Continue
 
-Write-Host "Upload to $StoreName"
-Get-ChildItem -File -Recurse $Path | ForEach-Object { Set-AzureStorageBlobContent -File $_.FullName -Blob ("$AzureBlobName/" + (([System.Uri]("$Path/")).MakeRelativeUri([System.Uri]($_.FullName))).ToString()) -Container "cms" -Context $BlobContext }
+    Write-Host "Upload to $StoreName"
+    Get-ChildItem -File -Recurse -Path $Path | ForEach-Object { Set-AzureStorageBlobContent -File $_.FullName -Blob ("$AzureBlobName/" + (([System.Uri]("$Path/")).MakeRelativeUri([System.Uri]($_.FullName))).ToString()) -Container "cms" -Context $BlobContext }
+}
