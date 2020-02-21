@@ -102,7 +102,7 @@ pipeline {
                         //theme
                         def themeIncludeParam = SETTINGS['themeName'] == null ? '' : "-Include ${SETTINGS['themeName']}"
                         def themeSrc = "${solutionRoot}\\${SETTINGS['themeBranch']}\\theme"
-                        powershell "Copy-Item -Path ${themeSrc}\\* -Destination ${env.WORKSPACE}\\CS ${themeIncludeParam} -Recurse -Force"
+                        powershell "Copy-Item -Path ${themeSrc} -Destination ${env.WORKSPACE}\\CS ${themeIncludeParam} -Recurse -Force"
                         //storefront
                         def storefrontSrc = "${solutionRoot}\\${SETTINGS['storefrontBranch']}"
                         powershell "Copy-Item -Path ${storefrontSrc}\\* -Destination ${env.WORKSPACE}\\CS -Include storefront -Recurse -Force"
