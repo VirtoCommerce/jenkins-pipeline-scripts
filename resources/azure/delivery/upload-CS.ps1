@@ -43,7 +43,7 @@ if($StorefrontDir -or $ThemeDir){
     Write-Host "Stop WebApp $WebAppPublicName"
     Stop-AzureRmWebApp -ResourceGroupName $ResourceGroupName -Name $WebAppPublicName | Select Name,State
 }
-Start-Sleep -s 5
+Start-Sleep -s 15
 
 $msdeploy = "${env:MSDEPLOY_DIR}\msdeploy.exe"
 
