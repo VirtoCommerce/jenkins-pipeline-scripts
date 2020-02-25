@@ -74,7 +74,7 @@ if($StorefrontDir){
 $dirpath = "Themes"
 
 
-Write-Output "AzCopy $elecPath"
+Write-Output "AzCopy $StorageAccount"
 $token = $env:AzureBlobToken
 & "${env:Utils}\AzCopy10\AzCopy" sync $ThemeDir https://$($StorageAccount).blob.core.windows.net/$BlobContainerName/$($dirpath)$token --delete-destination=true #/DestKey:$accountKey /S
 
