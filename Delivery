@@ -105,6 +105,7 @@ pipeline {
                         def themeDst = "${env.WORKSPACE}\\CS\\theme"
                         if(SETTINGS['themeName']!=null)
                         {
+                            themeSrc = "${themeSrc}\\*"
                             themeIncludeParam = "-Include ${SETTINGS['themeName']}"
                             themeDst = "${themeDst}\\${SETTINGS['themeName']}"
                         }
