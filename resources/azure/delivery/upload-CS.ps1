@@ -76,6 +76,7 @@ $dirpath = "Themes"
 
 Write-Output "AzCopy $StorageAccount"
 $token = $env:AzureBlobToken
+Write-Output "${env:Utils}\AzCopy10\AzCopy sync $ThemeDir https://$($StorageAccount).blob.core.windows.net/$BlobContainerName/$($dirpath)$token --delete-destination=true"
 & "${env:Utils}\AzCopy10\AzCopy" sync $ThemeDir https://$($StorageAccount).blob.core.windows.net/$BlobContainerName/$($dirpath)$token --delete-destination=true #/DestKey:$accountKey /S
 
 Write-Host "Start Backend $WebAppName"
