@@ -31,7 +31,7 @@ $AzureBlobName = "Themes/$StoreName/default"
 if($StoreName -eq "odt")
 {
     $accountname = $env:AzureBlobName
-    $token = $env:AzureBlobToken
+    $token = $env:AzureBlobKey
     $dirpath = "Themes/$StoreName"
     & "${env:Utils}\AzCopy10\AzCopy" sync $Path https://$($accountname).blob.core.windows.net/cms/$($dirpath)$token --delete-destination=true
 } 
