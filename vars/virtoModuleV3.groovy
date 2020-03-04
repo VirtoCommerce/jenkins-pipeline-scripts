@@ -32,28 +32,28 @@ def call(body) {
 
                 stage('Build'){
                     withSonarQubeEnv('VC Sonar Server'){
-                        bat "vc-build SonarQubeStart -SonarUrl ${env.SONAR_HOST_URL} -SonarAuthToken \"${env.SONAR_AUTH_TOKEN}\" -skip Restore+Compile"// %SONAR_HOST_URL% %SONAR_AUTH_TOKEN%
+                        powershell "vc-build SonarQubeStart -SonarUrl ${env.SONAR_HOST_URL} -SonarAuthToken \"${env.SONAR_AUTH_TOKEN}\" -skip Restore+Compile"// %SONAR_HOST_URL% %SONAR_AUTH_TOKEN%
                     }
                     //Packaging.startAnalyzer(this, true)
                     bat "dotnet restore"
-                    bat "vc-build Compile"
+                    powershell "vc-build Compile"
                 }
 
                 stage('Unit Tests'){
-                    bat "vc-build Test -skip Restore+Compile"
+                    powershell "vc-build Test -skip Restore+Compile"
                 } 
 
                 stage('Quality Gate'){
                     sleep time: 15
                     withSonarQubeEnv('VC Sonar Server'){
-                        bat "vc-build SonarQubeEnd -SonarUrl ${env.SONAR_HOST_URL} -SonarAuthToken ${env.SONAR_AUTH_TOKEN} -skip Restore+Compile+SonarQubeStart"
+                        powershell "vc-build SonarQubeEnd -SonarUrl ${env.SONAR_HOST_URL} -SonarAuthToken ${env.SONAR_AUTH_TOKEN} -skip Restore+Compile+SonarQubeStart"
                     }
                     Packaging.checkAnalyzerGate(this)
                 }
                  
 
                 stage('Packaging'){                
-                    bat "vc-build Compress -skip Clean+Restore+Compile+Test"
+                    powershell "vc-build Compress -skip Clean+Restore+Compile+Test"
                 }
 
                 if(!Utilities.isPullRequest(this)){
