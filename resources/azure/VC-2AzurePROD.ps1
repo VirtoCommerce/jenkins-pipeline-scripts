@@ -55,7 +55,7 @@ if($StagingName -eq "deploy")
 
 Write-Host "Sync $StoreName"
 $token = $env:AzureBlobToken
-& "${env:Utils}\AzCopy10\AzCopy" sync $SourceDir https://$($AzureBlobName).blob.core.windows.net/$StoreName$token --recursive --exclude-pattern="*.page"
+& "${env:Utils}\AzCopy10\AzCopy" sync $SourceDir https://$($AzureBlobName).blob.core.windows.net/$StoreName$token --recursive --exclude-pattern="*.htm;*.html;*.md;*.page"
 
 Write-Output "Restarting web site $DestWebAppName slot $SlotName"
 Start-AzureRmWebAppSlot -ResourceGroupName $DestResourceGroupName -Name $DestWebAppName -Slot $SlotName
