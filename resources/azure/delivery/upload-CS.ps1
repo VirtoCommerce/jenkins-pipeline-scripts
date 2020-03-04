@@ -53,7 +53,7 @@ $sourcewebapp_msdeployUrl = "https://${WebAppName}.scm.azurewebsites.net/msdeplo
 # Upload Platform
 if($PlatformDir){
     Write-Output "Upload Platform"
-    & $msdeploy -verb:sync -dest:contentPath="D:\home\site\wwwroot\platform",computerName=$sourcewebapp_msdeployUrl,publishSettings=$BackendPublishProfile -source:contentPath=$PlatformDir
+    & $msdeploy -verb:sync -dest:contentPath="D:\home\site\wwwroot\platform",computerName=$sourcewebapp_msdeployUrl,publishSettings=$BackendPublishProfile -source:contentPath=$PlatformDir -verbose
 }
 # Upload Modules
 if($ModulesDir){
