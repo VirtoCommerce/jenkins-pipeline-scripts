@@ -17,7 +17,7 @@ def STOREFRONT_INSTALL
 
 pipeline
 {
-    agent any
+    agent slave
 
     options
     {
@@ -32,7 +32,7 @@ pipeline
             {
                 script
                 {
-                    node(slv_virtocommerce)
+                    node(slave)
                     {
                         checkout scm
                         configFileProvider([configFile(fileId: 'virtocommerce', variable: 'SETTINGS_FILE')]) {
@@ -62,7 +62,7 @@ pipeline
             {
                 script
                 {
-                    node(slv_virtocommerce)
+                    node(slave)
                     {
                         def csSrc = "${env.SOLUTION_FOLDER}\\${SETTINGS['prefix']}\\${BASE_BRANCH}"
                         def csTarget = "${env.SOLUTION_FOLDER}\\${SETTINGS['ptrfix']}\\${BRANCH_NAME}"
@@ -92,7 +92,7 @@ pipeline
             {
                 script
                 {
-                    node(slv_virtocommerce)
+                    node(slave)
                     {
                         stage('Create Test Environment')
                         {
@@ -192,7 +192,7 @@ pipeline
         {
             script
             {
-                node(slv_virtocommerce)
+                node(slave)
                 {
                     def composeFolder = "${env.WORKSPACE}@libs\\${SETTINGS["composeDir"]}"
                     dir(composeFolder)
