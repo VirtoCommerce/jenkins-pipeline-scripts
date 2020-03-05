@@ -146,7 +146,7 @@ def call(body)
 						if (env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'master')
 						{
 							def stagingName = Utilities.getStagingNameFromBranchName(this)
-							withEnv(["AzureBlobName=${SETTINGS['azureBlobName']}", "AzureBlobKey=${SETTINGS['azureBlobKey']}"])
+							withEnv(["AzureBlobName=${SETTINGS['azureBlobName']}", "AzureBlobKey=${SETTINGS['azureBlobKey']}", "AzureBlobToken=${SETTINGS['azureBlobToken']}"])
 							{
 								Utilities.runSharedPS(this, "VC-ThemeMix2Azure.ps1", "-StagingName ${stagingName} -StoreName ${storeName}")
 							}
@@ -163,7 +163,7 @@ def call(body)
 										echo "regionAndEnvChoices: ${regionAndEnvChoices}"
 										stagingName = "${env.BRANCH_NAME}"
 										SETTINGS.setEnvironment(regionAndEnvChoices)
-										withEnv(["AzureBlobName=${SETTINGS['azureBlobName']}", "AzureBlobKey=${SETTINGS['azureBlobKey']}"])
+										withEnv(["AzureBlobName=${SETTINGS['azureBlobName']}", "AzureBlobKey=${SETTINGS['azureBlobKey']}", "AzureBlobToken=${SETTINGS['azureBlobToken']}"])
 										{
 											Utilities.runSharedPS(this, "VC-ThemeMix2Azure.ps1", "-StagingName ${stagingName} -StoreName ${storeName}")
 										}
@@ -174,7 +174,7 @@ def call(body)
 							{
 								stagingName = "${env.BRANCH_NAME}"
 								SETTINGS.setEnvironment('master')
-								withEnv(["AzureBlobName=${SETTINGS['azureBlobName']}", "AzureBlobKey=${SETTINGS['azureBlobKey']}"])
+								withEnv(["AzureBlobName=${SETTINGS['azureBlobName']}", "AzureBlobKey=${SETTINGS['azureBlobKey']}", "AzureBlobToken=${SETTINGS['azureBlobToken']}"])
 								{
 									Utilities.runSharedPS(this, "VC-ThemeMix2Azure.ps1", "-StagingName ${stagingName} -StoreName ${storeName}")
 								}

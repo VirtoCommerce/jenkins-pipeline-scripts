@@ -6,10 +6,14 @@ param(
     $WebAppName,
     $WebAppPublicName,
     $ResourceGroupName,
-    $SubscriptionID
+    $SubscriptionID,
+    $StorageAccount = "qademovc",
+    $BlobContainerName = "cms",
+    $ThemeBlobPath = "Themes"
 )
 
 # Upload Storefront Zip File to Azure
+[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
 $ApplicationID ="${env:AzureAppID}"
 $APIKey = ConvertTo-SecureString "${env:AzureAPIKey}" -AsPlainText -Force
@@ -41,7 +45,7 @@ if($StorefrontDir -or $ThemeDir){
     Write-Host "Stop WebApp $WebAppPublicName"
     Stop-AzureRmWebApp -ResourceGroupName $ResourceGroupName -Name $WebAppPublicName | Select Name,State
 }
-Start-Sleep -s 5
+Start-Sleep -s 15
 
 $msdeploy = "${env:MSDEPLOY_DIR}\msdeploy.exe"
 
@@ -49,7 +53,7 @@ $sourcewebapp_msdeployUrl = "https://${WebAppName}.scm.azurewebsites.net/msdeplo
 # Upload Platform
 if($PlatformDir){
     Write-Output "Upload Platform"
-    & $msdeploy -verb:sync -dest:contentPath="D:\home\site\wwwroot\platform",computerName=$sourcewebapp_msdeployUrl,publishSettings=$BackendPublishProfile -source:contentPath=$PlatformDir
+    & $msdeploy -verb:sync -dest:contentPath="D:\home\site\wwwroot\platform",computerName=$sourcewebapp_msdeployUrl,publishSettings=$BackendPublishProfile -source:contentPath=$PlatformDir -verbose
 }
 # Upload Modules
 if($ModulesDir){
@@ -69,14 +73,11 @@ if($StorefrontDir){
 #    Write-Output "Upload Theme"
 #    & $msdeploy -verb:sync -dest:contentPath="D:\home\site\wwwroot\wwwroot\theme",computerName=$sourcewebapp_msdeployUrl,publishSettings=$FrontendPublishProfile -source:contentPath=$ThemeDir
 #}
-$ContainerName = "cms"
-$dirpath = "Themes"
 
 
-Write-Output "AzCopy $elecPath"
-$accountname = "qademovc"
+Write-Output "AzCopy $StorageAccount"
 $token = $env:AzureBlobToken
-& "${env:Utils}\AzCopy10\AzCopy" sync $ThemeDir https://$($accountname).blob.core.windows.net/$ContainerName/$($dirpath)$token --delete-destination=true #/DestKey:$accountKey /S
+& "${env:Utils}\AzCopy10\AzCopy" sync $ThemeDir https://$($StorageAccount).blob.core.windows.net/$BlobContainerName/$($ThemeBlobPath)$token --delete-destination=true #/DestKey:$accountKey /S
 
 Write-Host "Start Backend $WebAppName"
 
