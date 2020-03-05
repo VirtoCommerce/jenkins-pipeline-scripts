@@ -17,7 +17,7 @@ def STOREFRONT_INSTALL
 
 pipeline
 {
-    agent slave
+    agent any
 
     options
     {
