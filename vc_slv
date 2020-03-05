@@ -54,11 +54,11 @@ pipeline
         }
         stage("Preparing Solution")
         {
-            node(SETTINGS['agentLabel'] ?: 'master')
+            steps
             {
-                steps
+                script
                 {
-                    script
+                    node(SETTINGS['agentLabel'] ?: 'master')
                     {
                         def csSrc = "${env.SOLUTION_FOLDER}\\${SETTINGS['prefix']}\\${BASE_BRANCH}"
                         def csTarget = "${env.SOLUTION_FOLDER}\\${SETTINGS['ptrfix']}\\${BRANCH_NAME}"
@@ -84,17 +84,17 @@ pipeline
         }
         stage("Docker Environment")
         {
-            node(SETTINGS['agentLabel'] ?: 'master')
+            steps
             {
-                steps
+                script
                 {
-                    script
+                    node(SETTINGS['agentLabel'] ?: 'master')
                     {
-                        stage('Create Test Environment') 
+                        stage('Create Test Environment')
                         {
                             timestamps 
                             { 
-                                // Start docker environment	
+                                // Start docker environment
                                 def composeFolder = "${env.WORKSPACE}@libs\\${SETTINGS['composeDir']}"
                                 dir(composeFolder)
                                 {
