@@ -192,8 +192,9 @@ pipeline
         {
             script
             {
-                // node(slave)
-                // {
+                node(slave)
+                {
+                    echo "*post*"
                     // def composeFolder = "${env.WORKSPACE}@libs\\${SETTINGS["composeDir"]}"
                     // dir(composeFolder)
                     // {
@@ -202,7 +203,7 @@ pipeline
                     //     }
                     //     bat "docker image prune -f"
                     // }
-                // }
+                }
             }
         }
     }
