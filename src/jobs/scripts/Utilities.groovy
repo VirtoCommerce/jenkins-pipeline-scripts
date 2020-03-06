@@ -47,7 +47,7 @@ class Utilities
 
     def static runSharedPS(context, scriptName, args = '')
     {
- 	    context.bat "powershell.exe -File \"${context.env.WORKSPACE}\\..\\workspace@libs\\${DefaultSharedLibName}\\resources\\azure\\${scriptName}\" ${args} -ErrorAction Stop".replaceAll('%', '%%')
+ 	    context.bat script: "powershell.exe -File \"${context.env.WORKSPACE}\\..\\workspace@libs\\${DefaultSharedLibName}\\resources\\azure\\${scriptName}\" ${args} -ErrorAction Stop".replaceAll('%', '%%'), label: scriptName
     }
 
     def static getAssemblyVersion(context, projectFile)
@@ -405,6 +405,7 @@ class Utilities
     }
 
     def static validateSwagger(context, schemaPath) {
+        context.echo "Swagger validation"
         Packaging.createSwaggerSchema(context, schemaPath)
         
         def schemaFile = new File(schemaPath)
@@ -606,7 +607,7 @@ class Utilities
 
     def static runBatchScript(context, command){
         def outFile = "log${context.env.BUILD_NUMBER}.out"
-        def exitCode = context.bat script: "${command} > ${outFile}", returnStatus:true
+        def exitCode = context.bat script: "${command} > ${outFile}", returnStatus:true, label: command
         def res = [:]
         def fileContent = context.readFile(outFile).trim()
         context.echo fileContent
@@ -643,7 +644,7 @@ class Utilities
 
     def static getRepoChanges(context)
     {
-        String result = context.bat (returnStdout: true, script: "@\"${context.tool 'Git'}\" log -1 --pretty=\"format:\" --name-only").trim()        
+        String result = context.bat (returnStdout: true, script: "@\"${context.tool 'Git'}\" log -1 --pretty=\"format:\" --name-only", label: "git log -1").trim()        
         def lines = result.split("\r?\n")
         return lines as String[]
     }
