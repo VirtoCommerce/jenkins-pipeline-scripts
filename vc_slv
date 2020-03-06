@@ -188,13 +188,13 @@ pipeline
         {
             script
             {
-                node("slave")
+                echo "*settings-post*: "
+                echo SETTINGS['agentLabel']
+                echo SETTINGS['composeDir']
+                
+                node(SETTINGS['agentLabel')
                 {
-                    echo "*post-off*"
-                    echo "*settings-post*: "
-                    echo SETTINGS['agentLabel']
-                    echo SETTINGS['composeDir']
-                    // def composeFolder = "${env.WORKSPACE}@libs\\${SETTINGS["composeDir"]}"
+                    def composeFolder = "${env.WORKSPACE}@libs\\${SETTINGS["composeDir"]}"
                     // dir(composeFolder)
                     // {
                     //     withEnv(["DOCKER_TAG=${DOCKER_TAG}", "DOCKER_PREFIX=${DOCKER_PREFIX}", "DOCKER_PLATFORM_PORT=${DOCKER_PLATFORM_PORT}", "DOCKER_STOREFRONT_PORT=${DOCKER_STOREFRONT_PORT}", "DOCKER_SQL_PORT=${DOCKER_SQL_PORT}", "COMPOSE_PROJECT_NAME=${env.BUILD_TAG}"]){
