@@ -42,11 +42,6 @@ pipeline
                         }
                         SETTINGS.setRegion("virtocommerce")
                         SETTINGS.setEnvironment("dev")
-
-                        echo "*settings*: "
-                        echo SETTINGS['agentLabel']
-                        echo SETTINGS['composeDir']
-
                         def branches = Utilities.getSubfolders("${env.SOLUTION_FOLDER}\\${SETTINGS['prefix']}").join("\n")
                         def userInput = input message: "Select Branch", parameters: 
                         [
@@ -125,12 +120,6 @@ pipeline
                             timestamps
                             {
                                 def platformContainer = Utilities.getPlatformContainer(this)
-                                def backendFeaturesDir = new File("${VCCOM_SETTINGS_PATH}\\backend")
-                                if(backendFeaturesDir.exists())
-                                {
-                                    echo "Copy features to the platform container"
-                                    powershell "\$files = Get-ChildItem ${backendFeaturesDir.toString()} -Recurse; foreach(\$file in \$files){ docker cp \$file.fullname ${platformContainer}:/vc-platform/ }"
-                                }
                                 // install modules
                                 Utils.runPS('qaenv/install-modules.ps1', "-ApiUrl \"${Utilities.getPlatformHost(this)}\" -PlatformContainer ${platformContainer} -ModulesDir ${env.WORKSPACE}\\CS\\modules")
                             }
@@ -188,20 +177,16 @@ pipeline
         {
             script
             {
-                echo "*settings-post*: "
-                echo SETTINGS['agentLabel']
-                echo SETTINGS['composeDir']
-
                 node(SETTINGS['agentLabel'])
                 {
                     def composeFolder = "${env.WORKSPACE}@libs\\${SETTINGS["composeDir"]}"
-                    // dir(composeFolder)
-                    // {
-                    //     withEnv(["DOCKER_TAG=${DOCKER_TAG}", "DOCKER_PREFIX=${DOCKER_PREFIX}", "DOCKER_PLATFORM_PORT=${DOCKER_PLATFORM_PORT}", "DOCKER_STOREFRONT_PORT=${DOCKER_STOREFRONT_PORT}", "DOCKER_SQL_PORT=${DOCKER_SQL_PORT}", "COMPOSE_PROJECT_NAME=${env.BUILD_TAG}"]){
-                    //         bat "docker-compose down -v"
-                    //     }
-                    //     bat "docker image prune -f"
-                    // }
+                    dir(composeFolder)
+                    {
+                        withEnv(["DOCKER_TAG=${DOCKER_TAG}", "DOCKER_PREFIX=${DOCKER_PREFIX}", "DOCKER_PLATFORM_PORT=${DOCKER_PLATFORM_PORT}", "DOCKER_STOREFRONT_PORT=${DOCKER_STOREFRONT_PORT}", "DOCKER_SQL_PORT=${DOCKER_SQL_PORT}", "COMPOSE_PROJECT_NAME=${env.BUILD_TAG}"]){
+                            bat "docker-compose down -v"
+                        }
+                        bat "docker image prune -f"
+                    }
                 }
             }
         }
