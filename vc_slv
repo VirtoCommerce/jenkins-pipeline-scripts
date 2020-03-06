@@ -191,8 +191,8 @@ pipeline
                 echo "*settings-post*: "
                 echo SETTINGS['agentLabel']
                 echo SETTINGS['composeDir']
-                
-                node(SETTINGS['agentLabel')
+
+                node(SETTINGS['agentLabel'])
                 {
                     def composeFolder = "${env.WORKSPACE}@libs\\${SETTINGS["composeDir"]}"
                     // dir(composeFolder)
