@@ -121,15 +121,19 @@ pipeline
                             {
                                 def platformContainer = Utilities.getPlatformContainer(this)
                                 // install modules
-                                //Utilities.runSharedPS(this, 'qaenv/install-modules.ps1', "-ApiUrl \"${Utilities.getPlatformHost(this)}\" -PlatformContainer ${platformContainer} -ModulesDir ${env.WORKSPACE}\\CS\\modules")
-                                echo "${env.WORKSPACE}"
+                                runPS('qaenv/install-modules.ps1', "-ApiUrl \"${Utilities.getPlatformHost(this)}\" -PlatformContainer ${platformContainer} -ModulesDir ${env.WORKSPACE}\\CS\\modules")
                             }
                         }
                         stage('Install Sample Data')
                         {
                             timestamps
                             {
-                                Utilities.runSharedPS(this, "vc-setup-sampledata.ps1", "-apiurl \"http://localhost:${DOCKER_PLATFORM_PORT}\"")
+                                def sampleDataSrcParam = ""
+                                if(SETTINGS['sampledata'] != null){
+                                    sampleDataSrcParam = "-sampleDataSrc ${SETTINGS['sampledata']}"
+                                    echo "using url from settings file"
+                                }
+                                runPS("vc-setup-sampledata.ps1", "-apiurl \"http://localhost:${DOCKER_PLATFORM_PORT}\" ${sampleDataSrcParam} -Verbose -Debug")
                             }
                         }
                         stage('Storefront Install')
@@ -140,7 +144,6 @@ pipeline
                                 {
                                     def storefrontContainer = Utilities.getStorefrontContainer(this)
                                     def storefrontDir = "${env.WORKSPACE}\\CS\\storefront"
-                                    //bat "docker exec ${storefrontContainer} cmd /c \"rmdir /S /Q C:\\vc-storefront\""
                                     bat "docker stop ${storefrontContainer}"
                                     bat "docker cp ${storefrontDir} ${storefrontContainer}:/vc-storefront/."
                                     bat "docker start ${storefrontContainer}"
@@ -151,10 +154,8 @@ pipeline
                         {
                             timestamps 
                             {
-                                //def storefrontContainer = Utilities.getStorefrontContainer(this)
                                 def platformContainer = Utilities.getPlatformContainer(this)
                                 def themeFolder = "${env.WORKSPACE}\\CS\\theme"
-                                //Utilities.runSharedPS(this, "vc-install-theme.ps1", "-themeZip \"${themeFolder}\" -platformContainer ${platformContainer}")
                                 bat "docker exec ${platformContainer} powershell -Command \"Remove-Item C:\\vc-platform\\App_Data\\cms-content\\Themes -Recurse -Force\""
                                 bat "docker exec ${platformContainer} powershell -Command \"mkdir tmp\""
                                 bat "docker cp ${themeFolder} ${platformContainer}:/tmp/Themes"
@@ -207,4 +208,10 @@ def wakeUpNode(nodeLabel)
     {
         echo any.getMessage()
     }
+}
+
+def runPS(psName, args)
+{
+    def script = "${env.WORKSPACE}\\resources\\azure\\${psName} ${args} -ErrorAction Stop"
+    powershell script: script, label: "${psName} ${args}"
 }
