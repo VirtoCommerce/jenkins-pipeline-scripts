@@ -121,19 +121,14 @@ pipeline
                             {
                                 def platformContainer = Utilities.getPlatformContainer(this)
                                 // install modules
-                                Utils.runPS('qaenv/install-modules.ps1', "-ApiUrl \"${Utilities.getPlatformHost(this)}\" -PlatformContainer ${platformContainer} -ModulesDir ${env.WORKSPACE}\\CS\\modules")
+                                Utilities.runSharedPS(this, 'qaenv/install-modules.ps1', "-ApiUrl \"${Utilities.getPlatformHost(this)}\" -PlatformContainer ${platformContainer} -ModulesDir ${env.WORKSPACE}\\CS\\modules")
                             }
                         }
                         stage('Install Sample Data')
                         {
                             timestamps
                             {
-                                def sampleDataSrcParam = ""
-                                if(SETTINGS['sampledata'] != null){
-                                    sampleDataSrcParam = "-sampleDataSrc ${SETTINGS['sampledata']}"
-                                    echo "using url from settings file"
-                                }
-                                Utils.runPS("vc-setup-sampledata.ps1", "-apiurl \"http://localhost:${DOCKER_PLATFORM_PORT}\" ${sampleDataSrcParam} -Verbose -Debug")
+                                Utilities.runSharedPS(this, "vc-setup-sampledata.ps1", "-apiurl \"http://localhost:${DOCKER_PLATFORM_PORT}\"")
                             }
                         }
                         stage('Storefront Install')
@@ -155,9 +150,14 @@ pipeline
                         {
                             timestamps 
                             {
-                                def storefrontContainer = Utilities.getStorefrontContainer(this)
-                                def themeFolder = "${env.WORKSPACE}\\CS\\theme\\vccom"
-                                Utils.runPS("install-vccom-theme.ps1", "-ThemePath \"${themeFolder}\" -Container ${storefrontContainer}")
+                                //def storefrontContainer = Utilities.getStorefrontContainer(this)
+                                def platformContainer = Utilities.getPlatformContainer(this)
+                                def themeFolder = "${env.WORKSPACE}\\CS\\theme"
+                                //Utilities.runSharedPS(this, "vc-install-theme.ps1", "-themeZip \"${themeFolder}\" -platformContainer ${platformContainer}")
+                                bat "docker exec ${platformContainer} powershell -Command \"Remove-Item C:\\vc-platform\\App_Data\\cms-content\\Themes -Recurse -Force\""
+                                bat "docker exec ${platformContainer} powershell -Command \"mkdir tmp\""
+                                bat "docker cp ${themeFolder} ${platformContainer}:/tmp/Themes"
+                                bat "docker exec ${platformContainer} powershell -Command \"Copy-Item -Path C:\\tmp\\Themes -Destination C:\\vc-platform\\App_Data\\cms-content\\Themes -Recurse -Force\""
                             }
                         }
                         
