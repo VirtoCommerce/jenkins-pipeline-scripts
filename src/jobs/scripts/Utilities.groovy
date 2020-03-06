@@ -640,4 +640,24 @@ class Utilities
             }
         }
     }
+
+    def static getRepoChanges(context)
+    {
+        String result = context.bat (returnStdout: true, script: "@\"${context.tool 'Git'}\" log -1 --pretty=\"format:\" --name-only").trim()        
+        def lines = result.split("\r?\n")
+        return lines as String[]
+    }
+    def static areThereCodeChanges(context)
+    {
+        def changes = Utilities.getRepoChanges(context)
+        def result = false
+        for(change in changes)
+        {
+            if(!change.startsWith('docs/') && !change.startsWith('build/') && !change.equalsIgnoreCase('readme.md'))
+            {
+                result = true
+            }
+        }
+        return result
+    }
 }

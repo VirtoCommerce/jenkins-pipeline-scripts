@@ -32,6 +32,11 @@ def call(body) {
                 stage('Checkout'){
                     deleteDir()
                     checkout scm
+                    
+					if(!Utilities.areThereCodeChanges(this))
+					{
+						throw new Exception("There are no Code Changes")
+					}
                 }
 
                 stage('Build'){
