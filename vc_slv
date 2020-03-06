@@ -183,7 +183,7 @@ pipeline
         {
             script
             {
-                node(SETTINGS['agentLabel'])
+                node('slave')
                 {
                     def composeFolder = "${env.WORKSPACE}@libs\\${SETTINGS["composeDir"]}"
                     dir(composeFolder)
