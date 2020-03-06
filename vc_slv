@@ -33,8 +33,8 @@ pipeline
             {
                 script
                 {
-                    Utilites.wakeUpNode('slave')
-                    node('slave')
+                    Utilites.wakeUpNode("slave")
+                    node("slave")
                     {
                         checkout scm
                         configFileProvider([configFile(fileId: 'virtocommerce', variable: 'SETTINGS_FILE')]) {
@@ -183,7 +183,7 @@ pipeline
         {
             script
             {
-                node('slave')
+                node("slave")
                 {
                     def composeFolder = "${env.WORKSPACE}@libs\\${SETTINGS["composeDir"]}"
                     dir(composeFolder)
