@@ -33,7 +33,7 @@ pipeline
             {
                 script
                 {
-                    Utilites.wakeUpNode("slave")
+                    wakeUpNode("slave")
                     node("slave")
                     {
                         checkout scm
@@ -191,6 +191,9 @@ pipeline
                 node("slave")
                 {
                     echo "*post-off*"
+                    echo "*settings-post*: "
+                    echo SETTINGS['agentLabel']
+                    echo SETTINGS['composeDir']
                     // def composeFolder = "${env.WORKSPACE}@libs\\${SETTINGS["composeDir"]}"
                     // dir(composeFolder)
                     // {
@@ -202,5 +205,20 @@ pipeline
                 }
             }
         }
+    }
+}
+
+def wakeUpNode(nodeLabel)
+{
+    try
+    {
+        node(nodeLabel)
+        {
+            echo "${nodeLabel} is up!"
+        }
+    }
+    catch(any)
+    {
+        echo any.getMessage()
     }
 }
