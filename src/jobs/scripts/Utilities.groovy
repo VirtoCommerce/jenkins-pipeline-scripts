@@ -640,4 +640,19 @@ class Utilities
             }
         }
     }
+
+    def wakeUpNode(nodeLabel)
+    {
+        try
+        {
+            node(nodeLabel)
+            {
+                echo "${nodeLabel} is up!"
+            }
+        }
+        catch(any)
+        {
+            echo any.getMessage()
+        }
+    }
 }
