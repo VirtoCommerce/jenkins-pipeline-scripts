@@ -42,6 +42,11 @@ pipeline
                         }
                         SETTINGS.setRegion("virtocommerce")
                         SETTINGS.setEnvironment("dev")
+
+                        echo "*settings*: "
+                        echo SETTINGS['agentLabel']
+                        echo SETTINGS['composeDir']
+
                         def branches = Utilities.getSubfolders("${env.SOLUTION_FOLDER}\\${SETTINGS['prefix']}").join("\n")
                         def userInput = input message: "Select Branch", parameters: 
                         [
@@ -185,14 +190,15 @@ pipeline
             {
                 node("slave")
                 {
-                    def composeFolder = "${env.WORKSPACE}@libs\\${SETTINGS["composeDir"]}"
-                    dir(composeFolder)
-                    {
-                        withEnv(["DOCKER_TAG=${DOCKER_TAG}", "DOCKER_PREFIX=${DOCKER_PREFIX}", "DOCKER_PLATFORM_PORT=${DOCKER_PLATFORM_PORT}", "DOCKER_STOREFRONT_PORT=${DOCKER_STOREFRONT_PORT}", "DOCKER_SQL_PORT=${DOCKER_SQL_PORT}", "COMPOSE_PROJECT_NAME=${env.BUILD_TAG}"]){
-                            bat "docker-compose down -v"
-                        }
-                        bat "docker image prune -f"
-                    }
+                    echo "*post-off*"
+                    // def composeFolder = "${env.WORKSPACE}@libs\\${SETTINGS["composeDir"]}"
+                    // dir(composeFolder)
+                    // {
+                    //     withEnv(["DOCKER_TAG=${DOCKER_TAG}", "DOCKER_PREFIX=${DOCKER_PREFIX}", "DOCKER_PLATFORM_PORT=${DOCKER_PLATFORM_PORT}", "DOCKER_STOREFRONT_PORT=${DOCKER_STOREFRONT_PORT}", "DOCKER_SQL_PORT=${DOCKER_SQL_PORT}", "COMPOSE_PROJECT_NAME=${env.BUILD_TAG}"]){
+                    //         bat "docker-compose down -v"
+                    //     }
+                    //     bat "docker image prune -f"
+                    // }
                 }
             }
         }
