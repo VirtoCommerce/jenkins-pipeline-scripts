@@ -121,7 +121,8 @@ pipeline
                             {
                                 def platformContainer = Utilities.getPlatformContainer(this)
                                 // install modules
-                                Utilities.runSharedPS(this, 'qaenv/install-modules.ps1', "-ApiUrl \"${Utilities.getPlatformHost(this)}\" -PlatformContainer ${platformContainer} -ModulesDir ${env.WORKSPACE}\\CS\\modules")
+                                //Utilities.runSharedPS(this, 'qaenv/install-modules.ps1', "-ApiUrl \"${Utilities.getPlatformHost(this)}\" -PlatformContainer ${platformContainer} -ModulesDir ${env.WORKSPACE}\\CS\\modules")
+                                echo "${env.WORKSPACE}"
                             }
                         }
                         stage('Install Sample Data')
