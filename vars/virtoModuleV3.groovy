@@ -1,4 +1,6 @@
-import jobs.scripts.*
+def Modules
+def Packaging
+def Utilities
 
 def call(body) {
 	// evaluate the body block, and collect configuration into the object
@@ -11,19 +13,25 @@ def call(body) {
 
     node {
         properties([disableConcurrentBuilds()])
+
+        def globalLib = library('global-shared-lib').com.test
+		Utilities = globalLib.Utilities
+		Packaging = globalLib.Packaging
+		Modules = globalLib.Modules
+
         def escapedBranch = env.BRANCH_NAME.replaceAll('/', '_')
         def repoName = Utilities.getRepoName(this)
         def workspace = "D:\\Buildsv3\\${repoName}\\${escapedBranch}"
         projectType = 'NETCORE2'
         dir(workspace){
-            def SETTINGS
-            def settingsFileContent
-            configFileProvider([configFile(fileId: 'shared_lib_settings', variable: 'SETTINGS_FILE')]) {
-                settingsFileContent = readFile(SETTINGS_FILE)
-            }
-            SETTINGS = new Settings(settingsFileContent)
-            SETTINGS.setRegion('platform-core')
-            SETTINGS.setEnvironment(env.BRANCH_NAME)
+            // def SETTINGS
+            // def settingsFileContent
+            // configFileProvider([configFile(fileId: 'shared_lib_settings', variable: 'SETTINGS_FILE')]) {
+            //     settingsFileContent = readFile(SETTINGS_FILE)
+            // }
+            // SETTINGS = globalLib.Settings.new(settingsFileContent)
+            // SETTINGS.setProject('platform-core')
+            // SETTINGS.setBranch(env.BRANCH_NAME)
             try {
                 stage('Checkout'){
                     deleteDir()
