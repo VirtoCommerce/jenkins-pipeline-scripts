@@ -219,11 +219,13 @@ class Packaging {
 
     def static cleanBuild(context, solution)
     {
+        context.cho "MSBuild Clean Task"
         context.bat "\"${context.tool DefaultMSBuild}\" \"${solution}\" /t:clean /p:Configuration=Debug /p:Platform=\"Any CPU\" /m"
     }    
 
     def static startAnalyzer(context, dotnet = false)
     {
+        context.echo "Start SonarScanner for MSBuild"
         def sqScannerMsBuildHome = context.tool 'Scanner for MSBuild'
         def fullJobName = Utilities.getRepoName(context)
         def coverageFolder = Utilities.getCoverageFolder(context)
@@ -251,6 +253,7 @@ class Packaging {
     }
 
     def static startSonarJS(context){
+        context.echo "Start SonarScanner"
         def sqScanner = context.tool 'SonarScannerJS'
         def fullJobName = Utilities.getRepoName(context)
         def sources = "./assets"
@@ -273,6 +276,7 @@ class Packaging {
 
     def static endAnalyzer(context, dotnet = false)
     {
+        context.echo "Stop SonarScanner for MSBuild"
         def sqScannerMsBuildHome = context.tool 'Scanner for MSBuild'
         def fullJobName = Utilities.getRepoName(context)
         def scannerPath = "\"${sqScannerMsBuildHome}\\SonarScanner.MSBuild.exe\""
@@ -287,6 +291,7 @@ class Packaging {
 
     def static checkAnalyzerGate(context)
     {
+        context.echo "Waiting for Quality Gate"
 		if(Utilities.isPullRequest(context))
         {
             return
@@ -301,6 +306,7 @@ class Packaging {
 
     def static runGulpBuild(context)
     {
+        context.echo "gulp build"
         context.timeout(activity: true, time: 15){
             def packagesDir = Utilities.getArtifactFolder(context)
 
