@@ -1,4 +1,6 @@
-import jobs.scripts.*
+def Modules
+def Packaging
+def Utilities
 
 def call(body) {
 	// evaluate the body block, and collect configuration into the object
@@ -11,6 +13,12 @@ def call(body) {
 
     node {
         properties([disableConcurrentBuilds()])
+
+        def globalLib = library('global-shared-lib').com.test
+		Utilities = globalLib.Utilities
+		Packaging = globalLib.Packaging
+		Modules = globalLib.Modules
+
         def escapedBranch = env.BRANCH_NAME.replaceAll('/', '_')
         def repoName = Utilities.getRepoName(this)
         def workspace = "D:\\Buildsv3\\${repoName}\\${escapedBranch}"
@@ -22,9 +30,9 @@ def call(body) {
             configFileProvider([configFile(fileId: 'shared_lib_settings', variable: 'SETTINGS_FILE')]) {
                 settingsFileContent = readFile(SETTINGS_FILE)
             }
-            SETTINGS = new Settings(settingsFileContent)
-            SETTINGS.setRegion('platform-core')
-            SETTINGS.setEnvironment(env.BRANCH_NAME)
+            SETTINGS = globalLib.Settings.new(settingsFileContent)
+            SETTINGS.setProject('platform-core')
+            SETTINGS.setBranch(env.BRANCH_NAME)
             Utilities.notifyBuildStatus(this, SETTINGS['of365hook'], '', 'STARTED')
             def coverageFolder = Utilities.getCoverageFolder(this)
 
@@ -109,17 +117,17 @@ def call(body) {
                     //     def orgName = Utilities.getOrgName(this)
                     //     powershell "vc-build Release -GitHubUser ${orgName} -GitHubToken ${env.GITHUB_TOKEN} -PreRelease -skip Clean+Restore+Compile+Test"
                     }
-                    stage('Deploy')
-                    {
-                        // $ZipFile,
-                        // $WebAppName,
-                        // $ResourceGroupName,
-                        // $SubscriptionID,
-                        // $DestContentPath = ""
-                        def artifacts = findFiles(glob: "artifacts/*.zip")
-                        def artifactPath = artifacts[0].path
-                        Utilities.runSharedPS(this, "v3\\DeployTo-Azure.ps1", "-ZipFile \"${artifactPath}\" -WebAppName ${SETTINGS['webAppName']} -ResourceGroupName ${SETTINGS['resourceGroupName']} -SubscriptionID ${SETTINGS['subscriptionID']} -DestContentPath \"platform\"")
-                    }
+                    // stage('Deploy')
+                    // {
+                    //     // $ZipFile,
+                    //     // $WebAppName,
+                    //     // $ResourceGroupName,
+                    //     // $SubscriptionID,
+                    //     // $DestContentPath = ""
+                    //     def artifacts = findFiles(glob: "artifacts/*.zip")
+                    //     def artifactPath = artifacts[0].path
+                    //     Utilities.runSharedPS(this, "v3\\DeployTo-Azure.ps1", "-ZipFile \"${artifactPath}\" -WebAppName ${SETTINGS['webAppName']} -ResourceGroupName ${SETTINGS['resourceGroupName']} -SubscriptionID ${SETTINGS['subscriptionID']} -DestContentPath \"platform\"")
+                    // }
                 }
             }
             catch(any){
