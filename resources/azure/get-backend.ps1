@@ -33,9 +33,9 @@ Write-Output "Output: ${env:AzureAPIKey}"
 Write-Output "Output: $TenantID"
 Write-Output "Output: $SubscriptionID"
 
-Add-AzureRmAccount -Credential $psCred -TenantId $TenantID -ServicePrincipal
+Add-AzureRmAccount -Credential $psCred -TenantId $TenantID -ServicePrincipal -Subscription $SubscriptionID
 #Select-AzureRmSubscription -SubscriptionId $SubscriptionID
-Get-AzureRmSubscription -SubscriptionId $SubscriptionId -TenantId $TenantID | Set-AzureRmContext
+#Get-AzureRmSubscription -SubscriptionId $SubscriptionId -TenantId $TenantID | Set-AzureRmContext
 
 $DestResourceGroupName = $ResourceGroupName
 $DestWebAppName = $AppName
