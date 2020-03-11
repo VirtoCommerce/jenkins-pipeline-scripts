@@ -19,6 +19,8 @@ Param(
     $SubscriptionID
 )
 
+Write-Output "subscriptionIDDD: $SubscriptionID"
+Write-Host "subscriptionIDDD: $SubscriptionID"
 # FILE TO GET PLATFORM VERSION FROM
 $PlatformVersionFile = $BackendPath+"\platform\bin\VirtoCommerce.Platform.Web.dll"
 
@@ -31,7 +33,6 @@ $psCred = New-Object System.Management.Automation.PSCredential($ApplicationID, $
 $TenantID = "${env:AzureTenantID}"
 
 Add-AzureRmAccount -Credential $psCred -TenantId $TenantID -ServicePrincipal
-Write-Output "subscriptionIDsubscriptionIDsubscriptionID: $SubscriptionID"
 Select-AzureRmSubscription -SubscriptionId $SubscriptionID
 
 
