@@ -11,16 +11,12 @@ Prerequirements:
 #> 
 
 Param(
-	[parameter(Mandatory = $true)]
 	$AppName,
-	[parameter(Mandatory = $true)]
 	$BackendPath,
     $ResourceGroupName,
     $SubscriptionID
 )
 
-Write-Output "subscriptionIDDD: $SubscriptionID"
-Write-Host "subscriptionIDDD: $SubscriptionID"
 # FILE TO GET PLATFORM VERSION FROM
 $PlatformVersionFile = $BackendPath+"\platform\bin\VirtoCommerce.Platform.Web.dll"
 
@@ -32,9 +28,12 @@ $APIKey = ConvertTo-SecureString "${env:AzureAPIKey}" -AsPlainText -Force
 $psCred = New-Object System.Management.Automation.PSCredential($ApplicationID, $APIKey)
 $TenantID = "${env:AzureTenantID}"
 
-Add-AzureRmAccount -Credential $psCred -TenantId $TenantID -ServicePrincipal
-Select-AzureRmSubscription -SubscriptionId $SubscriptionID
+Write-Output "Output: $ApplicationID"
+Write-Output "Output: $APIKey"
+Write-Output "Output: $TenantID"
 
+Add-AzureRmAccount -Credential $psCred -TenantId $TenantID -ServicePrincipal
+Write-Output "Select-AzureRmSubscription -SubscriptionId $SubscriptionID"
 
 $DestResourceGroupName = $ResourceGroupName
 $DestWebAppName = $AppName

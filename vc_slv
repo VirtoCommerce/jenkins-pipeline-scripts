@@ -70,7 +70,6 @@ pipeline
                         def appName = SETTINGS['appName']
 
                         //get backend
-                        echo "subscriptionIDsubscriptionIDsubscriptionID: ${SETTINGS['subscriptionID']}"
                         runPS("get-backend.ps1", "-AppName ${appName} -BackendPath ${tmpBackendPath} -ResourceGroupName \"${SETTINGS['resourceGroupName']}\" -SubscriptionID \"${SETTINGS['subscriptionID']}\"")
                         def platform_version = powershell script:"Write-Output \"\$([System.Diagnostics.FileVersionInfo]::GetVersionInfo(\"${tmpBackendPath}\\platform\\bin\\VirtoCommerce.Platform.Web.dll\").FileVersion)\"", returnStdout: true
                         platform_version = platform_version.replace('.0', '').trim()
