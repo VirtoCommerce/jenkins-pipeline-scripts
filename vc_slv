@@ -66,7 +66,11 @@ pipeline
                 {
                     node(SETTINGS['agentLabel'])
                     {
-                        echo "*Get-repos-to-cs*"
+                        def tmpBackendPath = "${env.WORKSPACE}@tmp\\tmpBackend${env.BUILD_NUMBER}"
+                        def appName = SETTINGS['appName']
+
+                        //get backend
+                        runPS("get-backend.ps1", "-AppName ${appName} -BackendPath ${tmpBackendPath} -ResourceGroupName \"${SETTINGS['resourceGroupName']}\" -SubscriptionID \"${SETTINGS['subscriptionID']}\"")
                     }
                 }
             }
