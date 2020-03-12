@@ -18,10 +18,10 @@ Param(
 )
 
 # FILE TO GET STOREFRONT VERSION FROM
-$StorefrontVersionFile = $BackendPath+"\storefront\VirtoCommerce.Storefront.dll"
+#$StorefrontVersionFile = $BackendPath+"\storefront\VirtoCommerce.Storefront.dll"
 
 # FILE WITH MODULES VERSIONS TO ADD TO ARCHIVE
-$FileToAddPath = $BackendPath + '\storefront\versions.txt'
+#$FileToAddPath = $BackendPath + '\storefront\versions.txt'
 
 $ApplicationID ="${env:AzureAppID}"
 $APIKey = ConvertTo-SecureString "${env:AzureAPIKey}" -AsPlainText -Force
@@ -44,7 +44,7 @@ $xml = Get-AzureRmWebAppPublishingProfile -Name $DestWebAppName `
 Write-Output "DOWNLOAD WEBSITE CODE"
 $msdeploy = "${env:MSDEPLOY_DIR}\msdeploy.exe"
 $sourcewebapp_msdeployUrl = "https://${AppName}.scm.azurewebsites.net/msdeploy.axd?site=${AppName}"
-& $msdeploy -verb:sync -source:contentPath="D:\home\site\wwwroot\",computerName=$sourcewebapp_msdeployUrl,publishSettings=$tmpPublishProfile -dest:contentPath=$BackendPath
+& $msdeploy -verb:sync -source:contentPath="D:\home\site\wwwroot\",computerName=$sourcewebapp_msdeployUrl,publishSettings=$tmpPublishProfile -dest:contentPath=$BackendPath\storefront
 
 # Get Storefront version from dll file properties (overwrite file if exist)
-Write-Output "$("Storefront version is",$([System.Diagnostics.FileVersionInfo]::GetVersionInfo($StorefrontVersionFile).FileVersion))" | Out-File -Force $FileToAddPath
+#Write-Output "$("Storefront version is",$([System.Diagnostics.FileVersionInfo]::GetVersionInfo($StorefrontVersionFile).FileVersion))" | Out-File -Force $FileToAddPath
