@@ -181,9 +181,11 @@ pipeline
                                 {
                                     def storefrontContainer = Utilities.getStorefrontContainer(this)
                                     def storefrontDir = "${backendPath}\\storefront"
-                                    bat "docker stop ${storefrontContainer}"
-                                    bat "docker cp ${storefrontDir} ${storefrontContainer}:/vc-storefront/."
-                                    bat "docker start ${storefrontContainer}"
+                                    echo "DOCKER_STOREFRONT_PORT: ${DOCKER_STOREFRONT_PORT}"
+                                    // storefrontContainer  DOCKER_STOREFRONT_PORT
+                                    bat "docker stop ${DOCKER_STOREFRONT_PORT}"
+                                    bat "docker cp ${storefrontDir} ${DOCKER_STOREFRONT_PORT}:/vc-storefront/."
+                                    bat "docker start ${DOCKER_STOREFRONT_PORT}"
                                 }
                             }
                         }
