@@ -84,6 +84,12 @@ pipeline
                         //get frontend
                         appName = SETTINGS['appNamePublic']
                         runPS("get-frontend.ps1", "-AppName ${appName} -BackendPath ${backendPath} -ResourceGroupName \"${SETTINGS['resourceGroupName']}\" -SubscriptionID \"${SETTINGS['subscriptionID']}\"")
+
+                        //get theme
+                        // def SFRepoName = "${SETTINGS['prefix']}-content"
+                        // def tagContains = STOREFRONT_VERSION
+                        // def release = GHRelease.getLatestGithubRelease(this, Utils.getRepoOrg(), SFRepoName, tagContains, false)
+                        
                     }
                 }
             }
@@ -186,20 +192,19 @@ pipeline
                             }
                         }
 
-                        stage('Install Theme')
+                        stage('Theme Install')
                         {
-                            timestamps 
+                            timestamps
                             {
                                 def platformContainer = Utilities.getPlatformContainer(this)
-                                def themeFolder = "${backendPath}\\wwwroot\\App_Data\\cms-content"
+                                def themeFolder = "C:\\CICD\\Solution\\vccom\\theme"
                                 // bat "docker exec ${platformContainer} powershell -Command \"Remove-Item C:\\vc-platform\\App_Data\\cms-content\\Themes -Recurse -Force\""
                                 bat "docker exec ${platformContainer} powershell -Command \"mkdir tmp\""
-                                bat "docker cp ${themeFolder} ${platformContainer}:/tmp"
-                                bat "docker exec ${platformContainer} powershell -Command \"Copy-Item -Path C:\\tmp\\themes -Destination C:\\vc-platform\\App_Data\\cms-content\\Themes -Recurse -Force\""
-                                bat "docker exec ${platformContainer} powershell -Command \"Copy-Item -Path C:\\tmp\\paages -Destination C:\\vc-platform\\App_Data\\cms-content\\Pages -Recurse -Force\""
+                                bat "docker cp ${themeFolder}\\Themes ${platformContainer}:/tmp/Themes"
+                                bat "docker exec ${platformContainer} powershell -Command \"Copy-Item -Path C:\\tmp\\Themes -Destination C:\\vc-platform\\App_Data\\cms-content\\Themes -Recurse -Force\""
                             }
                         }
-                        
+
                         stage('Awaiting Proceed')
                         {
                             def message = "Platform url: ${SETTINGS["platformContainerUrl"]}:${DOCKER_PLATFORM_PORT}\nStorefront: ${SETTINGS["storefrontContainerUrl"]}:${DOCKER_STOREFRONT_PORT}"
