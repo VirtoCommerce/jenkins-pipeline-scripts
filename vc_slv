@@ -32,11 +32,11 @@ pipeline
     {
         stage("User Input")
         {
-            timeout(time: "${SETTINGS['timeoutMinutes']}", unit: 'MINUTES')
-			{
-                steps
+            steps
+            {
+                script
                 {
-                    script
+                    timeout(time: "${SETTINGS['timeoutMinutes']}", unit: 'MINUTES')
                     {
                         wakeUpNode("slave")
                         node("slave")
