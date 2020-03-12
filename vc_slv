@@ -16,6 +16,8 @@ def DOCKER_TAG
 
 def STOREFRONT_INSTALL
 
+def backendPath
+
 pipeline
 {
     agent any
@@ -66,15 +68,13 @@ pipeline
                 {
                     node(SETTINGS['agentLabel'])
                     {
-                        def tmpBackendPath = "${env.WORKSPACE}@tmp\\tmpBackend${env.BUILD_NUMBER}"
+                        def backendPath = "${env.WORKSPACE}@tmp\\tmpBackend${env.BUILD_NUMBER}"
                         def appName = SETTINGS['appName']
 
                         //get backend
-                        runPS("get-backend.ps1", "-AppName ${appName} -BackendPath ${tmpBackendPath} -ResourceGroupName \"${SETTINGS['resourceGroupName']}\" -SubscriptionID \"${SETTINGS['subscriptionID']}\"")
-                        def platform_version = powershell script:"Write-Output \"\$([System.Diagnostics.FileVersionInfo]::GetVersionInfo(\"${tmpBackendPath}\\platform\\bin\\VirtoCommerce.Platform.Web.dll\").FileVersion)\"", returnStdout: true
+                        runPS("get-backend.ps1", "-AppName ${appName} -BackendPath ${backendPath} -ResourceGroupName \"${SETTINGS['resourceGroupName']}\" -SubscriptionID \"${SETTINGS['subscriptionID']}\"")
+                        def platform_version = powershell script:"Write-Output \"\$([System.Diagnostics.FileVersionInfo]::GetVersionInfo(\"${backendPath}\\platform\\bin\\VirtoCommerce.Platform.Web.dll\").FileVersion)\"", returnStdout: true
                         platform_version = platform_version.replace('.0', '').trim()
-
-                        def deliveryInfo = getDeliveryInfo()
                     }
                 }
             }
@@ -90,8 +90,8 @@ pipeline
                     {
                         stage('Create Test Environment')
                         {
-                            timestamps 
-                            { 
+                            timestamps
+                            {
                                 // Start docker environment
                                 def composeFolder = "${env.WORKSPACE}@libs\\${SETTINGS['composeDir']}"
                                 dir(composeFolder)
@@ -120,18 +120,20 @@ pipeline
                                         bat "docker-compose rm -f -v"
                                         bat "docker-compose up -d"
                                     }
-                                }			
+                                }
                             }
                         }
+
                         stage('Install Modules')
                         {
                             timestamps
                             {
                                 def platformContainer = Utilities.getPlatformContainer(this)
                                 // install modules
-                                runPS('qaenv/install-modules.ps1', "-ApiUrl \"${Utilities.getPlatformHost(this)}\" -PlatformContainer ${platformContainer} -ModulesDir ${env.WORKSPACE}\\CS\\modules")
+                                runPS('qaenv/install-modules.ps1', "-ApiUrl \"${Utilities.getPlatformHost(this)}\" -PlatformContainer ${platformContainer} -ModulesDir ${backendPath}\\modules")
                             }
                         }
+
                         stage('Install Sample Data')
                         {
                             timestamps
@@ -144,6 +146,7 @@ pipeline
                                 runPS("vc-setup-sampledata.ps1", "-apiurl \"http://localhost:${DOCKER_PLATFORM_PORT}\" ${sampleDataSrcParam} -Verbose -Debug")
                             }
                         }
+
                         stage('Storefront Install')
                         {
                             timestamps
@@ -158,6 +161,7 @@ pipeline
                                 }
                             }
                         }
+
                         stage('Theme Install')
                         {
                             timestamps 
@@ -171,7 +175,8 @@ pipeline
                             }
                         }
                         
-                        stage('Awaiting Proceed'){
+                        stage('Awaiting Proceed')
+                        {
                             def message = "Platform url: ${SETTINGS["platformContainerUrl"]}:${DOCKER_PLATFORM_PORT}\nStorefront: ${SETTINGS["storefrontContainerUrl"]}:${DOCKER_STOREFRONT_PORT}"
                             input(message)
                         }
@@ -223,9 +228,3 @@ def runPS(psName, args)
     def script = "${env.WORKSPACE}\\resources\\azure\\${psName} ${args} -ErrorAction Stop"
     powershell script: script, label: "${psName} ${args}"
 }
-
-def getDeliveryInfo() {
-    def deliveryFile = readFile("C:\\CICD\\delivery.json")
-    return new JsonSlurperClassic().parseText(deliveryFile)
-}
-
