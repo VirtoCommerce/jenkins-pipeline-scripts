@@ -17,11 +17,11 @@ Param(
     $SubscriptionID
 )
 
-# FILE TO GET PLATFORM VERSION FROM
-$PlatformVersionFile = $BackendPath+"\platform\bin\VirtoCommerce.Platform.Web.dll"
+# FILE TO GET STOREFRONT VERSION FROM
+$StorefrontVersionFile = $BackendPath+"\storefront\VirtoCommerce.Storefront.dll"
 
 # FILE WITH MODULES VERSIONS TO ADD TO ARCHIVE
-$FileToAddPath = $BackendPath + '\platform\versions.txt'
+$FileToAddPath = $BackendPath + '\storefront\versions.txt'
 
 $ApplicationID ="${env:AzureAppID}"
 $APIKey = ConvertTo-SecureString "${env:AzureAPIKey}" -AsPlainText -Force
@@ -29,8 +29,6 @@ $psCred = New-Object System.Management.Automation.PSCredential($ApplicationID, $
 $TenantID = "${env:AzureTenantID}"
 
 Add-AzureRmAccount -Credential $psCred -TenantId $TenantID -ServicePrincipal -Subscription $SubscriptionID
-#Select-AzureRmSubscription -SubscriptionId $SubscriptionID
-#Get-AzureRmSubscription -SubscriptionId $SubscriptionId -TenantId $TenantID | Set-AzureRmContext
 
 $DestResourceGroupName = $ResourceGroupName
 $DestWebAppName = $AppName
@@ -48,22 +46,5 @@ $msdeploy = "${env:MSDEPLOY_DIR}\msdeploy.exe"
 $sourcewebapp_msdeployUrl = "https://${AppName}.scm.azurewebsites.net/msdeploy.axd?site=${AppName}"
 & $msdeploy -verb:sync -source:contentPath="D:\home\site\wwwroot\",computerName=$sourcewebapp_msdeployUrl,publishSettings=$tmpPublishProfile -dest:contentPath=$BackendPath
 
-# ADD FILE WITH MODULES VERSIONS
-Write-Output "Find all manifests files (files in XML syntax)"
-$Manifests = Get-ChildItem $BackendPath -Include 'module.manifest' -Recurse
-# $Manifests = Get-ChildItem $BackendPath -Include 'Modules/*/module.manifest'
-# Array to store <module> section with id and version properties from each file
-$ModulesSections = @()
-Write-Output "Add to the array variable module name (id) and version from each file"
-ForEach ($Manifest in $Manifests) 
-{
-	# Fill array with id and version properties from <module> section
-	$ModulesSections += ([xml](Get-Content $Manifest)).module | Select-Object -Property id,version 
-}
-# Get Platform version from dll file properties (overwrite file if exist)
-Write-Output "$("Platform version is",$([System.Diagnostics.FileVersionInfo]::GetVersionInfo($PlatformVersionFile).FileVersion))" | Out-File -Force $FileToAddPath
-# Add modules names and versions as formated table
-$ModulesSections | Format-Table -HideTableHeaders -Property id,version | Out-File -Append $FileToAddPath
-
-#Removing App_Data
-Remove-Item $BackendPath\\platform\\App_Data -Recurse -Force -ErrorAction Continue
+# Get Storefront version from dll file properties (overwrite file if exist)
+Write-Output "$("Storefront version is",$([System.Diagnostics.FileVersionInfo]::GetVersionInfo($StorefrontVersionFile).FileVersion))" | Out-File -Force $FileToAddPath
