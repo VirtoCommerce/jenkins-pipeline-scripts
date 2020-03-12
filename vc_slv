@@ -104,7 +104,7 @@ pipeline
                             timestamps
                             {
                                 // Start docker environment
-                                def composeFolder = "${env.WORKSPACE}@libs\\${SETTINGS['composeDir']}"
+                                def composeFolder = "${env.WORKSPACE}\\${SETTINGS['composeDir']}"
                                 dir(composeFolder)
                                 {
                                     DOCKER_SQL_PORT = Utilities.getSqlPort(this)
