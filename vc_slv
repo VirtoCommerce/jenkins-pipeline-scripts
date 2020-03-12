@@ -36,18 +36,19 @@ pipeline
             {
                 script
                 {
-                    timeout(time: "${SETTINGS['timeoutMinutes']}", unit: 'MINUTES')
+                    wakeUpNode("slave")
+                    node("slave")
                     {
-                        wakeUpNode("slave")
-                        node("slave")
+                        checkout scm
+                        configFileProvider([configFile(fileId: 'virtocommerce', variable: 'SETTINGS_FILE')]) {
+                            SETTINGS = new Settings(readFile(SETTINGS_FILE))
+                        }
+                        SETTINGS.setRegion("virtocommerce")
+                        SETTINGS.setEnvironment("dev")
+                        def branches = Utilities.getSubfolders("${env.SOLUTION_FOLDER}\\${SETTINGS['prefix']}").join("\n")
+
+                        timeout(time: "${SETTINGS['timeoutMinutes']}", unit: 'MINUTES')
                         {
-                            checkout scm
-                            configFileProvider([configFile(fileId: 'virtocommerce', variable: 'SETTINGS_FILE')]) {
-                                SETTINGS = new Settings(readFile(SETTINGS_FILE))
-                            }
-                            SETTINGS.setRegion("virtocommerce")
-                            SETTINGS.setEnvironment("dev")
-                            def branches = Utilities.getSubfolders("${env.SOLUTION_FOLDER}\\${SETTINGS['prefix']}").join("\n")
                             def userInput = input message: "Select Branch", parameters: 
                             [
                                 choice(name:'Source Branch', choices:SETTINGS['sourceBranches']),
