@@ -195,7 +195,6 @@ class Packaging {
             //context.bat "dotnet msbuild \"${solution}\" -c Debug"
             // we need to use MSBuild directly to allow sonar analysis to work
             // DebugType=Full is for OpenCover
-            context.bat "${context.env.NUGET}\\nuget.exe restore ${solution}"
             context.bat "\"${context.tool DefaultMSBuild}\" \"${solution}\" /p:Configuration=Debug /p:Platform=\"Any CPU\" /t:restore /t:rebuild /m /p:DebugType=Full"
         }
         else
