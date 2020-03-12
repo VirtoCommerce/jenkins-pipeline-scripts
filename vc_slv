@@ -68,7 +68,7 @@ pipeline
                 {
                     node(SETTINGS['agentLabel'])
                     {
-                        def backendPath = "${env.WORKSPACE}@tmp\\tmpBackend${env.BUILD_NUMBER}"
+                        backendPath = "${env.WORKSPACE}@tmp\\tmpBackend${env.BUILD_NUMBER}"
                         def appName = SETTINGS['appName']
 
                         //get backend
