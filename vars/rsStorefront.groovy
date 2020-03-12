@@ -227,14 +227,14 @@ def call(body) {
 				throw any //rethrow exception to prevent the build from proceeding
 			}
 			finally {
-				Packaging.stopDockerTestEnvironment(this, dockerTag)
-				Utilities.generateAllureReport(this)
-				Utilities.notifyBuildStatus(this, SETTINGS['of365hook'], "Build finished", currentBuild.currentResult)
+				//Packaging.stopDockerTestEnvironment(this, dockerTag)
+				//Utilities.generateAllureReport(this)
+				//Utilities.notifyBuildStatus(this, SETTINGS['of365hook'], "Build finished", currentBuild.currentResult)
 				step([$class: 'LogParserPublisher',
 					failBuildOnError: false,
 					parsingRulesPath: env.LOG_PARSER_RULES,
 					useProjectRule: false])
-				bat "docker image prune --force"
+				//bat "docker image prune --force"
 				// if(currentBuild.result != 'FAILURE') {
 				// 	step([$class: 'Mailer', notifyEveryUnstableBuild: true, recipients: emailextrecipients([[$class: 'CulpritsRecipientProvider'], [$class: 'RequesterRecipientProvider']])])
 				// }
