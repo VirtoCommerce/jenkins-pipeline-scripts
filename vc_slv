@@ -196,13 +196,13 @@ pipeline
                         {
                             timestamps
                             {
-                                def platformContainer = Utilities.getPlatformContainer(this)
+                                def storefrontContainer = Utilities.getStorefrontContainer(this)
                                 def themeFolder = "C:\\CICD\\Solution\\vccom\\theme"
                                 // bat "docker exec ${platformContainer} powershell -Command \"Remove-Item C:\\vc-platform\\App_Data\\cms-content\\Themes -Recurse -Force\""
-                                bat "docker exec ${platformContainer} powershell -Command \"mkdir tmp\""
-                                bat "docker cp ${themeFolder}\\Themes ${platformContainer}:/tmp/Themes"
+                                bat "docker exec ${storefrontContainer} powershell -Command \"mkdir tmp\""
+                                bat "docker cp ${themeFolder}\\Themes ${storefrontContainer}:/tmp/Themes"
                                 // bat "docker cp ${themeFolder}\\Pages ${platformContainer}:/tmp/Pages"
-                                bat "docker exec ${platformContainer} powershell -Command \"Copy-Item -Path C:\\tmp\\Themes -Destination C:\\vc-platform\\App_Data\\cms-content\\Themes -Recurse -Force\""
+                                bat "docker exec ${storefrontContainer} powershell -Command \"Copy-Item -Path C:\\tmp\\Themes -Destination C:\\vc-platform\\App_Data\\cms-content\\Themes -Recurse -Force\""
                             }
                         }
 
