@@ -130,6 +130,7 @@ pipeline {
             }
             steps {
                 script{
+                    return 0
                     def csRoot = "${env.WORKSPACE}\\CS"
                     def webAppName = SETTINGS['webAppName']
                     def webAppPublicName = SETTINGS['webAppPublicName']
