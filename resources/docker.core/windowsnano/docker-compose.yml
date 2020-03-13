@@ -32,7 +32,7 @@ services:
       - "${DOCKER_STOREFRONT_PORT:-8090}:80"
     environment:
       - VirtoCommerce:Endpoint:Url=http://vc-platform-web
-      - VirtoCommerce:ContentConnectionString:C:\vc-storefront\wwwroot\cms-content
+      - ConnectionStrings:ContentConnectionString=C:\vc-storefront\wwwroot\cms-content
     depends_on:
       - vc-platform-web
     volumes:
