@@ -201,14 +201,18 @@ pipeline
                                 // bat "docker exec ${platformContainer} powershell -Command \"Remove-Item C:\\vc-platform\\App_Data\\cms-content\\Themes -Recurse -Force\""
                                 bat "docker exec ${platformContainer} powershell -Command \"mkdir tmp\""
                                 bat "docker cp ${themeFolder}\\Themes ${platformContainer}:/tmp/Themes"
+                                // bat "docker cp ${themeFolder}\\Pages ${platformContainer}:/tmp/Pages"
                                 bat "docker exec ${platformContainer} powershell -Command \"Copy-Item -Path C:\\tmp\\Themes -Destination C:\\vc-platform\\App_Data\\cms-content\\Themes -Recurse -Force\""
                             }
                         }
 
                         stage('Awaiting Proceed')
                         {
-                            def message = "Platform url: ${SETTINGS["platformContainerUrl"]}:${DOCKER_PLATFORM_PORT}\nStorefront: ${SETTINGS["storefrontContainerUrl"]}:${DOCKER_STOREFRONT_PORT}"
-                            input(message)
+                            timeout(time: "${SETTINGS['timeoutMinutes']}", unit: 'DAYS')
+                            {
+                                def message = "Platform url: ${SETTINGS["platformContainerUrl"]}:${DOCKER_PLATFORM_PORT}\nStorefront: ${SETTINGS["storefrontContainerUrl"]}:${DOCKER_STOREFRONT_PORT}"
+                                input(message)
+                            }
                         }
                     }
                 }
