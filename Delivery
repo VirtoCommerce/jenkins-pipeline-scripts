@@ -60,7 +60,7 @@ pipeline {
                     def buildOrder = Utilities.getNextBuildOrder(this)
                     def userInput = input message: "Region and Branch", parameters: [
                         choice(name: 'Region', choices: regionChoices),
-                        choice(name: 'Branch', choices: "dev\nmaster\nrelease_3.0.0")
+                        choice(name: 'Branch', choices: "dev\nmaster\nrelease_3.0.0\nfeature_migrate-to-vc30")
                     ]
                     PROJECT_TYPE = 'SOLUTION'
                     REGION = userInput['Region']
@@ -113,6 +113,10 @@ pipeline {
                         //storefront
                         def storefrontSrc = "${solutionRoot}\\${SETTINGS['storefrontBranch']}"
                         powershell script: "Copy-Item -Path ${storefrontSrc}\\* -Destination ${env.WORKSPACE}\\CS -Include storefront -Recurse -Force", label: "Copy Storefron to Workspace"
+                    } 
+                    else if(BRANCH_NAME == 'feature_migrate-to-vc30')
+                    {
+                        Utilities.runSharedPS(this, 'delivery/get-backend.ps1', "-BackendPath ${platformRoot} -AppName ${SETTINGS['webAppName']} -ResourceGroupName ${SETTINGS['resourceGroupName']} -SubscriptionID ${SETTINGS['subscriptionID']}")
                     }
                     powershell script: "Copy-Item -Path ${csSrc}\\* -Destination ${env.WORKSPACE}\\CS -Recurse -Force", label: "Copy Solution to Workspace"
                     powershell "Rename-Item -Path ${modulesRoot} -NewName Modules"
