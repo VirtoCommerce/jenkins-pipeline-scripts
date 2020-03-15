@@ -89,7 +89,11 @@ pipeline
                         // def SFRepoName = "${SETTINGS['prefix']}-content"
                         // def tagContains = STOREFRONT_VERSION
                         // def release = GHRelease.getLatestGithubRelease(this, Utils.getRepoOrg(), SFRepoName, tagContains, false)
-                        
+                        def themeFolder = SETTINGS['themeFolder']
+                        // bat "xcopy ${themeFolder} ${backendPath}\\storefront\\cms-content\\ /SYQ"
+                        // bat "xcopy ${themeFolder} ${backendPath}\\storefront\\wwwroot\\cms-content\\ /SYQ"
+                        powershell "Copy-Item -Path ${themeFolder}\\* ${backendPath}\\storefront\\cms-content -Recurse -Force -ErrorVariable capturedErrors -ErrorAction SilentlyContinue"
+                        powershell "Copy-Item -Path ${themeFolder}\\* ${backendPath}\\storefront\\wwwroot\\cms-content -Recurse -Force -ErrorVariable capturedErrors -ErrorAction SilentlyContinue"
                     }
                 }
             }
@@ -197,12 +201,12 @@ pipeline
                             timestamps
                             {
                                 def platformContainer = Utilities.getPlatformContainer(this)
-                                def themeFolder = "C:\\CICD\\Solution\\vccom\\theme"
-                                // Utilities.runSharedPS(this, "vc-install-theme.ps1", "-themeZip \"${themeFolder}\" -platformContainer ${platformContainer}")
-                                // bat "docker exec ${platformContainer} powershell -Command \"Remove-Item C:\\vc-platform\\App_Data\\cms-content\\Themes -Recurse -Force\""
-                                bat "docker exec ${platformContainer} powershell -Command \"mkdir tmp\""
-                                bat "docker cp ${themeFolder} ${platformContainer}:/tmp"
-                                bat "docker exec ${platformContainer} powershell -Command \"Copy-Item -Path C:\\tmp\\theme\\* -Destination C:\\vc-platform\\App_Data\\cms-content -Recurse -Force\""
+                                // def themeFolder = SETTINGS['themeFolder']
+                                // // Utilities.runSharedPS(this, "vc-install-theme.ps1", "-themeZip \"${themeFolder}\" -platformContainer ${platformContainer}")
+                                // // bat "docker exec ${platformContainer} powershell -Command \"Remove-Item C:\\vc-platform\\App_Data\\cms-content\\Themes -Recurse -Force\""
+                                // bat "docker exec ${platformContainer} powershell -Command \"mkdir tmp\""
+                                // bat "docker cp ${themeFolder} ${platformContainer}:/tmp"
+                                // bat "docker exec ${platformContainer} powershell -Command \"Copy-Item -Path C:\\tmp\\theme\\* -Destination C:\\vc-platform\\App_Data\\cms-content -Recurse -Force\""
                             }
                         }
 
