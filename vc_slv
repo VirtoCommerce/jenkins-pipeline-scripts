@@ -92,7 +92,8 @@ pipeline
                         def repoOrg = "${SETTINGS['repoOrg']}"
                         def repoName = "${SETTINGS['prefix']}-content"
                         def tagContains = THEME_VERSION
-                        getRepoContent(repoOrg, repoName)
+                        def githubCredId = "${env.GITHUB_CREDENTIALS_ID}"
+                        getRepoContent(githubCredId, repoOrg, repoName)
                         
                         def themeFolder = SETTINGS['themeFolder']
                         // bat "xcopy ${themeFolder} ${backendPath}\\storefront\\wwwroot\\cms-content\\ /SYQ"
@@ -270,8 +271,7 @@ def runPS(psName, args)
     powershell script: script, label: "${psName} ${args}"
 }
 
-def static getRepoContent(repoOrg, repoName, branch='dev')
+def static getRepoContent(githubCredId, repoOrg, repoName, branch='dev')
 {
-    def githubCredId = "${env.GITHUB_CREDENTIALS_ID}"
     git credentialsId: "${githubCredId}", url: "https://github.com/${repoOrg}/${repoName}.git", branch: "${branch}"
 }
