@@ -76,18 +76,19 @@ pipeline
                 {
                     node(SETTINGS['agentLabel'])
                     {
+                        backendPath = "${env.WORKSPACE}@tmp\\tmpBackend${env.BUILD_NUMBER}"
+                        def appName = SETTINGS['appName']
+
                         //get theme
                         def repoOrg = "${SETTINGS['repoOrg']}"
                         def repoName = "${SETTINGS['prefix']}-content"
                         def tagContains = THEME_VERSION
                         def githubCredId = "${env.GITHUB_CREDENTIALS_ID}"
                         echo "${repoOrg} and ${githubCredId}"
-                        git branch: "${branch}", credentialsId: "${githubCredId}", url: "https://github.com/${repoOrg}/${repoName}.git"
-                        def themeFolder = SETTINGS['themeFolder']
-
-
-                        backendPath = "${env.WORKSPACE}@tmp\\tmpBackend${env.BUILD_NUMBER}"
-                        def appName = SETTINGS['appName']
+                        dir(backendPath)
+                        {
+                            git branch: "${branch}", credentialsId: "${githubCredId}", url: "https://github.com/${repoOrg}/${repoName}.git"
+                        }
 
                         //get backend
                         runPS("get-backend.ps1", "-AppName ${appName} -BackendPath ${backendPath} -ResourceGroupName \"${SETTINGS['resourceGroupName']}\" -SubscriptionID \"${SETTINGS['subscriptionID']}\"")
@@ -98,7 +99,7 @@ pipeline
                         appName = SETTINGS['appNamePublic']
                         runPS("get-frontend.ps1", "-AppName ${appName} -BackendPath ${backendPath} -ResourceGroupName \"${SETTINGS['resourceGroupName']}\" -SubscriptionID \"${SETTINGS['subscriptionID']}\"")
 
-
+                        // def themeFolder = SETTINGS['themeFolder']
                         // bat "xcopy ${themeFolder} ${backendPath}\\storefront\\wwwroot\\cms-content\\ /SYQ"
                         // powershell "Copy-Item -Path ${themeFolder}\\Themes\\* ${backendPath}\\storefront\\cms-content\\Themes -Recurse -Force -ErrorVariable capturedErrors -ErrorAction SilentlyContinue"
                     }
