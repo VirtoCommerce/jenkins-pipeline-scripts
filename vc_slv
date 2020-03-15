@@ -272,5 +272,5 @@ def runPS(psName, args)
 
 def static getRepoContent(repoOrg, repoName, branch='dev')
 {
-    git credentialsId: env.GITHUB_CREDENTIALS_ID, url: "https://github.com/${repoOrg}/${repoName}.git", branch: branch
+    git credentialsId: "${env.GITHUB_CREDENTIALS_ID}", url: "https://github.com/${repoOrg}/${repoName}.git", branch: branch
 }
