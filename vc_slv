@@ -92,8 +92,8 @@ pipeline
                         def themeFolder = SETTINGS['themeFolder']
                         // bat "xcopy ${themeFolder} ${backendPath}\\storefront\\cms-content\\ /SYQ"
                         // bat "xcopy ${themeFolder} ${backendPath}\\storefront\\wwwroot\\cms-content\\ /SYQ"
-                        powershell "Copy-Item -Path ${themeFolder}\\* ${backendPath}\\storefront\\cms-content -Recurse -Force -ErrorVariable capturedErrors -ErrorAction SilentlyContinue"
-                        powershell "Copy-Item -Path ${themeFolder}\\* ${backendPath}\\storefront\\wwwroot\\cms-content -Recurse -Force -ErrorVariable capturedErrors -ErrorAction SilentlyContinue"
+                        powershell "Copy-Item -Path ${themeFolder}\\Themes\\* ${backendPath}\\storefront\\cms-content\\Themes -Recurse -Force -ErrorVariable capturedErrors -ErrorAction SilentlyContinue"
+                        powershell "Copy-Item -Path ${themeFolder}\\Themes\\* ${backendPath}\\storefront\\wwwroot\\cms-content\\Themes -Recurse -Force -ErrorVariable capturedErrors -ErrorAction SilentlyContinue"
                     }
                 }
             }
