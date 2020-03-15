@@ -8,6 +8,9 @@ def BRANCH_NAME
 def BASE_BRANCH
 def DELIVERY_AZURE = false
 
+def STOREFRONT_VERSION = ''
+def THEME_VERSION = ''
+
 def DOCKER_SQL_PORT
 def DOCKER_PLATFORM_PORT
 def DOCKER_STOREFRONT_PORT
@@ -86,9 +89,11 @@ pipeline
                         runPS("get-frontend.ps1", "-AppName ${appName} -BackendPath ${backendPath} -ResourceGroupName \"${SETTINGS['resourceGroupName']}\" -SubscriptionID \"${SETTINGS['subscriptionID']}\"")
 
                         //get theme
-                        // def SFRepoName = "${SETTINGS['prefix']}-content"
-                        // def tagContains = STOREFRONT_VERSION
-                        // def release = GHRelease.getLatestGithubRelease(this, Utils.getRepoOrg(), SFRepoName, tagContains, false)
+                        def repoOrg = "${SETTINGS['repoOrg']}"
+                        def repoName = "${SETTINGS['prefix']}-content"
+                        def tagContains = THEME_VERSION
+                        getRepoContent(repoOrg, repoName)
+                        
                         def themeFolder = SETTINGS['themeFolder']
                         // bat "xcopy ${themeFolder} ${backendPath}\\storefront\\wwwroot\\cms-content\\ /SYQ"
                         // powershell "Copy-Item -Path ${themeFolder}\\Themes\\* ${backendPath}\\storefront\\cms-content\\Themes -Recurse -Force -ErrorVariable capturedErrors -ErrorAction SilentlyContinue"
@@ -263,4 +268,9 @@ def runPS(psName, args)
 {
     def script = "${env.WORKSPACE}\\resources\\azure\\${psName} ${args} -ErrorAction Stop"
     powershell script: script, label: "${psName} ${args}"
+}
+
+def static getRepoContent(repoOrg, repoName, branch='dev')
+{
+    git credentialsId: env.GITHUB_CREDENTIALS_ID, url: "https://github.com/${repoOrg}/${repoName}.git", branch: branch
 }
