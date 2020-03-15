@@ -85,7 +85,8 @@ pipeline
                         def tagContains = THEME_VERSION
                         def githubCredId = "${SETTINGS['githubCredentialsId']}"
                         echo "${repoOrg} and ${githubCredId}"
-                        dir(backendPath)
+                        def themeFolder = SETTINGS['themeFolder']
+                        dir("${themeFolder}")
                         {
                             git branch: "${BRANCH_NAME}", credentialsId: "${githubCredId}", url: "https://github.com/${repoOrg}/${repoName}.git"
                         }
