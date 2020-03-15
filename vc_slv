@@ -83,7 +83,7 @@ pipeline
                         def repoOrg = "${SETTINGS['repoOrg']}"
                         def repoName = "${SETTINGS['prefix']}-content"
                         def tagContains = THEME_VERSION
-                        def githubCredId = "${env.GITHUB_CREDENTIALS_ID}"
+                        def githubCredId = "${SETTINGS['githubCredentialsId']}"
                         echo "${repoOrg} and ${githubCredId}"
                         dir(backendPath)
                         {
