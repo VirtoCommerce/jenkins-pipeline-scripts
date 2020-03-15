@@ -87,7 +87,7 @@ pipeline
                         echo "${repoOrg} and ${githubCredId}"
                         dir(backendPath)
                         {
-                            git branch: "${branch}", credentialsId: "${githubCredId}", url: "https://github.com/${repoOrg}/${repoName}.git"
+                            git branch: "${BRANCH_NAME}", credentialsId: "${githubCredId}", url: "https://github.com/${repoOrg}/${repoName}.git"
                         }
 
                         //get backend
