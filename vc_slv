@@ -79,18 +79,6 @@ pipeline
                         backendPath = "${env.WORKSPACE}@tmp\\tmpBackend${env.BUILD_NUMBER}"
                         def appName = SETTINGS['appName']
 
-                        //get theme
-                        def repoOrg = "${SETTINGS['repoOrg']}"
-                        def repoName = "${SETTINGS['prefix']}-content"
-                        def tagContains = THEME_VERSION
-                        def githubCredId = "${SETTINGS['githubCredentialsId']}"
-                        echo "${repoOrg} and ${githubCredId}"
-                        def themeFolder = SETTINGS['themeFolder']
-                        dir("${themeFolder}")
-                        {
-                            git branch: "${BRANCH_NAME}", credentialsId: "${githubCredId}", url: "https://github.com/${repoOrg}/${repoName}.git"
-                        }
-
                         //get backend
                         runPS("get-backend.ps1", "-AppName ${appName} -BackendPath ${backendPath} -ResourceGroupName \"${SETTINGS['resourceGroupName']}\" -SubscriptionID \"${SETTINGS['subscriptionID']}\"")
                         def platform_version = powershell script:"Write-Output \"\$([System.Diagnostics.FileVersionInfo]::GetVersionInfo(\"${backendPath}\\platform\\bin\\VirtoCommerce.Platform.Web.dll\").FileVersion)\"", returnStdout: true
@@ -100,9 +88,20 @@ pipeline
                         appName = SETTINGS['appNamePublic']
                         runPS("get-frontend.ps1", "-AppName ${appName} -BackendPath ${backendPath} -ResourceGroupName \"${SETTINGS['resourceGroupName']}\" -SubscriptionID \"${SETTINGS['subscriptionID']}\"")
 
-                        // def themeFolder = SETTINGS['themeFolder']
-                        // bat "xcopy ${themeFolder} ${backendPath}\\storefront\\wwwroot\\cms-content\\ /SYQ"
-                        // powershell "Copy-Item -Path ${themeFolder}\\Themes\\* ${backendPath}\\storefront\\cms-content\\Themes -Recurse -Force -ErrorVariable capturedErrors -ErrorAction SilentlyContinue"
+                        //get theme
+                        def repoOrg = "${SETTINGS['repoOrg']}"
+                        def repoName = "${SETTINGS['prefix']}-content"
+                        def tagContains = THEME_VERSION
+                        def githubCredId = "${SETTINGS['githubCredentialsId']}"
+                        echo "${repoOrg} and ${githubCredId}"
+                        def themeFolder = SETTINGS['themeFolder']
+                        dir("${themeFolder}")
+                        {
+                            deleteDir()
+                            git branch: "${BRANCH_NAME}", credentialsId: "${githubCredId}", url: "https://github.com/${repoOrg}/${repoName}.git"
+                            powershell "Copy-Item .\\theme .\\cms-content\\Themes\\vccom\\default -Recurse -Force"
+                            powershell "Copy-Item .\\pages .\\cms-content\\Pages\\vccom -Recurse -Force"
+                        }
                     }
                 }
             }
@@ -205,17 +204,17 @@ pipeline
                             }
                         }
 
-                        stage('Theme Install')
+                        stage('Install Theme')
                         {
                             timestamps
                             {
                                 def platformContainer = Utilities.getPlatformContainer(this)
-                                def themeFolder = SETTINGS['themeFolder']
+                                def themeFolder = "${SETTINGS['themeFolder']}\\cms-content"
                                 // Utilities.runSharedPS(this, "vc-install-theme.ps1", "-themeZip \"${themeFolder}\" -platformContainer ${platformContainer}")
                                 // bat "docker exec ${platformContainer} powershell -Command \"Remove-Item C:\\vc-platform\\App_Data\\cms-content\\Themes -Recurse -Force\""
                                 bat "docker exec ${platformContainer} powershell -Command \"mkdir tmp\""
                                 bat "docker cp ${themeFolder} ${platformContainer}:/tmp"
-                                bat "docker exec ${platformContainer} powershell -Command \"Copy-Item -Path C:\\tmp\\theme\\* -Destination C:\\vc-platform\\App_Data\\cms-content -Recurse -Force\""
+                                bat "docker exec ${platformContainer} powershell -Command \"Copy-Item -Path C:\\tmp\\cms-content\\* -Destination C:\\vc-platform\\App_Data\\cms-content -Recurse -Force\""
                             }
                         }
 
