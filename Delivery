@@ -117,6 +117,7 @@ pipeline {
                     else if(BRANCH_NAME == 'feature_migrate-to-vc30')
                     {
                         Utilities.runSharedPS(this, 'delivery/get-backend.ps1', "-BackendPath ${env.WORKSPACE}\\CS -AppName ${SETTINGS['webAppName']} -ResourceGroupName ${SETTINGS['resourceGroupName']} -SubscriptionID ${SETTINGS['subscriptionID']}")
+                        powershell "Rename-Item -Path ${env.WORKSPACE}\\CS\\modules -NewName module"
                     }
                     powershell script: "Copy-Item -Path ${csSrc}\\* -Destination ${env.WORKSPACE}\\CS -Recurse -Force", label: "Copy Solution to Workspace"
                     powershell "Rename-Item -Path ${modulesRoot} -NewName Modules"
