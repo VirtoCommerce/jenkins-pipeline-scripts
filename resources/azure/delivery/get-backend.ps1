@@ -23,7 +23,7 @@ Param(
 $PlatformVersionFile = $BackendPath+"\platform\VirtoCommerce.Platform.Web.dll"
 
 # FILE WITH MODULES VERSIONS TO ADD TO ARCHIVE
-$FileToAddPath = $BackendPath + '\platform\versions.txt'
+$FileToAddPath = $BackendPath + '\platform\wwwroot\versions.txt'
 
 $ApplicationID ="${env:AzureAppID}"
 $APIKey = ConvertTo-SecureString "${env:AzureAPIKey}" -AsPlainText -Force
