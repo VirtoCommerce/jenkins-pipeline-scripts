@@ -63,21 +63,22 @@ if($ModulesDir){
 
 $sourcewebapp_msdeployUrl = "https://${WebAppPublicName}.scm.azurewebsites.net/msdeploy.axd?site=${WebAppPublicName}"
 # Upload Storefront
-if($StorefrontDir){
+if($StorefrontDir -and (Test-Path $ThemeDir)){
     Write-Output "Upload Storefront"
     & $msdeploy -verb:sync -dest:contentPath="D:\home\site\wwwroot\",computerName=$sourcewebapp_msdeployUrl,publishSettings=$FrontendPublishProfile -source:contentPath=$StorefrontDir
 }
 
 # Upload Theme
-#if($ThemeDir){
-#    Write-Output "Upload Theme"
-#    & $msdeploy -verb:sync -dest:contentPath="D:\home\site\wwwroot\wwwroot\theme",computerName=$sourcewebapp_msdeployUrl,publishSettings=$FrontendPublishProfile -source:contentPath=$ThemeDir
-#}
+if($ThemeDir -and (Test-Path $ThemeDir)){
+    Write-Output "Upload Theme"
+    #& $msdeploy -verb:sync -dest:contentPath="D:\home\site\wwwroot\wwwroot\theme",computerName=$sourcewebapp_msdeployUrl,publishSettings=$FrontendPublishProfile -source:contentPath=$ThemeDir
+    
+    Write-Output "AzCopy $StorageAccount"
+    $token = $env:AzureBlobToken
+    & "${env:Utils}\AzCopy10\AzCopy" sync $ThemeDir https://$($StorageAccount).blob.core.windows.net/$BlobContainerName/$($ThemeBlobPath)$token --delete-destination=true #/DestKey:$accountKey /S
+}
 
 
-Write-Output "AzCopy $StorageAccount"
-$token = $env:AzureBlobToken
-& "${env:Utils}\AzCopy10\AzCopy" sync $ThemeDir https://$($StorageAccount).blob.core.windows.net/$BlobContainerName/$($ThemeBlobPath)$token --delete-destination=true #/DestKey:$accountKey /S
 
 Write-Host "Start Backend $WebAppName"
 
