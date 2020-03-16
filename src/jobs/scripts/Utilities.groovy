@@ -449,7 +449,9 @@ class Utilities
         return "${tag}_${containerId}_1"
     }
     def static getStorefrontContainer(context){
-        def tag = context.env.BUILD_TAG.toLowerCase().replace('%', '')
+        def tag = context.env.BUILD_TAG.toLowerCase()
+        tag = tag.replaceAll("%", '')
+        tag = tag.replaceAll("\\.", '')
         def containerId = 'vc-storefront-web'
         return "${tag}_${containerId}_1"
     }

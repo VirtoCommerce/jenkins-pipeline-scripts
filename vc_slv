@@ -1,0 +1,276 @@
+import jobs.scripts.*
+def GHRelease = library('virto-shared-library').jobs.scripts.GithubRelease
+import groovy.json.JsonSlurperClassic
+
+def SETTINGS
+
+def BRANCH_NAME
+def BASE_BRANCH
+def DELIVERY_AZURE = false
+
+def STOREFRONT_VERSION = ''
+def THEME_VERSION = ''
+
+def DOCKER_SQL_PORT
+def DOCKER_PLATFORM_PORT
+def DOCKER_STOREFRONT_PORT
+def DOCKER_PREFIX
+def DOCKER_TAG
+
+def PLATFORM_INSTALL = true
+def STOREFRONT_INSTALL = true
+
+def backendPath
+
+pipeline
+{
+    agent any
+
+    options
+    {
+        timestamps()
+    }
+
+    stages
+    {
+        stage("User Input")
+        {
+            steps
+            {
+                script
+                {
+                    wakeUpNode("slave")
+                    node("slave")
+                    {
+                        checkout scm
+                        configFileProvider([configFile(fileId: 'virtocommerce', variable: 'SETTINGS_FILE')]) {
+                            SETTINGS = new Settings(readFile(SETTINGS_FILE))
+                        }
+                        SETTINGS.setRegion("virtocommerce")
+                        SETTINGS.setEnvironment("dev")
+                        def branches = Utilities.getSubfolders("${env.SOLUTION_FOLDER}\\${SETTINGS['prefix']}").join("\n")
+
+                        timeout(time: "${SETTINGS['timeoutMinutes']}", unit: 'MINUTES')
+                        {
+                            def userInput = input message: "Select Branch", parameters: 
+                            [
+                                choice(name:'Source Branch', choices:SETTINGS['sourceBranches']),
+                                choice(name:'Target Branch', choices:branches),
+                                booleanParam(defaultValue: false, name: 'Delviery to Azure')
+                            ]
+                            BASE_BRANCH = userInput["Source Branch"]
+                            BRANCH_NAME = userInput["Target Branch"]
+                            DELIVERY_AZURE = userInput["Delivery to Azure"]
+                            echo "Source Branch: ${BASE_BRANCH}; Target Branch: ${BRANCH_NAME};"
+                        }
+                    }
+                }
+            }
+        }
+
+        stage("Preparing Solution")
+        {
+            steps
+            {
+                script
+                {
+                    node(SETTINGS['agentLabel'])
+                    {
+                        backendPath = "${env.WORKSPACE}@tmp\\tmpBackend${env.BUILD_NUMBER}"
+                        def appName = SETTINGS['appName']
+
+                        //get backend
+                        runPS("get-backend.ps1", "-AppName ${appName} -BackendPath ${backendPath} -ResourceGroupName \"${SETTINGS['resourceGroupName']}\" -SubscriptionID \"${SETTINGS['subscriptionID']}\"")
+                        def platform_version = powershell script:"Write-Output \"\$([System.Diagnostics.FileVersionInfo]::GetVersionInfo(\"${backendPath}\\platform\\bin\\VirtoCommerce.Platform.Web.dll\").FileVersion)\"", returnStdout: true
+                        platform_version = platform_version.replace('.0', '').trim()
+
+                        //get frontend
+                        appName = SETTINGS['appNamePublic']
+                        runPS("get-frontend.ps1", "-AppName ${appName} -BackendPath ${backendPath} -ResourceGroupName \"${SETTINGS['resourceGroupName']}\" -SubscriptionID \"${SETTINGS['subscriptionID']}\"")
+
+                        //get theme
+                        def repoOrg = "${SETTINGS['repoOrg']}"
+                        def repoName = "${SETTINGS['prefix']}-content"
+                        def tagContains = THEME_VERSION
+                        def githubCredId = "${SETTINGS['githubCredentialsId']}"
+                        echo "${repoOrg} and ${githubCredId}"
+                        def themeFolder = SETTINGS['themeFolder']
+                        dir("${themeFolder}")
+                        {
+                            deleteDir()
+                            git branch: "${BRANCH_NAME}", credentialsId: "${githubCredId}", url: "https://github.com/${repoOrg}/${repoName}.git"
+                            powershell "Copy-Item .\\theme .\\cms-content\\Themes\\vccom\\default -Recurse -Force"
+                            powershell "Copy-Item .\\pages .\\cms-content\\Pages\\vccom -Recurse -Force"
+                        }
+                    }
+                }
+            }
+        }
+
+        stage("Docker Environment")
+        {
+            steps
+            {
+                script
+                {
+                    node(SETTINGS['agentLabel'])
+                    {
+                        stage('Create Test Environment')
+                        {
+                            timestamps
+                            {
+                                // Start docker environment
+                                def composeFolder = "${env.WORKSPACE}\\${SETTINGS['composeDir']}"
+                                dir(composeFolder)
+                                {
+                                    DOCKER_SQL_PORT = Utilities.getSqlPort(this)
+                                    DOCKER_PLATFORM_PORT = Utilities.getPlatformPort(this)
+                                    DOCKER_STOREFRONT_PORT = Utilities.getStorefrontPort(this)
+                                    DOCKER_PREFIX = 'vc'
+                                    switch(BASE_BRANCH)
+                                    {
+                                        case 'dev':
+                                        DOCKER_TAG = 'dev-branch'
+                                        break
+                                        case 'master':
+                                        DOCKER_TAG = 'latest'
+                                        break
+                                    }
+
+                                    echo "DOCKER_PLATFORM_PORT=${DOCKER_PLATFORM_PORT}, DOCKER_STOREFRONT_PORT=${DOCKER_STOREFRONT_PORT}, DOCKER_SQL_PORT=${DOCKER_SQL_PORT}"
+                                    // 1. stop containers
+                                    // 2. remove instances including database
+                                    // 3. start up new containers
+                                    withEnv(["DOCKER_TAG=${DOCKER_TAG}", "DOCKER_PREFIX=${DOCKER_PREFIX}", "DOCKER_PLATFORM_PORT=${DOCKER_PLATFORM_PORT}", "DOCKER_STOREFRONT_PORT=${DOCKER_STOREFRONT_PORT}", "DOCKER_SQL_PORT=${DOCKER_SQL_PORT}", "COMPOSE_PROJECT_NAME=${env.BUILD_TAG}"])
+                                    {
+                                        // bat "docker-compose stop"
+                                        // bat "docker-compose rm -f -v"
+                                        bat "docker-compose up -d"
+                                    }
+                                }
+                            }
+                        }
+
+                        stage('Install Platform')
+                        {
+                            timestamps
+                            {
+                                if(PLATFORM_INSTALL)
+                                {
+                                    def platformContainer = Utilities.getPlatformContainer(this)
+                                    def platformDir = "${backendPath}\\platform"
+                                    bat "docker stop ${platformContainer}"
+                                    bat "docker cp ${platformDir} ${platformContainer}:/vc-platform/."
+                                    bat "docker start ${platformContainer}"
+                                }
+                            }
+                        }
+
+                        stage('Install Modules')
+                        {
+                            timestamps
+                            {
+                                def platformContainer = Utilities.getPlatformContainer(this)
+                                // install modules
+                                runPS('qaenv/install-modules.ps1', "-ApiUrl \"${Utilities.getPlatformHost(this)}\" -PlatformContainer ${platformContainer} -ModulesDir ${backendPath}\\modules")
+                            }
+                        }
+
+                        stage('Install Sample Data')
+                        {
+                            timestamps
+                            {
+                                def sampleDataSrcParam = ""
+                                if(SETTINGS['sampledata'] != null){
+                                    sampleDataSrcParam = "-sampleDataSrc ${SETTINGS['sampledata']}"
+                                    echo "using url from settings file"
+                                }
+                                runPS("vc-setup-sampledata.ps1", "-apiurl \"http://localhost:${DOCKER_PLATFORM_PORT}\" ${sampleDataSrcParam} -Verbose -Debug")
+                            }
+                        }
+
+                        stage('Install Storefront')
+                        {
+                            timestamps
+                            {
+                                if(STOREFRONT_INSTALL)
+                                {
+                                    def storefrontContainer = Utilities.getStorefrontContainer(this)
+                                    def storefrontDir = "${backendPath}\\storefront"
+                                    bat "docker stop ${storefrontContainer}"
+                                    bat "docker cp ${storefrontDir} ${storefrontContainer}:/vc-storefront/."
+                                    bat "docker start ${storefrontContainer}"
+                                }
+                            }
+                        }
+
+                        stage('Install Theme')
+                        {
+                            timestamps
+                            {
+                                def platformContainer = Utilities.getPlatformContainer(this)
+                                def themeFolder = "${SETTINGS['themeFolder']}\\cms-content"
+                                // Utilities.runSharedPS(this, "vc-install-theme.ps1", "-themeZip \"${themeFolder}\" -platformContainer ${platformContainer}")
+                                // bat "docker exec ${platformContainer} powershell -Command \"Remove-Item C:\\vc-platform\\App_Data\\cms-content\\Themes -Recurse -Force\""
+                                bat "docker exec ${platformContainer} powershell -Command \"mkdir tmp\""
+                                bat "docker cp ${themeFolder} ${platformContainer}:/tmp"
+                                bat "docker exec ${platformContainer} powershell -Command \"Copy-Item -Path C:\\tmp\\cms-content\\* -Destination C:\\vc-platform\\App_Data\\cms-content -Recurse -Force\""
+                            }
+                        }
+
+                        stage('Awaiting Proceed')
+                        {
+                            timeout(time: "${SETTINGS['timeoutMinutes']}", unit: 'DAYS')
+                            {
+                                def message = "Platform url: ${SETTINGS["platformContainerUrl"]}:${DOCKER_PLATFORM_PORT}\nStorefront: ${SETTINGS["storefrontContainerUrl"]}:${DOCKER_STOREFRONT_PORT}"
+                                input(message)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    post
+    {
+        always
+        {
+            script
+            {
+                node(SETTINGS['agentLabel'])
+                {
+                    def composeFolder = "${env.WORKSPACE}\\${SETTINGS['composeDir']}"
+                    dir(composeFolder)
+                    {
+                        withEnv(["DOCKER_TAG=${DOCKER_TAG}", "DOCKER_PREFIX=${DOCKER_PREFIX}", "DOCKER_PLATFORM_PORT=${DOCKER_PLATFORM_PORT}", "DOCKER_STOREFRONT_PORT=${DOCKER_STOREFRONT_PORT}", "DOCKER_SQL_PORT=${DOCKER_SQL_PORT}", "COMPOSE_PROJECT_NAME=${env.BUILD_TAG}"]){
+                            bat "docker-compose down -v"
+                        }
+                        bat "docker image prune -f"
+                    }
+                }
+            }
+        }
+    }
+}
+
+def wakeUpNode(nodeLabel)
+{
+    try
+    {
+        node(nodeLabel)
+        {
+            echo "${nodeLabel} is up!"
+        }
+    }
+    catch(any)
+    {
+        echo any.getMessage()
+    }
+}
+
+def runPS(psName, args)
+{
+    def script = "${env.WORKSPACE}\\resources\\azure\\${psName} ${args} -ErrorAction Stop"
+    powershell script: script, label: "${psName} ${args}"
+}
