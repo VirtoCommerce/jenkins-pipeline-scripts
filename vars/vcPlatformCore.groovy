@@ -39,7 +39,20 @@ def call(body) {
             try {
                 stage('Checkout'){
                     deleteDir()
-                    checkout scm
+                    if(!Utilities.isPullRequest(this))
+                    {
+                        checkout scm
+                    }
+                    else
+                    {
+                        checkout([
+                            $class: 'GitSCM',
+                            branches: scm.branches,
+                            doGenerateSubmoduleConfigurations: scm.doGenerateSubmoduleConfigurations,
+                            extensions: scm.extensions + [[$class: 'LocalBranch']],
+                            userRemoteConfigs: scm.userRemoteConfigs
+                        ])
+                    }
                     
 					if(!Utilities.areThereCodeChanges(this))
 					{
@@ -52,10 +65,7 @@ def call(body) {
                     //     powershell "vc-build SonarQubeStart -SonarUrl ${env.SONAR_HOST_URL} -SonarAuthToken \"${env.SONAR_AUTH_TOKEN}\" -skip Restore+Compile"// %SONAR_HOST_URL% %SONAR_AUTH_TOKEN%
                     // }
                     Packaging.startAnalyzer(this, true)
-                    withEnv(["JENKINS_URL=\"\""])
-                    {
-                        powershell "vc-build Compile"
-                    }
+                    powershell "vc-build Compile"
                 }
                 
                 stage('Unit Tests'){
