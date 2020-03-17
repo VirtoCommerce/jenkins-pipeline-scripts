@@ -39,20 +39,8 @@ def call(body) {
             try {
                 stage('Checkout'){
                     deleteDir()
-                    if(!Utilities.isPullRequest(this))
-                    {
-                        checkout scm
-                    }
-                    else
-                    {
-                        checkout([
-                            $class: 'GitSCM',
-                            branches: scm.branches,
-                            doGenerateSubmoduleConfigurations: scm.doGenerateSubmoduleConfigurations,
-                            extensions: scm.extensions + [[$class: 'LocalBranch']],
-                            userRemoteConfigs: scm.userRemoteConfigs
-                        ])
-                    }
+                    
+                    checkout scm
                     
 					if(!Utilities.areThereCodeChanges(this))
 					{
