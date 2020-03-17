@@ -65,10 +65,18 @@ def call(body) {
                     //     powershell "vc-build SonarQubeStart -SonarUrl ${env.SONAR_HOST_URL} -SonarAuthToken \"${env.SONAR_AUTH_TOKEN}\" -skip Restore+Compile"// %SONAR_HOST_URL% %SONAR_AUTH_TOKEN%
                     // }
                     Packaging.startAnalyzer(this, true)
-                    withEnv(['BRANCH_NAME=""'])
+                    if(Utilities.isPullRequest)
+                    {
+                        withEnv(["BRANCH_NAME=${env.CHANGE_BRANCH}"])
+                        {
+                            powershell "vc-build Compile"
+                        }
+                    }
+                    else
                     {
                         powershell "vc-build Compile"
                     }
+                    
                 }
                 
                 stage('Unit Tests'){
