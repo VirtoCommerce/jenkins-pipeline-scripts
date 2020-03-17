@@ -39,12 +39,21 @@ def call(body) {
                 }
 
                 stage('Build'){
-                    withSonarQubeEnv('VC Sonar Server'){
-                        powershell "vc-build SonarQubeStart -SonarUrl ${env.SONAR_HOST_URL} -SonarAuthToken \"${env.SONAR_AUTH_TOKEN}\" -skip Restore+Compile"// %SONAR_HOST_URL% %SONAR_AUTH_TOKEN%
+                    // withSonarQubeEnv('VC Sonar Server'){
+                    //     powershell "vc-build SonarQubeStart -SonarUrl ${env.SONAR_HOST_URL} -SonarAuthToken \"${env.SONAR_AUTH_TOKEN}\" -skip Restore+Compile"// %SONAR_HOST_URL% %SONAR_AUTH_TOKEN%
+                    // }
+                    Packaging.startAnalyzer(this, true)
+                    if(Utilities.isPullRequest)
+                    {
+                        withEnv(["BRANCH_NAME=${env.CHANGE_BRANCH}"])
+                        {
+                            powershell "vc-build Compile"
+                        }
                     }
-                    //Packaging.startAnalyzer(this, true)
-                    bat "dotnet restore"
-                    powershell "vc-build Compile"
+                    else
+                    {
+                        powershell "vc-build Compile"
+                    }
                 }
 
                 stage('Unit Tests'){
@@ -53,9 +62,10 @@ def call(body) {
 
                 stage('Quality Gate'){
                     sleep time: 15
-                    withSonarQubeEnv('VC Sonar Server'){
-                        powershell "vc-build SonarQubeEnd -SonarUrl ${env.SONAR_HOST_URL} -SonarAuthToken ${env.SONAR_AUTH_TOKEN} -skip Restore+Compile+SonarQubeStart"
-                    }
+                    // withSonarQubeEnv('VC Sonar Server'){
+                    //     powershell "vc-build SonarQubeEnd -SonarUrl ${env.SONAR_HOST_URL} -SonarAuthToken ${env.SONAR_AUTH_TOKEN} -skip Restore+Compile+SonarQubeStart"
+                    // }
+                    Packaging.endAnalyzer(this)
                     Packaging.checkAnalyzerGate(this)
                 }
                  
