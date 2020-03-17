@@ -48,10 +48,10 @@ def call(body) {
                 }
 
                 stage('Build'){
-                    withSonarQubeEnv('VC Sonar Server'){
-                        powershell "vc-build SonarQubeStart -SonarUrl ${env.SONAR_HOST_URL} -SonarAuthToken \"${env.SONAR_AUTH_TOKEN}\" -skip Restore+Compile"// %SONAR_HOST_URL% %SONAR_AUTH_TOKEN%
-                    }
-                    //Packaging.startAnalyzer(this, true)
+                    // withSonarQubeEnv('VC Sonar Server'){
+                    //     powershell "vc-build SonarQubeStart -SonarUrl ${env.SONAR_HOST_URL} -SonarAuthToken \"${env.SONAR_AUTH_TOKEN}\" -skip Restore+Compile"// %SONAR_HOST_URL% %SONAR_AUTH_TOKEN%
+                    // }
+                    Packaging.startAnalyzer(this, true)
                     powershell "vc-build Compile"
                 }
                 
@@ -60,10 +60,10 @@ def call(body) {
                 } 
 
                 stage('Quality Gate'){
-                    //Packaging.endAnalyzer(this)
-                    withSonarQubeEnv('VC Sonar Server'){
-                        powershell "vc-build SonarQubeEnd -SonarUrl ${env.SONAR_HOST_URL} -SonarAuthToken ${env.SONAR_AUTH_TOKEN} -skip Restore+Compile+SonarQubeStart"
-                    }
+                    Packaging.endAnalyzer(this)
+                    // withSonarQubeEnv('VC Sonar Server'){
+                    //     powershell "vc-build SonarQubeEnd -SonarUrl ${env.SONAR_HOST_URL} -SonarAuthToken ${env.SONAR_AUTH_TOKEN} -skip Restore+Compile+SonarQubeStart"
+                    // }
                     Packaging.checkAnalyzerGate(this)
                 }  
 
