@@ -52,7 +52,10 @@ def call(body) {
                     //     powershell "vc-build SonarQubeStart -SonarUrl ${env.SONAR_HOST_URL} -SonarAuthToken \"${env.SONAR_AUTH_TOKEN}\" -skip Restore+Compile"// %SONAR_HOST_URL% %SONAR_AUTH_TOKEN%
                     // }
                     Packaging.startAnalyzer(this, true)
-                    powershell "vc-build Compile"
+                    withEnv(["JENKINS_URL=\"\""])
+                    {
+                        powershell "vc-build Compile"
+                    }
                 }
                 
                 stage('Unit Tests'){
