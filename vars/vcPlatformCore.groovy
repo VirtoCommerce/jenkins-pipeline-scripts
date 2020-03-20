@@ -42,10 +42,14 @@ def call(body) {
                     
                     checkout scm
                     
-					if(!Utilities.areThereCodeChanges(this))
-					{
-						throw new Exception("There are no Code Changes")
-					}
+					
+                }
+
+                if(!Utilities.areThereCodeChanges(this))
+                {
+                    echo "There are no Code Changes"
+                    currentBuild.result = 'SUCCESS'
+                    return 0;
                 }
 
                 stage('Build'){
