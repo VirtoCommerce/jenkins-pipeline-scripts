@@ -32,7 +32,7 @@ def call(body) {
 
                 stage('Build')
                 {
-                    bat "dotnet restore"
+                    powershell "if(!(Test-Path -Path .\\.nuke)){ Get-ChildItem *.sln -Name > .nuke }"
                     powershell "vc-build Compile"
                 }
 
