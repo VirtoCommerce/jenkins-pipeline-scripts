@@ -134,7 +134,8 @@ pipeline
                                         DOCKER_TAG = 'dev-branch'
                                         break
                                         case 'master':
-                                        DOCKER_TAG = 'latest'
+                                        // DOCKER_TAG = 'latest'
+                                        DOCKER_TAG = 'dev-branch'
                                         break
                                     }
 
