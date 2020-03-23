@@ -235,10 +235,13 @@ pipeline
 
         stage('Delivery')
         {
-            // when
-            // {
-            //     equals expected: true, actual: DELIVERY_AZURE
-            // }
+            when
+            {
+                expression
+                {
+                    DELIVERY_AZURE
+                }
+            }
             steps
             {
                 script
@@ -254,7 +257,7 @@ pipeline
                         def subscriptionID = SETTINGS['subscriptionID']
                         def blobToken = SETTINGS['tokenSas']
                         withEnv(["AzureBlobToken=${blobToken}"]){
-                            Utilities.runSharedPS(this, "${deployScript}", "-StagingName ${stagingName} -StoreName ${storeName} -AzureBlobName ${azureBlobName} -AzureBlobKey ${azureBlobKey} -WebAppName ${webAppName} -ResourceGroupName ${resourceGroupName} -SubscriptionID ${subscriptionID}")
+                            runPS(this, "${deployScript}", "-StagingName ${stagingName} -StoreName ${storeName} -AzureBlobName ${azureBlobName} -AzureBlobKey ${azureBlobKey} -WebAppName ${webAppName} -ResourceGroupName ${resourceGroupName} -SubscriptionID ${subscriptionID}")
                         }
                     }
                 }
