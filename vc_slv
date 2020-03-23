@@ -243,16 +243,19 @@ pipeline
             {
                 script
                 {
-                    def stagingName = "qa"
-                    def storeName = "cms-content"
-                    def azureBlobName = SETTINGS['azureBlobName']
-                    def azureBlobKey = SETTINGS['azureBlobKey']
-                    def webAppName = SETTINGS['appNamePublic']
-                    def resourceGroupName = SETTINGS['resourceGroupName']
-                    def subscriptionID = SETTINGS['subscriptionID']
-                    def blobToken = SETTINGS['tokenSas']
-                    withEnv(["AzureBlobToken=${blobToken}"]){
-                        Utilities.runSharedPS(this, "${deployScript}", "-StagingName ${stagingName} -StoreName ${storeName} -AzureBlobName ${azureBlobName} -AzureBlobKey ${azureBlobKey} -WebAppName ${webAppName} -ResourceGroupName ${resourceGroupName} -SubscriptionID ${subscriptionID}")
+                    node(SETTINGS['agentLabel'])
+                    {
+                        def stagingName = "qa"
+                        def storeName = "cms-content"
+                        def azureBlobName = SETTINGS['azureBlobName']
+                        def azureBlobKey = SETTINGS['azureBlobKey']
+                        def webAppName = SETTINGS['appNamePublic']
+                        def resourceGroupName = SETTINGS['resourceGroupName']
+                        def subscriptionID = SETTINGS['subscriptionID']
+                        def blobToken = SETTINGS['tokenSas']
+                        withEnv(["AzureBlobToken=${blobToken}"]){
+                            Utilities.runSharedPS(this, "${deployScript}", "-StagingName ${stagingName} -StoreName ${storeName} -AzureBlobName ${azureBlobName} -AzureBlobKey ${azureBlobKey} -WebAppName ${webAppName} -ResourceGroupName ${resourceGroupName} -SubscriptionID ${subscriptionID}")
+                        }
                     }
                 }
             }
