@@ -257,7 +257,9 @@ pipeline
                         def subscriptionID = SETTINGS['subscriptionID']
                         def blobToken = SETTINGS['tokenSas']
                         withEnv(["AzureBlobToken=${blobToken}"]){
-                            powershell "VC-2AzureDEV.ps1 -StagingName ${stagingName} -StoreName ${storeName} -AzureBlobName ${azureBlobName} -AzureBlobKey ${azureBlobKey} -WebAppName ${webAppName} -ResourceGroupName ${resourceGroupName} -SubscriptionID ${subscriptionID}"
+                            def args = "-StagingName ${stagingName} -StoreName ${storeName} -AzureBlobName ${azureBlobName} -AzureBlobKey ${azureBlobKey} -WebAppName ${webAppName} -ResourceGroupName ${resourceGroupName} -SubscriptionID ${subscriptionID}"
+                            def script = "${env.WORKSPACE}\\resources\\azure\\VC-2AzureDEV.ps1 ${args} -ErrorAction Stop"
+                            powershell script: script, label: "${script} ${args}"
                             // Utilities.runSharedPS(this, "${deployScript}", "-StagingName ${stagingName} -StoreName ${storeName} -AzureBlobName ${azureBlobName} -AzureBlobKey ${azureBlobKey} -WebAppName ${webAppName} -ResourceGroupName ${resourceGroupName} -SubscriptionID ${subscriptionID}")
                         }
                     }
