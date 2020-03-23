@@ -235,13 +235,13 @@ pipeline
 
         stage('Delivery')
         {
-            when
-            {
-                expression
-                {
-                    DELIVERY_AZURE
-                }
-            }
+            // when
+            // {
+            //     expression
+            //     {
+            //         DELIVERY_AZURE
+            //     }
+            // }
             steps
             {
                 script
