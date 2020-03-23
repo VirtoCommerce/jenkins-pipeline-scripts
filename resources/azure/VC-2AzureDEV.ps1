@@ -44,7 +44,7 @@ Get-AzureStorageBlob -Container $StoreName -Context $BlobContext | Start-AzureSt
 
 Write-Host "Sync $StoreName"
 $token = $env:AzureBlobToken
-& "${env:Utils}\AzCopy10\AzCopy" sync $SourceDir https://$($AzureBlobName).blob.core.windows.net/$StoreName$token --exclude-pattern="*.page" --delete-destination=true
+& "${env:Utils}\AzCopy10\AzCopy" cp $SourceDir/* https://$($AzureBlobName).blob.core.windows.net/$StoreName$token --recursive --exclude-pattern="*.htm;*.html;*.md;*.page" --overwrite true #--delete-destination=true
 
 Write-Host "Start $DestWebAppName"
 Start-AzureRmWebApp -ResourceGroupName $DestResourceGroupName -Name $DestWebAppName

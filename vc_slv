@@ -21,6 +21,7 @@ def PLATFORM_INSTALL = true
 def STOREFRONT_INSTALL = true
 
 def backendPath
+def deployScript = 'VC-2AzureDEV.ps1'
 
 pipeline
 {
@@ -47,7 +48,7 @@ pipeline
                             SETTINGS = new Settings(readFile(SETTINGS_FILE))
                         }
                         SETTINGS.setRegion("virtocommerce")
-                        SETTINGS.setEnvironment("dev")
+                        SETTINGS.setEnvironment("qa")
                         def branches = Utilities.getSubfolders("${env.SOLUTION_FOLDER}\\${SETTINGS['prefix']}").join("\n")
 
                         timeout(time: "${SETTINGS['timeoutMinutes']}", unit: 'MINUTES')
@@ -226,6 +227,31 @@ pipeline
                                 input(message)
                             }
                         }
+                    }
+                }
+            }
+        }
+
+        stage('Delivery')
+        {
+            when
+            {
+                equals expected: true, actual: DELIVERY_AZURE
+            }
+            steps
+            {
+                script
+                {
+                    def stagingName = "qa"
+                    def storeName = "cms-content"
+                    def azureBlobName = SETTINGS['azureBlobName']
+                    def azureBlobKey = SETTINGS['azureBlobKey']
+                    def webAppName = SETTINGS['appNamePublic']
+                    def resourceGroupName = SETTINGS['resourceGroupName']
+                    def subscriptionID = SETTINGS['subscriptionID']
+                    def blobToken = SETTINGS['tokenSas']
+                    withEnv(["AzureBlobToken=${blobToken}"]){
+                        Utilities.runSharedPS(this, "${deployScript}", "-StagingName ${stagingName} -StoreName ${storeName} -AzureBlobName ${azureBlobName} -AzureBlobKey ${azureBlobKey} -WebAppName ${webAppName} -ResourceGroupName ${resourceGroupName} -SubscriptionID ${subscriptionID}")
                     }
                 }
             }
