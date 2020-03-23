@@ -235,10 +235,10 @@ pipeline
 
         stage('Delivery')
         {
-            when
-            {
-                equals expected: true, actual: DELIVERY_AZURE
-            }
+            // when
+            // {
+            //     equals expected: true, actual: DELIVERY_AZURE
+            // }
             steps
             {
                 script
