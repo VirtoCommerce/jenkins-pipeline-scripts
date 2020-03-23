@@ -6,7 +6,7 @@ def SETTINGS
 
 def BRANCH_NAME
 def BASE_BRANCH
-def DELIVERY_AZURE = false
+def DELIVERY_AZURE = true
 
 def STOREFRONT_VERSION = ''
 def THEME_VERSION = ''
@@ -57,7 +57,7 @@ pipeline
                             [
                                 choice(name:'Source Branch', choices:SETTINGS['sourceBranches']),
                                 choice(name:'Target Branch', choices:branches),
-                                booleanParam(defaultValue: false, name: 'Delviery to Azure')
+                                booleanParam(defaultValue: true, name: 'Delviery to Azure')
                             ]
                             BASE_BRANCH = userInput["Source Branch"]
                             BRANCH_NAME = userInput["Target Branch"]
