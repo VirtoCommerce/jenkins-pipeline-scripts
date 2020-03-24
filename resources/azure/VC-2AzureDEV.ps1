@@ -30,9 +30,9 @@ $APIKey = ConvertTo-SecureString "${env:AzureAPIKey}" -AsPlainText -Force
 $psCred = New-Object System.Management.Automation.PSCredential($ApplicationID, $APIKey)
 $TenantID = "${env:AzureTenantID}"
 
-Add-AzureRmAccount -Credential $psCred -TenantId $TenantID -ServicePrincipal
-Write-Host "SubscriptionID: $SubscriptionID"
-Select-AzureRmSubscription -SubscriptionId "$SubscriptionID"
+Add-AzureRmAccount -Credential $psCred -TenantId $TenantID -ServicePrincipal -Subscription $SubscriptionID
+#Add-AzureRmAccount -Credential $psCred -TenantId $TenantID -ServicePrincipal
+#Select-AzureRmSubscription -SubscriptionId $SubscriptionID
 
 $DestWebAppName = $WebAppName
 $DestResourceGroupName = $ResourceGroupName
