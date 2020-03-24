@@ -31,7 +31,8 @@ $psCred = New-Object System.Management.Automation.PSCredential($ApplicationID, $
 $TenantID = "${env:AzureTenantID}"
 
 Add-AzureRmAccount -Credential $psCred -TenantId $TenantID -ServicePrincipal
-Select-AzureRmSubscription -SubscriptionId $SubscriptionID
+Write-Host "SubscriptionID: $SubscriptionID"
+Select-AzureRmSubscription -SubscriptionId "$SubscriptionID"
 
 $DestWebAppName = $WebAppName
 $DestResourceGroupName = $ResourceGroupName
