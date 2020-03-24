@@ -251,8 +251,8 @@ pipeline
                         def themeFolder = SETTINGS['themeFolder']
                         dir("${themeFolder}")
                         {
-                            powershell "Copy-Item .\\pages ${env.WORKSPACE}\\artifacts\\Pages\\vccom -Recurse -Force"
-                            powershell "Copy-Item .\\theme ${env.WORKSPACE}\\artifacts\\Themes\\vccom\\default -Recurse -Force"
+                            powershell "Copy-Item .\\pages ${env.WORKSPACE}\\pages -Recurse -Force"
+                            powershell "Copy-Item .\\theme ${env.WORKSPACE}\\theme -Recurse -Force"
                         }
 
                         def stagingName = "qa"
