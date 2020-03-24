@@ -30,8 +30,9 @@ $APIKey = ConvertTo-SecureString "${env:AzureAPIKey}" -AsPlainText -Force
 $psCred = New-Object System.Management.Automation.PSCredential($ApplicationID, $APIKey)
 $TenantID = "${env:AzureTenantID}"
 
-Add-AzureRmAccount -Credential $psCred -TenantId $TenantID -ServicePrincipal
-Select-AzureRmSubscription -SubscriptionId $SubscriptionID
+Add-AzureRmAccount -Credential $psCred -TenantId $TenantID -ServicePrincipal -Subscription $SubscriptionID
+#Add-AzureRmAccount -Credential $psCred -TenantId $TenantID -ServicePrincipal
+#Select-AzureRmSubscription -SubscriptionId $SubscriptionID
 
 $DestWebAppName = $WebAppName
 $DestResourceGroupName = $ResourceGroupName
@@ -44,7 +45,7 @@ Get-AzureStorageBlob -Container $StoreName -Context $BlobContext | Start-AzureSt
 
 Write-Host "Sync $StoreName"
 $token = $env:AzureBlobToken
-& "${env:Utils}\AzCopy10\AzCopy" sync $SourceDir https://$($AzureBlobName).blob.core.windows.net/$StoreName$token --exclude-pattern="*.page" --delete-destination=true
+& "${env:Utils}\AzCopy10\AzCopy" cp $SourceDir/* https://$($AzureBlobName).blob.core.windows.net/$StoreName$token --recursive --exclude-pattern="*.htm;*.html;*.md;*.page" --overwrite true #--delete-destination=true
 
 Write-Host "Start $DestWebAppName"
 Start-AzureRmWebApp -ResourceGroupName $DestResourceGroupName -Name $DestWebAppName
