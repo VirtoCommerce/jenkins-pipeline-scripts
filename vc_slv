@@ -248,6 +248,13 @@ pipeline
                 {
                     node(SETTINGS['agentLabel'])
                     {
+                        def themeFolder = SETTINGS['themeFolder']
+                        dir("${themeFolder}")
+                        {
+                            powershell "Copy-Item .\\pages ${env.WORKSPACE}\\artifacts\\Pages\\vccom -Recurse -Force"
+                            powershell "Copy-Item .\\theme ${env.WORKSPACE}\\artifacts\\Themes\\vccom\\default -Recurse -Force"
+                        }
+
                         def stagingName = "qa"
                         def storeName = "cms-content"
                         def azureBlobName = SETTINGS['azureBlobName']
@@ -259,11 +266,7 @@ pipeline
                         withEnv(["AzureBlobToken=${blobToken}"]){
                             def args = "-StagingName ${stagingName} -StoreName ${storeName} -AzureBlobName ${azureBlobName} -AzureBlobKey ${azureBlobKey} -WebAppName ${webAppName} -ResourceGroupName ${resourceGroupName} -SubscriptionID ${subscriptionID}"
                             def script = "${env.WORKSPACE}\\resources\\azure\\VC-2AzureDEV.ps1 ${args} -ErrorAction Stop"
-                            def themeFolder = SETTINGS['themeFolder']
-                            dir("${themeFolder}")
-                            {
-                                powershell script: script, label: "${script} ${args}"
-                            }
+                            powershell script: script, label: "${script} ${args}"
                         }
                     }
                 }
