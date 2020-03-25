@@ -80,20 +80,29 @@ def call(body) {
 						def artifacts = findFiles(glob: 'artifacts\\*.zip')
 						Packaging.saveArtifact(this, 'vc', 'module', moduleId, artifacts[0].path)
                         
-                        def ghReleaseResult = Utilities.runBatchScript(this, "@vc-build PublishPackages -ApiKey ${env.NUGET_KEY} -skip Clean+Restore+Compile+Test")
-                        if(ghReleaseResult['status'] != 0){
-                            def nugetAlreadyExists = false
-                            for(line in ghReleaseResult['stdout']){
-                                if(line.contains("error: Response status code does not indicate success: 409")){
-                                    nugetAlreadyExists = true
-                                }
-                            }
-                            if(nugetAlreadyExists){
-                                UNSTABLE_CAUSES.add("Nuget package already exists.")
-                            }
-                            else{
-                                throw new Exception("ERROR: script returned exit code -1")
-                            }
+                        // def ghReleaseResult = Utilities.runBatchScript(this, "@vc-build PublishPackages -ApiKey ${env.NUGET_KEY} -skip Clean+Restore+Compile+Test")
+                        // if(ghReleaseResult['status'] != 0){
+                        //     def nugetAlreadyExists = false
+                        //     for(line in ghReleaseResult['stdout']){
+                        //         if(line.contains("error: Response status code does not indicate success: 409")){
+                        //             nugetAlreadyExists = true
+                        //         }
+                        //     }
+                        //     if(nugetAlreadyExists){
+                        //         UNSTABLE_CAUSES.add("Nuget package already exists.")
+                        //     }
+                        //     else{
+                        //         throw new Exception("ERROR: script returned exit code -1")
+                        //     }
+                        // }
+                        def ghReleaseResult = powershell script: "vc-build PublishPackages -ApiKey ${env.NUGET_KEY} -skip Clean+Restore+Compile+Test", returnStatus: true
+                        if(ghReleaseResult == 409)
+                        {
+                            UNSTABLE_CAUSES.add("Nuget package already exists.")
+                        } 
+                        else if(ghReleaseResult != 0)
+                        {
+                            throw new Exception("ERROR: script returned ${ghReleaseResult}")
                         }
                         
                         // def orgName = Utilities.getOrgName(this)
