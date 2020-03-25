@@ -55,16 +55,16 @@ def call(body) {
                 stage('Build'){
                     
                     //Packaging.startAnalyzer(this, true)
-                    withSonarQubeEnv('VC Sonar Server'){
-                        if(Utilities.isPullRequest(this))
-                        {
-                            powershell "vc-build SonarQubeStart -SonarUrl ${env.SONAR_HOST_URL} -SonarAuthToken \"${env.SONAR_AUTH_TOKEN}\" -PullRequest -GitHubToken ${env.GITHUB_TOKEN} -skip Restore+Compile"
-                        }
-                        else
-                        {
-                            powershell "vc-build SonarQubeStart -SonarUrl ${env.SONAR_HOST_URL} -SonarAuthToken \"${env.SONAR_AUTH_TOKEN}\" -skip Restore+Compile"
-                        }
-                    }
+                    // withSonarQubeEnv('VC Sonar Server'){
+                    //     if(Utilities.isPullRequest(this))
+                    //     {
+                    //         powershell "vc-build SonarQubeStart -SonarUrl ${env.SONAR_HOST_URL} -SonarAuthToken \"${env.SONAR_AUTH_TOKEN}\" -PullRequest -GitHubToken ${env.GITHUB_TOKEN} -skip Restore+Compile"
+                    //     }
+                    //     else
+                    //     {
+                    //         powershell "vc-build SonarQubeStart -SonarUrl ${env.SONAR_HOST_URL} -SonarAuthToken \"${env.SONAR_AUTH_TOKEN}\" -skip Restore+Compile"
+                    //     }
+                    // }
                     if(Utilities.isPullRequest)
                     {
                         withSonarQubeEnv('VC Sonar Server'){
