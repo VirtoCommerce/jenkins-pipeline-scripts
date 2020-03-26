@@ -46,8 +46,11 @@ def call(body) {
 
                 if(!Utilities.isPullRequest(this)){
                     stage('Publish'){
-						def moduleId = Modules.getModuleId(this)
+						//def moduleId = Modules.getModuleId(this)
 						def artifacts = findFiles(glob: 'artifacts\\*.zip')
+                        def artifactFileName = artifacts[0].path.split("\\").last()
+                        def moduleId = artifactsFileName.split("_").first()
+                        echo "Module id: ${moduleId}"
 						Packaging.saveArtifact(this, 'rs', 'module', moduleId, artifacts[0].path)
                         
                         // def ghReleaseResult = Utilities.runBatchScript(this, "@vc-build PublishPackages -ApiKey ${env.NUGET_KEY} -skip Clean+Restore+Compile+Test")
