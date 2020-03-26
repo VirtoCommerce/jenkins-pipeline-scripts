@@ -49,7 +49,7 @@ def call(body) {
 						//def moduleId = Modules.getModuleId(this)
 						def artifacts = findFiles(glob: 'artifacts\\*.zip')
                         def artifactFileName = artifacts[0].path.split("\\\\").last()
-                        def moduleId = artifactsFileName.split("_").first()
+                        def moduleId = artifactFileName.split("_").first()
                         echo "Module id: ${moduleId}"
 						Packaging.saveArtifact(this, 'rs', 'module', moduleId, artifacts[0].path)
                         
