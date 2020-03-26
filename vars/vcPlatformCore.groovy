@@ -54,7 +54,7 @@ def call(body) {
 
                 stage('Build'){
                     
-                    Packaging.startAnalyzer(this, true)
+                    // Packaging.startAnalyzer(this, true)
                     // withSonarQubeEnv('VC Sonar Server'){
                     //     if(Utilities.isPullRequest(this))
                     //     {
@@ -70,16 +70,16 @@ def call(body) {
                         withSonarQubeEnv('VC Sonar Server'){
                             withEnv(["BRANCH_NAME=${env.CHANGE_BRANCH}"])
                             {
-                                //powershell "vc-build SonarQubeStart -SonarUrl ${env.SONAR_HOST_URL} -SonarAuthToken \"${env.SONAR_AUTH_TOKEN}\" -PullRequest -GitHubToken ${env.GITHUB_TOKEN} -skip Restore+Compile"
+                                powershell "vc-build SonarQubeStart -SonarUrl ${env.SONAR_HOST_URL} -SonarAuthToken \"${env.SONAR_AUTH_TOKEN}\" -PullRequest -GitHubToken ${env.GITHUB_TOKEN} -skip Restore+Compile"
                                 powershell "vc-build Compile"
                             }
                         }
                     }
                     else
                     {
-                        // withSonarQubeEnv('VC Sonar Server'){
-                        //     powershell "vc-build SonarQubeStart -SonarUrl ${env.SONAR_HOST_URL} -SonarAuthToken \"${env.SONAR_AUTH_TOKEN}\" -skip Restore+Compile"
-                        // }
+                        withSonarQubeEnv('VC Sonar Server'){
+                            powershell "vc-build SonarQubeStart -SonarUrl ${env.SONAR_HOST_URL} -SonarAuthToken \"${env.SONAR_AUTH_TOKEN}\" -skip Restore+Compile"
+                        }
                         powershell "vc-build Compile"
                     }
                     
@@ -90,10 +90,10 @@ def call(body) {
                 } 
 
                 stage('Quality Gate'){
-                    Packaging.endAnalyzer(this)
-                    // withSonarQubeEnv('VC Sonar Server'){
-                    //     powershell "vc-build SonarQubeEnd -SonarUrl ${env.SONAR_HOST_URL} -SonarAuthToken ${env.SONAR_AUTH_TOKEN} -skip Restore+Compile+SonarQubeStart"
-                    // }
+                    // Packaging.endAnalyzer(this)
+                    withSonarQubeEnv('VC Sonar Server'){
+                        powershell "vc-build SonarQubeEnd -SonarUrl ${env.SONAR_HOST_URL} -SonarAuthToken ${env.SONAR_AUTH_TOKEN} -skip Restore+Compile+SonarQubeStart"
+                    }
                     Packaging.checkAnalyzerGate(this)
                 }  
 
