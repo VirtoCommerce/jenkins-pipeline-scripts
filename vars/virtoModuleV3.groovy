@@ -39,7 +39,7 @@ def call(body) {
                 }
 
                 stage('Build'){
-                    if(Utilities.isPullRequest)
+                    if(Utilities.isPullRequest(this))
                     {
                         withSonarQubeEnv('VC Sonar Server'){
                             withEnv(["BRANCH_NAME=${env.CHANGE_BRANCH}"])

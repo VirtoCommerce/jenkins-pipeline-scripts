@@ -65,7 +65,7 @@ def call(body) {
                     //         powershell "vc-build SonarQubeStart -SonarUrl ${env.SONAR_HOST_URL} -SonarAuthToken \"${env.SONAR_AUTH_TOKEN}\" -skip Restore+Compile"
                     //     }
                     // }
-                    if(Utilities.isPullRequest)
+                    if(Utilities.isPullRequest(this))
                     {
                         withSonarQubeEnv('VC Sonar Server'){
                             withEnv(["BRANCH_NAME=${env.CHANGE_BRANCH}"])
