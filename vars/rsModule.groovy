@@ -33,15 +33,15 @@ def call(body) {
                 stage('Build')
                 {
                     powershell "if(!(Test-Path -Path .\\.nuke)){ Get-ChildItem *.sln -Name > .nuke }"
-                    powershell "vc-build Compile"
+                    powershell "vc-build Compile -NugetConfig ${env.Utils}\\Nuget\\nuget.rs.config"
                 }
 
                 stage('Unit Tests'){
-                    powershell "vc-build Test -skip Restore+Compile"
+                    powershell "vc-build Test -skip"
                 } 
 
                 stage('Packaging'){                
-                    powershell "vc-build Compress -skip Clean+Restore+Compile+Test"
+                    powershell "vc-build Compress -skip"
                 }
 
                 if(!Utilities.isPullRequest(this)){
