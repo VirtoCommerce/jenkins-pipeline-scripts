@@ -121,6 +121,8 @@ pipeline {
                     }
                     powershell script: "Copy-Item -Path ${csSrc}\\* -Destination ${env.WORKSPACE}\\CS -Recurse -Force", label: "Copy Solution to Workspace"
                     powershell "Rename-Item -Path ${modulesRoot} -NewName Modules"
+                    if(BRANCH_NAME == 'feature_migrate-to-vc30')
+                        powershell script: "Copy-Item -Path ${env.SOLUTION_FOLDER}\\vc\\${BRANCH_NAME}\\module\\* -Destination ${env.WORKSPACE}\\CS\\modules -Recurse -Force", label: "Copy vc modules to Workspace/modules"
                 }
             }
         }
