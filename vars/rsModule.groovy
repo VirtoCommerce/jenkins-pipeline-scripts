@@ -41,7 +41,7 @@ def call(body) {
                 } 
 
                 stage('Packaging'){                
-                    powershell "vc-build Compress -skip"
+                    powershell "vc-build Compress -skip Clean+Restore+Compile+Test"
                 }
 
                 if(!Utilities.isPullRequest(this)){
