@@ -131,7 +131,7 @@ def call(body) {
                                     def platformPort = Utilities.getPlatformPort(this)
                                     def storefrontPort = Utilities.getStorefrontPort(this)
                                     def sqlPort = Utilities.getSqlPort(this)
-                                    withEnv(["DOCKER_TAG=${dockerTag}", "DOCKER_PLATFORM_PORT=${platformPort}", "DOCKER_STOREFRONT_PORT=${storefrontPort}", "DOCKER_SQL_PORT=${sqlPort}", "COMPOSE_PROJECT_NAME=${env.BUILD_TAG}" ]) {
+                                    withEnv(["DOCKER_TAG=dev-branch", "DOCKER_PLATFORM_PORT=${platformPort}", "DOCKER_STOREFRONT_PORT=${storefrontPort}", "DOCKER_SQL_PORT=${sqlPort}", "COMPOSE_PROJECT_NAME=${env.BUILD_TAG}" ]) {
                                         bat "docker-compose up -d"
                                     }
                                 }
