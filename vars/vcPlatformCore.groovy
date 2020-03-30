@@ -118,9 +118,52 @@ def call(body) {
                         }
                     }
                 }
-
                 if(!Utilities.isPullRequest(this))
                 {
+                    try
+                    {
+                        stage('Create Test Environment')
+                        {
+                            timestamps
+                            {
+                                dir(Utilities.getComposeFolderV3(this))
+                                {
+                                    def platformPort = Utilities.getPlatformPort(context)
+                                    def storefrontPort = Utilities.getStorefrontPort(context)
+                                    def sqlPort = Utilities.getSqlPort(context)
+                                    withEnv(["DOCKER_TAG=${dockerTag}", "DOCKER_PLATFORM_PORT=${platformPort}", "DOCKER_STOREFRONT_PORT=${storefrontPort}", "DOCKER_SQL_PORT=${sqlPort}", "COMPOSE_PROJECT_NAME=${context.env.BUILD_TAG}" ]) {
+                                        context.bat "docker-compose up -d"
+                                    }
+                                }
+                            }
+                        }
+                        stage('Install Modules')
+                        {
+                            timestamps
+                            {
+                                Utilities.runPS(this, "docker_v3/vc-setup-modules.ps1", "-ApiUrl ${Utilities.getPlatformHost(this)} -needRestart 0")
+                            }
+                        }
+                        stage('Install Sample Data')
+                        {
+                            timestamps
+                            {
+
+                            }
+                        }
+                        stage("Swagger Schema Validation")
+                        {
+                            timestamps
+                            {
+                                
+                            }
+                        }
+                    }
+                    catch(any)
+                    {
+                        echo any.getMessage()
+                    }
+
                     stage('Publish')
                     {
                         // powershell "vc-build PublishPackages -ApiKey ${env.NUGET_KEY} -skip Clean+Restore+Compile+Test"
@@ -180,6 +223,12 @@ def call(body) {
                     }
                 }
 			    Utilities.notifyBuildStatus(this, SETTINGS['of365hook'], "Build finished", currentBuild.currentResult)
+                dir(Utilities.getComposeFolderV3(this))
+                {
+                    withEnv(["DOCKER_TAG=${dockerTag}", "COMPOSE_PROJECT_NAME=${env.BUILD_TAG}"]) {
+                        bat "docker-compose down -v"
+                    }
+                }
                 Utilities.cleanPRFolder(this)
             }
         }
