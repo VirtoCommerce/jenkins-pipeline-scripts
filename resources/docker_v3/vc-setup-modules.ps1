@@ -31,7 +31,7 @@ function Get-AuthToken {
     $content_type = "application/x-www-form-urlencoded"
 
     $body = @{username=$username; password=$password; grant_type=$grant_type}
-    $response = Invoke-WebRequest -Uri $appAuthUrl -Method Post -ContentType $content_type -Body $body
+    $response = Invoke-WebRequest -Uri $appAuthUrl -Method Post -ContentType $content_type -Body $body -SkipCertificateCheck
     $responseContent = $response.Content | ConvertFrom-Json
     #return "$($responseContent.token_type) $($responseContent.access_token)"
     return $responseContent.access_token
@@ -44,17 +44,17 @@ $restartUrl = "$ApiUrl/api/platform/modules/restart"
 $appAuthUrl = "$ApiUrl/connect/token"
 
 # Call homepage, to make sure site is compiled
-#$initResult = Invoke-WebRequest $ApiUrl -UseBasicParsing
-#if ($initResult.StatusCode -ne 200) {
+$initResult = Invoke-WebRequest $ApiUrl -UseBasicParsing -SkipCertificateCheck
+if ($initResult.StatusCode -ne 200) {
     # throw exception when site can't be opened
-#    throw "Can't open admin site homepage"
-#}
+    throw "Can't open admin site homepage"
+}
 
 # Initiate modules installation
 $authToken = Get-AuthToken $appAuthUrl $Username $Password
 $headers = @{}
 $headers.Add("Authorization", "Bearer $authToken")
-$moduleImportResult = Invoke-RestMethod $modulesInstallUrl -Method Post -Headers $headers -ErrorAction Stop
+$moduleImportResult = Invoke-RestMethod $modulesInstallUrl -Method Post -Headers $headers -ErrorAction Stop -SkipCertificateCheck
 Write-Output $moduleImportResult
 Start-Sleep -s 1
 
@@ -71,7 +71,7 @@ $startIndex = 0
 try {
     do {
         # Retrieve notification state
-        $moduleState = Invoke-RestMethod "$modulesStateUrl" -Body $NotificationStateJson -Method Post -ContentType "application/json" -Headers $headers
+        $moduleState = Invoke-RestMethod "$modulesStateUrl" -Body $NotificationStateJson -Method Post -ContentType "application/json" -Headers $headers -SkipCertificateCheck
 
         # display all statuses
         if ($moduleState.NotifyEvents -ne $null -and $moduleState.NotifyEvents.Length -ne 0) {
@@ -95,7 +95,7 @@ try {
     }
     if($null -ne $NeedRestart -and $NeedRestart -gt 0){
       Write-Output "Restarting website"
-      $moduleState = Invoke-RestMethod "$restartUrl" -Method Post -ContentType "application/json" -Headers $headers
+      $moduleState = Invoke-RestMethod "$restartUrl" -Method Post -ContentType "application/json" -Headers $headers -SkipCertificateCheck
     }
 }
 catch {
