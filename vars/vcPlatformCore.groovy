@@ -225,7 +225,7 @@ def call(body) {
 			    Utilities.notifyBuildStatus(this, SETTINGS['of365hook'], "Build finished", currentBuild.currentResult)
                 dir(Utilities.getComposeFolderV3(this))
                 {
-                    withEnv(["DOCKER_TAG=${dockerTag}", "COMPOSE_PROJECT_NAME=${env.BUILD_TAG}"]) {
+                    withEnv(["DOCKER_TAG=dev-branch", "COMPOSE_PROJECT_NAME=${env.BUILD_TAG}"]) {
                         bat "docker-compose down -v"
                     }
                 }
