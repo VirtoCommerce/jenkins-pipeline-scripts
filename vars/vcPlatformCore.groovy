@@ -128,11 +128,11 @@ def call(body) {
                             {
                                 dir(Utilities.getComposeFolderV3(this))
                                 {
-                                    def platformPort = Utilities.getPlatformPort(context)
-                                    def storefrontPort = Utilities.getStorefrontPort(context)
-                                    def sqlPort = Utilities.getSqlPort(context)
-                                    withEnv(["DOCKER_TAG=${dockerTag}", "DOCKER_PLATFORM_PORT=${platformPort}", "DOCKER_STOREFRONT_PORT=${storefrontPort}", "DOCKER_SQL_PORT=${sqlPort}", "COMPOSE_PROJECT_NAME=${context.env.BUILD_TAG}" ]) {
-                                        context.bat "docker-compose up -d"
+                                    def platformPort = Utilities.getPlatformPort(this)
+                                    def storefrontPort = Utilities.getStorefrontPort(this)
+                                    def sqlPort = Utilities.getSqlPort(this)
+                                    withEnv(["DOCKER_TAG=${dockerTag}", "DOCKER_PLATFORM_PORT=${platformPort}", "DOCKER_STOREFRONT_PORT=${storefrontPort}", "DOCKER_SQL_PORT=${sqlPort}", "COMPOSE_PROJECT_NAME=${env.BUILD_TAG}" ]) {
+                                        bat "docker-compose up -d"
                                     }
                                 }
                             }
