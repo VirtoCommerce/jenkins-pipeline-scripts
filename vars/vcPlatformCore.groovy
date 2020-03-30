@@ -143,7 +143,7 @@ def call(body) {
                             {
                                 def platformHost = Utilities.getPlatformCoreHost(this)
                                 echo "Platform Host: ${platformHost}"
-                                Utilities.runPS(this, "docker_v3/vc-setup-modules.ps1", "-ApiUrl ${platformHost} -needRestart 0")
+                                Utilities.runPS(this, "docker_v3/vc-setup-modules.ps1", "-ApiUrl ${platformHost} -needRestart 0 -Verbose")
                             }
                         }
                         stage('Install Sample Data')
