@@ -142,6 +142,7 @@ def call(body) {
                             timestamps
                             {
                                 def platformHost = Utilities.getPlatformCoreHost(this)
+                                echo "Platform Host: ${platformHost}"
                                 Utilities.runPS(this, "docker_v3/vc-setup-modules.ps1", "-ApiUrl ${platformHost} -needRestart 0")
                             }
                         }
