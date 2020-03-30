@@ -141,7 +141,8 @@ def call(body) {
                         {
                             timestamps
                             {
-                                Utilities.runPS(this, "docker_v3/vc-setup-modules.ps1", "-ApiUrl ${Utilities.getPlatformCoreHost(this)} -needRestart 0")
+                                def platformHost = Utilities.getPlatformCoreHost(this)
+                                Utilities.runPS(this, "docker_v3/vc-setup-modules.ps1", "-ApiUrl ${platformHost} -needRestart 0")
                             }
                         }
                         stage('Install Sample Data')
