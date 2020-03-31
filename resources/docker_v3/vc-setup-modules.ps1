@@ -23,7 +23,8 @@ function Get-AuthToken {
     #return "$($responseContent.token_type) $($responseContent.access_token)"
     return $responseContent.access_token
 }   
-
+Write-Output "Pause"
+Start-Sleep -Seconds 30
 # Initialize paths used by the script
 Write-Output "Initialize paths used by the script"
 $modulesStateUrl = "$ApiUrl/api/platform/pushnotifications"
