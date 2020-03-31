@@ -33,7 +33,7 @@ $appAuthUrl = "$ApiUrl/connect/token"
 
 # Call homepage, to make sure site is compiled
 Write-Output "Call homepage, to make sure site is compiled"
-$initResult = Invoke-WebRequest $ApiUrl -UseBasicParsing -SkipCertificateCheck -MaximumRetryCount 3
+$initResult = Invoke-WebRequest $ApiUrl -UseBasicParsing -SkipCertificateCheck
 if ($initResult.StatusCode -ne 200) {
     # throw exception when site can't be opened
     Write-Output "Can't open admin site homepage"
