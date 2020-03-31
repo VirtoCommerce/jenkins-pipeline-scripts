@@ -5,6 +5,6 @@ Param(
     $OutFile
 )
 
-$swaggerApi = "$ApiUrl/docs/v1"
+$swaggerApi = "$ApiUrl/docs/PlatformUI/swagger.json"
 
 Invoke-WebRequest -Uri $swaggerApi -Method Get -OutFile $OutFile -SkipCertificateCheck
