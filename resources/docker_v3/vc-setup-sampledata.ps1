@@ -41,8 +41,8 @@ if([string]::IsNullOrWhiteSpace($SampleDataSrc)){
     $sdInstallUrl = "$ApiUrl/api/platform/sampledata/import?url=$SampleDataSrc"
 }
 
-
-$authToken = Get-AuthToken $appAuthUrl $Username $Password
+Start-Sleep -Seconds 15
+$authToken = (Get-AuthToken $appAuthUrl $Username $Password)[1]
 $headers = @{}
 $headers.Add("Authorization", "Bearer $authToken")
 $installResult = Invoke-RestMethod -Uri $sdInstallUrl -ContentType "application/json" -Method Post -Headers $headers -SkipCertificateCheck
