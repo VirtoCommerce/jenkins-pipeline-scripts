@@ -43,7 +43,7 @@ if ($initResult.StatusCode -ne 200) {
 
 # Initiate modules installation
 Write-Output "Authorization"
-$authToken = Get-AuthToken $appAuthUrl $Username $Password
+$authToken = (Get-AuthToken $appAuthUrl $Username $Password)[1]
 $headers = @{}
 $headers.Add("Authorization", "Bearer $authToken")
 Write-Output "Initiate modules installation"
