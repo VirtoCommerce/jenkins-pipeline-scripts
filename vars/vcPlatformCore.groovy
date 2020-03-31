@@ -111,7 +111,7 @@ def call(body) {
                         def websitePath = Utilities.getWebPublishFolder(this, "docker")
                         def dockerImageName = "platform-core"
                         powershell script: "Copy-Item ${workspace}\\artifacts\\publish\\* ${websitePath}\\VirtoCommerce.Platform -Recurse -Force"
-                        powershell script: "Copy-Item ${env.WORKSPACE}@libs\\virto-shared-library\\resources\\docker.core\\windowsnano\\PlatformCore\\* ${websitePath} -Force"
+                        powershell script: "Copy-Item ${env.WORKSPACE}\\..\\workspace@libs\\virto-shared-library\\resources\\docker.core\\windowsnano\\PlatformCore\\* ${websitePath} -Force"
                         dir(websitePath){
                             bat "dotnet dev-certs https -ep \"${websitePath}\\devcert.pfx\" -p virto"
                             docker.build("${dockerImageName}:${dockerTag}")
