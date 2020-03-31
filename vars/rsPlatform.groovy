@@ -127,7 +127,7 @@ def call(body) {
                     //     def artifacts = findFiles(glob: "artifacts/*.zip")
                     //     def artifactPath = artifacts[0].path
                     //     Utilities.runSharedPS(this, "v3\\DeployTo-Azure.ps1", "-ZipFile \"${artifactPath}\" -WebAppName ${SETTINGS['webAppName']} -ResourceGroupName ${SETTINGS['resourceGroupName']} -SubscriptionID ${SETTINGS['subscriptionID']} -DestContentPath \"platform\"")
-                    // }
+                    }
                 }
             }
             catch(any){
