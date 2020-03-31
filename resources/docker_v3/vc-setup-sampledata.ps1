@@ -21,17 +21,6 @@ function Get-AuthToken {
     $responseContent = $response.Content | ConvertFrom-Json
     #return "$($responseContent.token_type) $($responseContent.access_token)"
     return $responseContent.access_token
-}   
-
-if ([string]::IsNullOrWhiteSpace($hmacAppId)) {
-    $hmacAppId = "${env:HMAC_APP_ID}"
-}
-
-if ([string]::IsNullOrWhiteSpace($hmacSecret)) {
-    $hmacSecret = "${env:HMAC_SECRET}"
-}
-if ([string]::IsNullOrWhiteSpace($SampleDataSrc)) {
-    $SampleDataSrc = "${env:SAMPLE_DATA}"
 }
 
 $sdStateUrl = "$ApiUrl/api/platform/pushnotifications"
