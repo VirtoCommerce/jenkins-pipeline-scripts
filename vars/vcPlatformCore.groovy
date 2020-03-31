@@ -158,7 +158,7 @@ def call(body) {
                         {
                             timestamps
                             {
-                                Utilities.runPS(this, "docker_v3/vc-get-swagger.ps1", "-ApiUrl ${Utilities.getPlatformCoreHost(this)} -OutFile ${env.WORKSPACE}@tmp\\swaggerSchema${env.BUILD_NUMBER}.json -Verbose")
+                                Utilities.runPS(this, "docker_v3/vc-get-swagger.ps1", "-ApiUrl ${Utilities.getPlatformCoreHost(this)} -OutFile ${workspace}\\artifacts\\swaggerSchema${env.BUILD_NUMBER}.json -Verbose")
                             }
                         }
                     }
