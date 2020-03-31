@@ -27,6 +27,7 @@ function Get-AuthToken {
         $username,
         $password
     )
+    Write-Output "Get-AuthToken: appAuthUrl $appAuthUrl"
     $grant_type = "password"
     $content_type = "application/x-www-form-urlencoded"
 
@@ -38,12 +39,14 @@ function Get-AuthToken {
 }   
 
 # Initialize paths used by the script
+Write-Output "Initialize paths used by the script"
 $modulesStateUrl = "$ApiUrl/api/platform/pushnotifications"
 $modulesInstallUrl = "$ApiUrl/api/platform/modules/autoinstall"
 $restartUrl = "$ApiUrl/api/platform/modules/restart"
 $appAuthUrl = "$ApiUrl/connect/token"
 
 # Call homepage, to make sure site is compiled
+Write-Output "Call homepage, to make sure site is compiled"
 $initResult = Invoke-WebRequest $ApiUrl -UseBasicParsing -SkipCertificateCheck
 if ($initResult.StatusCode -ne 200) {
     # throw exception when site can't be opened
@@ -51,9 +54,11 @@ if ($initResult.StatusCode -ne 200) {
 }
 
 # Initiate modules installation
+Write-Output "Authorization"
 $authToken = Get-AuthToken $appAuthUrl $Username $Password
 $headers = @{}
 $headers.Add("Authorization", "Bearer $authToken")
+Write-Output "Initiate modules installation"
 $moduleImportResult = Invoke-RestMethod $modulesInstallUrl -Method Post -Headers $headers -ErrorAction Stop -SkipCertificateCheck
 Write-Output $moduleImportResult
 Start-Sleep -s 1
@@ -68,6 +73,7 @@ $NotificationStateJson = @"
 
 $cycleCount = 0
 $startIndex = 0
+Write-Output "Retrieve notification state"
 try {
     do {
         # Retrieve notification state
