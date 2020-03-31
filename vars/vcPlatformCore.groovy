@@ -142,22 +142,23 @@ def call(body) {
                             timestamps
                             {
                                 def platformHost = Utilities.getPlatformCoreHost(this)
+                                def platformContainerId = Utilities.getPlatformContainer(this)
                                 echo "Platform Host: ${platformHost}"
-                                Utilities.runPS(this, "docker_v3/vc-setup-modules.ps1", "-ApiUrl ${platformHost} -needRestart 0 -Verbose")
+                                Utilities.runPS(this, "docker_v3/vc-setup-modules.ps1", "-ApiUrl ${platformHost} -needRestart 1 -ContainerId ${platformContainerId} -Verbose")
                             }
                         }
                         stage('Install Sample Data')
                         {
                             timestamps
                             {
-
+                                Utilities.runPS(this, "docker_v3/vc-setup-sampledata.ps1", "-ApiUrl ${Utilities.getPlatformCoreHost(this)} -Verbose")
                             }
                         }
                         stage("Swagger Schema Validation")
                         {
                             timestamps
                             {
-                                
+                                Utilities.runPS(this, "docker_v3/vc-get-swagger.ps1", "-ApiUrl ${Utilities.getPlatformCoreHost(this)} -OutFile ${env.WORKSPACE}@tmp\\swaggerSchema${env.BUILD_NUMBER}.json -Verbose")
                             }
                         }
                     }

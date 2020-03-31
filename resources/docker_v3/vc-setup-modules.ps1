@@ -2,6 +2,7 @@ Param(
     [parameter(Mandatory = $true)]
     $ApiUrl,
     $NeedRestart,
+    $ContainerId = $null,
     $Username = "admin",
     $Password = "store"
 )
@@ -86,7 +87,8 @@ try {
     }
     if($null -ne $NeedRestart -and $NeedRestart -gt 0){
       Write-Output "Restarting website"
-      $moduleState = Invoke-RestMethod "$restartUrl" -Method Post -ContentType "application/json" -Headers $headers -SkipCertificateCheck
+      #$moduleState = Invoke-RestMethod "$restartUrl" -Method Post -ContentType "application/json" -Headers $headers -SkipCertificateCheck
+      docker restart $ContainerId
     }
 }
 catch {
