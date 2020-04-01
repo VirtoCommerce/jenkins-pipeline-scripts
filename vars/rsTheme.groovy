@@ -67,7 +67,7 @@ def call(body) {
             throw any //rethrow exception to prevent the build from proceeding
         }
         finally {
-            step([$class: 'Mailer', notifyEveryUnstableBuild: true, recipients: 'rs.support@virtoway.com', sendToIndividuals: true])
+            //step([$class: 'Mailer', notifyEveryUnstableBuild: true, recipients: 'rs.support@virtoway.com', sendToIndividuals: true])
         }
     }
 }
