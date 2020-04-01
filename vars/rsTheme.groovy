@@ -26,6 +26,8 @@ def call(body) {
                     checkout scm
                 }
 
+            }
+
             stage('Build') {
                 timestamps { 
                     runGulpBuild()
