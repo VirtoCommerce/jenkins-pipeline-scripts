@@ -48,31 +48,19 @@ pipeline {
     }
     
     stages{
-        stage("User Input"){
+        stage("Init"){
             steps{
                 script{
-                    def settingsFileContent
-                    configFileProvider([configFile(fileId: 'delivery_settings', variable: 'SETTINGS_FILE')]) {
-                        settingsFileContent = readFile(SETTINGS_FILE)
-                    }
+                    def settingsFileContent = readFile(params.DELIVERY_SETTINGS)
                     SETTINGS = new Settings(settingsFileContent)
-                    def regionChoices = SETTINGS.getRegions().join("\n")
                     def buildOrder = Utilities.getNextBuildOrder(this)
-                    def userInput = input message: "Region and Branch", parameters: [
-                        choice(name: 'Region', choices: regionChoices),
-                        choice(name: 'Branch', choices: "dev\nmaster\nrelease_3.0.0\nfeature_migrate-to-vc30")
-                    ]
                     PROJECT_TYPE = 'SOLUTION'
-                    REGION = userInput['Region']
-                    BRANCH_NAME = userInput['Branch']
+                    REGION = params.Region
+                    BRANCH_NAME = params.Branch
                     UPDATE_CS = true
                     SETTINGS.setRegion(REGION)
 
-                    def envChoices = SETTINGS.getEnvironments().join("\n")
-                    def userEnvInput = input message: "Select Environment", parameters: [
-                        choice(name: 'Environments', choices: envChoices)
-                    ]
-                    ENV_NAME = userEnvInput
+                    ENV_NAME = params.Environment
                     SETTINGS.setEnvironment(ENV_NAME)
                     echo "Vars: REGION - ${REGION}, UPDATE_CS - ${UPDATE_CS}, ENV_NAME - ${ENV_NAME}, BRANCH_NAME - ${BRANCH_NAME}"
                     def msgToHook = "Delivery Option ${PROJECT_TYPE}<br/>Environment ${ENV_NAME}<br/>${UPDATE_CS ? "Update Solution<br/>":""}"
