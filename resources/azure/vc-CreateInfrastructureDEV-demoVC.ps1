@@ -11,9 +11,9 @@ Select-AzureRmSubscription -SubscriptionId $SubscriptionID
 
 $DestResourceGroupName = "DEV-demoVC"
 
-$TemplateFolder = "resources\azure\arm-templates"
-$TemplateFile = "${env:WORKSPACE}\resources\azure\arm-templates\azuredeployDEV-demoVC.json"
-$TemplateParametersFile = "${env:WORKSPACE}\resources\azure\arm-templates\azuredeployDEV-demoVC_parameters.json"
+$TemplateFolder = "resources\azure"
+$TemplateFile = "${env:WORKSPACE}\$TemplateFolder\azuredeployDEV-demoVC.json"
+$TemplateParametersFile = "${env:WORKSPACE}\$TemplateFolder\azuredeployDEV-demoVC_parameters.json"
 
 New-AzureRmResourceGroupDeployment -Name ((Get-ChildItem $TemplateFile).BaseName + '-' + ((Get-Date).ToUniversalTime()).ToString('MMdd-HHmm')) `
 -ResourceGroupName $DestResourceGroupName `
