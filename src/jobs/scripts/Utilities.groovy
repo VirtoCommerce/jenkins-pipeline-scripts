@@ -521,34 +521,34 @@ class Utilities
     def static createInfrastructure(context, project = 'blank')
     {
         //def AzureTempDir = Utilities.getAzureTemplateDir(context)
-        def AzureTempDir = "..\\workspace@libs\\virto-shared-library\\resources\\azure" // Azure Resource Manager templates path
+        def AzureTempDir = "..\\workspace@libs\\virto-shared-library\\resources\\azure\\arm-templates" // Azure Resource Manager templates path
         context.dir(AzureTempDir)
         {
             switch(project)
             {
                 case 'bulk-update/dev':
-                    Utilities.runSharedPS(context, "vc-CreateInfrastructureBulkUpdateDev.ps1")
+                    Utilities.runSharedPS(context, "arm-templates//vc-CreateInfrastructureBulkUpdateDev.ps1")
                     break
                 case 'bulk-update/master':
-                    Utilities.runSharedPS(context, "vc-CreateInfrastructureBulkUpdateQA.ps1")
+                    Utilities.runSharedPS(context, "arm-templates//vc-CreateInfrastructureBulkUpdateQA.ps1")
                     break
                 case 'JS':
-                    Utilities.runSharedPS(context, "vc-CreateInfrastructureJsShoppingCartIntegrationSample.ps1")
+                    Utilities.runSharedPS(context, "arm-templates//vc-CreateInfrastructureJsShoppingCartIntegrationSample.ps1")
                     break
                 case 'DEV-VC':
-                    Utilities.runSharedPS(context, "vc-CreateInfrastructureDEV-VC.ps1")
+                    Utilities.runSharedPS(context, "arm-templates//vc-CreateInfrastructureDEV-VC.ps1")
                     break
                 case 'PROD-VC':
-                    Utilities.runSharedPS(context, "vc-CreateInfrastructurePROD-VC.ps1")
+                    Utilities.runSharedPS(context, "arm-templates//vc-CreateInfrastructurePROD-VC.ps1")
                     break
                 case 'DEV-demoVC':
-                    Utilities.runSharedPS(context, "vc-CreateInfrastructureDEV-demoVC.ps1")
+                    Utilities.runSharedPS(context, "arm-templates//vc-CreateInfrastructureDEV-demoVC.ps1")
                     break
                 case 'QA-demoVC':
-                    Utilities.runSharedPS(context, "vc-CreateInfrastructureQA-demoVC.ps1")
+                    Utilities.runSharedPS(context, "arm-templates//vc-CreateInfrastructureQA-demoVC.ps1")
                     break
                 case 'PROD-demoVC':
-                    Utilities.runSharedPS(context, "vc-CreateInfrastructurePROD-demoVC.ps1")
+                    Utilities.runSharedPS(context, "arm-templates//vc-CreateInfrastructurePROD-demoVC.ps1")
                     break
             }
         }
