@@ -129,6 +129,17 @@ pipeline {
 
         //docker was here
 
+        stage("Create / Update Environment"){
+            when {
+                expression {
+                    UPDATE_CS
+                }
+            }
+            steps {
+                script{}
+            }
+        }
+
         stage("Update Solution"){
             when {
                 expression {

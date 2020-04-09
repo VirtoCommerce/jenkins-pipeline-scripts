@@ -284,6 +284,11 @@
               "name": "VirtoCommerce",
               "connectionString": "[parameters('platformVirtoCommerce')]",
               "type": "SQLAzure"
+            },
+            {
+              "name": "SearchConnectionString",
+              "connectionString": "provider=Lucene;server=\\Lucene;scope=default",
+              "type": "Custom"
             }
           ],
           "virtualApplications": [
@@ -295,6 +300,10 @@
                 {
                   "virtualPath": "/modules",
                   "physicalPath": "site\\wwwroot\\modules"
+                },
+                {
+                  "virtualPath": "/Lucene",
+                  "physicalPath": "site\\wwwroot\\Lucene"
                 }
               ]
             }
