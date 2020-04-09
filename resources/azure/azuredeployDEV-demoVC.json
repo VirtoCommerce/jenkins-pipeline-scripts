@@ -287,7 +287,7 @@
             },
             {
               "name": "SearchConnectionString",
-              "connectionString": "provider=Lucene;server=\\Lucene;scope=default",
+              "connectionString": "provider=Lucene;server=\\Gobene;scope=default",
               "type": "Custom"
             }
           ],
@@ -303,7 +303,7 @@
                 },
                 {
                   "virtualPath": "/Lucene",
-                  "physicalPath": "site\\wwwroot\\Lucene"
+                  "physicalPath": "site\\wwwroot\\Gobene"
                 }
               ]
             }
