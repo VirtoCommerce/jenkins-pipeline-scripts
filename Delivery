@@ -136,7 +136,10 @@ pipeline {
                 }
             }
             steps {
-                script{}
+                script{
+                    def resourceGroupName = SETTINGS['resourceGroupName']
+                    Utilities.createInfrastructure(this, "${resourceGroupName}")
+                }
             }
         }
 
