@@ -28,7 +28,7 @@ import jobs.scripts.*
 		SETTINGS.setRegion('virtocommerce')
 		SETTINGS.setEnvironment(env.BRANCH_NAME)
 
-		if (env.BRANCH_NAME == 'deploy')
+		if (env.BRANCH_NAME == 'master')
 		{
 			deployScript = 'VC-2AzurePROD.ps1'
 			dockerTag = "latest"
@@ -37,7 +37,7 @@ import jobs.scripts.*
 		try
 		{
 			//Utilities.notifyBuildStatus(this, "started")
-			if(env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'deploy')
+			if(env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'master')
 			{
 				stage('Checkout')
 				{
@@ -75,7 +75,7 @@ import jobs.scripts.*
 				}
 			}
 
-			if(env.BRANCH_NAME == 'deploy')
+			if(env.BRANCH_NAME == 'master')
 			{
 				stage('Copy to Slot')
 				{
@@ -86,7 +86,7 @@ import jobs.scripts.*
 						def azureBlobName = SETTINGS['azureBlobNameProd']
 						def azureBlobKey = SETTINGS['azureBlobKeyProd']
 						def webAppName = SETTINGS['webAppNameProd']
-						def resourceGroupName = SETTINGS['resourceGroupNameProd']
+						def resourceGroupName = SETTINGS['resourceGroupName']
 						def subscriptionID = SETTINGS['subscriptionID']
 						def blobToken = SETTINGS['tokenSasStage']
 						withEnv(["AzureBlobToken=${blobToken}"]){
@@ -96,7 +96,7 @@ import jobs.scripts.*
 				}
 			}
 
-			if(env.BRANCH_NAME == 'deploy')
+			if(env.BRANCH_NAME == 'master')
 			{
 				stage('Deploy to PROD')
 				{
@@ -112,7 +112,7 @@ import jobs.scripts.*
 							def azureBlobName = SETTINGS['azureBlobNameProd']
 							def azureBlobKey = SETTINGS['azureBlobKeyProd']
 							def webAppName = SETTINGS['webAppNameProd']
-							def resourceGroupName = SETTINGS['resourceGroupNameProd']
+							def resourceGroupName = SETTINGS['resourceGroupName']
 							def subscriptionID = SETTINGS['subscriptionID']
 							def blobToken = SETTINGS['tokenSasProd']
 							withEnv(["AzureBlobToken=${blobToken}"]){
