@@ -49,6 +49,10 @@ Write-Output "DOWNLOAD WEBSITE CODE"
 $msdeploy = "${env:MSDEPLOY_DIR}\msdeploy.exe"
 $sourcewebapp_msdeployUrl = "https://${AppName}.scm.azurewebsites.net/msdeploy.axd?site=${AppName}"
 & $msdeploy -verb:sync -source:contentPath="D:\home\site\wwwroot\",computerName=$sourcewebapp_msdeployUrl,publishSettings=$tmpPublishProfile -dest:contentPath=$BackendPath
+if($LASTEXITCODE -ne 0)
+{
+    exit 1
+}
 
 # ADD FILE WITH MODULES VERSIONS
 Write-Output "Find all manifests files (files in XML syntax)"
