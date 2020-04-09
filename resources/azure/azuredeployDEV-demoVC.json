@@ -276,7 +276,7 @@
               "type": "Custom"
             },
             {
-              "name": "redisConnectionString",
+              "name": "RedisConnectionString",
               "connectionString": "[parameters('platformRedisConnectionString')]",
               "type": "Custom"
             },
