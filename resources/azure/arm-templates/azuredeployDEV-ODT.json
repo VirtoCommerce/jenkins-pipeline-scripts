@@ -14,12 +14,6 @@
     "sqlDatabaseName": {
       "type": "String"
     },
-    "redisCacheName": {
-      "type": "String"
-    },
-    "searchServicesName": {
-      "type": "String"
-    },
     "storageAccountName": {
       "type": "String"
     },
@@ -41,22 +35,10 @@
     "frontWebAppName": {
       "type": "String"
     },
-    "platformAssetsConnectionString": {
-      "type": "String"
-    },
-    "platformCmsContentConnectionString": {
-      "type": "String"
-    },
-    "platformRedisConnectionString": {
-      "type": "String"
-    },
     "platformVirtoCommerce": {
       "type": "String"
     },
     "platformAppinsightsInstrumentationKey": {
-      "type": "String"
-    },
-    "frontContentConnectionString": {
       "type": "String"
     },
     "frontVirtoCommerceEndpointUrl": {
@@ -106,40 +88,6 @@
           }
         }
       ]
-    },
-    {
-      "type": "Microsoft.Cache/Redis",
-      "apiVersion": "2018-03-01",
-      "name": "[parameters('redisCacheName')]",
-      "location": "[resourceGroup().location]",
-      "properties": {
-        "sku": {
-          "name": "Basic",
-          "family": "C",
-          "capacity": 1
-        },
-        "enableNonSslPort": true,
-        "redisConfiguration": {
-          "maxclients": "1000"
-        }
-      },
-      "tags": {
-        "displayName": "redisCache"
-      }
-    },
-    {
-      "name": "[parameters('searchServicesName')]",
-      "type": "Microsoft.Search/searchServices",
-      "apiVersion": "2015-08-19",
-      "location": "[resourceGroup().location]",
-      "sku": {
-        "name": "free"
-      },
-      "properties": {
-      },
-      "tags": {
-        "displayName": "searchServices"
-      }
     },
     {
       "name": "[parameters('storageAccountName')]",
@@ -215,23 +163,17 @@
         "enabled": true,
         "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('platformAppServicePlanName'))]",
         "siteConfig": {
-          "requestTracingEnabled": false,
+          "requestTracingEnabled": true,
           "requestTracingExpirationTime": "9999-12-31T23:59:00Z",
-          "httpLoggingEnabled": false,
+          "httpLoggingEnabled": true,
           "logsDirectorySizeLimit": 100,
-          "detailedErrorLoggingEnabled": false,
+          "detailedErrorLoggingEnabled": true,
           "clientAffinityEnabled": true,
           "use32BitWorkerProcess": false,
           "webSocketsEnabled": false,
-          "alwaysOn": true,
-          "httpsOnly": true,
+          "alwaysOn": false,
+          "httpsOnly": false,
           "http20Enabled": false,
-          "cors": {
-            "allowedOrigins": [
-              "*"
-            ],
-            "supportCredentials": false
-          },
           "minTlsVersion": "1.2",
           "ftpsState": "AllAllowed",
           "appSettings": [
@@ -239,8 +181,60 @@
               "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
               "value": "[parameters('platformAppinsightsInstrumentationKey')]"
             },
+			{
+              "name": "ASPNETCORE_ENVIRONMENT",
+              "value": "Production"
+            },
             {
               "name": "InstrumentationEngine_EXTENSION_VERSION",
+              "value": "~1"
+            },
+            {
+              "name": "APPINSIGHTS_PROFILERFEATURE_VERSION",
+              "value": "1.0.0"
+            },
+            {
+              "name": "APPINSIGHTS_SNAPSHOTFEATURE_VERSION",
+              "value": "1.0.0"
+            },
+            {
+              "name": "DiagnosticServices_EXTENSION_VERSION",
+              "value": "~3"
+            },
+            {
+              "name": "Content:AzureBlobStorage:RootPath",
+              "value": "cms"
+            },
+            {
+              "name": "Assets:Provider",
+              "value": "AzureBlobStorage"
+            },
+            {
+              "name": "Assets:AzureBlobStorage:ConnectionString",
+              "value": "[concat('provider=AzureBlobStorage;rootPath=assets;DefaultEndpointsProtocol=https;AccountName=',parameters('storageAccountName'),';AccountKey=',concat(listKeys(parameters('storageAccountName'),'2015-05-01-preview').key1))]"
+            },
+            {
+              "name": "Content:Provider",
+              "value": "AzureBlobStorage"
+            },
+            {
+              "name": "Content:AzureBlobStorage:ConnectionString",
+              "value": "[concat('provider=AzureBlobStorage;rootPath=assets;DefaultEndpointsProtocol=https;AccountName=',parameters('storageAccountName'),';AccountKey=',concat(listKeys(parameters('storageAccountName'),'2015-05-01-preview').key1))]"
+            },
+            {
+              "name": "Search:Provider",
+              "value": "Lucene"
+            },
+            {
+              "name": "Search:Lucene:Path",
+              "value": "D:\\home\\site\\wwwroot\\Lucene"
+            },
+            {
+              "name": "VirtoCommerce:DiscoveryPath",
+              "value": "../modules"
+            },
+            {
+              "name": "SnapshotDebugger_EXTENSION_VERSION",
               "value": "~1"
             },
             {
@@ -252,43 +246,19 @@
               "value": "~1"
             },
             {
-              "name": "VirtoCommerce:CORS:AllowedOrigins",
-              "value": "*"
-            },
-            {
-              "name": "VirtoCommerce:EnableBundlesOptimizations",
-              "value": "false"
+              "name": "VirtoCommerce:AutoInstallModuleBundles",
+              "value": ""
             },
             {
               "name": "VirtoCommerce:SampleDataUrl",
-              "value": "https://demovc.blob.core.windows.net/sample-data/virtocommerce_demo_data.zip"
+              "value": "http://virtocommerce.blob.core.windows.net/sample-data"
             }
           ],
           "connectionStrings": [
             {
-              "name": "AssetsConnectionString",
-              "connectionString": "[parameters('platformAssetsConnectionString')]",
-              "type": "Custom"
-            },
-            {
-              "name": "CmsContentConnectionString",
-              "connectionString": "[parameters('platformCmsContentConnectionString')]",
-              "type": "Custom"
-            },
-            {
-              "name": "RedisConnectionString",
-              "connectionString": "[parameters('platformRedisConnectionString')]",
-              "type": "Custom"
-            },
-            {
               "name": "VirtoCommerce",
               "connectionString": "[parameters('platformVirtoCommerce')]",
               "type": "SQLAzure"
-            },
-            {
-              "name": "SearchConnectionString",
-              "connectionString": "provider=Lucene;server=\\Lucene;scope=default",
-              "type": "Custom"
             }
           ],
           "virtualApplications": [
@@ -360,11 +330,11 @@
         "enabled": true,
         "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('frontAppServicePlanName'))]",
         "siteConfig": {
-          "requestTracingEnabled": false,
+          "requestTracingEnabled": true,
           "requestTracingExpirationTime": "9999-12-31T23:59:00Z",
-          "httpLoggingEnabled": false,
+          "httpLoggingEnabled": true,
           "logsDirectorySizeLimit": 100,
-          "detailedErrorLoggingEnabled": false,
+          "detailedErrorLoggingEnabled": true,
           "clientAffinityEnabled": true,
           "use32BitWorkerProcess": false,
           "alwaysOn": false,
@@ -379,57 +349,45 @@
             },
             {
               "name": "APPINSIGHTS_PROFILERFEATURE_VERSION",
-              "value": "1.0.0"
+              "value": "disabled"
             },
             {
               "name": "APPINSIGHTS_SNAPSHOTFEATURE_VERSION",
-              "value": "1.0.0"
+              "value": "disabled"
             },
             {
               "name": "ApplicationInsightsAgent_EXTENSION_VERSION",
               "value": "~2"
             },
             {
-              "name": "ASPNETCORE_ENVIRONMENT",
-              "value": "Development"
-            },
-            {
               "name": "DiagnosticServices_EXTENSION_VERSION",
-              "value": "~3"
+              "value": "disabled"
             },
             {
               "name": "InstrumentationEngine_EXTENSION_VERSION",
-              "value": "~1"
-            },
-            {
-              "name": "MobileAppsManagement_EXTENSION_VERSION",
-              "value": "latest"
+              "value": "disabled"
             },
             {
               "name": "SnapshotDebugger_EXTENSION_VERSION",
-              "value": "~1"
+              "value": "disabled"
             },
             {
               "name": "VirtoCommerce:Endpoint:Url",
               "value": "[parameters('frontVirtoCommerceEndpointUrl')]"
             },
             {
-              "name": "VirtoCommerce:RequestTimeout",
-              "value": "0:5:40"
-            },
-            {
-              "name": "WEBSITE_HTTPLOGGING_RETENTION_DAYS",
-              "value": "5"
-            },
-            {
               "name": "XDT_MicrosoftApplicationInsights_BaseExtensions",
-              "value": "~1"
+              "value": "disabled"
+            },
+            {
+              "name": "XDT_MicrosoftApplicationInsights_Mode",
+              "value": "default"
             }
           ],
           "connectionStrings": [
             {
               "name": "ContentConnectionString",
-              "connectionString": "[parameters('frontContentConnectionString')]",
+              "connectionString": "[concat('provider=AzureBlobStorage;rootPath=assets;DefaultEndpointsProtocol=https;AccountName=',parameters('storageAccountName'),';AccountKey=',concat(listKeys(parameters('storageAccountName'),'2015-05-01-preview').key1))]",
               "type": "Custom"
             }
           ],
