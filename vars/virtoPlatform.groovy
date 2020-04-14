@@ -189,6 +189,15 @@ def call(body) {
 						}
 						Packaging.saveArtifact(this, 'vc', Utilities.getProjectType(this), '', "artifacts/${artifacts[0].path}")
 
+						def gitversionOutput = powershell (script: "dotnet gitversion", returnStdout: true, label: 'Gitversion', encoding: 'UTF-8').trim()
+                        def gitversionJson = new groovy.json.JsonSlurperClassic().parseText(gitversionOutput)
+                        def commitNumber = gitversionJson['CommitsSinceVersionSource']
+                        def platformArtifactName = "VirtoCommerce.Platform_3.0.0-build.${commitNumber}"
+                        echo "artifact version: ${platformArtifactName}"
+                        def artifactPath = "${workspace}\\artifacts\\${platformArtifactName}.zip"
+                        powershell "Copy-Item ${artifacts[0].path} -Destination ${artifactPath}"
+                        powershell script: "${env.Utils}\\AzCopy10\\AzCopy.exe copy \"${artifactPath}\" \"https://vc3prerelease.blob.core.windows.net/packages${env.ARTIFACTS_BLOB_TOKEN}\"", label: "AzCopy"
+
 						if(solution == 'VirtoCommerce.Platform.sln' || projectType == 'NETCORE2')
 						{
 							Packaging.pushDockerImage(this, dockerImage, dockerTag)
