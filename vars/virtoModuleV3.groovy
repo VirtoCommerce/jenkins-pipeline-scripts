@@ -90,7 +90,7 @@ def call(body) {
                         echo "artifact version: ${moduleArtifactName}"
                         def artifactPath = "${workspace}\\artifacts\\${moduleArtifactName}.zip"
                         powershell "Copy-Item ${artifacts[0].path} -Destination ${artifactPath}"
-                        powershell "${env.Utils}\\AzCopy10\\AzCopy.exe copy ${artifactPath} https://vc3prerelease.blob.core.windows.net/packages/${env.ARTIFACTS_BLOB_TOKEN}"
+                        bat script: "@${env.Utils}\\AzCopy10\\AzCopy.exe copy ${artifactPath} https://vc3prerelease.blob.core.windows.net/packages/${env.ARTIFACTS_BLOB_TOKEN}", label: "AzCopy"
                         
                         // def ghReleaseResult = Utilities.runBatchScript(this, "@vc-build PublishPackages -ApiKey ${env.NUGET_KEY} -skip Clean+Restore+Compile+Test")
                         // if(ghReleaseResult['status'] != 0){
