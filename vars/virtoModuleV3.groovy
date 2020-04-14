@@ -88,6 +88,9 @@ def call(body) {
                         def commitNumber = gitversionJson['CommitsSinceVersionSource']
                         def moduleArtifactName = "${moduleId}_3.0.0-build.${commitNumber}"
                         echo "artifact version: ${moduleArtifactName}"
+                        def artifactPath = "${env.WORKSPACE}\\artifacts\\${moduleArtifactName}.zip"
+                        powershell "Copy-Item ${artifacts[0].path} -Destination ${artifactPath}"
+                        powershell "${env.Utils}\\AzCopy10\\AzCopy.exe copy ${artifactPath} https://vc3prerelease.blob.core.windows.net/packages/${env.ARTIFACTS_BLOB_TOKEN}"
                         
                         // def ghReleaseResult = Utilities.runBatchScript(this, "@vc-build PublishPackages -ApiKey ${env.NUGET_KEY} -skip Clean+Restore+Compile+Test")
                         // if(ghReleaseResult['status'] != 0){
