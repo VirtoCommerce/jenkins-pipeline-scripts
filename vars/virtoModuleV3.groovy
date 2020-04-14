@@ -83,6 +83,11 @@ def call(body) {
                         def moduleId = artifactFileName.split("_").first()
                         echo "Module id: ${moduleId}"
 						Packaging.saveArtifact(this, 'vc', 'module', moduleId, artifacts[0].path)
+                        def gitversionOutput = (powershell script: "dotnet gitversion", returnStdout: true, label: 'Gitversion', encoding: 'UTF-8').trim()
+                        def gitversionJson = new groovy.json.JsonSlurperClassic().parseText(gitversionOutput)
+                        def commitNumber = gitversionJson['CommitsSinceVersionSource']
+                        def moduleArtifactName = "${moduleId}_3.0.0-build.${commitNumber}"
+                        echo "artifact version: ${moduleArtifactName}"
                         
                         // def ghReleaseResult = Utilities.runBatchScript(this, "@vc-build PublishPackages -ApiKey ${env.NUGET_KEY} -skip Clean+Restore+Compile+Test")
                         // if(ghReleaseResult['status'] != 0){

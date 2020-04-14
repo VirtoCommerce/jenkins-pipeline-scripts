@@ -57,6 +57,10 @@ Write-Host "Sync $StoreName"
 $token = $env:AzureBlobToken
 #& "${env:Utils}\AzCopy10\AzCopy" sync $SourceDir https://$($AzureBlobName).blob.core.windows.net/$StoreName$token --recursive --exclude-pattern="*.htm;*.html;*.md;*.page"
 & "${env:Utils}\AzCopy10\AzCopy" cp $SourceDir/* https://$($AzureBlobName).blob.core.windows.net/$StoreName$token --recursive --exclude-pattern="*.htm;*.html;*.md;*.page" --overwrite true #--delete-destination=true
+if($LASTEXITCODE -ne 0)
+{
+    exit 1
+}
 
 Write-Output "Restarting web site $DestWebAppName slot $SlotName"
 Start-AzureRmWebAppSlot -ResourceGroupName $DestResourceGroupName -Name $DestWebAppName -Slot $SlotName
