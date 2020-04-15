@@ -126,7 +126,7 @@ def call(body) {
                             throw new Exception("Github release error")
                         }
 
-                        def mmStatus = bat script: "vc-build PublishModuleManifest -ModulesJsonName modules_v3_prerelease.json > out.log", returnStatus: true
+                        def mmStatus = bat script: "vc-build PublishModuleManifest > out.log", returnStatus: true
                         def mmout = readFile "out.log"
                         echo mmout
                         if(mmStatus!=0){
