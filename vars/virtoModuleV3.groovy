@@ -83,7 +83,7 @@ def call(body) {
                         def moduleId = artifactFileName.split("_").first()
                         echo "Module id: ${moduleId}"
 						Packaging.saveArtifact(this, 'vc', 'module', moduleId, artifacts[0].path)
-                        
+
                         // def gitversionOutput = powershell (script: "dotnet gitversion", returnStdout: true, label: 'Gitversion', encoding: 'UTF-8').trim()
                         // def gitversionJson = new groovy.json.JsonSlurperClassic().parseText(gitversionOutput)
                         // def commitNumber = gitversionJson['CommitsSinceVersionSource']
@@ -126,7 +126,7 @@ def call(body) {
                             throw new Exception("Github release error")
                         }
 
-                        def mmStatus = bat script: "vc-build PublishModuleManifest > out.log", returnStatus: true
+                        def mmStatus = bat script: "vc-build PublishModuleManifest -ModulesJsonName modules_v3_prerelease.json > out.log", returnStatus: true
                         def mmout = readFile "out.log"
                         echo mmout
                         if(mmStatus!=0){
