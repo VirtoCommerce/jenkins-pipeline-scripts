@@ -76,7 +76,7 @@ def call(body) {
                     powershell "vc-build Compress -skip Clean+Restore+Compile+Test"
                 }
 
-                if(!Utilities.isPullRequest(this)){
+                if(!Utilities.isPullRequest(this) && env.BRANCH_NAME == 'release/3.0.0'){
                     stage('Publish'){
 						def artifacts = findFiles(glob: 'artifacts\\*.zip')
                         def artifactFileName = artifacts[0].path.split("\\\\").last()
