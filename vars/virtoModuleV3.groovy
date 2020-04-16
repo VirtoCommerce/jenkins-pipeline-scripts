@@ -126,22 +126,31 @@ def call(body) {
                             throw new Exception("Github release error")
                         }
 
-                        def mmStatus = bat script: "vc-build PublishModuleManifest > out.log", returnStatus: true
-                        def mmout = readFile "out.log"
-                        echo mmout
-                        if(mmStatus!=0){
-                            def nothingToCommit = false
-                            for(line in mmout.trim().split("\n")){
-                                if(line.contains("nothing to commit, working tree clean")){
-                                    nothingToCommit = true
-                                }
-                            }
-                            if(nothingToCommit){
-                                UNSTABLE_CAUSES.add("Module Manifest: nothing to commit, working tree clean")
-                            } else {
-                                throw new Exception("Module Manifest: returned nonzero exit status")
-                            }
+                        def manifestResult = powershell script: "vc-build PublishModuleManifest", returnStatus: true
+                        if(manifestResult == 423)
+                        {
+                            UNSTABLE_CAUSES.add("Module Manifest: nothing to commit, working tree clean")
                         }
+                        else if(manifestResult != 0)
+                        {
+                            throw new Exception("Module Manifest: returned nonzero exit code")
+                        }
+                        // def mmStatus = bat script: "vc-build PublishModuleManifest > out.log", returnStatus: true
+                        // def mmout = readFile "out.log"
+                        // echo mmout
+                        // if(mmStatus!=0){
+                        //     def nothingToCommit = false
+                        //     for(line in mmout.trim().split("\n")){
+                        //         if(line.contains("nothing to commit, working tree clean")){
+                        //             nothingToCommit = true
+                        //         }
+                        //     }
+                        //     if(nothingToCommit){
+                        //         UNSTABLE_CAUSES.add("Module Manifest: nothing to commit, working tree clean")
+                        //     } else {
+                        //         throw new Exception("Module Manifest: returned nonzero exit status")
+                        //     }
+                        // }
                     }
 
                     // stage('Deploy'){
