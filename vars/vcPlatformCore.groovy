@@ -119,7 +119,7 @@ def call(body) {
                     }
                 }
 
-                if(!Utilities.isPullRequest(this))
+                if(!Utilities.isPullRequest(this) && env.BRANCH_NAME == 'release/3.0.0')
                 {
                     stage('Publish')
                     {
