@@ -76,38 +76,37 @@ def call(body) {
                     powershell "vc-build Compress -skip Clean+Restore+Compile+Test"
                 }
 
-                if(!Utilities.isPullRequest(this) && env.BRANCH_NAME == 'release/3.0.0'){
-                    stage('Publish'){
-						def artifacts = findFiles(glob: 'artifacts\\*.zip')
+                if(env.BRANCH_NAME == 'dev-3.0.0')
+                {
+                    stage('Publish')
+                    {
+                        def artifacts = findFiles(glob: 'artifacts\\*.zip')
                         def artifactFileName = artifacts[0].path.split("\\\\").last()
                         def moduleId = artifactFileName.split("_").first()
                         echo "Module id: ${moduleId}"
 						Packaging.saveArtifact(this, 'vc', 'module', moduleId, artifacts[0].path)
 
-                        // def gitversionOutput = powershell (script: "dotnet gitversion", returnStdout: true, label: 'Gitversion', encoding: 'UTF-8').trim()
-                        // def gitversionJson = new groovy.json.JsonSlurperClassic().parseText(gitversionOutput)
-                        // def commitNumber = gitversionJson['CommitsSinceVersionSource']
-                        // def moduleArtifactName = "${moduleId}_3.0.0-build.${commitNumber}"
-                        // echo "artifact version: ${moduleArtifactName}"
-                        // def artifactPath = "${workspace}\\artifacts\\${moduleArtifactName}.zip"
-                        // powershell "Copy-Item ${artifacts[0].path} -Destination ${artifactPath}"
-                        // powershell script: "${env.Utils}\\AzCopy10\\AzCopy.exe copy \"${artifactPath}\" \"https://vc3prerelease.blob.core.windows.net/packages${env.ARTIFACTS_BLOB_TOKEN}\"", label: "AzCopy"
+                        def gitversionOutput = powershell (script: "dotnet gitversion", returnStdout: true, label: 'Gitversion', encoding: 'UTF-8').trim()
+                        def gitversionJson = new groovy.json.JsonSlurperClassic().parseText(gitversionOutput)
+                        def commitNumber = gitversionJson['CommitsSinceVersionSource']
+                        def moduleArtifactName = "${moduleId}_3.0.0-build.${commitNumber}"
+                        echo "artifact version: ${moduleArtifactName}"
+                        def artifactPath = "${workspace}\\artifacts\\${moduleArtifactName}.zip"
+                        powershell "Copy-Item ${artifacts[0].path} -Destination ${artifactPath}"
+                        powershell script: "${env.Utils}\\AzCopy10\\AzCopy.exe copy \"${artifactPath}\" \"https://vc3prerelease.blob.core.windows.net/packages${env.ARTIFACTS_BLOB_TOKEN}\"", label: "AzCopy"
+                    }
+                }
+
+                if(!Utilities.isPullRequest(this) && env.BRANCH_NAME == 'release/3.0.0')
+                {
+                    stage('Publish')
+                    {
+						def artifacts = findFiles(glob: 'artifacts\\*.zip')
+                        def artifactFileName = artifacts[0].path.split("\\\\").last()
+                        def moduleId = artifactFileName.split("_").first()
+                        echo "Module id: ${moduleId}"
+						Packaging.saveArtifact(this, 'vc', 'module', moduleId, artifacts[0].path)
                         
-                        // def ghReleaseResult = Utilities.runBatchScript(this, "@vc-build PublishPackages -ApiKey ${env.NUGET_KEY} -skip Clean+Restore+Compile+Test")
-                        // if(ghReleaseResult['status'] != 0){
-                        //     def nugetAlreadyExists = false
-                        //     for(line in ghReleaseResult['stdout']){
-                        //         if(line.contains("error: Response status code does not indicate success: 409")){
-                        //             nugetAlreadyExists = true
-                        //         }
-                        //     }
-                        //     if(nugetAlreadyExists){
-                        //         UNSTABLE_CAUSES.add("Nuget package already exists.")
-                        //     }
-                        //     else{
-                        //         throw new Exception("ERROR: script returned exit code -1")
-                        //     }
-                        // }
                         def ghReleaseResult = powershell script: "vc-build PublishPackages -ApiKey ${env.NUGET_KEY} -skip Clean+Restore+Compile+Test", returnStatus: true
                         if(ghReleaseResult == 409)
                         {
@@ -135,22 +134,6 @@ def call(body) {
                         {
                             throw new Exception("Module Manifest: returned nonzero exit code")
                         }
-                        // def mmStatus = bat script: "vc-build PublishModuleManifest > out.log", returnStatus: true
-                        // def mmout = readFile "out.log"
-                        // echo mmout
-                        // if(mmStatus!=0){
-                        //     def nothingToCommit = false
-                        //     for(line in mmout.trim().split("\n")){
-                        //         if(line.contains("nothing to commit, working tree clean")){
-                        //             nothingToCommit = true
-                        //         }
-                        //     }
-                        //     if(nothingToCommit){
-                        //         UNSTABLE_CAUSES.add("Module Manifest: nothing to commit, working tree clean")
-                        //     } else {
-                        //         throw new Exception("Module Manifest: returned nonzero exit status")
-                        //     }
-                        // }
                     }
 
                     // stage('Deploy'){
