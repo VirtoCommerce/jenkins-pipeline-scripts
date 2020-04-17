@@ -29,6 +29,7 @@ if([string]::IsNullOrWhiteSpace($SampleDataSrc)){
 } else {
     $sdInstallUrl = "$ApiUrl/api/platform/sampledata/import?url=$SampleDataSrc"
 }
+$appAuthUrl = "$ApiUrl/connect/token"
 
 Start-Sleep -Seconds 15
 $authToken = (Get-AuthToken $appAuthUrl $Username $Password)[1]
