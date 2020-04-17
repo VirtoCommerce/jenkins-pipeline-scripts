@@ -1,7 +1,11 @@
 
 import groovy.util.*
-import jobs.scripts.*
 import groovy.json.JsonSlurperClassic
+
+def globalLib = library('global-shared-lib').com.test
+def Utilities = globalLib.Utilities
+def Packaging = globalLib.Packaging
+def Modules = globalLib.Modules
 
 def SETTINGS
 
