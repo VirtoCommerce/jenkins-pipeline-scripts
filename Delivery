@@ -6,6 +6,7 @@ def globalLib = library('global-shared-lib').com.test
 def Utilities = globalLib.Utilities
 def Packaging = globalLib.Packaging
 def Modules = globalLib.Modules
+def Settings = globalLib.Settings
 
 def SETTINGS
 
@@ -59,7 +60,7 @@ pipeline {
                     configFileProvider([configFile(fileId: 'delivery_settings', variable: 'SETTINGS_FILE')]) {
                         settingsFileContent = readFile(SETTINGS_FILE)
                     }
-                    SETTINGS = new Settings(settingsFileContent)
+                    SETTINGS = Settings.new(settingsFileContent)
                     def regionChoices = SETTINGS.getRegions().join("\n")
                     def buildOrder = Utilities.getNextBuildOrder(this)
                     def userInput = input message: "Region and Branch", parameters: [
