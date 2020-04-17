@@ -170,6 +170,7 @@ def call(body) {
 
                     stage('Publish')
                     {
+                        return 0
                         // powershell "vc-build PublishPackages -ApiKey ${env.NUGET_KEY} -skip Clean+Restore+Compile+Test"
 						def artifacts = findFiles(glob: 'artifacts\\*.zip')
 						Packaging.saveArtifact(this, 'vc', Utilities.getProjectType(this), '', artifacts[0].path)
