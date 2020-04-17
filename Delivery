@@ -175,6 +175,7 @@ pipeline {
                         timestamps
                         {
                             Utilities.runPS(this, "docker_v3/vc-get-swagger.ps1", "-ApiUrl ${Utilities.getPlatformCoreHost(this)} -OutFile ${workspace}\\artifacts\\swaggerSchema${env.BUILD_NUMBER}.json -Verbose")
+                            throw new Exception("The End")
                         }
                     }
                 }
