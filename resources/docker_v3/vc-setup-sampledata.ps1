@@ -35,7 +35,7 @@ Start-Sleep -Seconds 15
 $authToken = (Get-AuthToken $appAuthUrl $Username $Password)[1]
 $headers = @{}
 $headers.Add("Authorization", "Bearer $authToken")
-$installResult = Invoke-RestMethod -Uri $sdInstallUrl -ContentType "application/json" -Method Post -Headers $headers -SkipCertificateCheck
+$installResult = Invoke-RestMethod -Uri $sdInstallUrl -ContentType "application/json" -Method Post -Headers $headers -SkipCertificateCheck -MaximumRetryCount 3 -RetryIntervalSec 5
 Write-Output $installResult
 
 $notificationId = $installResult.id
