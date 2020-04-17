@@ -34,6 +34,10 @@ if($StoreName -eq "odt")
     $token = $env:AzureBlobToken
     $dirpath = "Themes/$StoreName/default"
     & "${env:Utils}\AzCopy10\AzCopy" sync $Path https://$($accountname).blob.core.windows.net/cms/$($dirpath)$token --delete-destination=true
+    if($LASTEXITCODE -ne 0)
+    {
+        exit 1
+    }
 } 
 else
 {

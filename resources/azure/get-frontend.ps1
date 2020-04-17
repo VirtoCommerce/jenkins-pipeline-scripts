@@ -45,6 +45,10 @@ Write-Output "DOWNLOAD WEBSITE CODE"
 $msdeploy = "${env:MSDEPLOY_DIR}\msdeploy.exe"
 $sourcewebapp_msdeployUrl = "https://${AppName}.scm.azurewebsites.net/msdeploy.axd?site=${AppName}"
 & $msdeploy -verb:sync -source:contentPath="D:\home\site\wwwroot\",computerName=$sourcewebapp_msdeployUrl,publishSettings=$tmpPublishProfile -dest:contentPath=$BackendPath\storefront
+if($LASTEXITCODE -ne 0)
+{
+    exit 1
+}
 
 # Get Storefront version from dll file properties (overwrite file if exist)
 #Write-Output "$("Storefront version is",$([System.Diagnostics.FileVersionInfo]::GetVersionInfo($StorefrontVersionFile).FileVersion))" | Out-File -Force $FileToAddPath

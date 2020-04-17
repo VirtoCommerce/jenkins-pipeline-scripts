@@ -1,0 +1,76 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "sqlServerName": {
+      "value": "qa-odt"
+    },
+    "sqlAdministratorLogin": {
+      "value": "vc-admin"
+    },
+    "sqlAdministratorLoginPassword": {
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/973d0b8c-44bf-438d-a4b7-1c4162d3ccba/resourceGroups/QA-ODT/providers/Microsoft.KeyVault/vaults/qa-odt"
+        },
+        "secretName": "sqlAdministratorLoginPassword-qa"
+      }
+    },
+    "sqlDatabaseName": {
+      "value": "qa-odt"
+    },
+    "storageAccountName": {
+      "value": "qa4odt"
+    },
+    "platformAppServicePlanName": {
+      "value": "qa-odt-admin"
+    },
+    "frontAppServicePlanName": {
+      "value": "qa-odt-public"
+    },
+    "platformAppInsights": {
+      "value": "qa-odt-admin"
+    },
+    "frontAppInsights": {
+      "value": "qa-odt-public"
+    },
+    "platformWebAppName": {
+      "value": "qa-odt-admin"
+    },
+    "frontWebAppName": {
+      "value": "qa-odt-public"
+    },
+    "platformVirtoCommerce": {
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/973d0b8c-44bf-438d-a4b7-1c4162d3ccba/resourceGroups/QA-ODT/providers/Microsoft.KeyVault/vaults/qa-odt"
+        },
+        "secretName": "platformVirtoCommerce-qa"
+      }
+    },
+    "platformAppinsightsInstrumentationKey": {
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/973d0b8c-44bf-438d-a4b7-1c4162d3ccba/resourceGroups/QA-ODT/providers/Microsoft.KeyVault/vaults/qa-odt"
+        },
+        "secretName": "platformAppinsightsInstrumentationKey-qa"
+      }
+    },
+    "frontVirtoCommerceEndpointUrl": {
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/973d0b8c-44bf-438d-a4b7-1c4162d3ccba/resourceGroups/QA-ODT/providers/Microsoft.KeyVault/vaults/qa-odt"
+        },
+        "secretName": "frontVirtoCommerceEndpointUrl-qa"
+      }
+    },
+    "frontAppinsightsInstrumentationKey": {
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/973d0b8c-44bf-438d-a4b7-1c4162d3ccba/resourceGroups/QA-ODT/providers/Microsoft.KeyVault/vaults/qa-odt"
+        },
+        "secretName": "frontAppinsightsInstrumentationKey-qa"
+      }
+    }
+  }
+}

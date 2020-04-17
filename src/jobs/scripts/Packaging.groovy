@@ -492,7 +492,8 @@ class Packaging {
         def destinationFolderPath = "${context.env.SOLUTION_FOLDER}\\${prefix}\\${branchEscaped}\\${projectType}"
         switch(projectType){
             case ['module','theme']:
-                destinationFolderPath = destinationFolderPath + "\\${id}"
+                if(id != null)
+                    destinationFolderPath = destinationFolderPath + "\\${id}"
                 break
         }
         def destinationFolder = new File(destinationFolderPath)

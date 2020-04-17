@@ -41,8 +41,10 @@ $contentPath = $DestContentPath
 $msdeploy = "${env:MSDEPLOY_DIR}\msdeploy.exe"
 $sourcewebapp_msdeployUrl = "https://${DestWebAppName}.scm.azurewebsites.net/msdeploy.axd?site=${DestWebAppName}"
 & $msdeploy -verb:sync -dest:contentPath="D:\home\site\wwwroot\$contentPath",computerName=$sourcewebapp_msdeployUrl,publishSettings=$tmpPublishProfile -source:package=$ZipFile
-
-
+if($LASTEXITCODE -ne 0)
+{
+    exit 1
+}
 
 Start-Sleep -s 5
 

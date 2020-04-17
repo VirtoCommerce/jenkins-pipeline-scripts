@@ -57,16 +57,17 @@ def call(body)
 			{
 				timestamps
 				{
-					bat "npm install -g typescript"
-					bat "npm install typescript"
+					// bat "npm install -g typescript"
+					// bat "npm install typescript"
 					echo "Packaging.startSonarJS"
-        			def fullJobName = Utilities.getRepoName(this)
+        			// def fullJobName = Utilities.getRepoName(this)
 
-					def sqScanner = tool 'SonarScannerJS'
-					withSonarQubeEnv('VC Sonar Server')
-					{
-						bat "\"${sqScanner}\\bin\\sonar-scanner.bat\" scan -Dsonar.projectKey=theme_default_${env.BRANCH_NAME} -Dsonar.sources=. -Dsonar.branch=${env.BRANCH_NAME} -Dsonar.projectName=\"${fullJobName}\" -Dsonar.host.url=%SONAR_HOST_URL% -Dsonar.login=%SONAR_AUTH_TOKEN%"
-					}
+					// def sqScanner = tool 'SonarScannerJS'
+					// withSonarQubeEnv('VC Sonar Server')
+					// {
+					// 	bat "\"${sqScanner}\\bin\\sonar-scanner.bat\" scan -Dsonar.projectKey=theme_default_${env.BRANCH_NAME} -Dsonar.sources=. -Dsonar.branch=${env.BRANCH_NAME} -Dsonar.projectName=\"${fullJobName}\" -Dsonar.host.url=%SONAR_HOST_URL% -Dsonar.login=%SONAR_AUTH_TOKEN%"
+					// }
+					Packaging.startSonarJS(this)
 				}
 			}
 

@@ -45,12 +45,12 @@ def call(body) {
 					
                 }
 
-                if(!Utilities.areThereCodeChanges(this))
-                {
-                    echo "There are no Code Changes"
-                    currentBuild.result = 'SUCCESS'
-                    return 0;
-                }
+                // if(!Utilities.areThereCodeChanges(this))
+                // {
+                //     echo "There are no Code Changes"
+                //     currentBuild.result = 'SUCCESS'
+                //     return 0;
+                // }
 
                 stage('Build'){
                     
@@ -118,7 +118,8 @@ def call(body) {
                         }
                     }
                 }
-                if(!Utilities.isPullRequest(this))
+
+                if(!Utilities.isPullRequest(this) && env.BRANCH_NAME == 'release/3.0.0')
                 {
                     try
                     {
@@ -172,6 +173,16 @@ def call(body) {
                         // powershell "vc-build PublishPackages -ApiKey ${env.NUGET_KEY} -skip Clean+Restore+Compile+Test"
 						def artifacts = findFiles(glob: 'artifacts\\*.zip')
 						Packaging.saveArtifact(this, 'vc', Utilities.getProjectType(this), '', artifacts[0].path)
+
+                        def gitversionOutput = powershell (script: "dotnet gitversion", returnStdout: true, label: 'Gitversion', encoding: 'UTF-8').trim()
+                        def gitversionJson = new groovy.json.JsonSlurperClassic().parseText(gitversionOutput)
+                        def commitNumber = gitversionJson['CommitsSinceVersionSource']
+                        def platformArtifactName = "VirtoCommerce.Platform_3.0.0-build.${commitNumber}"
+                        echo "artifact version: ${platformArtifactName}"
+                        def artifactPath = "${workspace}\\artifacts\\${platformArtifactName}.zip"
+                        powershell "Copy-Item ${artifacts[0].path} -Destination ${artifactPath}"
+                        powershell script: "${env.Utils}\\AzCopy10\\AzCopy.exe copy \"${artifactPath}\" \"https://vc3prerelease.blob.core.windows.net/packages${env.ARTIFACTS_BLOB_TOKEN}\"", label: "AzCopy"
+
                         // def ghReleaseResult = Utilities.runBatchScript(this, "@vc-build PublishPackages -ApiKey ${env.NUGET_KEY} -skip Clean+Restore+Compile+Test")
                         // if(ghReleaseResult['status'] != 0){
                         //     def nugetAlreadyExists = false
@@ -196,6 +207,14 @@ def call(body) {
                         else if(ghReleaseResult != 0)
                         {
                             throw new Exception("ERROR: script returned ${ghReleaseResult}")
+                        }
+
+                        def orgName = Utilities.getOrgName(this)
+                        def releaseResult = powershell script: "vc-build Release -GitHubUser ${orgName} -GitHubToken ${env.GITHUB_TOKEN} -PreRelease -skip Clean+Restore+Compile+Test", returnStatus: true
+                        if(releaseResult == 422){
+                            UNSTABLE_CAUSES.add("Release already exists on github")
+                        } else if(releaseResult !=0 ) {
+                            throw new Exception("Github release error")
                         }
 
                     //     def orgName = Utilities.getOrgName(this)

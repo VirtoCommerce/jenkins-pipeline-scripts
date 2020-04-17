@@ -75,8 +75,8 @@ pipeline {
                     ENV_NAME = userEnvInput
                     SETTINGS.setEnvironment(ENV_NAME)
                     echo "Vars: REGION - ${REGION}, UPDATE_CS - ${UPDATE_CS}, ENV_NAME - ${ENV_NAME}, BRANCH_NAME - ${BRANCH_NAME}"
-                    def msgToHook = "Delivery Option ${PROJECT_TYPE}<br/>Environment ${ENV_NAME}<br/>${UPDATE_CS ? "Update Solution<br/>":""}"
-                    //Utilities.notifyBuildStatus(this, SETTINGS['prefix'], SETTINGS['of365hook'], msgToHook, 'STARTED')
+                    def msgToHook = "Delivery Parameters: ${REGION}<br/>Environment ${ENV_NAME}<br/>Branch Name: ${BRANCH_NAME}<br/>${UPDATE_CS ? "Update Solution<br/>":""}"
+                    Utilities.notifyBuildStatus(this, env.TEAMS_HOOK, msgToHook, 'STARTED')
                 }
             }
         }
@@ -128,6 +128,20 @@ pipeline {
         }
 
         //docker was here
+
+        stage("Create / Update Environment"){
+            when {
+                expression {
+                    UPDATE_CS
+                }
+            }
+            steps {
+                script{
+                    def resourceGroupName = SETTINGS['resourceGroupName']
+                    Utilities.createInfrastructure(this, "${resourceGroupName}")
+                }
+            }
+        }
 
         stage("Update Solution"){
             when {
@@ -351,7 +365,7 @@ pipeline {
                     currentBuild.result = 'UNSTABLE'
                     Utilities.checkLogForWarnings(this)
                 }
-                //Utilities.notifyBuildStatus(this, SETTINGS['prefix'], SETTINGS['of365hook'], "", currentBuild.result)
+                Utilities.notifyBuildStatus(this, env.TEAMS_HOOK, "", currentBuild.result)
                 if(!UPDATE_CS && (PROJECT_TYPE=='HOT' || PROJECT_TYPE=='RW1')){
                     node(SETTINGS['agentLabel']){
                         withEnv(["DOCKER_TAG=${DOCKER_TAG}", "DOCKER_PREFIX=${DOCKER_PREFIX}", "DOCKER_PLATFORM_PORT=${DOCKER_PLATFORM_PORT}", "DOCKER_STOREFRONT_PORT=${DOCKER_STOREFRONT_PORT}", "DOCKER_SQL_PORT=${DOCKER_SQL_PORT}", "COMPOSE_PROJECT_NAME=${env.BUILD_TAG}"]){
