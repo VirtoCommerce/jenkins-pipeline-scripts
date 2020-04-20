@@ -26,6 +26,8 @@ function Get-AuthToken {
     return $responseContent.access_token
 }
 
+Start-Sleep -Seconds 30
+
 $authToken = (Get-AuthToken $appAuthUrl $Username $Password)[1]
 $headers = @{}
 $headers.Add("Authorization", "Bearer $authToken")
