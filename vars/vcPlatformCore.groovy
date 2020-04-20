@@ -21,9 +21,9 @@ def call(body) {
 
         def escapedBranch = env.BRANCH_NAME.replaceAll('/', '_')
         def repoName = Utilities.getRepoName(this)
-        def workspace = "D:\\Buildsv3\\${repoName}\\${escapedBranch}"
+        def workspace = "S:\\Buildsv3\\${repoName}\\${escapedBranch}"
         projectType = 'NETCORE2'
-        dockerTag = 'dev'
+        dockerTag = '3.0-preview'
         dir(workspace){
             def SETTINGS
             def settingsFileContent
@@ -109,7 +109,7 @@ def call(body) {
 
                     if(env.BRANCH_NAME == 'release/3.0.0'){
                         def websitePath = Utilities.getWebPublishFolder(this, "docker")
-                        def dockerImageName = "platform-core"
+                        def dockerImageName = "virtocommerce/platform"
                         powershell script: "Copy-Item ${workspace}\\artifacts\\publish\\* ${websitePath}\\VirtoCommerce.Platform -Recurse -Force"
                         powershell script: "Copy-Item ${env.WORKSPACE}@libs\\virto-shared-library\\resources\\docker.core\\windowsnano\\PlatformCore\\* ${websitePath} -Force"
                         dir(websitePath){
@@ -119,7 +119,7 @@ def call(body) {
                     }
                 }
 
-                if(!Utilities.isPullRequest(this) && (env.BRANCH_NAME == 'release/3.0.0' || env.BRANCH_NAME == 'dev-3.0.0'))
+                if(env.BRANCH_NAME == 'release/3.0.0' || env.BRANCH_NAME == 'dev-3.0.0')
                 {
                     stage('Publish')
                     {
