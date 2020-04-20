@@ -29,7 +29,7 @@ function Get-AuthToken {
 $authToken = (Get-AuthToken $appAuthUrl $Username $Password)[1]
 $headers = @{}
 $headers.Add("Authorization", "Bearer $authToken")
-$modules = Invoke-RestMethod $checkModulesUrl -Method Get -Headers $headers -SkipCertificateCheck -ErrorAction Stop -MaximumRetryCount 3 -RetryIntervalSec 5
+$modules = Invoke-RestMethod $checkModulesUrl -Method Get -Headers $headers -SkipCertificateCheck -MaximumRetryCount 3 -RetryIntervalSec 5
 $installedModules = 0
 if ($modules.Length -le 0) {
     Write-Output "No module's info returned"
