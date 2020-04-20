@@ -161,6 +161,7 @@ pipeline {
                             def platformContainerId = Utilities.getPlatformContainer(this)
                             echo "Platform Host: ${platformHost}"
                             Utilities.runPS(this, "docker_v3/vc-setup-modules.ps1", "-ApiUrl ${platformHost} -needRestart 1 -ContainerId ${platformContainerId} -Verbose")
+                            Utilities.runPS(this, "docker_v3/vc-check-installed-modules.ps1", "-ApiUrl ${platformHost}")
                         }
                     }
                     stage('Install Sample Data')
@@ -174,7 +175,9 @@ pipeline {
                     {
                         timestamps
                         {
-                            Utilities.runPS(this, "docker_v3/vc-get-swagger.ps1", "-ApiUrl ${Utilities.getPlatformCoreHost(this)} -OutFile ${workspace}\\swaggerSchema${env.BUILD_NUMBER}.json -Verbose")
+                            def swaggerSchemaPath = "${workspace}\\swaggerSchema${env.BUILD_NUMBER}.json"
+                            Utilities.runPS(this, "docker_v3/vc-get-swagger.ps1", "-ApiUrl ${Utilities.getPlatformCoreHost(this)} -OutFile ${swaggerSchemaPath} -Verbose")
+                            powershell "echo test.sln > .nuke; vc-build ValidateSwaggerSchema -SwaggerSchemaPath ${swaggerSchemaPath}"
                             throw new Exception("The End")
                         }
                     }
