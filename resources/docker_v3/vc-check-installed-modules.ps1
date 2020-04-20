@@ -48,6 +48,6 @@ Foreach ($module in $modules) {
     }
 }
 Write-Output "Modules installed: $installedModules"
-if($installedModules -lt 20){
+if($installedModules -lt 23){
     exit 1
 }
