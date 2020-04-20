@@ -18,7 +18,7 @@ function Get-AuthToken {
     $content_type = "application/x-www-form-urlencoded"
 
     $body = @{username=$username; password=$password; grant_type=$grant_type}
-    $response = Invoke-WebRequest -Uri $appAuthUrl -Method Post -ContentType $content_type -Body $body -SkipCertificateCheck
+    $response = Invoke-RestMethod -Uri $appAuthUrl -Method Post -ContentType $content_type -Body $body -SkipCertificateCheck
     $responseContent = $response.Content | ConvertFrom-Json
     #return "$($responseContent.token_type) $($responseContent.access_token)"
     return $responseContent.access_token
@@ -34,7 +34,7 @@ $appAuthUrl = "$ApiUrl/connect/token"
 
 # Call homepage, to make sure site is compiled
 Write-Output "Call homepage, to make sure site is compiled"
-$initResult = Invoke-WebRequest $ApiUrl -UseBasicParsing -SkipCertificateCheck
+$initResult = Invoke-RestMethod $ApiUrl -UseBasicParsing -SkipCertificateCheck -RetryIntervalSec 5 -MaximumRetryCount 5
 if ($initResult.StatusCode -ne 200) {
     # throw exception when site can't be opened
     Write-Output "Can't open admin site homepage"
