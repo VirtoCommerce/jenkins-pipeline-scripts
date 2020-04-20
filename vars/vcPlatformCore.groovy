@@ -119,7 +119,7 @@ def call(body) {
                     }
                 }
 
-                if(!Utilities.isPullRequest(this) && env.BRANCH_NAME == 'release/3.0.0')
+                if(!Utilities.isPullRequest(this) && (env.BRANCH_NAME == 'release/3.0.0' || env.BRANCH_NAME == 'dev-3.0.0'))
                 {
                     stage('Publish')
                     {
@@ -127,6 +127,10 @@ def call(body) {
 						def artifacts = findFiles(glob: 'artifacts\\*.zip')
 						Packaging.saveArtifact(this, 'vc', Utilities.getProjectType(this), '', artifacts[0].path)
 
+                        if(env.BRANCH_NAME == 'dev-3.0.0')
+                        {
+                            return 0
+                        }
                         def gitversionOutput = powershell (script: "dotnet gitversion", returnStdout: true, label: 'Gitversion', encoding: 'UTF-8').trim()
                         def gitversionJson = new groovy.json.JsonSlurperClassic().parseText(gitversionOutput)
                         def commitNumber = gitversionJson['CommitsSinceVersionSource']
