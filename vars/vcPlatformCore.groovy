@@ -119,6 +119,11 @@ def call(body) {
                     }
                 }
 
+                if(env.BRANCH_NAME == 'release/3.0.0')
+                {
+                    
+                }
+
                 if(env.BRANCH_NAME == 'release/3.0.0' || env.BRANCH_NAME == 'dev-3.0.0')
                 {
                     stage('Publish')
