@@ -121,7 +121,48 @@ def call(body) {
 
                 if(env.BRANCH_NAME == 'release/3.0.0')
                 {
-                    
+                    stage('Create Test Environment')
+                    {
+                        timestamps
+                        {
+                            dir(Utilities.getComposeFolderV3(this))
+                            {
+                                def platformPort = Utilities.getPlatformPort(this)
+                                def storefrontPort = Utilities.getStorefrontPort(this)
+                                def sqlPort = Utilities.getSqlPort(this)
+                                withEnv(["DOCKER_TAG=dev-branch", "DOCKER_PLATFORM_PORT=${platformPort}", "DOCKER_STOREFRONT_PORT=${storefrontPort}", "DOCKER_SQL_PORT=${sqlPort}" ]) {
+                                    bat "docker-compose up -d"
+                                }
+                            }
+                        }
+                    }
+                    stage('Install Modules')
+                    {
+                        timestamps
+                        {
+                            def platformHost = Utilities.getPlatformCoreHost(this)
+                            def platformContainerId = Utilities.getPlatformContainer(this)
+                            echo "Platform Host: ${platformHost}"
+                            Utilities.runPS(this, "docker_v3/vc-setup-modules.ps1", "-ApiUrl ${platformHost} -NeedRestart -ContainerId ${platformContainerId} -Verbose")
+                            Utilities.runPS(this, "docker_v3/vc-check-installed-modules.ps1", "-ApiUrl ${platformHost} -Verbose -Debug")
+                        }
+                    }
+                    stage('Install Sample Data')
+                    {
+                        timestamps
+                        {
+                            Utilities.runPS(this, "docker_v3/vc-setup-sampledata.ps1", "-ApiUrl ${Utilities.getPlatformCoreHost(this)} -Verbose -Debug")
+                        }
+                    }
+                    stage("Swagger Schema Validation")
+                    {
+                        timestamps
+                        {
+                            def swaggerSchemaPath = "${workspace}\\swaggerSchema${env.BUILD_NUMBER}.json"
+                            Utilities.runPS(this, "docker_v3/vc-get-swagger.ps1", "-ApiUrl ${Utilities.getPlatformCoreHost(this)} -OutFile ${swaggerSchemaPath} -Verbose")
+                            powershell "vc-build ValidateSwaggerSchema -SwaggerSchemaPath ${swaggerSchemaPath}"
+                        }
+                    }
                 }
 
                 if(env.BRANCH_NAME == 'release/3.0.0' || env.BRANCH_NAME == 'dev-3.0.0')
@@ -200,6 +241,12 @@ def call(body) {
                 throw any
             }
             finally {
+                def platformPort = Utilities.getPlatformPort(this)
+                def storefrontPort = Utilities.getStorefrontPort(this)
+                def sqlPort = Utilities.getSqlPort(this)
+                withEnv(["DOCKER_TAG=dev-branch", "DOCKER_PLATFORM_PORT=${platformPort}", "DOCKER_STOREFRONT_PORT=${storefrontPort}", "DOCKER_SQL_PORT=${sqlPort}" ]) {
+                    bat "docker-compose down -v"
+                }
                 if(currentBuild.resultIsBetterOrEqualTo('SUCCESS') && UNSTABLE_CAUSES.size()>0){
                     currentBuild.result = 'UNSTABLE'
                     for(cause in UNSTABLE_CAUSES){
