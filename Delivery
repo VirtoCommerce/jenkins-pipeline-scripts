@@ -177,7 +177,7 @@ pipeline {
                         {
                             def swaggerSchemaPath = "${workspace}\\swaggerSchema${env.BUILD_NUMBER}.json"
                             Utilities.runPS(this, "docker_v3/vc-get-swagger.ps1", "-ApiUrl ${Utilities.getPlatformCoreHost(this)} -OutFile ${swaggerSchemaPath} -Verbose")
-                            powershell "New-Item .nuke; Set-Content .nuke \"C:\\tmp\\vc-platform008dbg\\vc-platform\\VirtoCommerce.Platform.sln\"; vc-build ValidateSwaggerSchema -SwaggerSchemaPath ${swaggerSchemaPath}"
+                            powershell "New-Item .nuke -Force; Set-Content .nuke \"C:/tmp/vc-platform008dbg/vc-platform/VirtoCommerce.Platform.sln\"; vc-build ValidateSwaggerSchema -SwaggerSchemaPath ${swaggerSchemaPath}"
                             throw new Exception("The End")
                         }
                     }
