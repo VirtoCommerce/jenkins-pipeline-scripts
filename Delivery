@@ -161,7 +161,7 @@ pipeline {
                             def platformContainerId = Utilities.getPlatformContainer(this)
                             echo "Platform Host: ${platformHost}"
                             Utilities.runPS(this, "docker_v3/vc-setup-modules.ps1", "-ApiUrl ${platformHost} -needRestart 1 -ContainerId ${platformContainerId} -Verbose")
-                            Utilities.runPS(this, "docker_v3/vc-check-installed-modules.ps1", "-ApiUrl ${platformHost}")
+                            Utilities.runPS(this, "docker_v3/vc-check-installed-modules.ps1", "-ApiUrl ${platformHost} -Verbose -Debug")
                         }
                     }
                     stage('Install Sample Data')
