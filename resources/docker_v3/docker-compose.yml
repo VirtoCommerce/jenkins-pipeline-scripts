@@ -13,7 +13,7 @@ services:
       - virto
 
   vc-platform-web:
-    image: platform-core:dev
+    image: virtocommerce/platform:3.0-preview
     ports:
       - "${DOCKER_PLATFORM_PORT:-8090}:443"
     environment:
