@@ -18,7 +18,7 @@ function Get-AuthToken {
     $content_type = "application/x-www-form-urlencoded"
 
     $body = @{username=$username; password=$password; grant_type=$grant_type}
-    $response = Invoke-RestMethod -Uri $appAuthUrl -Method Post -ContentType $content_type -Body $body -SkipCertificateCheck
+    $response = Invoke-WebRequest -Uri $appAuthUrl -Method Post -ContentType $content_type -Body $body -SkipCertificateCheck
     $responseContent = $response.Content | ConvertFrom-Json
     #return "$($responseContent.token_type) $($responseContent.access_token)"
     return $responseContent.access_token
