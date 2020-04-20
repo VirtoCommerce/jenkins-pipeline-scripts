@@ -60,7 +60,7 @@ pipeline {
                     def buildOrder = Utilities.getNextBuildOrder(this)
                     def userInput = input message: "Region and Branch", parameters: [
                         choice(name: 'Region', choices: regionChoices),
-                        choice(name: 'Branch', choices: "dev\nmaster\nrelease_3.0.0\nfeature_migrate-to-vc30")
+                        choice(name: 'Branch', choices: "dev\nmaster\ndev-3.0.0\nrelease_3.0.0\nfeature_migrate-to-vc30")
                     ]
                     PROJECT_TYPE = 'SOLUTION'
                     REGION = userInput['Region']
