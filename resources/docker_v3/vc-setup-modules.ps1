@@ -24,7 +24,7 @@ function Get-AuthToken {
     return $responseContent.access_token
 }   
 Write-Output "Pause"
-Start-Sleep -Seconds 50
+Start-Sleep -Seconds 60
 # Initialize paths used by the script
 Write-Output "Initialize paths used by the script"
 $modulesStateUrl = "$ApiUrl/api/platform/pushnotifications"
