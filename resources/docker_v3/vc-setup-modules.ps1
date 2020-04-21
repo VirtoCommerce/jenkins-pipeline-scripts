@@ -18,10 +18,15 @@ function Get-AuthToken {
     $content_type = "application/x-www-form-urlencoded"
 
     $body = @{username=$username; password=$password; grant_type=$grant_type}
-    $response = Invoke-WebRequest -Uri $appAuthUrl -Method Post -ContentType $content_type -Body $body -SkipCertificateCheck -MaximumRetryCount 5 -RetryIntervalSec 5
-    $responseContent = $response.Content | ConvertFrom-Json
-    #return "$($responseContent.token_type) $($responseContent.access_token)"
-    return $responseContent.access_token
+    try {
+        $response = Invoke-WebRequest -Uri $appAuthUrl -Method Post -ContentType $content_type -Body $body -SkipCertificateCheck -MaximumRetryCount 5 -RetryIntervalSec 5
+        $responseContent = $response.Content | ConvertFrom-Json
+        return $responseContent.access_token
+    }
+    catch {
+        Write-Output $_.Exception
+        exit 1
+    }
 }   
 Write-Output "Pause"
 Start-Sleep -Seconds 60
