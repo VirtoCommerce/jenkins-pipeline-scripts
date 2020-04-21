@@ -160,7 +160,11 @@ def call(body) {
                         {
                             def swaggerSchemaPath = "${workspace}\\swaggerSchema${env.BUILD_NUMBER}.json"
                             Utilities.runPS(this, "docker_v3/vc-get-swagger.ps1", "-ApiUrl ${Utilities.getPlatformCoreHost(this)} -OutFile ${swaggerSchemaPath} -Verbose -Debug")
-                            powershell "vc-build ValidateSwaggerSchema -SwaggerSchemaPath ${swaggerSchemaPath}"
+                            def swaggerResult = powershell script: "vc-build ValidateSwaggerSchema -SwaggerSchemaPath ${swaggerSchemaPath}", returnStatus: true
+                            if(swaggerResult != 0)
+                            {
+                                UNSTABLE_CAUSES.add("Swagger Schema contains error")
+                            }
                         }
                     }
                 }
