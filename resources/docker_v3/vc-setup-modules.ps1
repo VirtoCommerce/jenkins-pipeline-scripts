@@ -39,6 +39,7 @@ $appAuthUrl = "$ApiUrl/connect/token"
 
 # Call homepage, to make sure site is compiled
 Write-Output "Call homepage, to make sure site is compiled"
+docker logs $ContainerId
 try {
     $initResult = Invoke-WebRequest $ApiUrl -UseBasicParsing -SkipCertificateCheck -RetryIntervalSec 5 -MaximumRetryCount 5
     if ($initResult.StatusCode -ne 200) {
