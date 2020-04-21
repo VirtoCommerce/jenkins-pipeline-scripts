@@ -24,6 +24,10 @@ def call(body) {
         def workspace = "S:\\Buildsv3\\${repoName}\\${escapedBranch}"
         projectType = 'NETCORE2'
         dockerTag = '3.0-preview'
+        if(env.BRANCH_NAME == 'dev-3.0.0')
+        {
+            dockerTag = '3.0-dev'
+        }
         dir(workspace){
             def SETTINGS
             def settingsFileContent
