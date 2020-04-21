@@ -97,7 +97,7 @@ pipeline {
                     def modulesRoot = "${env.WORKSPACE}\\CS\\module"
                     def platformRoot = "${env.WORKSPACE}\\CS\\platform"
                     powershell script: "Remove-Item -Path ${env.WORKSPACE}\\CS\\* -Recurse -Force -ErrorAction Continue", label: "Clean Workspace"
-                    if(BRANCH_NAME == 'release_3.0.0')
+                    if(BRANCH_NAME == 'release_3.0.0' || BRANCH_NAME == 'dev-3.0.0')
                     {
                         //theme
                         def themeIncludeParam = ''
