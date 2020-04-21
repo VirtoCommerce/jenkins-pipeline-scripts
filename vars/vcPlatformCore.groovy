@@ -23,10 +23,12 @@ def call(body) {
         def repoName = Utilities.getRepoName(this)
         def workspace = "S:\\Buildsv3\\${repoName}\\${escapedBranch}"
         projectType = 'NETCORE2'
-        dockerTag = '3.0-preview'
+        def platformDockerTag = '3.0-preview'
+        def storefrontDockerTag = 'latest'
         if(env.BRANCH_NAME == 'dev-3.0.0')
         {
-            dockerTag = '3.0-dev'
+            platformDockerTag = '3.0-dev'
+            storefrontDockerTag = 'dev-branch'
         }
         dir(workspace){
             def SETTINGS
@@ -118,7 +120,7 @@ def call(body) {
                         powershell script: "Copy-Item ${env.WORKSPACE}@libs\\virto-shared-library\\resources\\docker.core\\windowsnano\\PlatformCore\\* ${websitePath} -Force"
                         dir(websitePath){
                             bat "dotnet dev-certs https -ep \"${websitePath}\\devcert.pfx\" -p virto"
-                            docker.build("${dockerImageName}:${dockerTag}")
+                            docker.build("${dockerImageName}:${platformDockerTag}")
                         }
                     }
                 }
@@ -134,7 +136,7 @@ def call(body) {
                                 def platformPort = Utilities.getPlatformPort(this)
                                 def storefrontPort = Utilities.getStorefrontPort(this)
                                 def sqlPort = Utilities.getSqlPort(this)
-                                withEnv(["DOCKER_TAG=${dockerTag}", "DOCKER_PLATFORM_PORT=${platformPort}", "DOCKER_STOREFRONT_PORT=${storefrontPort}", "DOCKER_SQL_PORT=${sqlPort}", "COMPOSE_PROJECT_NAME=${env.BUILD_TAG}"]) {
+                                withEnv(["PLATFORM_DOCKER_TAG=${platformDockerTag}", "STOREFRONT_DOCKER_TAG=${storefrontDockerTag}", "DOCKER_PLATFORM_PORT=${platformPort}", "DOCKER_STOREFRONT_PORT=${storefrontPort}", "DOCKER_SQL_PORT=${sqlPort}", "COMPOSE_PROJECT_NAME=${env.BUILD_TAG}"]) {
                                     bat "docker-compose up -d"
                                 }
                             }
@@ -256,7 +258,7 @@ def call(body) {
                         def platformPort = Utilities.getPlatformPort(this)
                         def storefrontPort = Utilities.getStorefrontPort(this)
                         def sqlPort = Utilities.getSqlPort(this)
-                        withEnv(["DOCKER_TAG=${dockerTag}", "DOCKER_PLATFORM_PORT=${platformPort}", "DOCKER_STOREFRONT_PORT=${storefrontPort}", "DOCKER_SQL_PORT=${sqlPort}", "COMPOSE_PROJECT_NAME=${env.BUILD_TAG}"]) {
+                        withEnv(["PLATFORM_DOCKER_TAG=${platformDockerTag}", "STOREFRONT_DOCKER_TAG=${storefrontDockerTag}", "DOCKER_PLATFORM_PORT=${platformPort}", "DOCKER_STOREFRONT_PORT=${storefrontPort}", "DOCKER_SQL_PORT=${sqlPort}", "COMPOSE_PROJECT_NAME=${env.BUILD_TAG}"]) {
                             bat "docker-compose down -v"
                         }
                     }
