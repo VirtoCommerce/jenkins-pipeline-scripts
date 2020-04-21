@@ -39,11 +39,17 @@ $appAuthUrl = "$ApiUrl/connect/token"
 
 # Call homepage, to make sure site is compiled
 Write-Output "Call homepage, to make sure site is compiled"
-$initResult = Invoke-WebRequest $ApiUrl -UseBasicParsing -SkipCertificateCheck -RetryIntervalSec 5 -MaximumRetryCount 5
-if ($initResult.StatusCode -ne 200) {
-    # throw exception when site can't be opened
-    Write-Output "Can't open admin site homepage"
-    throw "Can't open admin site homepage"
+try {
+    $initResult = Invoke-WebRequest $ApiUrl -UseBasicParsing -SkipCertificateCheck -RetryIntervalSec 5 -MaximumRetryCount 5
+    if ($initResult.StatusCode -ne 200) {
+        # throw exception when site can't be opened
+        Write-Output "Can't open admin site homepage"
+        throw "Can't open admin site homepage"
+    }
+}
+catch{
+    Write-Output $_.Exception
+    exit 1
 }
 
 # Initiate modules installation
