@@ -26,7 +26,7 @@ function Get-AuthToken {
     return $responseContent.access_token
 }
 
-#Start-Sleep -Seconds 60
+Start-Sleep -Seconds 15
 
 $authToken = (Get-AuthToken $appAuthUrl $Username $Password)[1]
 $headers = @{}
