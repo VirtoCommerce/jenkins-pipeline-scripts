@@ -76,6 +76,15 @@ def call(body) {
                     powershell "vc-build Compress -skip Clean+Restore+Compile+Test"
                 }
 
+                if(env.BRANCH_NAME == 'feature/migrate-to-vc30')
+                {
+                    def artifacts = findFiles(glob: 'artifacts\\*.zip')
+                    def artifactFileName = artifacts[0].path.split("\\\\").last()
+                    def moduleId = artifactFileName.split("_").first()
+                    echo "Module id: ${moduleId}"
+                    Packaging.saveArtifact(this, 'vc', 'module', moduleId, artifacts[0].path)
+                }
+
                 if(env.BRANCH_NAME == 'dev-3.0.0')
                 {
                     stage('Publish')
