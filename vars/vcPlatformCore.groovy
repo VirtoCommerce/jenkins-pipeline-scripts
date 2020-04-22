@@ -113,7 +113,7 @@ def call(body) {
                 stage('Packaging'){                
                     powershell "vc-build Compress -skip Clean+Restore+Compile+Test"
 
-                    if(env.BRANCH_NAME == 'release/3.0.0'){
+                    if(env.BRANCH_NAME == 'release/3.0.0' || env.BRANCH_NAME == 'dev-3.0.0'){
                         def websitePath = Utilities.getWebPublishFolder(this, "docker")
                         def dockerImageName = "virtocommerce/platform"
                         powershell script: "Copy-Item ${workspace}\\artifacts\\publish\\* ${websitePath}\\VirtoCommerce.Platform -Recurse -Force"
