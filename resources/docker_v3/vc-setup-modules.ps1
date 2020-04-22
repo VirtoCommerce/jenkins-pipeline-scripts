@@ -29,7 +29,7 @@ function Get-AuthToken {
     }
 }   
 Write-Output "Pause"
-Start-Sleep -Seconds 60
+#Start-Sleep -Seconds 60
 # Initialize paths used by the script
 Write-Output "Initialize paths used by the script"
 $modulesStateUrl = "$ApiUrl/api/platform/pushnotifications"
@@ -59,7 +59,7 @@ $authToken = (Get-AuthToken $appAuthUrl $Username $Password)[1]
 $headers = @{}
 $headers.Add("Authorization", "Bearer $authToken")
 Write-Output "Initiate modules installation"
-$moduleImportResult = Invoke-RestMethod $modulesInstallUrl -Method Post -Headers $headers -ErrorAction Stop -SkipCertificateCheck
+$moduleImportResult = Invoke-RestMethod $modulesInstallUrl -Method Post -Headers $headers -ErrorAction Stop -SkipCertificateCheck -MaximumRetryCount 5 -RetryIntervalSec 5
 Write-Output $moduleImportResult
 Start-Sleep -s 1
 
