@@ -125,7 +125,7 @@ def call(body) {
                     }
                 }
 
-                if(env.BRANCH_NAME == 'release/3.0.0')
+                if(env.BRANCH_NAME == 'release/3.0.0' || env.BRANCH_NAME == 'dev-3.0.0')
                 {
                     stage('Create Test Environment')
                     {
@@ -252,7 +252,7 @@ def call(body) {
                 throw any
             }
             finally {
-                if(env.BRANCH_NAME == 'release/3.0.0')
+                if(env.BRANCH_NAME == 'release/3.0.0' || env.BRANCH_NAME == 'dev-3.0.0')
                 {
                     dir(Utilities.getComposeFolderV3(this))
                     {
