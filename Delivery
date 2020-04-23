@@ -109,7 +109,7 @@ pipeline {
                             themeIncludeParam = "-Include ${SETTINGS['themeName'].join(',')}"
                         }
                         echo "Copy-Item -Path ${themeSrc} ${themeIncludeParam} -Destination ${themeDst} -Recurse -Force"
-                        powershell script: "Copy-Item -Path ${themeSrc} ${themeIncludeParam} -Destination ${themeDst} -Recurse -Force", label: "Copy Theme to Workspace"
+                        pwsh script: "Copy-Item -Path ${themeSrc} ${themeIncludeParam} -Destination ${themeDst} -Recurse -Force", label: "Copy Theme to Workspace"
                         //storefront
                         def storefrontSrc = "${solutionRoot}\\${SETTINGS['storefrontBranch']}"
                         powershell script: "Copy-Item -Path ${storefrontSrc}\\* -Destination ${env.WORKSPACE}\\CS -Include storefront -Recurse -Force", label: "Copy Storefron to Workspace"
