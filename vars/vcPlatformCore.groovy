@@ -48,38 +48,38 @@ def call(body) {
                     
                     checkout scm
                     
-					def changelog = gitChangelog returnType: 'STRING', template: '''# Changelog
+// 					def changelog = gitChangelog returnType: 'STRING', template: '''# Changelog
 
-Changelog for {{ownerName}} {{repoName}}.
+// Changelog for {{ownerName}} {{repoName}}.
 
-{{#tags}}
-## {{name}}
- {{#issues}}
-  {{#hasIssue}}
-   {{#hasLink}}
-### {{name}} [{{issue}}]({{link}}) {{title}} {{#hasIssueType}} *{{issueType}}* {{/hasIssueType}} {{#hasLabels}} {{#labels}} *{{.}}* {{/labels}} {{/hasLabels}}
-   {{/hasLink}}
-   {{^hasLink}}
-### {{name}} {{issue}} {{title}} {{#hasIssueType}} *{{issueType}}* {{/hasIssueType}} {{#hasLabels}} {{#labels}} *{{.}}* {{/labels}} {{/hasLabels}}
-   {{/hasLink}}
-  {{/hasIssue}}
-  {{^hasIssue}}
-### {{name}}
-  {{/hasIssue}}
+// {{#tags}}
+// ## {{name}}
+//  {{#issues}}
+//   {{#hasIssue}}
+//    {{#hasLink}}
+// ### {{name}} [{{issue}}]({{link}}) {{title}} {{#hasIssueType}} *{{issueType}}* {{/hasIssueType}} {{#hasLabels}} {{#labels}} *{{.}}* {{/labels}} {{/hasLabels}}
+//    {{/hasLink}}
+//    {{^hasLink}}
+// ### {{name}} {{issue}} {{title}} {{#hasIssueType}} *{{issueType}}* {{/hasIssueType}} {{#hasLabels}} {{#labels}} *{{.}}* {{/labels}} {{/hasLabels}}
+//    {{/hasLink}}
+//   {{/hasIssue}}
+//   {{^hasIssue}}
+// ### {{name}}
+//   {{/hasIssue}}
 
-  {{#commits}}
-**{{{messageTitle}}}**
+//   {{#commits}}
+// **{{{messageTitle}}}**
 
-{{#messageBodyItems}}
- * {{.}} 
-{{/messageBodyItems}}
+// {{#messageBodyItems}}
+//  * {{.}} 
+// {{/messageBodyItems}}
 
-[{{hash}}](https://github.com/{{ownerName}}/{{repoName}}/commit/{{hash}}) {{authorName}} *{{commitTime}}*
+// [{{hash}}](https://github.com/{{ownerName}}/{{repoName}}/commit/{{hash}}) {{authorName}} *{{commitTime}}*
 
-  {{/commits}}
+//   {{/commits}}
 
- {{/issues}}
-{{/tags}}'''
+//  {{/issues}}
+// {{/tags}}'''
                     echo changelog
                 }
 
