@@ -1,7 +1,7 @@
 Param(  
     [parameter(Mandatory = $true)]
     $ApiUrl,
-    $NeedRestart,
+    [switch]$NeedRestart,
     $ContainerId = $null,
     $Username = "admin",
     $Password = "store"
@@ -18,13 +18,18 @@ function Get-AuthToken {
     $content_type = "application/x-www-form-urlencoded"
 
     $body = @{username=$username; password=$password; grant_type=$grant_type}
-    $response = Invoke-WebRequest -Uri $appAuthUrl -Method Post -ContentType $content_type -Body $body -SkipCertificateCheck
-    $responseContent = $response.Content | ConvertFrom-Json
-    #return "$($responseContent.token_type) $($responseContent.access_token)"
-    return $responseContent.access_token
+    try {
+        $response = Invoke-WebRequest -Uri $appAuthUrl -Method Post -ContentType $content_type -Body $body -SkipCertificateCheck -MaximumRetryCount 5 -RetryIntervalSec 5
+        $responseContent = $response.Content | ConvertFrom-Json
+        return $responseContent.access_token
+    }
+    catch {
+        Write-Output $_.Exception
+        exit 1
+    }
 }   
 Write-Output "Pause"
-Start-Sleep -Seconds 30
+Start-Sleep -Seconds 15
 # Initialize paths used by the script
 Write-Output "Initialize paths used by the script"
 $modulesStateUrl = "$ApiUrl/api/platform/pushnotifications"
@@ -34,11 +39,18 @@ $appAuthUrl = "$ApiUrl/connect/token"
 
 # Call homepage, to make sure site is compiled
 Write-Output "Call homepage, to make sure site is compiled"
-$initResult = Invoke-WebRequest $ApiUrl -UseBasicParsing -SkipCertificateCheck -RetryIntervalSec 5 -MaximumRetryCount 5
-if ($initResult.StatusCode -ne 200) {
-    # throw exception when site can't be opened
-    Write-Output "Can't open admin site homepage"
-    throw "Can't open admin site homepage"
+docker logs $ContainerId
+try {
+    $initResult = Invoke-WebRequest $ApiUrl -UseBasicParsing -SkipCertificateCheck -RetryIntervalSec 5 -MaximumRetryCount 5
+    if ($initResult.StatusCode -ne 200) {
+        # throw exception when site can't be opened
+        Write-Output "Can't open admin site homepage"
+        throw "Can't open admin site homepage"
+    }
+}
+catch{
+    Write-Output $_.Exception
+    exit 1
 }
 
 # Initiate modules installation
@@ -47,7 +59,7 @@ $authToken = (Get-AuthToken $appAuthUrl $Username $Password)[1]
 $headers = @{}
 $headers.Add("Authorization", "Bearer $authToken")
 Write-Output "Initiate modules installation"
-$moduleImportResult = Invoke-RestMethod $modulesInstallUrl -Method Post -Headers $headers -ErrorAction Stop -SkipCertificateCheck
+$moduleImportResult = Invoke-RestMethod $modulesInstallUrl -Method Post -Headers $headers -ErrorAction Stop -SkipCertificateCheck -MaximumRetryCount 5 -RetryIntervalSec 5
 Write-Output $moduleImportResult
 Start-Sleep -s 1
 
@@ -87,7 +99,7 @@ try {
         Write-Output $moduleState
         exit 1
     }
-    if($null -ne $NeedRestart -and $NeedRestart -gt 0){
+    if($NeedRestart){
       Write-Output "Restarting website"
       #$moduleState = Invoke-RestMethod "$restartUrl" -Method Post -ContentType "application/json" -Headers $headers -SkipCertificateCheck
       docker restart $ContainerId

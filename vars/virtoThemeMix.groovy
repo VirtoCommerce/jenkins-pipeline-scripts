@@ -34,7 +34,8 @@ def call(body)
 				SETTINGS.setRegion('themeMixOdt')
 				themeStyleAndJs = "${env.WORKSPACE}\\client-app"
 				break
-			case 'meds':
+			case 'meds-customers':
+			case 'meds-suppliers':
 				SETTINGS.setRegion('themeMixMeds')
 				themeStyleAndJs = "${env.WORKSPACE}\\client-app"
 				break
@@ -80,7 +81,7 @@ def call(body)
 			{
 				timestamps
 				{
-					if(storeName == 'odt' || storeName == 'meds' )
+					if(storeName == 'odt' || storeName == 'meds-customers' || storeName == 'meds-suppliers')
 					{
 						dir("${themeStyleAndJs}")
 						{
@@ -179,7 +180,7 @@ def call(body)
 							// 		}
 							// 	}
 							// }
-							if((storeName == 'odt' && env.BRANCH_NAME == 'master') || (storeName == 'meds' && env.BRANCH_NAME == 'master'))
+							if((storeName == 'odt' && env.BRANCH_NAME == 'master') || (storeName == 'meds-customers' && env.BRANCH_NAME == 'master') || (storeName == 'meds-suppliers' && env.BRANCH_NAME == 'master'))
 							{
 								stagingName = "${env.BRANCH_NAME}"
 								SETTINGS.setEnvironment('master')
