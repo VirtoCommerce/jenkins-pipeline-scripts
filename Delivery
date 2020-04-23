@@ -106,8 +106,7 @@ pipeline {
                         if(SETTINGS['themeName']!=null)
                         {
                             themeSrc = "${themeSrc}\\*"
-                            themeIncludeParam = "-Include ${SETTINGS['themeName']}"
-                            themeDst = "${themeDst}\\${SETTINGS['themeName']}"
+                            themeIncludeParam = "-Include ${SETTINGS['themeName'].join(',')}"
                         }
                         powershell script: "Copy-Item -Path ${themeSrc} -Destination ${themeDst} ${themeIncludeParam} -Recurse -Force", label: "Copy Theme to Workspace"
                         //storefront
@@ -160,12 +159,12 @@ pipeline {
                     def themeSrcDir = "${csRoot}\\theme"
                     def themeBlobPath = ""
                     def themeBlobPathParam = ""
-                    if(SETTINGS['themeName'] != null)
-                    {
-                        themeBlobPath = "Themes/${SETTINGS['themeName']}"
-                        themeSrcDir = "${themeSrcDir}\\${SETTINGS['themeName']}"
-                        themeBlobPathParam = "-ThemeBlobPath ${themeBlobPath}"
-                    }
+                    // if(SETTINGS['themeName'] != null)
+                    // {
+                    //     themeBlobPath = "Themes/${SETTINGS['themeName']}"
+                    //     themeSrcDir = "${themeSrcDir}\\${SETTINGS['themeName']}"
+                    //     themeBlobPathParam = "-ThemeBlobPath ${themeBlobPath}"
+                    // }
                     withEnv(["AzureBlobToken=${blobToken}"]){
                         Utilities.runSharedPS(this, 'delivery/upload-CS.ps1', 
                             "-PlatformDir ${csRoot}\\platform -ModulesDir ${csRoot}\\modules -StorefrontDir ${csRoot}\\storefront -ThemeDir ${themeSrcDir} -WebAppName ${webAppName} -WebAppPublicName ${webAppPublicName} -ResourceGroupName ${resourceGroupName} -SubscriptionID ${subscriptionID} -StorageAccount ${SETTINGS['storageAccount']} -BlobContainerName ${SETTINGS['blobContainerName']} ${themeBlobPathParam}")
