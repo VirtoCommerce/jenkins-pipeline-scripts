@@ -160,7 +160,7 @@ pipeline {
                             def platformHost = Utilities.getPlatformCoreHost(this)
                             def platformContainerId = Utilities.getPlatformContainer(this)
                             echo "Platform Host: ${platformHost}"
-                            Utilities.runPS(this, "docker_v3/vc-setup-modules.ps1", "-ApiUrl ${platformHost} -needRestart 1 -ContainerId ${platformContainerId} -Verbose")
+                            Utilities.runPS(this, "docker_v3/vc-setup-modules.ps1", "-ApiUrl ${platformHost} -NeedRestart -ContainerId ${platformContainerId} -Verbose -Debug")
                             Utilities.runPS(this, "docker_v3/vc-check-installed-modules.ps1", "-ApiUrl ${platformHost} -Verbose -Debug")
                         }
                     }
@@ -176,8 +176,12 @@ pipeline {
                         timestamps
                         {
                             def swaggerSchemaPath = "${workspace}\\swaggerSchema${env.BUILD_NUMBER}.json"
-                            Utilities.runPS(this, "docker_v3/vc-get-swagger.ps1", "-ApiUrl ${Utilities.getPlatformCoreHost(this)} -OutFile ${swaggerSchemaPath} -Verbose")
-                            powershell "New-Item .nuke -Force; Set-Content .nuke \"C:/tmp/vc-platform008dbg/vc-platform/VirtoCommerce.Platform.sln\"; vc-build ValidateSwaggerSchema -SwaggerSchemaPath ${swaggerSchemaPath}"
+                            Utilities.runPS(this, "docker_v3/vc-get-swagger.ps1", "-ApiUrl ${Utilities.getPlatformCoreHost(this)} -OutFile ${swaggerSchemaPath} -Verbose -Debug")
+                            def swaggerResult = powershell script: "vc-build ValidateSwaggerSchema -SwaggerSchemaPath ${swaggerSchemaPath}", returnStatus: true
+                            if(swaggerResult != 0)
+                            {
+                                UNSTABLE_CAUSES.add("Swagger Schema contains error")
+                            }
                         }
                     }
                     stage("E2E")
