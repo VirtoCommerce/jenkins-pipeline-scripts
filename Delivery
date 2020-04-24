@@ -65,7 +65,7 @@ pipeline {
                     def buildOrder = Utilities.getNextBuildOrder(this)
                     def userInput = input message: "Region and Branch", parameters: [
                         choice(name: 'Region', choices: regionChoices),
-                        choice(name: 'Branch', choices: "dev\nmaster\nrelease_3.0.0\nfeature_migrate-to-vc30")
+                        choice(name: 'Branch', choices: "dev\nmaster\ndev-3.0.0\nrelease_3.0.0\nfeature_migrate-to-vc30")
                     ]
                     PROJECT_TYPE = 'SOLUTION'
                     REGION = userInput['Region']
@@ -102,7 +102,7 @@ pipeline {
                     def modulesRoot = "${env.WORKSPACE}\\CS\\module"
                     def platformRoot = "${env.WORKSPACE}\\CS\\platform"
                     powershell script: "Remove-Item -Path ${env.WORKSPACE}\\CS\\* -Recurse -Force -ErrorAction Continue", label: "Clean Workspace"
-                    if(BRANCH_NAME == 'release_3.0.0')
+                    if(BRANCH_NAME == 'release_3.0.0' || BRANCH_NAME == 'dev-3.0.0')
                     {
                         //theme
                         def themeIncludeParam = ''
@@ -111,10 +111,10 @@ pipeline {
                         if(SETTINGS['themeName']!=null)
                         {
                             themeSrc = "${themeSrc}\\*"
-                            themeIncludeParam = "-Include ${SETTINGS['themeName']}"
-                            themeDst = "${themeDst}\\${SETTINGS['themeName']}"
+                            themeIncludeParam = "-Include ${SETTINGS['themeName'].join(',')}"
                         }
-                        powershell script: "Copy-Item -Path ${themeSrc} -Destination ${themeDst} ${themeIncludeParam} -Recurse -Force", label: "Copy Theme to Workspace"
+                        powershell script: "mkdir ${themeDst}"
+                        powershell script: "Copy-Item -Path ${themeSrc} ${themeIncludeParam} -Destination ${themeDst} -Recurse -Force", label: "Copy Theme to Workspace"
                         //storefront
                         def storefrontSrc = "${solutionRoot}\\${SETTINGS['storefrontBranch']}"
                         powershell script: "Copy-Item -Path ${storefrontSrc}\\* -Destination ${env.WORKSPACE}\\CS -Include storefront -Recurse -Force", label: "Copy Storefron to Workspace"
@@ -216,12 +216,12 @@ pipeline {
                     def themeSrcDir = "${csRoot}\\theme"
                     def themeBlobPath = ""
                     def themeBlobPathParam = ""
-                    if(SETTINGS['themeName'] != null)
-                    {
-                        themeBlobPath = "Themes/${SETTINGS['themeName']}"
-                        themeSrcDir = "${themeSrcDir}\\${SETTINGS['themeName']}"
-                        themeBlobPathParam = "-ThemeBlobPath ${themeBlobPath}"
-                    }
+                    // if(SETTINGS['themeName'] != null)
+                    // {
+                    //     themeBlobPath = "Themes/${SETTINGS['themeName']}"
+                    //     themeSrcDir = "${themeSrcDir}\\${SETTINGS['themeName']}"
+                    //     themeBlobPathParam = "-ThemeBlobPath ${themeBlobPath}"
+                    // }
                     withEnv(["AzureBlobToken=${blobToken}"]){
                         Utilities.runSharedPS(this, 'delivery/upload-CS.ps1', 
                             "-PlatformDir ${csRoot}\\platform -ModulesDir ${csRoot}\\modules -StorefrontDir ${csRoot}\\storefront -ThemeDir ${themeSrcDir} -WebAppName ${webAppName} -WebAppPublicName ${webAppPublicName} -ResourceGroupName ${resourceGroupName} -SubscriptionID ${subscriptionID} -StorageAccount ${SETTINGS['storageAccount']} -BlobContainerName ${SETTINGS['blobContainerName']} ${themeBlobPathParam}")

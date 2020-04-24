@@ -21,7 +21,7 @@ def call(body) {
 
         def escapedBranch = env.BRANCH_NAME.replaceAll('/', '_')
         def repoName = Utilities.getRepoName(this)
-        def workspace = "D:\\Buildsv3\\${repoName}\\${escapedBranch}"
+        def workspace = "S:\\Buildsv3\\${repoName}\\${escapedBranch}"
         projectType = 'NETCORE2'
         dir(workspace){
             // def SETTINGS
@@ -74,6 +74,15 @@ def call(body) {
 
                 stage('Packaging'){                
                     powershell "vc-build Compress -skip Clean+Restore+Compile+Test"
+                }
+
+                if(env.BRANCH_NAME == 'feature/migrate-to-vc30')
+                {
+                    def artifacts = findFiles(glob: 'artifacts\\*.zip')
+                    def artifactFileName = artifacts[0].path.split("\\\\").last()
+                    def moduleId = artifactFileName.split("_").first()
+                    echo "Module id: ${moduleId}"
+                    Packaging.saveArtifact(this, 'vc', 'module', moduleId, artifacts[0].path)
                 }
 
                 if(env.BRANCH_NAME == 'dev-3.0.0')

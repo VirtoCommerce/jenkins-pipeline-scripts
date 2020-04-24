@@ -28,15 +28,21 @@ def call(body)
 		}
 		SETTINGS = new Settings(settingsFileContent)
 		SETTINGS.setEnvironment(env.BRANCH_NAME)
-		if(storeName == 'odt')
+		switch(storeName)
 		{
-			SETTINGS.setRegion('themeMixOdt')
-			themeStyleAndJs = "${env.WORKSPACE}\\client-app"
-		}
-		else
-		{
-			SETTINGS.setRegion('themeMix')
-			themeStyleAndJs = "${env.WORKSPACE}\\ng-app"
+			case 'odt':
+				SETTINGS.setRegion('themeMixOdt')
+				themeStyleAndJs = "${env.WORKSPACE}\\client-app"
+				break
+			case 'meds-customers':
+			case 'meds-suppliers':
+				SETTINGS.setRegion('themeMixMeds')
+				themeStyleAndJs = "${env.WORKSPACE}\\client-app"
+				break
+			default:
+				SETTINGS.setRegion('themeMix')
+				themeStyleAndJs = "${env.WORKSPACE}\\ng-app"
+				break
 		}
 
 		try
@@ -75,7 +81,7 @@ def call(body)
 			{
 				timestamps
 				{
-					if(storeName == 'odt')
+					if(storeName == 'odt' || storeName == 'meds-customers' || storeName == 'meds-suppliers')
 					{
 						dir("${themeStyleAndJs}")
 						{
@@ -155,26 +161,26 @@ def call(body)
 								Utilities.runSharedPS(this, "VC-ThemeMix2Azure.ps1", "-StagingName ${stagingName} -StoreName ${storeName}")
 							}
 
-							if(storeName == 'odt' && env.BRANCH_NAME == 'dev')
-							{
-								timestamps
-								{
-									timeout(time: 15, unit: 'MINUTES')
-									{
-										def regionAndEnvChoices = input message: "Make publish for ", parameters: [
-                        					choice(name: 'QA', choices:"qa\n")
-                    					]
-										echo "regionAndEnvChoices: ${regionAndEnvChoices}"
-										stagingName = "${env.BRANCH_NAME}"
-										SETTINGS.setEnvironment(regionAndEnvChoices)
-										withEnv(["AzureBlobName=${SETTINGS['azureBlobName']}", "AzureBlobKey=${SETTINGS['azureBlobKey']}", "AzureBlobToken=${SETTINGS['azureBlobToken']}"])
-										{
-											Utilities.runSharedPS(this, "VC-ThemeMix2Azure.ps1", "-StagingName ${stagingName} -StoreName ${storeName}")
-										}
-									}
-								}
-							}
-							else if(storeName == 'odt' && env.BRANCH_NAME == 'master')
+							// if(storeName == 'odt' && env.BRANCH_NAME == 'dev')
+							// {
+							// 	timestamps
+							// 	{
+							// 		timeout(time: 15, unit: 'MINUTES')
+							// 		{
+							// 			def regionAndEnvChoices = input message: "Make publish for ", parameters: [
+                        	// 				choice(name: 'QA', choices:"qa\n")
+                    		// 			]
+							// 			echo "regionAndEnvChoices: ${regionAndEnvChoices}"
+							// 			stagingName = "${env.BRANCH_NAME}"
+							// 			SETTINGS.setEnvironment(regionAndEnvChoices)
+							// 			withEnv(["AzureBlobName=${SETTINGS['azureBlobName']}", "AzureBlobKey=${SETTINGS['azureBlobKey']}", "AzureBlobToken=${SETTINGS['azureBlobToken']}"])
+							// 			{
+							// 				Utilities.runSharedPS(this, "VC-ThemeMix2Azure.ps1", "-StagingName ${stagingName} -StoreName ${storeName}")
+							// 			}
+							// 		}
+							// 	}
+							// }
+							if((storeName == 'odt' && env.BRANCH_NAME == 'master') || (storeName == 'meds-customers' && env.BRANCH_NAME == 'master') || (storeName == 'meds-suppliers' && env.BRANCH_NAME == 'master'))
 							{
 								stagingName = "${env.BRANCH_NAME}"
 								SETTINGS.setEnvironment('master')
