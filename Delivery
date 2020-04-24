@@ -178,8 +178,24 @@ pipeline {
                             def swaggerSchemaPath = "${workspace}\\swaggerSchema${env.BUILD_NUMBER}.json"
                             Utilities.runPS(this, "docker_v3/vc-get-swagger.ps1", "-ApiUrl ${Utilities.getPlatformCoreHost(this)} -OutFile ${swaggerSchemaPath} -Verbose")
                             powershell "New-Item .nuke -Force; Set-Content .nuke \"C:/tmp/vc-platform008dbg/vc-platform/VirtoCommerce.Platform.sln\"; vc-build ValidateSwaggerSchema -SwaggerSchemaPath ${swaggerSchemaPath}"
-                            throw new Exception("The End")
                         }
+                    }
+                    stage("E2E")
+                    {
+                        timestamps
+                        {
+                            def e2eDir = "${env.WORKSPACE}\\e2e"
+                            dir(e2eDir)
+                            {
+                                git changelog: false, credentialsId: '38b768a3-7d9c-4203-9389-d6c6d8d6aff4', poll: false, url: 'https://github.com/VirtoCommerce/vc-quality-gate-katalon.git'
+                                bat "${env.KATALON_DIR}\\katalonc.exe -projectPath=\"platform_storefront.prj\" -StoreURL \"http://localhost:${Utilities.getStorefrontPort(this)}\""
+                            }
+                        }
+                    }
+
+                    stage("The End")
+                    {
+                        throw new Exception("The End")
                     }
                 }
             }
