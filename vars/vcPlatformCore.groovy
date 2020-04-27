@@ -80,7 +80,7 @@ Changelog for {{ownerName}} {{repoName}}.
 
  {{/issues}}
 {{/tags}}'''
-                    //echo changelog
+                    echo changelog
                 }
 
                 // if(!Utilities.areThereCodeChanges(this))
