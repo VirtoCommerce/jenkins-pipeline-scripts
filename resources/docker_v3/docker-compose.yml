@@ -20,9 +20,9 @@ services:
       - ConnectionStrings:VirtoCommerce=Data Source=vc-db;Initial Catalog=VirtoCommerce2;Persist Security Info=True;User ID=sa;Password=v!rto_Labs!;MultipleActiveResultSets=True;Connect Timeout=30;
       - Assets:Provider=FileSystem
       - Assets:FileSystem:RootPath=~/App_Data/Assets
-      - Assets:FileSystem:PublicUrl=https://localhost:${DOCKER_PLATFORM_PORT:-8090}/assets
+      - Assets:FileSystem:PublicUrl=http://localhost:${DOCKER_PLATFORM_PORT:-8090}/assets
       - ASPNETCORE_ENVIRONMENT=Production
-      - ASPNETCORE_URLS=http://+;https://+;
+      - ASPNETCORE_URLS=http://+;
     depends_on:
       - vc-db
     volumes:
