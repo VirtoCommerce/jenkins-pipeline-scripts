@@ -176,7 +176,7 @@ pipeline {
                     {
                         timestamps
                         {
-                            Utilities.runPS(this, "docker_v3/vc-theme-install.ps1", "-ThemePath ${env.WORKSPACE}\\CS\\theme -PlatformContainer ${Utilities.getPlatformContainer(this)}")
+                            Utilities.runPS(this, "docker_v3/vc-theme-install.ps1", "-ThemePath ${env.WORKSPACE}\\CS\\theme -StorefrontContainer ${Utilities.getStorefrontContainer(this)}")
                         }
                     }
                     stage("Swagger Schema Validation")
