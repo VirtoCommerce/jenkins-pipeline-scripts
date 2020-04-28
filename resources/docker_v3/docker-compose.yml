@@ -40,6 +40,7 @@ services:
       - VirtoCommerce:Endpoint:UserName=admin
       - VirtoCommerce:Endpoint:Password=store
       - ConnectionStrings:ContentConnectionString=provider=LocalStorage;rootPath=~/Themes
+      - LiquidThemeEngine:BaseThemePath=Electronics/default
     depends_on:
       - vc-platform-web
     volumes:
