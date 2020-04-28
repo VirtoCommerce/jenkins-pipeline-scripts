@@ -48,7 +48,7 @@ def call(body) {
                     
                     checkout scm
                     
-// 					def changelog = gitChangelog returnType: 'STRING', template: '''# Changelog
+// 					def changelog = gitChangelog from: [type: 'REF', value: '3.0.0-rc.5.248'], to: [type: 'REF', value: '3.0.0-rc.5.250'], returnType: 'STRING', template: '''# Changelog
 
 // Changelog for {{ownerName}} {{repoName}}.
 
@@ -80,7 +80,7 @@ def call(body) {
 
 //  {{/issues}}
 // {{/tags}}'''
-                    //echo changelog
+//                     echo changelog
                 }
 
                 // if(!Utilities.areThereCodeChanges(this))
