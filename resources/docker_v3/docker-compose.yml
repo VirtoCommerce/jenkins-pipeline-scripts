@@ -25,8 +25,6 @@ services:
       - ASPNETCORE_URLS=http://+;
     depends_on:
       - vc-db
-    volumes:
-      - cms-content-volume:c:\vc-platform\App_Data\cms-content
     networks:
       - virto
 
@@ -35,20 +33,16 @@ services:
     ports:
       - "${DOCKER_STOREFRONT_PORT:-8081}:80"
     environment:
-      - ASPNETCORE_ENVIRONMENT:Development
+      - ASPNETCORE_ENVIRONMENT=Development
       - VirtoCommerce:Endpoint:Url=http://vc-platform-web
       - VirtoCommerce:Endpoint:UserName=admin
       - VirtoCommerce:Endpoint:Password=store
-      - ConnectionStrings:ContentConnectionString=provider=LocalStorage;rootPath=~/Themes
+      - VirtoCommerce:DefaultStore=Electronics
+      - ConnectionStrings:ContentConnectionString=provider=LocalStorage;rootPath=~/cms-content
     depends_on:
       - vc-platform-web
-    volumes:
-      - cms-content-volume:C:\vc-storefront\wwwroot\cms-content
     networks:
       - virto
-
-volumes:
-  cms-content-volume:
 
 networks:
   virto:
