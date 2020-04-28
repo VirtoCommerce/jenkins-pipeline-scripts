@@ -108,14 +108,12 @@ pipeline {
                         def themeIncludeParam = ''
                         def themeSrc = "${solutionRoot}\\${SETTINGS['themeBranch']}\\theme"
                         def themeDst = "${env.WORKSPACE}\\CS\\theme"
-                        if(SETTINGS['themeName']?.trim())
+                        if(SETTINGS['themeName'] != '' && SETTINGS['themeName'] != null)
                         {
-                            echo "theme name: ${SETTINGS['themeName']}, type of: ${SETTINGS['themeName'].getClass()}"
-                            themeSrc = "${themeSrc}\\*"
                             themeIncludeParam = "-Include ${SETTINGS['themeName'].join(',')}"
                         }
                         powershell script: "mkdir ${themeDst}"
-                        powershell script: "Copy-Item -Path ${themeSrc} ${themeIncludeParam} -Destination ${themeDst} -Recurse -Force", label: "Copy Theme to Workspace"
+                        powershell script: "Copy-Item -Path ${themeSrc}\\* ${themeIncludeParam} -Destination ${themeDst} -Recurse -Force", label: "Copy Theme to Workspace"
                         //storefront
                         def storefrontSrc = "${solutionRoot}\\${SETTINGS['storefrontBranch']}"
                         powershell script: "Copy-Item -Path ${storefrontSrc}\\* -Destination ${env.WORKSPACE}\\CS -Include storefront -Recurse -Force", label: "Copy Storefron to Workspace"

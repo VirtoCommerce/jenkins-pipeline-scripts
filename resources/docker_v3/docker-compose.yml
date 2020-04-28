@@ -39,7 +39,7 @@ services:
       - VirtoCommerce:Endpoint:Url=http://vc-platform-web
       - VirtoCommerce:Endpoint:UserName=admin
       - VirtoCommerce:Endpoint:Password=store
-      - ConnectionStrings:ContentConnectionString=provider=LocalStorage;rootPath=~/cms-content
+      - ConnectionStrings:ContentConnectionString=provider=LocalStorage;rootPath=~/Themes
     depends_on:
       - vc-platform-web
     volumes:

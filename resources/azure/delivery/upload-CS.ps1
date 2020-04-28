@@ -9,7 +9,7 @@ param(
     $SubscriptionID,
     $StorageAccount = "qademovc",
     $BlobContainerName = "cms",
-    $ThemeBlobPath = "Themes"
+    $ThemeBlobPath = "Themes/"
 )
 
 # Upload Storefront Zip File to Azure

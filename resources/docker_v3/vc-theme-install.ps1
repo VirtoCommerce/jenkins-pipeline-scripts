@@ -2,10 +2,10 @@ Param(
     [parameter(Mandatory = $true)]
     $ThemePath,
     [parameter(Mandatory = $true)]
-    $PlatformContainer
+    $StorefrontContainer
 )
 
-Write-Output $PlatformContainer
+Write-Output $StorefrontContainer
 Write-Output $ThemePath
 Write-Output "docker cp"
-docker cp $ThemePath ${PlatformContainer}:/vc-platform/App_Data/cms-content/Themes
+docker cp $ThemePath ${StorefrontContainer}:/vc-storefront/wwwroot/Themes
