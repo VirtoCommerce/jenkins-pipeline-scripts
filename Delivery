@@ -110,6 +110,7 @@ pipeline {
                         def themeDst = "${env.WORKSPACE}\\CS\\theme"
                         if(SETTINGS['themeName']!=null)
                         {
+                            echo "theme name: ${SETTINGS['themeName']}, type of: ${SETTINGS['themeName'].getClass()}"
                             themeSrc = "${themeSrc}\\*"
                             themeIncludeParam = "-Include ${SETTINGS['themeName'].join(',')}"
                         }
