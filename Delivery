@@ -108,7 +108,7 @@ pipeline {
                         def themeIncludeParam = ''
                         def themeSrc = "${solutionRoot}\\${SETTINGS['themeBranch']}\\theme"
                         def themeDst = "${env.WORKSPACE}\\CS\\theme"
-                        if(SETTINGS['themeName']!=null)
+                        if(SETTINGS['themeName']?.trim())
                         {
                             echo "theme name: ${SETTINGS['themeName']}, type of: ${SETTINGS['themeName'].getClass()}"
                             themeSrc = "${themeSrc}\\*"
