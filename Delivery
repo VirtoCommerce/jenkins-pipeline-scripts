@@ -103,7 +103,7 @@ pipeline {
                         def themeIncludeParam = ''
                         def themeSrc = "${solutionRoot}\\${SETTINGS['themeBranch']}\\theme"
                         def themeDst = "${env.WORKSPACE}\\CS\\theme"
-                        if(SETTINGS['themeName']?.trim())
+                        if(SETTINGS['themeName'] == '' || SETTINGS['themeName'] == null)
                         {
                             themeSrc = "${themeSrc}\\*"
                             themeIncludeParam = "-Include ${SETTINGS['themeName'].join(',')}"
