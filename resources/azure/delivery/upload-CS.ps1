@@ -87,7 +87,7 @@ if($ThemeDir -and (Test-Path $ThemeDir)){
     
     Write-Output "AzCopy $StorageAccount"
     $token = $env:AzureBlobToken
-    & "${env:Utils}\AzCopy10\AzCopy" sync $ThemeDir https://$($StorageAccount).blob.core.windows.net/$BlobContainerName/$($ThemeBlobPath)$token --delete-destination=true #/DestKey:$accountKey /S
+    & "${env:Utils}\AzCopy10\AzCopy" sync $ThemeDir https://$($StorageAccount).blob.core.windows.net/$BlobContainerName/$($ThemeBlobPath)$token --delete-destination=true --include="*" #/DestKey:$accountKey /S
     if($LASTEXITCODE -ne 0)
     {
         exit 1
