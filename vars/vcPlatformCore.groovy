@@ -48,7 +48,11 @@ def call(body) {
                     
                     checkout scm
                     
-					def changelog = gitChangelog from: [type: 'REF', value: '3.0.0-rc.5.248'], to: [type: 'REF', value: 'dev-3.0.0'], returnType: 'STRING', template: '''# Changelog
+                    if(env.BRANCH_NAME == 'release/3.0.0')
+                    {
+                        def commitId = pwsh(returnStdout: true, script: 'git rev-parse HEAD').trim()
+                        def prevCommitId = pwsh(returnStdout: true, script: 'git rev-parse HEAD^1').trim()
+					def changelog = gitChangelog from: [type: 'REF', value: prevCommitId], to: [type: 'REF', value: commitId], returnType: 'STRING', template: '''# Changelog
 
 Changelog for {{ownerName}} {{repoName}}.
 
@@ -81,14 +85,15 @@ Changelog for {{ownerName}} {{repoName}}.
  {{/issues}}
 {{/tags}}'''
                     echo changelog
+                    }
                 }
 
-                // if(!Utilities.areThereCodeChanges(this))
-                // {
-                //     echo "There are no Code Changes"
-                //     currentBuild.result = 'SUCCESS'
-                //     return 0;
-                // }
+                if(!Utilities.areThereCodeChanges(this))
+                {
+                    echo "There are no Code Changes"
+                    currentBuild.result = 'SUCCESS'
+                    return 0;
+                }
 
                 stage('Build'){
                     
