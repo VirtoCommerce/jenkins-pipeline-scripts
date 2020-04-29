@@ -450,6 +450,7 @@ pipeline {
                     def platformPort = Utilities.getPlatformPort(this)
                     def storefrontPort = Utilities.getStorefrontPort(this)
                     def sqlPort = Utilities.getSqlPort(this)
+                    def msg = "Storefront:\nhttp://ci.virtocommerce.com:${storefrontPort}\nPlatform:\nhttp://ci.virtocommerce.com:${platformPort}"
                     withEnv(["PLATFORM_DOCKER_TAG=3.0-preview", "STOREFRONT_DOCKER_TAG=latest", "DOCKER_PLATFORM_PORT=${platformPort}", "DOCKER_STOREFRONT_PORT=${storefrontPort}", "DOCKER_SQL_PORT=${sqlPort}", "COMPOSE_PROJECT_NAME=${env.BUILD_TAG}"]) {
                         bat "docker-compose down -v"
                     }
