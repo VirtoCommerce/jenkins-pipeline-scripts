@@ -52,7 +52,7 @@ def call(body) {
                     {
                         def commitId = pwsh(returnStdout: true, script: 'git rev-parse HEAD').trim()
                         def prevCommitId = pwsh(returnStdout: true, script: 'git rev-parse HEAD^1').trim()
-					def changelog = gitChangelog from: [type: 'COMMIT', value: prevCommitId], to: [type: 'COMMIT', value: commitId], returnType: 'STRING', template: '''# Changelog
+					def changelog = gitChangelog from: [type: 'REF', value: "3.0.0-rc.5.248"], to: [type: 'REF', value: "3.0.0-rc.5.250"], returnType: 'STRING', template: '''# Changelog
 
 Changelog for {{ownerName}} {{repoName}}.
 
