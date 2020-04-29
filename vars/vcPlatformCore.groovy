@@ -48,39 +48,39 @@ def call(body) {
                     
                     checkout scm
                     
-// 					def changelog = gitChangelog from: [type: 'REF', value: '3.0.0-rc.5.248'], to: [type: 'REF', value: 'dev-3.0.0'], returnType: 'STRING', template: '''# Changelog
+					def changelog = gitChangelog from: [type: 'REF', value: '3.0.0-rc.5.248'], to: [type: 'REF', value: 'dev-3.0.0'], returnType: 'STRING', template: '''# Changelog
 
-// Changelog for {{ownerName}} {{repoName}}.
+Changelog for {{ownerName}} {{repoName}}.
 
-// {{#tags}}
-// ## {{name}}
-//  {{#issues}}
-//   {{#hasIssue}}
-//    {{#hasLink}}
-// ### {{name}} [{{issue}}]({{link}}) {{title}} {{#hasIssueType}} *{{issueType}}* {{/hasIssueType}} {{#hasLabels}} {{#labels}} *{{.}}* {{/labels}} {{/hasLabels}}
-//    {{/hasLink}}
-//    {{^hasLink}}
-// ### {{name}} {{issue}} {{title}} {{#hasIssueType}} *{{issueType}}* {{/hasIssueType}} {{#hasLabels}} {{#labels}} *{{.}}* {{/labels}} {{/hasLabels}}
-//    {{/hasLink}}
-//   {{/hasIssue}}
-//   {{^hasIssue}}
-// ### {{name}}
-//   {{/hasIssue}}
+{{#tags}}
+## {{name}}
+ {{#issues}}
+  {{#hasIssue}}
+   {{#hasLink}}
+### {{name}} [{{issue}}]({{link}}) {{title}} {{#hasIssueType}} *{{issueType}}* {{/hasIssueType}} {{#hasLabels}} {{#labels}} *{{.}}* {{/labels}} {{/hasLabels}}
+   {{/hasLink}}
+   {{^hasLink}}
+### {{name}} {{issue}} {{title}} {{#hasIssueType}} *{{issueType}}* {{/hasIssueType}} {{#hasLabels}} {{#labels}} *{{.}}* {{/labels}} {{/hasLabels}}
+   {{/hasLink}}
+  {{/hasIssue}}
+  {{^hasIssue}}
+### {{name}}
+  {{/hasIssue}}
 
-//   {{#commits}}
-// **{{{messageTitle}}}**
+  {{#commits}}
+**{{{messageTitle}}}**
 
-// {{#messageBodyItems}}
-//  * {{.}} 
-// {{/messageBodyItems}}
+{{#messageBodyItems}}
+ * {{.}} 
+{{/messageBodyItems}}
 
-// [{{hash}}](https://github.com/{{ownerName}}/{{repoName}}/commit/{{hash}}) {{authorName}} *{{commitTime}}*
+[{{hash}}](https://github.com/{{ownerName}}/{{repoName}}/commit/{{hash}}) {{authorName}} *{{commitTime}}*
 
-//   {{/commits}}
+  {{/commits}}
 
-//  {{/issues}}
-// {{/tags}}'''
-//                     echo changelog
+ {{/issues}}
+{{/tags}}'''
+                    echo changelog
                 }
 
                 // if(!Utilities.areThereCodeChanges(this))
