@@ -80,7 +80,7 @@ pipeline {
                     
                     def userInputBranch
                     echo SETTINGS['branch']
-                    echo SETTINGS['branch'].getClass()
+                    echo SETTINGS['branch'].getClass().getSimpleName()
                     if(SETTINGS['branch'].size() > 1)
                     {
                         userInputBranch = input message: "Select Branch", parameters: [
