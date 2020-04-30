@@ -76,7 +76,7 @@ pipeline {
                         choice(name: 'Environments', choices: envChoices)
                     ]
                     ENV_NAME = userEnvInput
-                    SETTINGS.setEnvironment(ENV_NAME)
+                    SETTINGS.setBranch(ENV_NAME)
                     
                     def userInputBranch
                     if(SETTINGS['branch'].size() > 1)
