@@ -79,17 +79,16 @@ pipeline {
                     SETTINGS.setBranch(ENV_NAME)
                     
                     def userInputBranch
-                    echo SETTINGS['branch']
-                    echo SETTINGS['branch'].getClass().getSimpleName()
-                    if(SETTINGS['branch'].size() > 1)
+                    def branchesArr = SETTINGS['branch'] as String[]
+                    if(branchesArr.size() > 1)
                     {
                         userInputBranch = input message: "Select Branch", parameters: [
-                            choice(name: 'Branch', choices: SETTINGS['branch'].join("\n"))
+                            choice(name: 'Branch', choices: branchesArr.join("\n"))
                         ]
                     }
                     else
                     {
-                        userInputBranch = SETTINGS['branch'].first()
+                        userInputBranch = branchesArr.first()
                     }
 
                     BRANCH_NAME = userInputBranch
