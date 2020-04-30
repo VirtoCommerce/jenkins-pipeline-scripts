@@ -156,7 +156,6 @@ pipeline {
             {
                 script
                 {
-                    UPDATE_CS = false
                     stage('Create Test Environment')
                     {
                         timestamps
