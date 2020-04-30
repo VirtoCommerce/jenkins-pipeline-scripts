@@ -79,6 +79,8 @@ pipeline {
                     SETTINGS.setBranch(ENV_NAME)
                     
                     def userInputBranch
+                    echo SETTINGS['branch']
+                    echo SETTINGS['branch'].getClass()
                     if(SETTINGS['branch'].size() > 1)
                     {
                         userInputBranch = input message: "Select Branch", parameters: [
