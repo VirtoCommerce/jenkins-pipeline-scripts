@@ -58,13 +58,11 @@ pipeline {
                     SETTINGS = new Settings(settingsFileContent)
                     def regionChoices = SETTINGS.getRegions().join("\n")
                     def buildOrder = Utilities.getNextBuildOrder(this)
-                    def userInput = input message: "Region and Branch", parameters: [
-                        choice(name: 'Region', choices: regionChoices),
-                        choice(name: 'Branch', choices: "dev\nmaster\ndev-3.0.0\nrelease_3.0.0\nfeature_migrate-to-vc30")
+                    def userInputRegion = input message: "Select Region", parameters: [
+                        choice(name: 'Region', choices: regionChoices)
                     ]
                     PROJECT_TYPE = 'SOLUTION'
-                    REGION = userInput['Region']
-                    BRANCH_NAME = userInput['Branch']
+                    REGION = userInputRegion
                     UPDATE_CS = true
                     SETTINGS.setRegion(REGION)
 
@@ -74,6 +72,20 @@ pipeline {
                     ]
                     ENV_NAME = userEnvInput
                     SETTINGS.setEnvironment(ENV_NAME)
+                    
+                    def userInputBranch
+                    if(SETTINGS['branch'].size() > 1)
+                    {
+                        userInputBranch = input message: "Select Branch", parameters: [
+                            choice(name: 'Branch', choices: SETTINGS['branch'].join("\n"))
+                        ]
+                    }
+                    else
+                    {
+                        userInputBranch = SETTINGS['branch'].first()
+                    }
+
+                    BRANCH_NAME = userInputBranch
                     echo "Vars: REGION - ${REGION}, UPDATE_CS - ${UPDATE_CS}, ENV_NAME - ${ENV_NAME}, BRANCH_NAME - ${BRANCH_NAME}"
                     def msgToHook = "Delivery Parameters: ${REGION}<br/>Environment ${ENV_NAME}<br/>Branch Name: ${BRANCH_NAME}<br/>${UPDATE_CS ? "Update Solution<br/>":""}"
                     Utilities.notifyBuildStatus(this, env.TEAMS_HOOK, msgToHook, 'STARTED')
