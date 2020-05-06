@@ -235,9 +235,15 @@ pipeline
                         }
                     }
                     
-                    stage('Awaiting Proceed'){
-                        def message = "Platform url: ${SETTINGS["platformContainerUrl"]}:${DOCKER_PLATFORM_PORT}\nStorefront: ${SETTINGS["storefrontContainerUrl"]}:${DOCKER_STOREFRONT_PORT}"
-                        input(message)
+                    stage('Awaiting Proceed')
+                    {
+                        timestamps
+                        {  
+                            def platformPort = Utilities.getPlatformPort(this)
+                            def storefrontPort = Utilities.getStorefrontPort(this)
+                            def msg = "Storefront:\nhttp://ci.virtocommerce.com:${storefrontPort}\nPlatform:\nhttp://ci.virtocommerce.com:${platformPort}"
+                            input message: msg
+                        }
                     }
                 }
             }
