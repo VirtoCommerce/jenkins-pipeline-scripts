@@ -83,7 +83,7 @@ pipeline
                         ]
                     SRC_BRANCH = userInputBranch['Source Branch']
                     TRG_BRANCH = userInputBranch['Target Branch']
-                    echo "Vars: REGION - ${REGION}, UPDATE_CS - ${UPDATE_CS}, ENV_NAME - ${ENV_NAME}, SRC_BRANCH - ${SRC_BRANCH}, TRG_BRANCH - ${TRG_BRANCH}"
+                    echo "Vars: REGION - ${REGION}, DELIVERY_AZURE - ${DELIVERY_AZURE}, ENV_NAME - ${ENV_NAME}, SRC_BRANCH - ${SRC_BRANCH}, TRG_BRANCH - ${TRG_BRANCH}"
                 }
             }
         }
