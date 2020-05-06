@@ -1,5 +1,10 @@
-import jobs.scripts.*
 import groovy.json.JsonSlurperClassic
+
+def globalLib = library('global-shared-lib').com.test
+def Utilities = globalLib.Utilities
+def Packaging = globalLib.Packaging
+def Modules = globalLib.Modules
+def Settings = globalLib.Settings
 
 def SETTINGS
 
@@ -10,7 +15,6 @@ def DELIVERY_AZURE = false
 def DOCKER_SQL_PORT
 def DOCKER_PLATFORM_PORT
 def DOCKER_STOREFRONT_PORT
-def DOCKER_PREFIX
 def DOCKER_TAG
 
 def STOREFRONT_INSTALL
@@ -34,10 +38,10 @@ pipeline
                 {
                     checkout scm
                     configFileProvider([configFile(fileId: 'qaenv', variable: 'SETTINGS_FILE')]) {
-                        SETTINGS = new Settings(readFile(SETTINGS_FILE))
+                        SETTINGS = Settings.new(readFile(SETTINGS_FILE))
                     }
-                    SETTINGS.setRegion("qaenv")
-                    SETTINGS.setEnvironment("master")
+                    SETTINGS.setProject("qaenv")
+                    SETTINGS.setBranch("master")
                     def branches = Utilities.getSubfolders("${env.SOLUTION_FOLDER}\\${SETTINGS['prefix']}").join("\n")
                     def userInput = input message: "Select Branch", parameters: 
                     [
@@ -88,29 +92,32 @@ pipeline
                     {
                         timestamps 
                         { 
-                            // Start docker environment	
-		                    def composeFolder = "${env.WORKSPACE}@libs\\${SETTINGS['composeDir']}"
-                            dir(composeFolder)
+                            DOCKER_SQL_PORT = Utilities.getSqlPort(this)
+                            DOCKER_PLATFORM_PORT = Utilities.getPlatformPort(this)
+                            DOCKER_STOREFRONT_PORT = Utilities.getStorefrontPort(this)
+                            switch(BASE_BRANCH)
                             {
-                                DOCKER_SQL_PORT = Utilities.getSqlPort(this)
-                                DOCKER_PLATFORM_PORT = Utilities.getPlatformPort(this)
-                                DOCKER_STOREFRONT_PORT = Utilities.getStorefrontPort(this)
-                                DOCKER_PREFIX = 'qaenv'
-                                switch(BASE_BRANCH)
-                                {
-                                    case 'dev':
-                                    DOCKER_TAG = 'dev-branch'
-                                    break
-                                    case 'master':
-                                    DOCKER_TAG = 'latest'
-                                    break
-                                }
-
-                                echo "DOCKER_PLATFORM_PORT=${DOCKER_PLATFORM_PORT}, DOCKER_STOREFRONT_PORT=${DOCKER_STOREFRONT_PORT}, DOCKER_SQL_PORT=${DOCKER_SQL_PORT}"
+                                case 'dev':
+                                DOCKER_TAG = 'dev-branch'
+                                break
+                                case 'master':
+                                DOCKER_TAG = 'latest'
+                                break
+                                case 'dev-3.0.0':
+                                DOCKER_TAG = '3.0-dev'
+                                break
+                                case 'release_3.0.0':
+                                DOCKER_TAG = '3.0-preview'
+                                break
+                            }
+                            // Start docker environment	
+                            dir(Utilities.getComposeFolderV3(this))
+                            {
+                                echo "DOCKER_TAG=${DOCKER_TAG}, DOCKER_PLATFORM_PORT=${DOCKER_PLATFORM_PORT}, DOCKER_STOREFRONT_PORT=${DOCKER_STOREFRONT_PORT}, DOCKER_SQL_PORT=${DOCKER_SQL_PORT}"
                                 // 1. stop containers
                                 // 2. remove instances including database
                                 // 3. start up new containers
-                                withEnv(["DOCKER_TAG=${DOCKER_TAG}", "DOCKER_PREFIX=${DOCKER_PREFIX}", "DOCKER_PLATFORM_PORT=${DOCKER_PLATFORM_PORT}", "DOCKER_STOREFRONT_PORT=${DOCKER_STOREFRONT_PORT}", "DOCKER_SQL_PORT=${DOCKER_SQL_PORT}", "COMPOSE_PROJECT_NAME=${env.BUILD_TAG}"])
+                                withEnv(["DOCKER_TAG=${DOCKER_TAG}", "DOCKER_PLATFORM_PORT=${DOCKER_PLATFORM_PORT}", "DOCKER_STOREFRONT_PORT=${DOCKER_STOREFRONT_PORT}", "DOCKER_SQL_PORT=${DOCKER_SQL_PORT}", "COMPOSE_PROJECT_NAME=${env.BUILD_TAG}"])
                                 {
                                     bat "docker-compose stop"
                                     bat "docker-compose rm -f -v"
@@ -126,14 +133,14 @@ pipeline
                             def platformContainer = Utilities.getPlatformContainer(this)
 
                             // install modules
-                            Utilities.runSharedPS(this, 'qaenv/install-modules.ps1', "-ApiUrl \"${Utilities.getPlatformHost(this)}\" -PlatformContainer ${platformContainer} -ModulesDir ${env.WORKSPACE}\\CS\\modules")
+                            Utilities.runPS(this, 'docker_v3/setup-modulesFromDir.ps1', "-PlatformContainer ${platformContainer} -ModulesDir ${env.WORKSPACE}\\CS\\modules -Verbose -Debug")
                         }
                     }
                     stage('Install Sample Data')
                     {
                         timestamps
                         {
-                            Utilities.runSharedPS(this, "vc-setup-sampledata.ps1", "-apiurl \"http://localhost:${DOCKER_PLATFORM_PORT}\"")
+                            Utilities.runPS(this, "docker_v3/vc-setup-sampledata.ps1", "-ApiUrl ${Utilities.getPlatformCoreHost(this)} -Verbose -Debug")
                         }
                     }
                     stage('Storefront Install')
@@ -196,13 +203,11 @@ pipeline
         {
             script
             {
-                def composeFolder = "${env.WORKSPACE}@libs\\${SETTINGS["composeDir"]}"
-                dir(composeFolder)
+                dir(Utilities.getComposeFolderV3(this))
                 {
-                    withEnv(["DOCKER_TAG=${DOCKER_TAG}", "DOCKER_PREFIX=${DOCKER_PREFIX}", "DOCKER_PLATFORM_PORT=${DOCKER_PLATFORM_PORT}", "DOCKER_STOREFRONT_PORT=${DOCKER_STOREFRONT_PORT}", "DOCKER_SQL_PORT=${DOCKER_SQL_PORT}", "COMPOSE_PROJECT_NAME=${env.BUILD_TAG}"]){
+                    withEnv(["DOCKER_TAG=${DOCKER_TAG}", "DOCKER_PLATFORM_PORT=${DOCKER_PLATFORM_PORT}", "DOCKER_STOREFRONT_PORT=${DOCKER_STOREFRONT_PORT}", "DOCKER_SQL_PORT=${DOCKER_SQL_PORT}", "COMPOSE_PROJECT_NAME=${env.BUILD_TAG}"]){
                         bat "docker-compose down -v"
                     }
-                    bat "docker image prune -f"
                 }
             }
         }
