@@ -165,7 +165,8 @@ pipeline
                         }
                     }
                     
-                    stage('Awaiting Proceed'){
+                    stage('Awaiting Proceed')
+                    {
                         def message = "Platform url: ${SETTINGS["platformContainerUrl"]}:${DOCKER_PLATFORM_PORT}\nStorefront: ${SETTINGS["storefrontContainerUrl"]}:${DOCKER_STOREFRONT_PORT}"
                         input(message)
                     }
