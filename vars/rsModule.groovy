@@ -27,12 +27,7 @@ def call(body) {
             try {
                 stage('Checkout'){
                     deleteDir()
-                    checkout changelog: false, poll: false, scm: [
-                        $class: 'GitSCM', branches: [[name: env.BRANCH_NAME]],
-                        doGenerateSubmoduleConfigurations: false, 
-                        extensions: [
-                            [$class: 'CloneOption', noTags: false, reference: '', shallow: false], [$class: 'LocalBranch']], submoduleCfg: [], userRemoteConfigs: [[credentialsId: '38b768a3-7d9c-4203-9389-d6c6d8d6aff4']]
-                            ]
+                    checkout scm
                 }
 
                 stage('Build')
