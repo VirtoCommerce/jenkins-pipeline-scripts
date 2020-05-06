@@ -190,6 +190,7 @@ pipeline
                         timestamps
                         {
                             def platformContainer = Utilities.getPlatformContainer(this)
+                            def platformHost = Utilities.getPlatformCoreHost(this)
 
                             // install modules
                             Utilities.runPS(this, 'docker_v3/setup-modulesFromDir.ps1', "-PlatformContainer ${platformContainer} -ModulesDir ${env.WORKSPACE}\\CS\\modules -Verbose -Debug")
