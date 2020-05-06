@@ -180,8 +180,6 @@ pipeline
                                 // 3. start up new containers
                                 withEnv(["PLATFORM_DOCKER_TAG=${PLATFORM_DOCKER_TAG}", "STOREFRONT_DOCKER_TAG=${STOREFRONT_DOCKER_TAG}", "DOCKER_PLATFORM_PORT=${DOCKER_PLATFORM_PORT}", "DOCKER_STOREFRONT_PORT=${DOCKER_STOREFRONT_PORT}", "DOCKER_SQL_PORT=${DOCKER_SQL_PORT}", "COMPOSE_PROJECT_NAME=${env.BUILD_TAG}"])
                                 {
-                                    bat "docker-compose stop"
-                                    bat "docker-compose rm -f -v"
                                     bat "docker-compose up -d"
                                 }
                             }			
@@ -195,6 +193,7 @@ pipeline
 
                             // install modules
                             Utilities.runPS(this, 'docker_v3/setup-modulesFromDir.ps1', "-PlatformContainer ${platformContainer} -ModulesDir ${env.WORKSPACE}\\CS\\modules -Verbose -Debug")
+                            Utilities.runPS(this, "docker_v3/vc-check-installed-modules.ps1", "-ApiUrl ${platformHost} -Verbose -Debug")
                         }
                     }
                     stage('Install Sample Data')
