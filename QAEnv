@@ -23,7 +23,6 @@ pipeline
     {
         timestamps()
     }
-
     stages
     {
         stage("User Input")
