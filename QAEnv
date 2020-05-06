@@ -223,14 +223,15 @@ pipeline
                     {
                         timestamps 
                         {
-                            //def storefrontContainer = Utilities.getStorefrontContainer(this)
-                            def platformContainer = Utilities.getPlatformContainer(this)
-                            def themeFolder = "${env.WORKSPACE}\\CS\\theme"
-                            //Utilities.runSharedPS(this, "vc-install-theme.ps1", "-themeZip \"${themeFolder}\" -platformContainer ${platformContainer}")
-                            bat "docker exec ${platformContainer} powershell -Command \"Remove-Item C:\\vc-platform\\App_Data\\cms-content\\Themes -Recurse -Force\""
-                            bat "docker exec ${platformContainer} powershell -Command \"mkdir tmp\""
-                            bat "docker cp ${themeFolder} ${platformContainer}:/tmp/Themes"
-                            bat "docker exec ${platformContainer} powershell -Command \"Copy-Item -Path C:\\tmp\\Themes -Destination C:\\vc-platform\\App_Data\\cms-content\\Themes -Recurse -Force\""
+                            // //def storefrontContainer = Utilities.getStorefrontContainer(this)
+                            // def platformContainer = Utilities.getPlatformContainer(this)
+                            // def themeFolder = "${env.WORKSPACE}\\CS\\theme"
+                            // //Utilities.runSharedPS(this, "vc-install-theme.ps1", "-themeZip \"${themeFolder}\" -platformContainer ${platformContainer}")
+                            // bat "docker exec ${platformContainer} powershell -Command \"Remove-Item C:\\vc-platform\\App_Data\\cms-content\\Themes -Recurse -Force\""
+                            // bat "docker exec ${platformContainer} powershell -Command \"mkdir tmp\""
+                            // bat "docker cp ${themeFolder} ${platformContainer}:/tmp/Themes"
+                            // bat "docker exec ${platformContainer} powershell -Command \"Copy-Item -Path C:\\tmp\\Themes -Destination C:\\vc-platform\\App_Data\\cms-content\\Themes -Recurse -Force\""
+                            Utilities.runPS(this, "docker_v3/vc-theme-install.ps1", "-ThemePath ${env.WORKSPACE}\\CS\\theme -StorefrontContainer ${Utilities.getStorefrontContainer(this)}")
                         }
                     }
                     
