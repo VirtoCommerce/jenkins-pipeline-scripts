@@ -65,17 +65,15 @@ pipeline
                     //     choice(name: 'Region', choices: regionChoices)
                     // ]
                     // PROJECT_TYPE = 'SOLUTION'
-                    // REGION = userInputRegion
-                    // SETTINGS.setProject(REGION)
-                    SETTINGS.setProject('demo3')
+                    REGION = "demo3"//userInputRegion
+                    SETTINGS.setProject(REGION)
 
                     // def envChoices = SETTINGS.getBranches().join("\n")
                     // def userEnvInput = input message: "Select Environment", parameters: [
                     //     choice(name: 'Environments', choices: envChoices)
                     // ]
-                    // ENV_NAME = userEnvInput
-                    // SETTINGS.setBranch(ENV_NAME)
-                    SETTINGS.setBranch('DEV')
+                    ENV_NAME = "DEV"//userEnvInput
+                    SETTINGS.setBranch(ENV_NAME)
                     
                     def srcBranches = SETTINGS['branch'] as String[]
                     def targetBranches = Utilities.getSubfolders("${env.SOLUTION_FOLDER}\\vc").join("\n")
