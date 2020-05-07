@@ -59,21 +59,23 @@ pipeline
                         settingsFileContent = readFile(SETTINGS_FILE)
                     }
                     SETTINGS = Settings.new(settingsFileContent)
-                    def regionChoices = SETTINGS.getProjects().join("\n")
-                    def buildOrder = Utilities.getNextBuildOrder(this)
-                    def userInputRegion = input message: "Select Region", parameters: [
-                        choice(name: 'Region', choices: regionChoices)
-                    ]
-                    PROJECT_TYPE = 'SOLUTION'
-                    REGION = userInputRegion
-                    SETTINGS.setProject(REGION)
+                    // def regionChoices = SETTINGS.getProjects().join("\n")
+                    // def buildOrder = Utilities.getNextBuildOrder(this)
+                    // def userInputRegion = input message: "Select Region", parameters: [
+                    //     choice(name: 'Region', choices: regionChoices)
+                    // ]
+                    // PROJECT_TYPE = 'SOLUTION'
+                    // REGION = userInputRegion
+                    // SETTINGS.setProject(REGION)
+                    SETTINGS.setProject('demo3')
 
-                    def envChoices = SETTINGS.getBranches().join("\n")
-                    def userEnvInput = input message: "Select Environment", parameters: [
-                        choice(name: 'Environments', choices: envChoices)
-                    ]
-                    ENV_NAME = userEnvInput
-                    SETTINGS.setBranch(ENV_NAME)
+                    // def envChoices = SETTINGS.getBranches().join("\n")
+                    // def userEnvInput = input message: "Select Environment", parameters: [
+                    //     choice(name: 'Environments', choices: envChoices)
+                    // ]
+                    // ENV_NAME = userEnvInput
+                    // SETTINGS.setBranch(ENV_NAME)
+                    SETTINGS.setBranch('DEV')
                     
                     def srcBranches = SETTINGS['branch'] as String[]
                     def targetBranches = Utilities.getSubfolders("${env.SOLUTION_FOLDER}\\vc").join("\n")
