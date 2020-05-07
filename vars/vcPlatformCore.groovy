@@ -1,6 +1,7 @@
 def Modules
 def Packaging
 def Utilities
+def GithubRelease
 
 def call(body) {
 	// evaluate the body block, and collect configuration into the object
@@ -18,6 +19,7 @@ def call(body) {
 		Utilities = globalLib.Utilities
 		Packaging = globalLib.Packaging
 		Modules = globalLib.Modules
+        GithubRelease = globalLib.GithubRelease
 
         def escapedBranch = env.BRANCH_NAME.replaceAll('/', '_')
         def repoName = Utilities.getRepoName(this)
@@ -47,6 +49,16 @@ def call(body) {
                     deleteDir()
                     
                     checkout scm
+
+                    try
+                    {
+                        def release = GithubRelease.getLatestGithubReleaseRegexp(this, Utilities.getRepoOrg(this), Utilities.getRepoName(this), /\d\.\d\.\d[\s]{0,1}[\w]*/, true)
+                        pwsh "git log --pretty=format:\"%s\" --since=\"${release.published_at}\""
+                    }
+                    catch(any)
+                    {
+                        echo any.getMessage()
+                    }
                     
 //                     if(env.BRANCH_NAME == 'release/3.0.0')
 //                     {

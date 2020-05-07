@@ -1,17 +1,24 @@
-import jobs.scripts.*
 import groovy.json.JsonSlurperClassic
+
+def globalLib = library('global-shared-lib').com.test
+def Utilities = globalLib.Utilities
+def Packaging = globalLib.Packaging
+def Modules = globalLib.Modules
+def Settings = globalLib.Settings
 
 def SETTINGS
 
-def BRANCH_NAME
-def BASE_BRANCH
+def TRG_BRANCH
+def SRC_BRANCH
 def DELIVERY_AZURE = false
 
 def DOCKER_SQL_PORT
 def DOCKER_PLATFORM_PORT
 def DOCKER_STOREFRONT_PORT
-def DOCKER_PREFIX
-def DOCKER_TAG
+
+def PLATFORM_DOCKER_TAG
+def STOREFRONT_DOCKER_TAG
+
 def STOREFRONT_INSTALL
 
 pipeline
@@ -31,22 +38,52 @@ pipeline
                 script
                 {
                     checkout scm
-                    configFileProvider([configFile(fileId: 'qaenv', variable: 'SETTINGS_FILE')]) {
-                        SETTINGS = new Settings(readFile(SETTINGS_FILE))
+                    // configFileProvider([configFile(fileId: 'qaenv', variable: 'SETTINGS_FILE')]) {
+                    //     SETTINGS = Settings.new(readFile(SETTINGS_FILE))
+                    // }
+                    // SETTINGS.setProject("qaenv")
+                    // SETTINGS.setBranch("master")
+                    // def branches = Utilities.getSubfolders("${env.SOLUTION_FOLDER}\\${SETTINGS['prefix']}").join("\n")
+                    // def userInput = input message: "Select Branch", parameters: 
+                    // [
+                    //     choice(name:'Source Branch', choices:SETTINGS['sourceBranches']),
+                    //     choice(name:'Target Branch', choices:branches),
+                    //     booleanParam(defaultValue: false, name: 'Delviery to Azure')
+                    // ]
+                    // SRC_BRANCH = userInput["Source Branch"]
+                    // TRG_BRANCH = userInput["Target Branch"]
+                    // DELIVERY_AZURE = userInput["Delivery to Azure"]
+                    // echo "Source Branch: ${SRC_BRANCH}; Target Branch: ${TRG_BRANCH};"
+                    def settingsFileContent
+                    configFileProvider([configFile(fileId: 'delivery_settings', variable: 'SETTINGS_FILE')]) {
+                        settingsFileContent = readFile(SETTINGS_FILE)
                     }
-                    SETTINGS.setRegion("qaenv")
-                    SETTINGS.setEnvironment("master")
-                    def branches = Utilities.getSubfolders("${env.SOLUTION_FOLDER}\\${SETTINGS['prefix']}").join("\n")
-                    def userInput = input message: "Select Branch", parameters: 
-                    [
-                        choice(name:'Source Branch', choices:SETTINGS['sourceBranches']),
-                        choice(name:'Target Branch', choices:branches),
-                        booleanParam(defaultValue: false, name: 'Delviery to Azure')
-                    ]
-                    BASE_BRANCH = userInput["Source Branch"]
-                    BRANCH_NAME = userInput["Target Branch"]
-                    DELIVERY_AZURE = userInput["Delivery to Azure"]
-                    echo "Source Branch: ${BASE_BRANCH}; Target Branch: ${BRANCH_NAME};"
+                    SETTINGS = Settings.new(settingsFileContent)
+                    // def regionChoices = SETTINGS.getProjects().join("\n")
+                    // def buildOrder = Utilities.getNextBuildOrder(this)
+                    // def userInputRegion = input message: "Select Region", parameters: [
+                    //     choice(name: 'Region', choices: regionChoices)
+                    // ]
+                    // PROJECT_TYPE = 'SOLUTION'
+                    REGION = "demo3"//userInputRegion
+                    SETTINGS.setProject(REGION)
+
+                    // def envChoices = SETTINGS.getBranches().join("\n")
+                    // def userEnvInput = input message: "Select Environment", parameters: [
+                    //     choice(name: 'Environments', choices: envChoices)
+                    // ]
+                    ENV_NAME = "DEV"//userEnvInput
+                    SETTINGS.setBranch(ENV_NAME)
+                    
+                    def srcBranches = SETTINGS['branch'] as String[]
+                    def targetBranches = Utilities.getSubfolders("${env.SOLUTION_FOLDER}\\vc").join("\n")
+                    def userInputBranch = input message: "Select Branch", parameters: [
+                            choice(name:'Source Branch', choices:srcBranches.join("\n")),
+                            choice(name:'Target Branch', choices:targetBranches)
+                        ]
+                    SRC_BRANCH = userInputBranch['Source Branch']
+                    TRG_BRANCH = userInputBranch['Target Branch']
+                    echo "Vars: REGION - ${REGION}, DELIVERY_AZURE - ${DELIVERY_AZURE}, ENV_NAME - ${ENV_NAME}, SRC_BRANCH - ${SRC_BRANCH}, TRG_BRANCH - ${TRG_BRANCH}"
                 }
             }
         }
@@ -55,18 +92,44 @@ pipeline
             {
                 script
                 {
-                    def csSrc = "${env.SOLUTION_FOLDER}\\${SETTINGS['prefix']}\\${BASE_BRANCH}"
-                    def csTarget = "${env.SOLUTION_FOLDER}\\${SETTINGS['ptrfix']}\\${BRANCH_NAME}"
+                    def csSrc = "${env.SOLUTION_FOLDER}\\${SETTINGS['prefix']}\\${SRC_BRANCH}"
+                    def csTarget = "${env.SOLUTION_FOLDER}\\${SETTINGS['prefix']}\\${TRG_BRANCH}"
                     def modulesRoot = "${env.WORKSPACE}\\CS\\module"
                     powershell "Remove-Item -Path ${env.WORKSPACE}\\CS\\* -Recurse -Force -ErrorAction Continue"
                     powershell "Copy-Item -Path ${csSrc}\\module -Destination ${env.WORKSPACE}\\CS -Recurse -Force"
-                    def themeTargetBranchExists = new File("${csTarget}\\theme").exists()
-                    powershell "Copy-Item -Path ${themeTargetBranchExists ? csTarget : csSrc}\\theme -Destination ${env.WORKSPACE}\\CS -Recurse -Force"
-                    if(new File("${csTarget}\\storefront").exists())
+                    
+                    if(SRC_BRANCH == 'release_3.0.0' || SRC_BRANCH == 'dev-3.0.0')
                     {
-                        STOREFRONT_INSTALL = true
-                        powershell "Copy-Item -Path ${csTarget}\\storefront -Destination ${env.WORKSPACE}\\CS -Recurse -Force"
+                        def solutionRoot = "${env.SOLUTION_FOLDER}\\${SETTINGS['prefix']}"
+                        //theme
+                        def themeIncludeParam = ''
+                        def themeSrc = "${solutionRoot}\\${SETTINGS['themeBranch']}\\theme"
+                        def themeTargetBranchExists = new File("${solutionRoot}\\${TRG_BRANCH}\\theme").exists()
+                        if(themeTargetBranchExists)
+                        {
+                            themeSrc = "${solutionRoot}\\${TRG_BRANCH}\\theme"
+                        }
+                        def themeDst = "${env.WORKSPACE}\\CS\\theme"
+                        if(SETTINGS['themeName'] != '' && SETTINGS['themeName'] != null)
+                        {
+                            themeIncludeParam = "-Include ${SETTINGS['themeName'].join(',')}"
+                        }
+                        powershell script: "mkdir ${themeDst}"
+                        powershell script: "Copy-Item -Path ${themeSrc}\\* ${themeIncludeParam} -Destination ${themeDst} -Recurse -Force", label: "Copy Theme to Workspace"
+                        //storefront
+                        def storefrontSrc = "${solutionRoot}\\${SETTINGS['storefrontBranch']}"
+                        powershell script: "Copy-Item -Path ${storefrontSrc}\\* -Destination ${env.WORKSPACE}\\CS -Include storefront -Recurse -Force", label: "Copy Storefron to Workspace"
+                    } 
+                    else {
+                        def themeTargetBranchExists = new File("${csTarget}\\theme").exists()
+                        powershell "Copy-Item -Path ${themeTargetBranchExists ? csTarget : csSrc}\\theme -Destination ${env.WORKSPACE}\\CS -Recurse -Force"
+                        if(new File("${csTarget}\\storefront").exists())
+                        {
+                            STOREFRONT_INSTALL = true
+                            powershell "Copy-Item -Path ${csTarget}\\storefront -Destination ${env.WORKSPACE}\\CS -Recurse -Force"
+                        }
                     }
+                    
                     dir(modulesRoot)
                     {
                         powershell "Get-ChildItem ${csTarget}\\module -Name | Remove-Item -ErrorAction SilentlyContinue -Force -Recurse"
@@ -86,32 +149,37 @@ pipeline
                     {
                         timestamps 
                         { 
-                            // Start docker environment	
-		                    def composeFolder = "${env.WORKSPACE}@libs\\${SETTINGS['composeDir']}"
-                            dir(composeFolder)
+                            DOCKER_SQL_PORT = Utilities.getSqlPort(this)
+                            DOCKER_PLATFORM_PORT = Utilities.getPlatformPort(this)
+                            DOCKER_STOREFRONT_PORT = Utilities.getStorefrontPort(this)
+                            switch(SRC_BRANCH)
                             {
-                                DOCKER_SQL_PORT = Utilities.getSqlPort(this)
-                                DOCKER_PLATFORM_PORT = Utilities.getPlatformPort(this)
-                                DOCKER_STOREFRONT_PORT = Utilities.getStorefrontPort(this)
-                                DOCKER_PREFIX = 'qaenv'
-                                switch(BASE_BRANCH)
-                                {
-                                    case 'dev':
-                                    DOCKER_TAG = 'dev-branch'
-                                    break
-                                    case 'master':
-                                    DOCKER_TAG = 'latest'
-                                    break
-                                }
-
-                                echo "DOCKER_PLATFORM_PORT=${DOCKER_PLATFORM_PORT}, DOCKER_STOREFRONT_PORT=${DOCKER_STOREFRONT_PORT}, DOCKER_SQL_PORT=${DOCKER_SQL_PORT}"
+                                case 'dev':
+                                PLATFORM_DOCKER_TAG = 'dev-branch'
+                                STOREFRONT_DOCKER_TAG = 'dev-branch'
+                                break
+                                case 'master':
+                                PLATFORM_DOCKER_TAG = 'latest'
+                                STOREFRONT_DOCKER_TAG = 'latest'
+                                break
+                                case 'dev-3.0.0':
+                                PLATFORM_DOCKER_TAG = '3.0-dev'
+                                STOREFRONT_DOCKER_TAG = 'dev-branch'
+                                break
+                                case 'release_3.0.0':
+                                PLATFORM_DOCKER_TAG = '3.0-preview'
+                                STOREFRONT_DOCKER_TAG = 'latest'
+                                break
+                            }
+                            // Start docker environment	
+                            dir(Utilities.getComposeFolderV3(this))
+                            {
+                                echo "PLATFORM_DOCKER_TAG=${PLATFORM_DOCKER_TAG}, STOREFRONT_DOCKER_TAG=${STOREFRONT_DOCKER_TAG}, DOCKER_PLATFORM_PORT=${DOCKER_PLATFORM_PORT}, DOCKER_STOREFRONT_PORT=${DOCKER_STOREFRONT_PORT}, DOCKER_SQL_PORT=${DOCKER_SQL_PORT}"
                                 // 1. stop containers
                                 // 2. remove instances including database
                                 // 3. start up new containers
-                                withEnv(["DOCKER_TAG=${DOCKER_TAG}", "DOCKER_PREFIX=${DOCKER_PREFIX}", "DOCKER_PLATFORM_PORT=${DOCKER_PLATFORM_PORT}", "DOCKER_STOREFRONT_PORT=${DOCKER_STOREFRONT_PORT}", "DOCKER_SQL_PORT=${DOCKER_SQL_PORT}", "COMPOSE_PROJECT_NAME=${env.BUILD_TAG}"])
+                                withEnv(["PLATFORM_DOCKER_TAG=${PLATFORM_DOCKER_TAG}", "STOREFRONT_DOCKER_TAG=${STOREFRONT_DOCKER_TAG}", "DOCKER_PLATFORM_PORT=${DOCKER_PLATFORM_PORT}", "DOCKER_STOREFRONT_PORT=${DOCKER_STOREFRONT_PORT}", "DOCKER_SQL_PORT=${DOCKER_SQL_PORT}", "COMPOSE_PROJECT_NAME=${env.BUILD_TAG}"])
                                 {
-                                    bat "docker-compose stop"
-                                    bat "docker-compose rm -f -v"
                                     bat "docker-compose up -d"
                                 }
                             }			
@@ -122,16 +190,18 @@ pipeline
                         timestamps
                         {
                             def platformContainer = Utilities.getPlatformContainer(this)
+                            def platformHost = Utilities.getPlatformCoreHost(this)
 
                             // install modules
-                            Utilities.runSharedPS(this, 'qaenv/install-modules.ps1', "-ApiUrl \"${Utilities.getPlatformHost(this)}\" -PlatformContainer ${platformContainer} -ModulesDir ${env.WORKSPACE}\\CS\\modules")
+                            Utilities.runPS(this, 'docker_v3/setup-modulesFromDir.ps1', "-PlatformContainer ${platformContainer} -ModulesDir ${env.WORKSPACE}\\CS\\modules -Verbose -Debug")
+                            Utilities.runPS(this, "docker_v3/vc-check-installed-modules.ps1", "-ApiUrl ${platformHost} -Verbose -Debug")
                         }
                     }
                     stage('Install Sample Data')
                     {
                         timestamps
                         {
-                            Utilities.runSharedPS(this, "vc-setup-sampledata.ps1", "-apiurl \"http://localhost:${DOCKER_PLATFORM_PORT}\"")
+                            Utilities.runPS(this, "docker_v3/vc-setup-sampledata.ps1", "-ApiUrl ${Utilities.getPlatformCoreHost(this)} -Verbose -Debug")
                         }
                     }
                     stage('Storefront Install')
@@ -153,21 +223,27 @@ pipeline
                     {
                         timestamps 
                         {
-                            //def storefrontContainer = Utilities.getStorefrontContainer(this)
-                            def platformContainer = Utilities.getPlatformContainer(this)
-                            def themeFolder = "${env.WORKSPACE}\\CS\\theme"
-                            //Utilities.runSharedPS(this, "vc-install-theme.ps1", "-themeZip \"${themeFolder}\" -platformContainer ${platformContainer}")
-                            bat "docker exec ${platformContainer} powershell -Command \"Remove-Item C:\\vc-platform\\App_Data\\cms-content\\Themes -Recurse -Force\""
-                            bat "docker exec ${platformContainer} powershell -Command \"mkdir tmp\""
-                            bat "docker cp ${themeFolder} ${platformContainer}:/tmp/Themes"
-                            bat "docker exec ${platformContainer} powershell -Command \"Copy-Item -Path C:\\tmp\\Themes -Destination C:\\vc-platform\\App_Data\\cms-content\\Themes -Recurse -Force\""
+                            // //def storefrontContainer = Utilities.getStorefrontContainer(this)
+                            // def platformContainer = Utilities.getPlatformContainer(this)
+                            // def themeFolder = "${env.WORKSPACE}\\CS\\theme"
+                            // //Utilities.runSharedPS(this, "vc-install-theme.ps1", "-themeZip \"${themeFolder}\" -platformContainer ${platformContainer}")
+                            // bat "docker exec ${platformContainer} powershell -Command \"Remove-Item C:\\vc-platform\\App_Data\\cms-content\\Themes -Recurse -Force\""
+                            // bat "docker exec ${platformContainer} powershell -Command \"mkdir tmp\""
+                            // bat "docker cp ${themeFolder} ${platformContainer}:/tmp/Themes"
+                            // bat "docker exec ${platformContainer} powershell -Command \"Copy-Item -Path C:\\tmp\\Themes -Destination C:\\vc-platform\\App_Data\\cms-content\\Themes -Recurse -Force\""
+                            Utilities.runPS(this, "docker_v3/vc-theme-install.ps1", "-ThemePath ${env.WORKSPACE}\\CS\\theme -StorefrontContainer ${Utilities.getStorefrontContainer(this)}")
                         }
                     }
                     
                     stage('Awaiting Proceed')
                     {
-                        def message = "Platform url: ${SETTINGS["platformContainerUrl"]}:${DOCKER_PLATFORM_PORT}\nStorefront: ${SETTINGS["storefrontContainerUrl"]}:${DOCKER_STOREFRONT_PORT}"
-                        input(message)
+                        timestamps
+                        {  
+                            def platformPort = Utilities.getPlatformPort(this)
+                            def storefrontPort = Utilities.getStorefrontPort(this)
+                            def msg = "Storefront:\nhttp://ci.virtocommerce.com:${storefrontPort}\nPlatform:\nhttp://ci.virtocommerce.com:${platformPort}"
+                            input message: msg
+                        }
                     }
                 }
             }
@@ -195,13 +271,11 @@ pipeline
         {
             script
             {
-                def composeFolder = "${env.WORKSPACE}@libs\\${SETTINGS["composeDir"]}"
-                dir(composeFolder)
+                dir(Utilities.getComposeFolderV3(this))
                 {
-                    withEnv(["DOCKER_TAG=${DOCKER_TAG}", "DOCKER_PREFIX=${DOCKER_PREFIX}", "DOCKER_PLATFORM_PORT=${DOCKER_PLATFORM_PORT}", "DOCKER_STOREFRONT_PORT=${DOCKER_STOREFRONT_PORT}", "DOCKER_SQL_PORT=${DOCKER_SQL_PORT}", "COMPOSE_PROJECT_NAME=${env.BUILD_TAG}"]){
+                    withEnv(["PLATFORM_DOCKER_TAG=${PLATFORM_DOCKER_TAG}", "STOREFRONT_DOCKER_TAG=${STOREFRONT_DOCKER_TAG}", "DOCKER_PLATFORM_PORT=${DOCKER_PLATFORM_PORT}", "DOCKER_STOREFRONT_PORT=${DOCKER_STOREFRONT_PORT}", "DOCKER_SQL_PORT=${DOCKER_SQL_PORT}", "COMPOSE_PROJECT_NAME=${env.BUILD_TAG}"]){
                         bat "docker-compose down -v"
                     }
-                    bat "docker image prune -f"
                 }
             }
         }
