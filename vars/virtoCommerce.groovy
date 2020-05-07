@@ -11,7 +11,7 @@ import jobs.scripts.*
 	body.delegate = config
 	body()
 
-	node(slave)
+	node("slave")
 	{
 		properties([disableConcurrentBuilds()])
 	    def deployScript = 'VC-2AzureDEV.ps1'
