@@ -15,6 +15,7 @@ def DELIVERY_AZURE = false
 def DOCKER_SQL_PORT
 def DOCKER_PLATFORM_PORT
 def DOCKER_STOREFRONT_PORT
+
 def PLATFORM_DOCKER_TAG
 def STOREFRONT_DOCKER_TAG
 
@@ -28,7 +29,6 @@ pipeline
     {
         timestamps()
     }
-
     stages
     {
         stage("User Input")

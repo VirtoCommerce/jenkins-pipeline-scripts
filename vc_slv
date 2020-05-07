@@ -25,7 +25,7 @@ def deployScript = 'VC-2AzureDEV.ps1'
 
 pipeline
 {
-    agent any
+    agent {label 'slave'}
 
     options
     {
