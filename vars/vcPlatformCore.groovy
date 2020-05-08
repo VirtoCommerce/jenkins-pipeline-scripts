@@ -58,6 +58,7 @@ def call(body) {
                     }
                     catch(any)
                     {
+                        echo "exception:"
                         echo any.getMessage()
                     }
                     
