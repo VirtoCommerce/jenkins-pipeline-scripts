@@ -53,6 +53,7 @@ def call(body) {
                     try
                     {
                         def release = GithubRelease.getLatestGithubReleaseRegexp(this, Utilities.getOrgName(this), Utilities.getRepoName(this), /\d\.\d\.\d[\s]{0,1}[\w]*/, true)
+                        echo release.published_at
                         def releaseNotes = Utilities.getReleaseNotesFromCommits(this, release.published_at)
                         echo releaseNotes
                     }
