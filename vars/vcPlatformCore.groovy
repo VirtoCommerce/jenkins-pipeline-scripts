@@ -27,6 +27,7 @@ def call(body) {
         projectType = 'NETCORE2'
         def platformDockerTag = '3.0-preview'
         def storefrontDockerTag = 'latest'
+        def releaseNotes
         if(env.BRANCH_NAME == 'dev-3.0.0')
         {
             platformDockerTag = '3.0-dev'
@@ -54,7 +55,7 @@ def call(body) {
                     {
                         def release = GithubRelease.getLatestGithubReleaseRegexp(this, Utilities.getOrgName(this), Utilities.getRepoName(this), /\d\.\d\.\d[\s]{0,1}[\w]*/, true)
                         echo release.published_at
-                        def releaseNotes = Utilities.getReleaseNotesFromCommits(this, release.published_at)
+                        releaseNotes = Utilities.getReleaseNotesFromCommits(this, release.published_at)
                         echo releaseNotes
                     }
                     catch(any)
@@ -323,7 +324,8 @@ def call(body) {
                         }
 
                         def orgName = Utilities.getOrgName(this)
-                        def releaseResult = powershell script: "vc-build Release -GitHubUser ${orgName} -GitHubToken ${env.GITHUB_TOKEN} -PreRelease -skip Clean+Restore+Compile+Test", returnStatus: true
+                        def releaseNotesArg = releaseNotes == null ? "" : "-GithubReleaseDescription ${releaseNotes}"
+                        def releaseResult = powershell script: "vc-build Release -GitHubUser ${orgName} -GitHubToken ${env.GITHUB_TOKEN} ${releaseNotesArg} -PreRelease -skip Clean+Restore+Compile+Test", returnStatus: true
                         if(releaseResult == 422){
                             UNSTABLE_CAUSES.add("Release already exists on github")
                         } else if(releaseResult !=0 ) {
