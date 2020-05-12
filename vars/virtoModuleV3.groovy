@@ -1,6 +1,7 @@
 def Modules
 def Packaging
 def Utilities
+def GithubRelease
 
 def call(body) {
 	// evaluate the body block, and collect configuration into the object
@@ -18,6 +19,7 @@ def call(body) {
 		Utilities = globalLib.Utilities
 		Packaging = globalLib.Packaging
 		Modules = globalLib.Modules
+        GithubRelease = globalLib.GithubRelease
 
         def escapedBranch = env.BRANCH_NAME.replaceAll('/', '_')
         def repoName = Utilities.getRepoName(this)
