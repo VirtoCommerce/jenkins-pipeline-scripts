@@ -22,6 +22,7 @@ def call(body) {
         def escapedBranch = env.BRANCH_NAME.replaceAll('/', '_')
         def repoName = Utilities.getRepoName(this)
         def workspace = "S:\\Buildsv3\\${repoName}\\${escapedBranch}"
+        def releaseNotes
         projectType = 'NETCORE2'
         dir(workspace){
             // def SETTINGS
@@ -36,6 +37,19 @@ def call(body) {
                 stage('Checkout'){
                     deleteDir()
                     checkout scm
+
+                    try
+                    {
+                        def release = GithubRelease.getLatestGithubReleaseRegexp(this, Utilities.getOrgName(this), Utilities.getRepoName(this), /\d\.\d\.\d[\s]{0,1}[\w]*/, true)
+                        echo release.published_at
+                        releaseNotes = Utilities.getReleaseNotesFromCommits(this, release.published_at)
+                        echo releaseNotes
+                    }
+                    catch(any)
+                    {
+                        echo "exception:"
+                        echo any.getMessage()
+                    }
                 }
 
                 stage('Build'){
@@ -138,7 +152,8 @@ def call(body) {
                         }
                         
                         def orgName = Utilities.getOrgName(this)
-                        def releaseResult = powershell script: "vc-build Release -GitHubUser ${orgName} -GitHubToken ${env.GITHUB_TOKEN} -PreRelease -skip Clean+Restore+Compile+Test", returnStatus: true
+                        def releaseNotesArg = releaseNotes == null ? "" : "-GithubReleaseDescription ${releaseNotes}"
+                        def releaseResult = powershell script: "vc-build Release -GitHubUser ${orgName} -GitHubToken ${env.GITHUB_TOKEN} ${releaseNotesArg} -PreRelease -skip Clean+Restore+Compile+Test", returnStatus: true
                         if(releaseResult == 422){
                             UNSTABLE_CAUSES.add("Release already exists on github")
                         } else if(releaseResult !=0 ) {
