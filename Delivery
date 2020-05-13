@@ -144,7 +144,7 @@ pipeline {
             }
         }
 
-        stage("Docker Environment")
+        stage("Stash")
         {
             when
             {
@@ -156,18 +156,37 @@ pipeline {
             {
                 script
                 {
+                    stash includes: 'CS/**', name: 'solution'
+                }
+            }
+        }
+
+        stage("Docker Environment")
+        {
+            when
+            {
+                expression{
+                    return REGION == 'demo3'
+                }
+            }
+            agent {
+                label 'linux'
+            }
+            steps
+            {
+                script
+                {
                     stage('Create Test Environment')
                     {
                         timestamps
                         {
-                            dir(Utilities.getComposeFolderV3(this))
-                            {
-                                def platformPort = Utilities.getPlatformPort(this)
-                                def storefrontPort = Utilities.getStorefrontPort(this)
-                                def sqlPort = Utilities.getSqlPort(this)
-                                withEnv(["PLATFORM_DOCKER_TAG=3.0-preview", "STOREFRONT_DOCKER_TAG=latest", "DOCKER_PLATFORM_PORT=${platformPort}", "DOCKER_STOREFRONT_PORT=${storefrontPort}", "DOCKER_SQL_PORT=${sqlPort}", "COMPOSE_PROJECT_NAME=${env.BUILD_TAG}"]) {
-                                    bat "docker-compose up -d"
-                                }
+                            unstash 'solution'
+                            sh "cp ~/docker/docker-compose.yml ${env.WORKSPACE}"
+                            def platformPort = Utilities.getPlatformPort(this)
+                            def storefrontPort = Utilities.getStorefrontPort(this)
+                            def sqlPort = Utilities.getSqlPort(this)
+                            withEnv(["PLATFORM_DOCKER_TAG=3.0-preview", "STOREFRONT_DOCKER_TAG=3.0-preview", "DOCKER_PLATFORM_PORT=${platformPort}", "DOCKER_STOREFRONT_PORT=${storefrontPort}", "DOCKER_SQL_PORT=${sqlPort}", "COMPOSE_PROJECT_NAME=${env.BUILD_TAG}"]) {
+                                sh "docker-compose up -d"
                             }
                         }
                     }
@@ -209,33 +228,125 @@ pipeline {
                             }
                         }
                     }
-                    stage("E2E")
-                    {
-                        timestamps
-                        {
-                            def e2eDir = "${env.WORKSPACE}\\e2e"
-                            dir(e2eDir)
-                            {
-                                git changelog: false, credentialsId: '38b768a3-7d9c-4203-9389-d6c6d8d6aff4', poll: false, url: 'https://github.com/VirtoCommerce/vc-quality-gate-katalon.git'
-                                def e2eStatus = 'success'
-                                try{
-                                    powershell "${env.KATALON_DIR}\\katalonc.exe -projectPath=\"${e2eDir}\\platform_storefront.prj\" -testSuitePath=\"Test Suites/StorefrontPlatform\" -apiKey=\"${env.KATALON_API_KEY}\" -browserType=\"Chrome (headless)\" -g_StoreURL=\"http://localhost:${Utilities.getStorefrontPort(this)}\" -executionProfile=\"default\""
-                                }
-                                catch(any)
-                                {
-                                    echo any.getMessage()
-                                    e2eStatus = 'failed'
-                                }
-                                def platformPort = Utilities.getPlatformPort(this)
-                                def storefrontPort = Utilities.getStorefrontPort(this)
-                                def msg = "E2E ${e2eStatus}\nStorefront:\nhttp://ci.virtocommerce.com:${storefrontPort}\nPlatform:\nhttp://ci.virtocommerce.com:${platformPort}"
-                                input message: msg
-                            }
-                        }
-                    }
+                    // stage("E2E")
+                    // {
+                    //     timestamps
+                    //     {
+                    //         def e2eDir = "${env.WORKSPACE}\\e2e"
+                    //         dir(e2eDir)
+                    //         {
+                    //             git changelog: false, credentialsId: '38b768a3-7d9c-4203-9389-d6c6d8d6aff4', poll: false, url: 'https://github.com/VirtoCommerce/vc-quality-gate-katalon.git'
+                    //             def e2eStatus = 'success'
+                    //             try{
+                    //                 powershell "${env.KATALON_DIR}\\katalonc.exe -projectPath=\"${e2eDir}\\platform_storefront.prj\" -testSuitePath=\"Test Suites/StorefrontPlatform\" -apiKey=\"${env.KATALON_API_KEY}\" -browserType=\"Chrome (headless)\" -g_StoreURL=\"http://localhost:${Utilities.getStorefrontPort(this)}\" -executionProfile=\"default\""
+                    //             }
+                    //             catch(any)
+                    //             {
+                    //                 echo any.getMessage()
+                    //                 e2eStatus = 'failed'
+                    //             }
+                    //             def platformPort = Utilities.getPlatformPort(this)
+                    //             def storefrontPort = Utilities.getStorefrontPort(this)
+                    //             def msg = "E2E ${e2eStatus}\nStorefront:\nhttp://ci.virtocommerce.com:${storefrontPort}\nPlatform:\nhttp://ci.virtocommerce.com:${platformPort}"
+                    //             input message: msg
+                    //         }
+                    //     }
+                    // }
                 }
             }
         }
+        // stage("Docker Environment")
+        // {
+        //     when
+        //     {
+        //         expression{
+        //             return REGION == 'demo3'
+        //         }
+        //     }
+        //     steps
+        //     {
+        //         script
+        //         {
+        //             stage('Create Test Environment')
+        //             {
+        //                 timestamps
+        //                 {
+        //                     dir(Utilities.getComposeFolderV3(this))
+        //                     {
+        //                         def platformPort = Utilities.getPlatformPort(this)
+        //                         def storefrontPort = Utilities.getStorefrontPort(this)
+        //                         def sqlPort = Utilities.getSqlPort(this)
+        //                         withEnv(["PLATFORM_DOCKER_TAG=3.0-preview", "STOREFRONT_DOCKER_TAG=latest", "DOCKER_PLATFORM_PORT=${platformPort}", "DOCKER_STOREFRONT_PORT=${storefrontPort}", "DOCKER_SQL_PORT=${sqlPort}", "COMPOSE_PROJECT_NAME=${env.BUILD_TAG}"]) {
+        //                             bat "docker-compose up -d"
+        //                         }
+        //                     }
+        //                 }
+        //             }
+        //             stage('Install Modules')
+        //             {
+        //                 timestamps
+        //                 {
+        //                     def platformHost = Utilities.getPlatformCoreHost(this)
+        //                     def platformContainerId = Utilities.getPlatformContainer(this)
+        //                     echo "Platform Host: ${platformHost}"
+        //                     Utilities.runPS(this, "docker_v3/vc-setup-modules.ps1", "-ApiUrl ${platformHost} -NeedRestart -ContainerId ${platformContainerId} -Verbose -Debug")
+        //                     Utilities.runPS(this, "docker_v3/vc-check-installed-modules.ps1", "-ApiUrl ${platformHost} -Verbose -Debug")
+        //                 }
+        //             }
+        //             stage('Install Sample Data')
+        //             {
+        //                 timestamps
+        //                 {
+        //                     Utilities.runPS(this, "docker_v3/vc-setup-sampledata.ps1", "-ApiUrl ${Utilities.getPlatformCoreHost(this)} -Verbose -Debug")
+        //                 }
+        //             }
+        //             stage('Theme Install')
+        //             {
+        //                 timestamps
+        //                 {
+        //                     Utilities.runPS(this, "docker_v3/vc-theme-install.ps1", "-ThemePath ${env.WORKSPACE}\\CS\\theme -StorefrontContainer ${Utilities.getStorefrontContainer(this)}")
+        //                 }
+        //             }
+        //             stage("Swagger Schema Validation")
+        //             {
+        //                 timestamps
+        //                 {
+        //                     def swaggerSchemaPath = "${workspace}\\swaggerSchema${env.BUILD_NUMBER}.json"
+        //                     Utilities.runPS(this, "docker_v3/vc-get-swagger.ps1", "-ApiUrl ${Utilities.getPlatformCoreHost(this)} -OutFile ${swaggerSchemaPath} -Verbose -Debug")
+        //                     def swaggerResult = powershell script: "vc-build ValidateSwaggerSchema -SwaggerSchemaPath ${swaggerSchemaPath}", returnStatus: true
+        //                     if(swaggerResult != 0)
+        //                     {
+        //                         echo "Swagger Schema contains error"
+        //                     }
+        //                 }
+        //             }
+        //             stage("E2E")
+        //             {
+        //                 timestamps
+        //                 {
+        //                     def e2eDir = "${env.WORKSPACE}\\e2e"
+        //                     dir(e2eDir)
+        //                     {
+        //                         git changelog: false, credentialsId: '38b768a3-7d9c-4203-9389-d6c6d8d6aff4', poll: false, url: 'https://github.com/VirtoCommerce/vc-quality-gate-katalon.git'
+        //                         def e2eStatus = 'success'
+        //                         try{
+        //                             powershell "${env.KATALON_DIR}\\katalonc.exe -projectPath=\"${e2eDir}\\platform_storefront.prj\" -testSuitePath=\"Test Suites/StorefrontPlatform\" -apiKey=\"${env.KATALON_API_KEY}\" -browserType=\"Chrome (headless)\" -g_StoreURL=\"http://localhost:${Utilities.getStorefrontPort(this)}\" -executionProfile=\"default\""
+        //                         }
+        //                         catch(any)
+        //                         {
+        //                             echo any.getMessage()
+        //                             e2eStatus = 'failed'
+        //                         }
+        //                         def platformPort = Utilities.getPlatformPort(this)
+        //                         def storefrontPort = Utilities.getStorefrontPort(this)
+        //                         def msg = "E2E ${e2eStatus}\nStorefront:\nhttp://ci.virtocommerce.com:${storefrontPort}\nPlatform:\nhttp://ci.virtocommerce.com:${platformPort}"
+        //                         input message: msg
+        //                     }
+        //                 }
+        //             }
+        //         }
+        //     }
+        // }
 
         stage("Create / Update Environment"){
             when {
@@ -469,7 +580,7 @@ pipeline {
     post{
         always{
             script{
-                dir(Utilities.getComposeFolderV3(this))
+                node('linux')
                 {
                     def platformPort = Utilities.getPlatformPort(this)
                     def storefrontPort = Utilities.getStorefrontPort(this)
