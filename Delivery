@@ -114,7 +114,7 @@ pipeline {
                     def csSrc = "${solutionRoot}\\${BRANCH_NAME}"
                     def modulesRoot = "${env.WORKSPACE}\\CS\\module"
                     def platformRoot = "${env.WORKSPACE}\\CS\\platform"
-                    powershell script: "Remove-Item -Path ${env.WORKSPACE}\\CS\\* -Recurse -Force -ErrorAction Continue", label: "Clean Workspace"
+                    pwsh script: "Remove-Item -Path ${env.WORKSPACE}\\CS\\* -Recurse -Force -ErrorAction Continue", label: "Clean Workspace"
                     if(BRANCH_NAME == 'release_3.0.0' || BRANCH_NAME == 'dev-3.0.0')
                     {
                         //theme
@@ -125,21 +125,21 @@ pipeline {
                         {
                             themeIncludeParam = "-Include ${SETTINGS['themeName'].join(',')}"
                         }
-                        powershell script: "mkdir ${themeDst}"
-                        powershell script: "Copy-Item -Path ${themeSrc}\\* ${themeIncludeParam} -Destination ${themeDst} -Recurse -Force", label: "Copy Theme to Workspace"
+                        pwsh script: "mkdir ${themeDst}"
+                        pwsh script: "Copy-Item -Path ${themeSrc}\\* ${themeIncludeParam} -Destination ${themeDst} -Recurse -Force", label: "Copy Theme to Workspace"
                         //storefront
                         def storefrontSrc = "${solutionRoot}\\${SETTINGS['storefrontBranch']}"
-                        powershell script: "Copy-Item -Path ${storefrontSrc}\\* -Destination ${env.WORKSPACE}\\CS -Include storefront -Recurse -Force", label: "Copy Storefron to Workspace"
+                        pwsh script: "Copy-Item -Path ${storefrontSrc}\\* -Destination ${env.WORKSPACE}\\CS -Include storefront -Recurse -Force", label: "Copy Storefron to Workspace"
                     } 
                     else if(BRANCH_NAME == 'feature_migrate-to-vc30')
                     {
                         Utilities.runSharedPS(this, 'delivery/get-backend.ps1', "-BackendPath ${env.WORKSPACE}\\CS -AppName ${SETTINGS['webAppName']} -ResourceGroupName ${SETTINGS['resourceGroupName']} -SubscriptionID ${SETTINGS['subscriptionID']}")
-                        powershell "Rename-Item -Path ${env.WORKSPACE}\\CS\\modules -NewName module"
+                        pwsh "Rename-Item -Path ${env.WORKSPACE}\\CS\\modules -NewName module"
                     }
-                    powershell script: "Copy-Item -Path ${csSrc}\\* -Destination ${env.WORKSPACE}\\CS -Recurse -Force", label: "Copy Solution to Workspace"
-                    powershell "Rename-Item -Path ${modulesRoot} -NewName Modules"
+                    pwsh script: "Copy-Item -Path ${csSrc}\\* -Destination ${env.WORKSPACE}\\CS -Recurse -Force", label: "Copy Solution to Workspace"
+                    pwsh "Rename-Item -Path ${modulesRoot} -NewName Modules"
                     if(BRANCH_NAME == 'feature_migrate-to-vc30')
-                        powershell script: "Copy-Item -Path ${env.SOLUTION_FOLDER}\\vc\\${BRANCH_NAME}\\module\\* -Destination ${env.WORKSPACE}\\CS\\modules -Recurse -Force", label: "Copy vc modules to Workspace/modules"
+                        pwsh script: "Copy-Item -Path ${env.SOLUTION_FOLDER}\\vc\\${BRANCH_NAME}\\module\\* -Destination ${env.WORKSPACE}\\CS\\modules -Recurse -Force", label: "Copy vc modules to Workspace/modules"
                 }
             }
         }
@@ -221,7 +221,7 @@ pipeline {
                         {
                             def swaggerSchemaPath = "${workspace}\\swaggerSchema${env.BUILD_NUMBER}.json"
                             Utilities.runPS(this, "docker_v3/vc-get-swagger.ps1", "-ApiUrl ${Utilities.getPlatformCoreHost(this)} -OutFile ${swaggerSchemaPath} -Verbose -Debug")
-                            def swaggerResult = powershell script: "vc-build ValidateSwaggerSchema -SwaggerSchemaPath ${swaggerSchemaPath}", returnStatus: true
+                            def swaggerResult = pwsh script: "vc-build ValidateSwaggerSchema -SwaggerSchemaPath ${swaggerSchemaPath}", returnStatus: true
                             if(swaggerResult != 0)
                             {
                                 echo "Swagger Schema contains error"
@@ -238,7 +238,7 @@ pipeline {
                     //             git changelog: false, credentialsId: '38b768a3-7d9c-4203-9389-d6c6d8d6aff4', poll: false, url: 'https://github.com/VirtoCommerce/vc-quality-gate-katalon.git'
                     //             def e2eStatus = 'success'
                     //             try{
-                    //                 powershell "${env.KATALON_DIR}\\katalonc.exe -projectPath=\"${e2eDir}\\platform_storefront.prj\" -testSuitePath=\"Test Suites/StorefrontPlatform\" -apiKey=\"${env.KATALON_API_KEY}\" -browserType=\"Chrome (headless)\" -g_StoreURL=\"http://localhost:${Utilities.getStorefrontPort(this)}\" -executionProfile=\"default\""
+                    //                 pwsh "${env.KATALON_DIR}\\katalonc.exe -projectPath=\"${e2eDir}\\platform_storefront.prj\" -testSuitePath=\"Test Suites/StorefrontPlatform\" -apiKey=\"${env.KATALON_API_KEY}\" -browserType=\"Chrome (headless)\" -g_StoreURL=\"http://localhost:${Utilities.getStorefrontPort(this)}\" -executionProfile=\"default\""
                     //             }
                     //             catch(any)
                     //             {
@@ -313,7 +313,7 @@ pipeline {
         //                 {
         //                     def swaggerSchemaPath = "${workspace}\\swaggerSchema${env.BUILD_NUMBER}.json"
         //                     Utilities.runPS(this, "docker_v3/vc-get-swagger.ps1", "-ApiUrl ${Utilities.getPlatformCoreHost(this)} -OutFile ${swaggerSchemaPath} -Verbose -Debug")
-        //                     def swaggerResult = powershell script: "vc-build ValidateSwaggerSchema -SwaggerSchemaPath ${swaggerSchemaPath}", returnStatus: true
+        //                     def swaggerResult = pwsh script: "vc-build ValidateSwaggerSchema -SwaggerSchemaPath ${swaggerSchemaPath}", returnStatus: true
         //                     if(swaggerResult != 0)
         //                     {
         //                         echo "Swagger Schema contains error"
@@ -330,7 +330,7 @@ pipeline {
         //                         git changelog: false, credentialsId: '38b768a3-7d9c-4203-9389-d6c6d8d6aff4', poll: false, url: 'https://github.com/VirtoCommerce/vc-quality-gate-katalon.git'
         //                         def e2eStatus = 'success'
         //                         try{
-        //                             powershell "${env.KATALON_DIR}\\katalonc.exe -projectPath=\"${e2eDir}\\platform_storefront.prj\" -testSuitePath=\"Test Suites/StorefrontPlatform\" -apiKey=\"${env.KATALON_API_KEY}\" -browserType=\"Chrome (headless)\" -g_StoreURL=\"http://localhost:${Utilities.getStorefrontPort(this)}\" -executionProfile=\"default\""
+        //                             pwsh "${env.KATALON_DIR}\\katalonc.exe -projectPath=\"${e2eDir}\\platform_storefront.prj\" -testSuitePath=\"Test Suites/StorefrontPlatform\" -apiKey=\"${env.KATALON_API_KEY}\" -browserType=\"Chrome (headless)\" -g_StoreURL=\"http://localhost:${Utilities.getStorefrontPort(this)}\" -executionProfile=\"default\""
         //                         }
         //                         catch(any)
         //                         {
@@ -403,7 +403,7 @@ pipeline {
         //         script{
         //             if(ENV_NAME == 'ACC'){
         //                 echo "Octopus api: ${env.OCTOPUS_USR}"
-        //                 def res = powershell script: "${env.Utils}\\octopus\\octo.exe push --package ${BACKEND_FILE} --server ${env.OCTOPUS_USR} --apiKey ${env.OCTOPUS_PSW}", returnStatus:true
+        //                 def res = pwsh script: "${env.Utils}\\octopus\\octo.exe push --package ${BACKEND_FILE} --server ${env.OCTOPUS_USR} --apiKey ${env.OCTOPUS_PSW}", returnStatus:true
         //                 if(res != 0){
         //                     UNSTABLE = true
         //                     CAUSES.add("Delivering Backend: octopus failed")
@@ -431,7 +431,7 @@ pipeline {
         //                 if(DELIVERY_BACKEND){
         //                     sleep time:5, unit:'MINUTES'
         //                 }
-        //                 def res = powershell script:"${env.Utils}\\octopus\\octo.exe push --package ${FRONTEND_FILE} --server ${env.OCTOPUS_USR} --apiKey ${env.OCTOPUS_PSW}", returnStatus:true
+        //                 def res = pwsh script:"${env.Utils}\\octopus\\octo.exe push --package ${FRONTEND_FILE} --server ${env.OCTOPUS_USR} --apiKey ${env.OCTOPUS_PSW}", returnStatus:true
         //                 if(res != 0){
         //                     UNSTABLE = true
         //                     CAUSES.add("Delivering Storefront: octopus failed")
@@ -440,9 +440,9 @@ pipeline {
         //                 def tmpFrontendPath = "${env.WORKSPACE}@tmp\\frontendTemp"
         //                 dir(tmpFrontendPath){
         //                     deleteDir()
-        //                     powershell "Expand-Archive -Path ${FRONTEND_FILE} -DestinationPath ."
-        //                     powershell "Remove-Item ${FRONTEND_FILE} -Force"
-        //                     powershell "Expand-Archive -Path ${THEME_FILE} -DestinationPath .\\wwwroot\\theme"
+        //                     pwsh "Expand-Archive -Path ${FRONTEND_FILE} -DestinationPath ."
+        //                     pwsh "Remove-Item ${FRONTEND_FILE} -Force"
+        //                     pwsh "Expand-Archive -Path ${THEME_FILE} -DestinationPath .\\wwwroot\\theme"
         //                     zip dir: tmpFrontendPath, zipFile: FRONTEND_FILE
         //                 }
         //                 runPS("Deploy-ToAzure.ps1", "-ZipFile ${FRONTEND_FILE} -WebAppName \"${SETTINGS['webAppPublicName']}\" -ResourceGroupName \"${SETTINGS['resourceGroupName']}\" -SubscriptionID \"${SETTINGS['subscriptionID']}\"")
@@ -462,7 +462,7 @@ pipeline {
         //                 if(DELIVERY_BACKEND){
         //                     sleep time:5, unit:'MINUTES'
         //                 }
-        //                 def res = powershell script: "${env.Utils}\\octopus\\octo.exe push --package ${THEME_FILE} --server ${env.OCTOPUS_USR} --apiKey ${env.OCTOPUS_PSW}", returnStatus: true
+        //                 def res = pwsh script: "${env.Utils}\\octopus\\octo.exe push --package ${THEME_FILE} --server ${env.OCTOPUS_USR} --apiKey ${env.OCTOPUS_PSW}", returnStatus: true
         //                 if(res != 0){
         //                     UNSTABLE = true
         //                     CAUSES.add("Delivering Theme: octopus failed")
@@ -512,7 +512,7 @@ pipeline {
         //                 unzip zipFile: 'Platform.zip', dir: 'VirtoCommerce.Platform'
         //                 def dstConfigPath = "${env.WORKSPACE}\\VirtoCommerce.Platform\\platform\\Web.config"
         //                 def srcConfigPath = "${env.WORKSPACE}\\${SETTINGS['config']}"
-        //                 powershell "${env.WORKSPACE}\\combine-configs.ps1 -srcConfigPath ${srcConfigPath} -dstConfigPath ${dstConfigPath} -ErrorAction Stop"
+        //                 pwsh "${env.WORKSPACE}\\combine-configs.ps1 -srcConfigPath ${srcConfigPath} -dstConfigPath ${dstConfigPath} -ErrorAction Stop"
         //                 def dockerImage = docker.build("${SETTINGS['prefix']}-platform:${SETTINGS['dockerTag']}")
         //             }
         //         }
@@ -541,8 +541,8 @@ pipeline {
         //                     LOGICAPP_FILE = "${env.WORKSPACE}@tmp\\VirtoWay.B2BOrderTransfer.${PROJECT_TYPE}.LA-${logicApp}.deployer.${logicAppVersion}.zip"
         //                     deliveryInfo['LOGICAPPS'][PROJECT_TYPE][logicApp]['number']++
         //                     updateDeliveryInfo(deliveryInfo)
-        //                     powershell "Rename-Item -Path ${appDir}\\LogicApp-${logicApp}.json -NewName DeploymentTemplate.json -Force"
-        //                     powershell "Compress-Archive -Path ${appDir}\\DeploymentTemplate.json, ${appDir}\\DeploymentTemplate.param.*.json -DestinationPath ${LOGICAPP_FILE}"
+        //                     pwsh "Rename-Item -Path ${appDir}\\LogicApp-${logicApp}.json -NewName DeploymentTemplate.json -Force"
+        //                     pwsh "Compress-Archive -Path ${appDir}\\DeploymentTemplate.json, ${appDir}\\DeploymentTemplate.param.*.json -DestinationPath ${LOGICAPP_FILE}"
         //                 }
         //                 else{
         //                     LOGICAPP_NAME = logicApp
@@ -561,7 +561,7 @@ pipeline {
         //     steps{
         //         script{
         //             if(ENV_NAME == 'ACC'){
-        //                 def res = powershell script: "${env.Utils}\\octopus\\octo.exe push --package ${LOGICAPP_FILE} --server ${env.OCTOPUS_USR} --apiKey ${env.OCTOPUS_PSW}", returnStatus: true
+        //                 def res = pwsh script: "${env.Utils}\\octopus\\octo.exe push --package ${LOGICAPP_FILE} --server ${env.OCTOPUS_USR} --apiKey ${env.OCTOPUS_PSW}", returnStatus: true
         //                 if(res != 0){
         //                     UNSTABLE = true
         //                     CAUSES.add("Delivering Logic App: octopus failed")
@@ -571,7 +571,7 @@ pipeline {
         //                 def templateFile = "${LOGICAPP_FILE}\\LogicApp-${LOGICAPP_NAME}.json"
         //                 def envname = ENV_NAME.toLowerCase()
         //                 def templateParametersFile = "${LOGICAPP_FILE}\\LogicApp-${LOGICAPP_NAME}.parameters.${envname}.json"
-        //                 powershell "${env.WORKSPACE}\\ps\\Deploy-LogicApps.ps1 -SubscriptionID ${SETTINGS['subscriptionID']} -ResourceGroupName ${SETTINGS['resourceGroupName']} -TemplateFile ${templateFile} -TemplateParametersFile ${templateParametersFile}"
+        //                 pwsh "${env.WORKSPACE}\\ps\\Deploy-LogicApps.ps1 -SubscriptionID ${SETTINGS['subscriptionID']} -ResourceGroupName ${SETTINGS['resourceGroupName']} -TemplateFile ${templateFile} -TemplateParametersFile ${templateParametersFile}"
         //             }
         //         }
         //     }
@@ -626,7 +626,7 @@ pipeline {
 def runPS(psName, args){
     def psPath = libraryResource "delivery/${psName}"
     echo "dbg: ${psPath} ${args}"
-    powershell "${psPath} ${args} -ErrorAction Stop"
+    pwsh "${psPath} ${args} -ErrorAction Stop"
 }
 
 def getVirtoModules() {
