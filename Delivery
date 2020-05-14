@@ -156,6 +156,7 @@ pipeline {
             {
                 script
                 {
+                    UPDATE_CS = false
                     stash includes: 'CS/**', name: 'solution'
                 }
             }
