@@ -101,7 +101,7 @@ def call(body) {
 					if (env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'master') {
 						def websitePath = Utilities.getWebPublishFolder(this, websiteDir)
 						dockerImage = Packaging.createDockerImage(this, zipArtifact.replaceAll('\\.','/'), websitePath, ".", dockerTag)		
-						if(Utilities.isNetCore(this))
+						if(Utilities.isNetCore(projectType))
 						{
 							stash includes: 'VirtoCommerce.Storefront/**', name: 'artifact'
 							node('linux')
@@ -207,7 +207,7 @@ def call(body) {
 						if(solution == 'VirtoCommerce.Platform.sln' || projectType == 'NETCORE2')
 						{
 							Packaging.pushDockerImage(this, dockerImage, dockerTag)
-							if(Utilities.isNetCore(this))
+							if(Utilities.isNetCore(projectType))
 							{
 								node('linux')
 								{
