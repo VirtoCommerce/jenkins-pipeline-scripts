@@ -141,7 +141,8 @@ def call(body) {
                         node('linux')
                         {
                             unstash 'artifact'
-                            sh "cp ${env.WORKSPACE}/resources/docker.core/linux/storefront/Dockerfile ${env.WORKSPACE}/"
+                            def dockerfileContent = libraryResource 'docker.core/linux/storefront/Dockerfile'
+                            writeFile file: "${env.WORKSPACE}/Dockerfile", text: dockerfileContent
                             docker.build("${dockerImageName}:${platformDockerTag}")
                         }
                     }
