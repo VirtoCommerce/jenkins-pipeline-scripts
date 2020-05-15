@@ -26,13 +26,16 @@ def call(body) {
         def workspace = "S:\\Buildsv3\\${repoName}\\${escapedBranch}"
         projectType = 'NETCORE2'
         def platformDockerTag = '3.0-preview'
+        def platformLinuxDockerTag = '3.0-preview-linux'
         def storefrontDockerTag = 'latest'
         def releaseNotesPath = "${workspace}\\release_notes.txt"
         if(env.BRANCH_NAME == 'dev-3.0.0')
         {
-            platformDockerTag = '3.0-dev'
+            platformDockerTag = '3.0-dev-linux'
             storefrontDockerTag = 'dev-branch'
         }
+        def dockerWinImage
+        def dockerLinImage
         dir(workspace){
             def SETTINGS
             def settingsFileContent
@@ -74,18 +77,6 @@ def call(body) {
                 }
 
                 stage('Build'){
-                    
-                    // Packaging.startAnalyzer(this, true)
-                    // withSonarQubeEnv('VC Sonar Server'){
-                    //     if(Utilities.isPullRequest(this))
-                    //     {
-                    //         powershell "vc-build SonarQubeStart -SonarUrl ${env.SONAR_HOST_URL} -SonarAuthToken \"${env.SONAR_AUTH_TOKEN}\" -PullRequest -GitHubToken ${env.GITHUB_TOKEN} -skip Restore+Compile"
-                    //     }
-                    //     else
-                    //     {
-                    //         powershell "vc-build SonarQubeStart -SonarUrl ${env.SONAR_HOST_URL} -SonarAuthToken \"${env.SONAR_AUTH_TOKEN}\" -skip Restore+Compile"
-                    //     }
-                    // }
                     if(Utilities.isPullRequest(this))
                     {
                         withSonarQubeEnv('VC Sonar Server'){
@@ -134,8 +125,7 @@ def call(body) {
                         powershell script: "Copy-Item ${workspace}\\artifacts\\publish\\* ${websitePath}\\VirtoCommerce.Platform -Recurse -Force"
                         powershell script: "Copy-Item ${env.WORKSPACE}\\..\\workspace@libs\\virto-shared-library\\resources\\docker.core\\windowsnano\\PlatformCore\\* ${websitePath} -Force"
                         dir(websitePath){
-                            bat "dotnet dev-certs https -ep \"${websitePath}\\devcert.pfx\" -p virto"
-                            docker.build("${dockerImageName}:${platformDockerTag}")
+                            dockerWinImage = docker.build("${dockerImageName}:${platformDockerTag}")
                             stash includes: 'VirtoCommerce.Platform/**', name: 'artifact'
                         }
                         node('linux')
@@ -143,7 +133,7 @@ def call(body) {
                             unstash 'artifact'
                             def dockerfileContent = libraryResource 'docker.core/linux/platform/Dockerfile'
                             writeFile file: "${env.WORKSPACE}/Dockerfile", text: dockerfileContent
-                            docker.build("${dockerImageName}:${platformDockerTag}")
+                            dockerLinImage = docker.build("${dockerImageName}:${platformLinuxDockerTag}")
                         }
                     }
                 }
@@ -266,7 +256,11 @@ def call(body) {
                             return 0
                         }
                         
-
+                        Packaging.pushDockerImage(this, dockerWinImage, platformDockerTag)
+                        node('linux')
+                        {
+                            Packaging.pushDockerImage(this, dockerLinImage, platformLinuxDockerTag)
+                        }
                         // def ghReleaseResult = Utilities.runBatchScript(this, "@vc-build PublishPackages -ApiKey ${env.NUGET_KEY} -skip Clean+Restore+Compile+Test")
                         // if(ghReleaseResult['status'] != 0){
                         //     def nugetAlreadyExists = false
