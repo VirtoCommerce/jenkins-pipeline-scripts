@@ -29,9 +29,12 @@ def call(body) {
 		def websiteDir = 'VirtoCommerce.Platform.Web'
 		def deployScript = 'VC-WebApp2Azure.ps1'
 		def dockerTag = "${env.BRANCH_NAME}-branch"
+		def dockerTagLinux = "3.0-dev-linux"
+		def storefrontImageName = 'virtocommerce/storefront'
 		def buildOrder = Utilities.getNextBuildOrder(this)
 		if (env.BRANCH_NAME == 'master') {
 			dockerTag = "latest"
+			dockerTagLinux = '3.0-preview-linux'
 		}
 
 		def SETTINGS
@@ -90,13 +93,25 @@ def call(body) {
 		
 			def version = Utilities.getAssemblyVersion(this, webProject)
 			def dockerImage
+			def dockerImageLinux
 
 			stage('Packaging') {
 				timestamps { 
 					Packaging.createReleaseArtifact(this, version, webProject, zipArtifact, websiteDir)
 					if (env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'master') {
 						def websitePath = Utilities.getWebPublishFolder(this, websiteDir)
-						dockerImage = Packaging.createDockerImage(this, zipArtifact.replaceAll('\\.','/'), websitePath, ".", dockerTag)			
+						dockerImage = Packaging.createDockerImage(this, zipArtifact.replaceAll('\\.','/'), websitePath, ".", dockerTag)		
+						if(Utilities.isNetCore(this))
+						{
+							stash includes: 'VirtoCommerce.Storefront/**', name: 'artifact'
+							node('linux')
+							{
+								unstash 'artifact'
+								def dockerfileContent = libraryResource 'docker.core/linux/storefront/Dockerfile'
+								writeFile file: "${env.WORKSPACE}/Dockerfile", text: dockerfileContent
+								dockerImageLinux = docker.build("${storefrontImageName}:${dockerTagLinux}")
+							}
+						}	
 					}
 				}
 			}
@@ -192,6 +207,13 @@ def call(body) {
 						if(solution == 'VirtoCommerce.Platform.sln' || projectType == 'NETCORE2')
 						{
 							Packaging.pushDockerImage(this, dockerImage, dockerTag)
+							if(Utilities.isNetCore(this))
+							{
+								node('linux')
+								{
+									Packaging.pushDockerImage(this, dockerImageLinux, dockerTagLinux)
+								}
+							}
 						}
 						if (Packaging.getShouldPublish(this)) {
 							Packaging.createNugetPackages(this)
