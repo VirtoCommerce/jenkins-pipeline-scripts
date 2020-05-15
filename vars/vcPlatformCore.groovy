@@ -66,12 +66,12 @@ def call(body) {
                     }
                 }
 
-                // if(!Utilities.areThereCodeChanges(this))
-                // {
-                //     echo "There are no Code Changes"
-                //     currentBuild.result = 'SUCCESS'
-                //     return 0;
-                // }
+                if(!Utilities.areThereCodeChanges(this))
+                {
+                    echo "There are no Code Changes"
+                    currentBuild.result = 'SUCCESS'
+                    return 0;
+                }
 
                 stage('Build'){
                     
