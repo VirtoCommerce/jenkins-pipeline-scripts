@@ -154,7 +154,7 @@ def call(body) {
                         }
                         
                         def orgName = Utilities.getOrgName(this)
-                        def releaseNotesArg = releaseNotes == null ? "" : "-GithubReleaseDescription ${releaseNotes}"
+                        def releaseNotesArg = releaseNotes == null ? "" : "--% -GithubReleaseDescription ${releaseNotes}"
                         def releaseResult = powershell script: "vc-build Release -GitHubUser ${orgName} -GitHubToken ${env.GITHUB_TOKEN} ${releaseNotesArg} -PreRelease -skip Clean+Restore+Compile+Test", returnStatus: true
                         if(releaseResult == 422){
                             UNSTABLE_CAUSES.add("Release already exists on github")
