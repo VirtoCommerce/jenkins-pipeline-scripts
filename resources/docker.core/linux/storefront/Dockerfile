@@ -6,6 +6,4 @@ ADD $SOURCE /vc-storefront/
 
 WORKDIR /vc-storefront
 
-RUN /bin/bash -c "apt update && apt install unzip && unzip ${SOURCE}"
-
 ENTRYPOINT ["dotnet", "VirtoCommerce.Storefront.dll"]
