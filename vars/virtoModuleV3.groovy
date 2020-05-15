@@ -24,7 +24,7 @@ def call(body) {
         def escapedBranch = env.BRANCH_NAME.replaceAll('/', '_')
         def repoName = Utilities.getRepoName(this)
         def workspace = "S:\\Buildsv3\\${repoName}\\${escapedBranch}"
-        def releaseNotesPath = "${env.WORKSPACE}\\release_notes.txt"
+        def releaseNotesPath = "${workspace}\\release_notes.txt"
         projectType = 'NETCORE2'
         dir(workspace){
             // def SETTINGS

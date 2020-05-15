@@ -27,7 +27,7 @@ def call(body) {
         projectType = 'NETCORE2'
         def platformDockerTag = '3.0-preview'
         def storefrontDockerTag = 'latest'
-        def releaseNotes
+        def releaseNotesPath = "${workspace}\\release_notes.txt"
         if(env.BRANCH_NAME == 'dev-3.0.0')
         {
             platformDockerTag = '3.0-dev'
@@ -55,53 +55,15 @@ def call(body) {
                     {
                         def release = GithubRelease.getLatestGithubReleaseRegexp(this, Utilities.getOrgName(this), Utilities.getRepoName(this), /\d\.\d\.\d[\s]{0,1}[\w]*/, true)
                         echo release.published_at
-                        releaseNotes = Utilities.getReleaseNotesFromCommits(this, release.published_at)
+                        def releaseNotes = Utilities.getReleaseNotesFromCommits(this, release.published_at)
                         echo releaseNotes
+                        writeFile file: releaseNotesPath, text: releaseNotes
                     }
                     catch(any)
                     {
                         echo "exception:"
                         echo any.getMessage()
                     }
-                    
-//                     if(env.BRANCH_NAME == 'release/3.0.0')
-//                     {
-//                         def commitId = pwsh(returnStdout: true, script: 'git rev-parse HEAD').trim()
-//                         def prevCommitId = pwsh(returnStdout: true, script: 'git rev-parse HEAD^1').trim()
-// 					def changelog = gitChangelog from: [type: 'REF', value: "3.0.0-rc.5.248"], to: [type: 'REF', value: "3.0.0-rc.5.250"], returnType: 'STRING', template: '''# Changelog
-
-// Changelog for {{ownerName}} {{repoName}}.
-
-// {{#tags}}
-// ## {{name}}
-//  {{#issues}}
-//   {{#hasIssue}}
-//    {{#hasLink}}
-// ### {{name}} [{{issue}}]({{link}}) {{title}} {{#hasIssueType}} *{{issueType}}* {{/hasIssueType}} {{#hasLabels}} {{#labels}} *{{.}}* {{/labels}} {{/hasLabels}}
-//    {{/hasLink}}
-//    {{^hasLink}}
-// ### {{name}} {{issue}} {{title}} {{#hasIssueType}} *{{issueType}}* {{/hasIssueType}} {{#hasLabels}} {{#labels}} *{{.}}* {{/labels}} {{/hasLabels}}
-//    {{/hasLink}}
-//   {{/hasIssue}}
-//   {{^hasIssue}}
-// ### {{name}}
-//   {{/hasIssue}}
-
-//   {{#commits}}
-// **{{{messageTitle}}}**
-
-// {{#messageBodyItems}}
-//  * {{.}} 
-// {{/messageBodyItems}}
-
-// [{{hash}}](https://github.com/{{ownerName}}/{{repoName}}/commit/{{hash}}) {{authorName}} *{{commitTime}}*
-
-//   {{/commits}}
-
-//  {{/issues}}
-// {{/tags}}'''
-//                     echo changelog
-//                     }
                 }
 
                 if(!Utilities.areThereCodeChanges(this))
@@ -173,6 +135,13 @@ def call(body) {
                         powershell script: "Copy-Item ${env.WORKSPACE}\\..\\workspace@libs\\virto-shared-library\\resources\\docker.core\\windowsnano\\PlatformCore\\* ${websitePath} -Force"
                         dir(websitePath){
                             bat "dotnet dev-certs https -ep \"${websitePath}\\devcert.pfx\" -p virto"
+                            docker.build("${dockerImageName}:${platformDockerTag}")
+                            stash includes: 'VirtoCommerce.Platform/**', name: 'artifact'
+                        }
+                        node('linux')
+                        {
+                            unstash 'artifact'
+                            sh "cp ${env.WORKSPACE}/resources/docker.core/linux/storefront/Dockerfile ${env.WORKSPACE}/"
                             docker.build("${dockerImageName}:${platformDockerTag}")
                         }
                     }
@@ -324,7 +293,8 @@ def call(body) {
                         }
 
                         def orgName = Utilities.getOrgName(this)
-                        def releaseNotesArg = releaseNotes == null ? "" : "-GithubReleaseDescription ${releaseNotes}"
+                        def releaseNotesFile = new File(releaseNotesPath)
+                        def releaseNotesArg = releaseNotesFile.exists() ? "" : "-ReleaseNotes ${releaseNotesPath}"
                         def releaseResult = powershell script: "vc-build Release -GitHubUser ${orgName} -GitHubToken ${env.GITHUB_TOKEN} ${releaseNotesArg} -PreRelease -skip Clean+Restore+Compile+Test", returnStatus: true
                         if(releaseResult == 422){
                             UNSTABLE_CAUSES.add("Release already exists on github")
