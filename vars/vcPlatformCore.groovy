@@ -186,56 +186,6 @@ def call(body) {
                             }
                         }
                     }
-                }
-
-                if(env.BRANCH_NAME == 'release/3.0.0' || env.BRANCH_NAME == 'dev-3.0.0')
-                {
-                    try
-                    {
-                        stage('Create Test Environment')
-                        {
-                            timestamps
-                            {
-                                dir(Utilities.getComposeFolderV3(this))
-                                {
-                                    def platformPort = Utilities.getPlatformPort(this)
-                                    def storefrontPort = Utilities.getStorefrontPort(this)
-                                    def sqlPort = Utilities.getSqlPort(this)
-                                    withEnv(["DOCKER_TAG=dev-branch", "DOCKER_PLATFORM_PORT=${platformPort}", "DOCKER_STOREFRONT_PORT=${storefrontPort}", "DOCKER_SQL_PORT=${sqlPort}", "COMPOSE_PROJECT_NAME=${env.BUILD_TAG}" ]) {
-                                        bat "docker-compose up -d"
-                                    }
-                                }
-                            }
-                        }
-                        stage('Install Modules')
-                        {
-                            timestamps
-                            {
-                                def platformHost = Utilities.getPlatformCoreHost(this)
-                                def platformContainerId = Utilities.getPlatformContainer(this)
-                                echo "Platform Host: ${platformHost}"
-                                Utilities.runPS(this, "docker_v3/vc-setup-modules.ps1", "-ApiUrl ${platformHost} -needRestart 1 -ContainerId ${platformContainerId} -Verbose")
-                            }
-                        }
-                        stage('Install Sample Data')
-                        {
-                            timestamps
-                            {
-                                Utilities.runPS(this, "docker_v3/vc-setup-sampledata.ps1", "-ApiUrl ${Utilities.getPlatformCoreHost(this)} -Verbose")
-                            }
-                        }
-                        stage("Swagger Schema Validation")
-                        {
-                            timestamps
-                            {
-                                Utilities.runPS(this, "docker_v3/vc-get-swagger.ps1", "-ApiUrl ${Utilities.getPlatformCoreHost(this)} -OutFile ${workspace}\\artifacts\\swaggerSchema${env.BUILD_NUMBER}.json -Verbose")
-                            }
-                        }
-                    }
-                    catch(any)
-                    {
-                        echo any.getMessage()
-                    }
 
                     stage('Publish')
                     {
