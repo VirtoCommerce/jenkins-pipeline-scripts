@@ -109,7 +109,7 @@ def call(body) {
 								unstash 'artifact'
 								def dockerfileContent = libraryResource 'docker.core/linux/storefront/Dockerfile'
 								writeFile file: "${env.WORKSPACE}/Dockerfile", text: dockerfileContent
-								dockerImageLinux = docker.build("${storefrontImageName}:${dockerTagLinux}")
+								dockerImageLinux = docker.build("${storefrontImageName}:${dockerTagLinux}", "--build-arg Source=./VirtoCommerce.Storefront .")
 							}
 						}	
 					}
