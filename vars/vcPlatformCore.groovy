@@ -79,7 +79,7 @@ def call(body) {
                 stage('Build'){
                     if(Utilities.isPullRequest(this))
                     {
-                        withSonarQubeEnv('SonarCloud'){
+                        withSonarQubeEnv('VC Sonar Server'){
                             withEnv(["BRANCH_NAME=${env.CHANGE_BRANCH}"])
                             {
                                 powershell "vc-build SonarQubeStart -SonarUrl ${env.SONAR_HOST_URL} -SonarAuthToken \"${env.SONAR_AUTH_TOKEN}\" -PullRequest -GitHubToken ${env.GITHUB_TOKEN} -skip Restore+Compile"
@@ -89,7 +89,7 @@ def call(body) {
                     }
                     else
                     {
-                        withSonarQubeEnv('SonarCloud'){
+                        withSonarQubeEnv('VC Sonar Server'){
                             powershell "vc-build SonarQubeStart -SonarUrl ${env.SONAR_HOST_URL} -SonarAuthToken \"${env.SONAR_AUTH_TOKEN}\" -skip Restore+Compile"
                         }
                         powershell "vc-build Compile"
@@ -103,7 +103,7 @@ def call(body) {
 
                 stage('Quality Gate'){
                     // Packaging.endAnalyzer(this)
-                    withSonarQubeEnv('SonarCloud'){
+                    withSonarQubeEnv('VC Sonar Server'){
                         powershell "vc-build SonarQubeEnd -SonarUrl ${env.SONAR_HOST_URL} -SonarAuthToken ${env.SONAR_AUTH_TOKEN} -skip Restore+Compile+SonarQubeStart"
                     }
                     Packaging.checkAnalyzerGate(this)
