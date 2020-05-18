@@ -42,7 +42,7 @@ def call(body) {
 
                     try
                     {
-                        def release = GithubRelease.getLatestGithubReleaseRegexp(this, Utilities.getOrgName(this), Utilities.getRepoName(this))
+                        def release = GithubRelease.getLatestGithubReleaseV3(this, Utilities.getOrgName(this), Utilities.getRepoName(this))
                         echo release.published_at
                         def releaseNotes = Utilities.getReleaseNotesFromCommits(this, release.published_at)
                         echo releaseNotes
