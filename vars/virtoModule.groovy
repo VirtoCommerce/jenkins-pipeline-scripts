@@ -17,14 +17,14 @@ def call(body) {
     node
     {
 		properties([disableConcurrentBuilds()])
+		def globalLib = library('global-shared-lib').com.test
+		Utilities = globalLib.Utilities
+		Packaging = globalLib.Packaging
+		Modules = globalLib.Modules
 
 		def workspace = env.WORKSPACE.replaceAll('%2F', '_')
 		dir(workspace)
 		{
-			def globalLib = library('global-shared-lib').com.test
-			Utilities = globalLib.Utilities
-			Packaging = globalLib.Packaging
-			Modules = globalLib.Modules
 
 			def deployScript = 'VC-Module2AzureDev.ps1'
 			def dockerTag = "dev-branch"

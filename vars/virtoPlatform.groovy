@@ -18,15 +18,14 @@ def call(body) {
 		def solution = config.solution
 		projectType = config.projectType
 
+		def globalLib = library('global-shared-lib').com.test
+		def Utilities = globalLib.Utilities
+		def Packaging = globalLib.Packaging
+		def Docker = globalLib.Docker
+
         def workspace = env.WORKSPACE.replaceAll('%2F', '_')
 		dir(workspace)
 		{
-			
-			def globalLib = library('global-shared-lib').com.test
-			def Utilities = globalLib.Utilities
-			def Packaging = globalLib.Packaging
-			def Docker = globalLib.Docker
-			
 			def webProject = 'VirtoCommerce.Platform.Web\\VirtoCommerce.Platform.Web.csproj'
 			def zipArtifact = 'VirtoCommerce.Platform'
 			def websiteDir = 'VirtoCommerce.Platform.Web'
