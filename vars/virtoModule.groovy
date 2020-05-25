@@ -27,7 +27,7 @@ def call(body) {
 		def dockerTag = "${env.BRANCH_NAME}-branch"
 		def buildOrder = Utilities.getNextBuildOrder(this)
 		projectType = config.projectType
-	    if (env.BRANCH_NAME == 'master' || env.BRANCH_NAME == '1.1.3') {
+	    if (env.BRANCH_NAME == 'support/2.x' || env.BRANCH_NAME == '1.1.3') {
 			deployScript = 'VC-Module2AzureQA.ps1'
 			dockerTag = "latest"
 		}
@@ -41,7 +41,7 @@ def call(body) {
 		SETTINGS.setBranch(env.BRANCH_NAME)
 		SETTINGS.setProject('module')
 		if(env.BRANCH_NAME == '1.1.3')
-			SETTINGS.setBranch('master')
+			SETTINGS.setBranch('support/2.x')
 
 		try {
 			//step([$class: 'GitHubCommitStatusSetter', contextSource: [$class: 'ManuallyEnteredCommitContextSource', context: 'ci.virtocommerce.com'], statusResultSource: [$class: 'ConditionalStatusResultSource', results: [[$class: 'AnyBuildResult', message: 'Building on Virto Commerce CI', state: 'PENDING']]]])		
@@ -90,7 +90,7 @@ def call(body) {
 				}
 			}			
 
-			if (env.BRANCH_NAME=='1.1.3' || env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'release') {
+			if (env.BRANCH_NAME=='1.1.3' || env.BRANCH_NAME == 'support/2.x' || env.BRANCH_NAME == 'release') {
 				stage('Create Test Environment') {
 					timestamps { 
 						// Start docker environment
@@ -154,21 +154,21 @@ def call(body) {
 				// }
 			}
 
-			if (env.BRANCH_NAME == '1.1.3' || env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'dev-eventhandler-dynamicproperties'){
+			if (env.BRANCH_NAME == '1.1.3' || env.BRANCH_NAME == 'support/2.x-dev' || env.BRANCH_NAME == 'support/2.x' || env.BRANCH_NAME == 'dev-eventhandler-dynamicproperties'){
 				stage('Publish')
 				{
 					timestamps {
 						def moduleId = Modules.getModuleId(this)
 						def artifacts = findFiles(glob: 'artifacts\\*.zip')
 						Packaging.saveArtifact(this, 'vc', 'module', moduleId, artifacts[0].path)
-						if (env.BRANCH_NAME == 'master' || env.BRANCH_NAME =='1.1.3') {
+						if (env.BRANCH_NAME == 'support/2.x' || env.BRANCH_NAME =='1.1.3') {
 							processManifests(true) // publish artifacts to github releases
 						}
 						switch(env.BRANCH_NAME){
-							case ['master', '1.1.3']:
+							case ['support/2.x', '1.1.3']:
 								Packaging.createNugetPackages(this)
 								break
-							case 'dev':
+							case 'support/2.x-dev':
 								Utilities.runSharedPS(this, "${deployScript}", "-SubscriptionID ${SETTINGS['subscriptionID']} -WebAppName ${SETTINGS['appName']} -ResourceGroupName ${SETTINGS['resourceGroupName']}")
 								break
 						}
@@ -180,9 +180,9 @@ def call(body) {
 				stage('Delivery to virtocommerce.com'){
 					timestamps{
 						SETTINGS.setProject('virtocommerce')
-						SETTINGS.setBranch('dev')
-						if(env.BRANCH_NAME == 'master'){
-							SETTINGS.setBranch('master')
+						SETTINGS.setBranch('support/2.x-dev')
+						if(env.BRANCH_NAME == 'support/2.x'){
+							SETTINGS.setBranch('support/2.x')
 						}
 						Utilities.runSharedPS(this, "${deployScript}", "-SubscriptionID ${SETTINGS['subscriptionID']} -WebAppName ${SETTINGS['appName']} -ResourceGroupName ${SETTINGS['resourceGroupName']}")
 					}
