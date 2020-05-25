@@ -125,7 +125,7 @@ def call(body) {
 
 					stage('Theme Build and Deploy'){
 						timestamps {
-							def themePath = "${env.WORKSPACE}@tmp\\theme.zip"
+							def themePath = "${workspace}@tmp\\theme.zip"
 							def themeJobName = "../vc-theme-default/${env.BRANCH_NAME}"
 							if(env.BRANCH_NAME == "1.1.3")
 								themeJobName = "../vc-theme-default/master"
@@ -172,7 +172,10 @@ def call(body) {
 									Packaging.createNugetPackages(this)
 									break
 								case 'support/2.x-dev':
-									Utilities.runSharedPS(this, "${deployScript}", "-SubscriptionID ${SETTINGS['subscriptionID']} -WebAppName ${SETTINGS['appName']} -ResourceGroupName ${SETTINGS['resourceGroupName']}")
+									withEnv(["WORKSPACE=${workspace}"])
+									{
+										Utilities.runSharedPS(this, "${deployScript}", "-SubscriptionID ${SETTINGS['subscriptionID']} -WebAppName ${SETTINGS['appName']} -ResourceGroupName ${SETTINGS['resourceGroupName']}")
+									}
 									break
 							}
 						}
@@ -187,7 +190,10 @@ def call(body) {
 							if(env.BRANCH_NAME == 'support/2.x'){
 								SETTINGS.setBranch('support/2.x')
 							}
-							Utilities.runSharedPS(this, "${deployScript}", "-SubscriptionID ${SETTINGS['subscriptionID']} -WebAppName ${SETTINGS['appName']} -ResourceGroupName ${SETTINGS['resourceGroupName']}")
+							withEnv(["WORKSPACE=${workspace}"])
+							{
+								Utilities.runSharedPS(this, "${deployScript}", "-SubscriptionID ${SETTINGS['subscriptionID']} -WebAppName ${SETTINGS['appName']} -ResourceGroupName ${SETTINGS['resourceGroupName']}")
+							}
 						}
 					}
 				}
