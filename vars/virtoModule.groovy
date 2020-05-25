@@ -27,7 +27,7 @@ def call(body) {
 			Modules = globalLib.Modules
 
 			def deployScript = 'VC-Module2AzureDev.ps1'
-			def dockerTag = "${env.BRANCH_NAME}-branch"
+			def dockerTag = "dev-branch"
 			def buildOrder = Utilities.getNextBuildOrder(this)
 			projectType = config.projectType
 			if (env.BRANCH_NAME == 'support/2.x' || env.BRANCH_NAME == '1.1.3') {
