@@ -156,14 +156,15 @@ def call(body) {
 					// 	}
 					// }
 				}
-
+				def artifactPath
 				if (env.BRANCH_NAME == '1.1.3' || env.BRANCH_NAME == 'support/2.x-dev' || env.BRANCH_NAME == 'support/2.x' || env.BRANCH_NAME == 'dev-eventhandler-dynamicproperties'){
 					stage('Publish')
 					{
 						timestamps {
 							def moduleId = Modules.getModuleId(this)
 							def artifacts = findFiles(glob: 'artifacts\\*.zip')
-							Packaging.saveArtifact(this, 'vc', 'module', moduleId, artifacts[0].path)
+							artifactPath = artifacts[0].path
+							Packaging.saveArtifact(this, 'vc', 'module', moduleId, artifactPath)
 							if (env.BRANCH_NAME == 'support/2.x' || env.BRANCH_NAME =='1.1.3') {
 								processManifests(true) // publish artifacts to github releases
 							}
@@ -172,10 +173,7 @@ def call(body) {
 									Packaging.createNugetPackages(this)
 									break
 								case 'support/2.x-dev':
-									withEnv(["WORKSPACE=${workspace}"])
-									{
-										Utilities.runSharedPS(this, "${deployScript}", "-SubscriptionID ${SETTINGS['subscriptionID']} -WebAppName ${SETTINGS['appName']} -ResourceGroupName ${SETTINGS['resourceGroupName']}")
-									}
+									Utilities.runSharedPS(this, "${deployScript}", "-SubscriptionID ${SETTINGS['subscriptionID']} -WebAppName ${SETTINGS['appName']} -ResourceGroupName ${SETTINGS['resourceGroupName']} -Path2Zip ${artifactPath}")
 									break
 							}
 						}
@@ -190,10 +188,7 @@ def call(body) {
 							if(env.BRANCH_NAME == 'support/2.x'){
 								SETTINGS.setBranch('support/2.x')
 							}
-							withEnv(["WORKSPACE=${workspace}"])
-							{
-								Utilities.runSharedPS(this, "${deployScript}", "-SubscriptionID ${SETTINGS['subscriptionID']} -WebAppName ${SETTINGS['appName']} -ResourceGroupName ${SETTINGS['resourceGroupName']}")
-							}
+							Utilities.runSharedPS(this, "${deployScript}", "-SubscriptionID ${SETTINGS['subscriptionID']} -WebAppName ${SETTINGS['appName']} -ResourceGroupName ${SETTINGS['resourceGroupName']} -Path2Zip ${artifactPath}")
 						}
 					}
 				}
