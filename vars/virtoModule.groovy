@@ -125,8 +125,9 @@ def call(body) {
 
 					stage('Theme Build and Deploy'){
 						timestamps {
+							def themeBranch = 'master'
 							def themePath = "${workspace}@tmp\\theme.zip"
-							def themeJobName = "../vc-theme-default/${env.BRANCH_NAME}"
+							def themeJobName = "../vc-theme-default/${themeBranch}"
 							if(env.BRANCH_NAME == "1.1.3")
 								themeJobName = "../vc-theme-default/master"
 							build(job: themeJobName, parameters: [string(name: 'themeResultZip', value: themePath)])
