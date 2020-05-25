@@ -29,9 +29,10 @@ def call(body) {
         def platformLinuxDockerTag = '3.0-preview-linux'
         def storefrontDockerTag = 'latest'
         def releaseNotesPath = "${workspace}\\release_notes.txt"
-        if(env.BRANCH_NAME == 'dev-3.0.0')
+        if(env.BRANCH_NAME == 'dev')
         {
-            platformDockerTag = '3.0-dev-linux'
+            platformDockerTag = '3.0-dev'
+            platformLinuxDockerTag = '3.0-dev-linux'
             storefrontDockerTag = 'dev-branch'
         }
         def dockerWinImage
@@ -119,7 +120,7 @@ def call(body) {
                 stage('Packaging'){                
                     powershell "vc-build Compress -skip Clean+Restore+Compile+Test"
 
-                    if(env.BRANCH_NAME == 'release/3.0.0' || env.BRANCH_NAME == 'dev-3.0.0'){
+                    if(env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'dev'){
                         def websitePath = Utilities.getWebPublishFolder(this, "docker")
                         def dockerImageName = "virtocommerce/platform"
                         powershell script: "Copy-Item ${workspace}\\artifacts\\publish\\* ${websitePath}\\VirtoCommerce.Platform -Recurse -Force"
@@ -138,7 +139,7 @@ def call(body) {
                     }
                 }
 
-                if(env.BRANCH_NAME == 'release/3.0.0' || env.BRANCH_NAME == 'dev-3.0.0')
+                if(env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'dev')
                 {
                     stage('Create Test Environment')
                     {
@@ -193,7 +194,7 @@ def call(body) {
 						def artifacts = findFiles(glob: 'artifacts\\*.zip')
 						Packaging.saveArtifact(this, 'vc', Utilities.getProjectType(this), '', artifacts[0].path)
 
-                        if(env.BRANCH_NAME == 'dev-3.0.0')
+                        if(env.BRANCH_NAME == 'dev')
                         {
                             def gitversionOutput = powershell (script: "dotnet gitversion", returnStdout: true, label: 'Gitversion', encoding: 'UTF-8').trim()
                             def gitversionJson = new groovy.json.JsonSlurperClassic().parseText(gitversionOutput)
@@ -268,7 +269,7 @@ def call(body) {
                 throw any
             }
             finally {
-                if(env.BRANCH_NAME == 'release/3.0.0' || env.BRANCH_NAME == 'dev-3.0.0')
+                if(env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'dev')
                 {
                     dir(Utilities.getComposeFolderV3(this))
                     {
