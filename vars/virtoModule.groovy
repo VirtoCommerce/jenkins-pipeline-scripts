@@ -18,206 +18,210 @@ def call(body) {
     {
 		properties([disableConcurrentBuilds()])
 
-		def globalLib = library('global-shared-lib').com.test
-		Utilities = globalLib.Utilities
-		Packaging = globalLib.Packaging
-		Modules = globalLib.Modules
+		def workspace = env.WORKSPACE.replaceAll('%2F', '_')
+		dir(workspace)
+		{
+			def globalLib = library('global-shared-lib').com.test
+			Utilities = globalLib.Utilities
+			Packaging = globalLib.Packaging
+			Modules = globalLib.Modules
 
-	    def deployScript = 'VC-Module2AzureDev.ps1'
-		def dockerTag = "${env.BRANCH_NAME}-branch"
-		def buildOrder = Utilities.getNextBuildOrder(this)
-		projectType = config.projectType
-	    if (env.BRANCH_NAME == 'support/2.x' || env.BRANCH_NAME == '1.1.3') {
-			deployScript = 'VC-Module2AzureQA.ps1'
-			dockerTag = "latest"
-		}
-
-		def SETTINGS
-		def settingsFileContent
-		configFileProvider([configFile(fileId: 'shared_lib_settings', variable: 'SETTINGS_FILE')]) {
-			settingsFileContent = readFile(SETTINGS_FILE)
-		}
-		SETTINGS = globalLib.Settings.new(settingsFileContent)
-		SETTINGS.setBranch(env.BRANCH_NAME)
-		SETTINGS.setProject('module')
-		if(env.BRANCH_NAME == '1.1.3')
-			SETTINGS.setBranch('support/2.x')
-
-		try {
-			//step([$class: 'GitHubCommitStatusSetter', contextSource: [$class: 'ManuallyEnteredCommitContextSource', context: 'ci.virtocommerce.com'], statusResultSource: [$class: 'ConditionalStatusResultSource', results: [[$class: 'AnyBuildResult', message: 'Building on Virto Commerce CI', state: 'PENDING']]]])		
-			//Utilities.updateGithubCommitStatus(this, 'PENDING', 'Building on Virto Commerce CI')
-			Utilities.notifyBuildStatus(this, SETTINGS['of365hook'], '', 'STARTED')
-
-			stage('Checkout') {
-				timestamps {
-					deleteDir()
-					checkout scm
-				}				
-			}			
-
-			if(Utilities.checkAndAbortBuild(this))
-			{
-				return true
+			def deployScript = 'VC-Module2AzureDev.ps1'
+			def dockerTag = "${env.BRANCH_NAME}-branch"
+			def buildOrder = Utilities.getNextBuildOrder(this)
+			projectType = config.projectType
+			if (env.BRANCH_NAME == 'support/2.x' || env.BRANCH_NAME == '1.1.3') {
+				deployScript = 'VC-Module2AzureQA.ps1'
+				dockerTag = "latest"
 			}
 
-			stage('Build')
-			{
-				timestamps { 
-												
-					Packaging.startAnalyzer(this)
-					Packaging.buildSolutions(this)
-				}
+			def SETTINGS
+			def settingsFileContent
+			configFileProvider([configFile(fileId: 'shared_lib_settings', variable: 'SETTINGS_FILE')]) {
+				settingsFileContent = readFile(SETTINGS_FILE)
 			}
+			SETTINGS = globalLib.Settings.new(settingsFileContent)
+			SETTINGS.setBranch(env.BRANCH_NAME)
+			SETTINGS.setProject('module')
+			if(env.BRANCH_NAME == '1.1.3')
+				SETTINGS.setBranch('support/2.x')
 
-			stage('Package Module')
-			{
-				timestamps { 				
-					processManifests(false) // prepare artifacts for testing
+			try {
+				//step([$class: 'GitHubCommitStatusSetter', contextSource: [$class: 'ManuallyEnteredCommitContextSource', context: 'ci.virtocommerce.com'], statusResultSource: [$class: 'ConditionalStatusResultSource', results: [[$class: 'AnyBuildResult', message: 'Building on Virto Commerce CI', state: 'PENDING']]]])		
+				//Utilities.updateGithubCommitStatus(this, 'PENDING', 'Building on Virto Commerce CI')
+				Utilities.notifyBuildStatus(this, SETTINGS['of365hook'], '', 'STARTED')
+
+				stage('Checkout') {
+					timestamps {
+						deleteDir()
+						checkout scm
+					}				
+				}			
+
+				if(Utilities.checkAndAbortBuild(this))
+				{
+					return true
 				}
-			}
 
-			stage('Unit Tests')
-			{
-				timestamps { 				
-					Modules.runUnitTests(this)
-				}
-			}
-
-			stage('Code Analysis') {
-				timestamps { 
-					Packaging.endAnalyzer(this)
-					Packaging.checkAnalyzerGate(this)
-				}
-			}			
-
-			if (env.BRANCH_NAME=='1.1.3' || env.BRANCH_NAME == 'support/2.x' || env.BRANCH_NAME == 'release') {
-				stage('Create Test Environment') {
+				stage('Build')
+				{
 					timestamps { 
-						// Start docker environment
-						Packaging.startDockerTestEnvironment(this, dockerTag)
+													
+						Packaging.startAnalyzer(this)
+						Packaging.buildSolutions(this)
 					}
 				}
 
-				stage('Install VC Modules'){
-					timestamps{
-
-						// install modules
-						Packaging.installModules(this, 0)
-
-                        // install module
-                        Modules.installModuleArtifacts(this)
-
-						//check installed modules
-						Packaging.checkInstalledModules(this)
-
-					}
-				}
-
-				stage('Install Sample Data'){
-					timestamps{
-						// now create sample data
-						Packaging.createSampleData(this)
-					}
-				}
-
-				stage('Theme Build and Deploy'){
-					timestamps {
-						def themePath = "${env.WORKSPACE}@tmp\\theme.zip"
-						def themeJobName = "../vc-theme-default/${env.BRANCH_NAME}"
-						if(env.BRANCH_NAME == "1.1.3")
-							themeJobName = "../vc-theme-default/master"
-						build(job: themeJobName, parameters: [string(name: 'themeResultZip', value: themePath)])
-						Packaging.installTheme(this, themePath)
-					}
-				}
-
-				stage("Swagger Schema Validation"){
-					timestamps{
-						def tempFolder = Utilities.getTempFolder(this)
-						def schemaPath = "${tempFolder}\\swagger.json"
-
-						Utilities.validateSwagger(this, schemaPath)
-					}
-				}	
-
-				stage('Integration Tests')
+				stage('Package Module')
 				{
-					timestamps {
-						Modules.runIntegrationTests(this)
+					timestamps { 				
+						processManifests(false) // prepare artifacts for testing
 					}
 				}
 
-				// stage('E2E'){
-				// 	timestamps{
-				// 		Utilities.runE2E(this)
-				// 	}
+				stage('Unit Tests')
+				{
+					timestamps { 				
+						Modules.runUnitTests(this)
+					}
+				}
+
+				stage('Code Analysis') {
+					timestamps { 
+						Packaging.endAnalyzer(this)
+						Packaging.checkAnalyzerGate(this)
+					}
+				}			
+
+				if (env.BRANCH_NAME=='1.1.3' || env.BRANCH_NAME == 'support/2.x' || env.BRANCH_NAME == 'release') {
+					stage('Create Test Environment') {
+						timestamps { 
+							// Start docker environment
+							Packaging.startDockerTestEnvironment(this, dockerTag)
+						}
+					}
+
+					stage('Install VC Modules'){
+						timestamps{
+
+							// install modules
+							Packaging.installModules(this, 0)
+
+							// install module
+							Modules.installModuleArtifacts(this)
+
+							//check installed modules
+							Packaging.checkInstalledModules(this)
+
+						}
+					}
+
+					stage('Install Sample Data'){
+						timestamps{
+							// now create sample data
+							Packaging.createSampleData(this)
+						}
+					}
+
+					stage('Theme Build and Deploy'){
+						timestamps {
+							def themePath = "${env.WORKSPACE}@tmp\\theme.zip"
+							def themeJobName = "../vc-theme-default/${env.BRANCH_NAME}"
+							if(env.BRANCH_NAME == "1.1.3")
+								themeJobName = "../vc-theme-default/master"
+							build(job: themeJobName, parameters: [string(name: 'themeResultZip', value: themePath)])
+							Packaging.installTheme(this, themePath)
+						}
+					}
+
+					stage("Swagger Schema Validation"){
+						timestamps{
+							def tempFolder = Utilities.getTempFolder(this)
+							def schemaPath = "${tempFolder}\\swagger.json"
+
+							Utilities.validateSwagger(this, schemaPath)
+						}
+					}	
+
+					stage('Integration Tests')
+					{
+						timestamps {
+							Modules.runIntegrationTests(this)
+						}
+					}
+
+					// stage('E2E'){
+					// 	timestamps{
+					// 		Utilities.runE2E(this)
+					// 	}
+					// }
+				}
+
+				if (env.BRANCH_NAME == '1.1.3' || env.BRANCH_NAME == 'support/2.x-dev' || env.BRANCH_NAME == 'support/2.x' || env.BRANCH_NAME == 'dev-eventhandler-dynamicproperties'){
+					stage('Publish')
+					{
+						timestamps {
+							def moduleId = Modules.getModuleId(this)
+							def artifacts = findFiles(glob: 'artifacts\\*.zip')
+							Packaging.saveArtifact(this, 'vc', 'module', moduleId, artifacts[0].path)
+							if (env.BRANCH_NAME == 'support/2.x' || env.BRANCH_NAME =='1.1.3') {
+								processManifests(true) // publish artifacts to github releases
+							}
+							switch(env.BRANCH_NAME){
+								case ['support/2.x', '1.1.3']:
+									Packaging.createNugetPackages(this)
+									break
+								case 'support/2.x-dev':
+									Utilities.runSharedPS(this, "${deployScript}", "-SubscriptionID ${SETTINGS['subscriptionID']} -WebAppName ${SETTINGS['appName']} -ResourceGroupName ${SETTINGS['resourceGroupName']}")
+									break
+							}
+						}
+					}
+				}
+
+				if(Utilities.getRepoName(this) == 'vc-module-pagebuilder'){
+					stage('Delivery to virtocommerce.com'){
+						timestamps{
+							SETTINGS.setProject('virtocommerce')
+							SETTINGS.setBranch('support/2.x-dev')
+							if(env.BRANCH_NAME == 'support/2.x'){
+								SETTINGS.setBranch('support/2.x')
+							}
+							Utilities.runSharedPS(this, "${deployScript}", "-SubscriptionID ${SETTINGS['subscriptionID']} -WebAppName ${SETTINGS['appName']} -ResourceGroupName ${SETTINGS['resourceGroupName']}")
+						}
+					}
+				}
+
+				stage('Cleanup') {
+					timestamps { 
+						Packaging.cleanSolutions(this)
+					}
+				}				
+			}
+			catch (any) {
+				currentBuild.result = 'FAILURE'
+				throw any //rethrow exception to prevent the build from proceeding
+			}
+			finally {
+				Packaging.stopDockerTestEnvironment(this, dockerTag)
+				Utilities.generateAllureReport(this)
+				Utilities.notifyBuildStatus(this, SETTINGS['of365hook'], "Build finished", currentBuild.currentResult)
+				step([$class: 'LogParserPublisher',
+					failBuildOnError: false,
+					parsingRulesPath: env.LOG_PARSER_RULES,
+					useProjectRule: false])
+				// if(currentBuild.result != 'FAILURE') {
+				// 	step([$class: 'Mailer', notifyEveryUnstableBuild: true, recipients: emailextrecipients([[$class: 'CulpritsRecipientProvider'], [$class: 'RequesterRecipientProvider']])])
 				// }
+				// else {
+				// 	def log = currentBuild.rawBuild.getLog(300)
+				// 	def failedStageLog = Utilities.getFailedStageStr(log)
+				// 	def failedStageName = Utilities.getFailedStageName(failedStageLog)
+				// 	def mailBody = Utilities.getMailBody(this, failedStageName, failedStageLog)
+				// 	emailext body:mailBody, subject: "${env.JOB_NAME}:${env.BUILD_NUMBER} - ${currentBuild.currentResult}", recipientProviders: [[$class: 'CulpritsRecipientProvider'], [$class: 'RequesterRecipientProvider']]
+				// }
+				Utilities.cleanPRFolder(this)
 			}
-
-			if (env.BRANCH_NAME == '1.1.3' || env.BRANCH_NAME == 'support/2.x-dev' || env.BRANCH_NAME == 'support/2.x' || env.BRANCH_NAME == 'dev-eventhandler-dynamicproperties'){
-				stage('Publish')
-				{
-					timestamps {
-						def moduleId = Modules.getModuleId(this)
-						def artifacts = findFiles(glob: 'artifacts\\*.zip')
-						Packaging.saveArtifact(this, 'vc', 'module', moduleId, artifacts[0].path)
-						if (env.BRANCH_NAME == 'support/2.x' || env.BRANCH_NAME =='1.1.3') {
-							processManifests(true) // publish artifacts to github releases
-						}
-						switch(env.BRANCH_NAME){
-							case ['support/2.x', '1.1.3']:
-								Packaging.createNugetPackages(this)
-								break
-							case 'support/2.x-dev':
-								Utilities.runSharedPS(this, "${deployScript}", "-SubscriptionID ${SETTINGS['subscriptionID']} -WebAppName ${SETTINGS['appName']} -ResourceGroupName ${SETTINGS['resourceGroupName']}")
-								break
-						}
-					}
-				}
-			}
-
-			if(Utilities.getRepoName(this) == 'vc-module-pagebuilder'){
-				stage('Delivery to virtocommerce.com'){
-					timestamps{
-						SETTINGS.setProject('virtocommerce')
-						SETTINGS.setBranch('support/2.x-dev')
-						if(env.BRANCH_NAME == 'support/2.x'){
-							SETTINGS.setBranch('support/2.x')
-						}
-						Utilities.runSharedPS(this, "${deployScript}", "-SubscriptionID ${SETTINGS['subscriptionID']} -WebAppName ${SETTINGS['appName']} -ResourceGroupName ${SETTINGS['resourceGroupName']}")
-					}
-				}
-			}
-
-			stage('Cleanup') {
-				timestamps { 
-					Packaging.cleanSolutions(this)
-				}
-			}				
-		}
-		catch (any) {
-			currentBuild.result = 'FAILURE'
-			throw any //rethrow exception to prevent the build from proceeding
-		}
-		finally {
-			Packaging.stopDockerTestEnvironment(this, dockerTag)
-			Utilities.generateAllureReport(this)
-			Utilities.notifyBuildStatus(this, SETTINGS['of365hook'], "Build finished", currentBuild.currentResult)
-			step([$class: 'LogParserPublisher',
-				  failBuildOnError: false,
-				  parsingRulesPath: env.LOG_PARSER_RULES,
-				  useProjectRule: false])
-			// if(currentBuild.result != 'FAILURE') {
-			// 	step([$class: 'Mailer', notifyEveryUnstableBuild: true, recipients: emailextrecipients([[$class: 'CulpritsRecipientProvider'], [$class: 'RequesterRecipientProvider']])])
-			// }
-			// else {
-			// 	def log = currentBuild.rawBuild.getLog(300)
-			// 	def failedStageLog = Utilities.getFailedStageStr(log)
-			// 	def failedStageName = Utilities.getFailedStageName(failedStageLog)
-			// 	def mailBody = Utilities.getMailBody(this, failedStageName, failedStageLog)
-			// 	emailext body:mailBody, subject: "${env.JOB_NAME}:${env.BUILD_NUMBER} - ${currentBuild.currentResult}", recipientProviders: [[$class: 'CulpritsRecipientProvider'], [$class: 'RequesterRecipientProvider']]
-			// }
-			Utilities.cleanPRFolder(this)
 		}
 
 		//step([$class: 'GitHubCommitStatusSetter', statusResultSource: [$class: 'ConditionalStatusResultSource', results: []]])
