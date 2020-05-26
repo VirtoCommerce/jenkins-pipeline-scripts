@@ -216,9 +216,12 @@ def call(body) {
 					}
 				}
 
-				if (env.BRANCH_NAME == 'support/2.x-dev' || env.BRANCH_NAME == 'support/2.x') {
-					stage('Publish'){
-						timestamps { 
+				if (env.BRANCH_NAME == 'support/2.x-dev' || env.BRANCH_NAME == 'support/2.x' || env.BRANCH_NAME == 'dev' || env.BRANCH_NAME =='master') 
+				{
+					stage('Publish')
+					{
+						timestamps 
+						{ 
 							def packagesDir = Utilities.getArtifactFolder(this)
 							def artifacts
 							dir(packagesDir)
@@ -227,18 +230,16 @@ def call(body) {
 							}
 							Packaging.saveArtifact(this, 'vc', Utilities.getProjectType(this), '', "artifacts/${artifacts[0].path}")
 
-							if(solution == 'VirtoCommerce.Platform.sln' || projectType == 'NETCORE2')
+							Packaging.pushDockerImage(this, dockerImage, dockerTag)
+							if(Utilities.isNetCore(projectType))
 							{
-								Packaging.pushDockerImage(this, dockerImage, dockerTag)
-								if(Utilities.isNetCore(projectType))
+								node('linux')
 								{
-									node('linux')
-									{
-										Packaging.pushDockerImage(this, dockerImageLinux, dockerTagLinux)
-									}
+									Packaging.pushDockerImage(this, dockerImageLinux, dockerTagLinux)
 								}
 							}
-							if (Packaging.getShouldPublish(this)) {
+							if (env.BRANCH_NAME == 'support/2.x' || env.BRANCH_NAME =='master') 
+							{
 								Packaging.createNugetPackages(this)
 								def notes = Utilities.getReleaseNotes(this, webProject)
 								Packaging.publishRelease(this, version, notes)
