@@ -115,7 +115,7 @@ pipeline {
                     def modulesRoot = "${env.WORKSPACE}\\CS\\module"
                     def platformRoot = "${env.WORKSPACE}\\CS\\platform"
                     powershell script: "Remove-Item -Path ${env.WORKSPACE}\\CS\\* -Recurse -Force -ErrorAction Continue", label: "Clean Workspace"
-                    if(BRANCH_NAME == 'support_2.x' || BRANCH_NAME == 'support_2.x-dev')
+                    if(BRANCH_NAME == 'support_2.x' || BRANCH_NAME == 'support_2.x-dev' || BRANCH_NAME == 'dev' || BRANCH_NAME == 'master')
                     {
                         //theme
                         def themeIncludeParam = ''
