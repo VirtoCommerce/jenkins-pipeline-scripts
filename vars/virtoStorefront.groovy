@@ -123,6 +123,13 @@ def call(body) {
 						Packaging.createReleaseArtifact(this, version, webProject, zipArtifact, websiteDir)
 						if (env.BRANCH_NAME == 'support/2.x-dev' || env.BRANCH_NAME == 'support/2.x' || env.BRANCH_NAME == 'dev' || env.BRANCH_NAME =='master') {
 							def websitePath = Utilities.getWebPublishFolder(this, websiteDir)
+							if (env.BRANCH_NAME == 'support/2.x-dev' || env.BRANCH_NAME == 'support/2.x')
+							{
+								dir(env.WORKSPACE)
+								{
+									websitePath = Utilities.getWebPublishFolder(this, websiteDir)
+								}
+							}
 							dockerImage = Packaging.createDockerImage(this, zipArtifact.replaceAll('\\.','/'), websitePath, ".", dockerTag, runtimeImage)		
 							if(Utilities.isNetCore(projectType) && (env.BRANCH_NAME == 'dev' || env.BRANCH_NAME =='master'))
 							{
