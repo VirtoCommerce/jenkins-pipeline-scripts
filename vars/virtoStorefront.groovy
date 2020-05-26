@@ -234,7 +234,7 @@ def call(body) {
 							Packaging.saveArtifact(this, 'vc', Utilities.getProjectType(this), '', "artifacts/${artifacts[0].path}")
 
 							Packaging.pushDockerImage(this, dockerImage, dockerTag)
-							if(Utilities.isNetCore(projectType))
+							if(Utilities.isNetCore(projectType) && dockerImageLinux != null)
 							{
 								node('linux')
 								{
