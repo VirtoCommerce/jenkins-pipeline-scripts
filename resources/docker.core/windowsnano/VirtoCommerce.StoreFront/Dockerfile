@@ -1,6 +1,7 @@
 # escape=`
+ARG RUNTIME_IMAGE=microsoft/dotnet:2.2-aspnetcore-runtime
 
-FROM microsoft/dotnet:2.2-aspnetcore-runtime
+FROM $RUNTIME_IMAGE
 
 ARG SOURCE=VirtoCommerce.Storefront
 
