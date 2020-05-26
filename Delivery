@@ -115,7 +115,7 @@ pipeline {
                     def modulesRoot = "${env.WORKSPACE}\\CS\\module"
                     def platformRoot = "${env.WORKSPACE}\\CS\\platform"
                     powershell script: "Remove-Item -Path ${env.WORKSPACE}\\CS\\* -Recurse -Force -ErrorAction Continue", label: "Clean Workspace"
-                    if(BRANCH_NAME == 'release_3.0.0' || BRANCH_NAME == 'dev-3.0.0')
+                    if(BRANCH_NAME == 'support_2.x' || BRANCH_NAME == 'support_2.x-dev')
                     {
                         //theme
                         def themeIncludeParam = ''
@@ -149,7 +149,7 @@ pipeline {
             when
             {
                 expression{
-                    return REGION == 'demo3'
+                    return false && REGION == 'demo3'
                 }
             }
             steps
@@ -483,25 +483,7 @@ pipeline {
                     Utilities.checkLogForWarnings(this)
                 }
                 Utilities.notifyBuildStatus(this, env.TEAMS_HOOK, "", currentBuild.result)
-                if(!UPDATE_CS && (PROJECT_TYPE=='HOT' || PROJECT_TYPE=='RW1')){
-                    node(SETTINGS['agentLabel']){
-                        withEnv(["DOCKER_TAG=${DOCKER_TAG}", "DOCKER_PREFIX=${DOCKER_PREFIX}", "DOCKER_PLATFORM_PORT=${DOCKER_PLATFORM_PORT}", "DOCKER_STOREFRONT_PORT=${DOCKER_STOREFRONT_PORT}", "DOCKER_SQL_PORT=${DOCKER_SQL_PORT}", "COMPOSE_PROJECT_NAME=${env.BUILD_TAG}"]){
-                            bat "docker-compose down -v"
-                        }
-                        bat "docker image prune -f"
-                    }
-                    //Utilities.generateAllureReport(this)
-                    def slave = SETTINGS['agentLabel']
-                    if(slave != null){
-                        try{
-                            unstash 'allure'
-                        }
-                        catch(any){
-                            echo any.getMessage()
-                        }
-                    }
-                    allure results: [[path: "allure-results-${PROJECT_TYPE}"]]
-                }
+                
                 if(CAUSES.size() > 0){
                     echo "UNSTABLE's Causes:"
                     for(cause in CAUSES){
