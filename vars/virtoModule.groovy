@@ -173,9 +173,9 @@ def call(body) {
 								case ['support/2.x', '1.1.3']:
 									Packaging.createNugetPackages(this)
 									break
-								case 'support/2.x-dev':
-									Utilities.runSharedPS(this, "${deployScript}", "-SubscriptionID ${SETTINGS['subscriptionID']} -WebAppName ${SETTINGS['appName']} -ResourceGroupName ${SETTINGS['resourceGroupName']} -Path2Zip ${artifactPath}")
-									break
+								// case 'support/2.x-dev':
+								// 	Utilities.runSharedPS(this, "${deployScript}", "-SubscriptionID ${SETTINGS['subscriptionID']} -WebAppName ${SETTINGS['appName']} -ResourceGroupName ${SETTINGS['resourceGroupName']} -Path2Zip ${artifactPath}")
+								// 	break
 							}
 						}
 					}
