@@ -219,7 +219,7 @@ def call(body) {
 									}
 								}
 							}
-							if (Packaging.getShouldPublish(this)) {
+							if (env.BRANCH_NAME == 'support/2.x') {
 								Packaging.createNugetPackages(this)
 								def notes = Utilities.getReleaseNotes(this, webProject)
 								Packaging.publishRelease(this, version, notes)
