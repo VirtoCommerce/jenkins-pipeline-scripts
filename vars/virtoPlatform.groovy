@@ -165,7 +165,7 @@ def call(body) {
 						stage('Theme Build and Deploy'){
 							timestamps{
 								def themePath = "${workspace}@tmp\\theme.zip"
-								build(job: "../vc-theme-default/${env.BRANCH_NAME}", parameters: [string(name: 'themeResultZip', value: themePath)])
+								build(job: "../vc-theme-default/${themeBranch}", parameters: [string(name: 'themeResultZip', value: themePath)])
 								Packaging.installTheme(this, themePath)
 							}
 						}
