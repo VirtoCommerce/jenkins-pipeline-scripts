@@ -34,15 +34,18 @@ def call(body) {
 			def dockerTagLinux = "2.0-dev-linux"
 			def storefrontImageName = 'virtocommerce/storefront'
 			def buildOrder = Utilities.getNextBuildOrder(this)
+			def themeBranch
 			switch(env.BRANCH_NAME)
 			{
 				case 'support/2.x':
 					dockerTag = "2.0"
 					dockerTagLinux = '2.0-linux'
+					themeBranch = 'master'
 				break
 				case 'support/2.x-dev':
 					dockerTag = "2.0-dev-branch"
 					dockerTagLinux = '2.0-dev-linux'
+					themeBranch = 'dev'
 				break
 			}
 

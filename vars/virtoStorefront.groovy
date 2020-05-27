@@ -35,6 +35,7 @@ def call(body) {
 			def runtimeImage = ""
 			def storefrontImageName = 'virtocommerce/storefront'
 			def buildOrder = Utilities.getNextBuildOrder(this)
+			def themeBranch
 			if (env.BRANCH_NAME == 'support/2.x') {
 				
 			}
@@ -43,20 +44,24 @@ def call(body) {
 				case 'support/2.x':
 					dockerTag = "2.0"
 					dockerTagLinux = '2.0-linux'
+					themeBranch = 'master'
 				break
 				case 'support/2.x-dev':
 					dockerTag = "2.0-dev-branch"
 					dockerTagLinux = '2.0-dev-linux'
+					themeBranch = 'dev'
 				break
 				case 'dev':
 					dockerTag = "3.0-dev"
 					dockerTagLinux = '3.0-dev-linux'
 					runtimeImage = "mcr.microsoft.com/dotnet/core/aspnet:3.1"
+					themeBranch = 'dev'
 				break
 				case 'master':
 					dockerTag = "3.0"
 					dockerTagLinux = '3.0-linux'
 					runtimeImage = "mcr.microsoft.com/dotnet/core/aspnet:3.1"
+					themeBranch = 'master'
 				break
 			}
 
@@ -187,7 +192,7 @@ def call(body) {
 						stage('Theme Build and Deploy'){
 							timestamps{
 								def themePath = "${workspace}@tmp\\theme.zip"
-								build(job: "../vc-theme-default/${env.BRANCH_NAME}", parameters: [string(name: 'themeResultZip', value: themePath)])
+								build(job: "../vc-theme-default/${themeBranch}", parameters: [string(name: 'themeResultZip', value: themePath)])
 								Packaging.installTheme(this, themePath)
 							}
 						}
