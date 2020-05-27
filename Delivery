@@ -178,7 +178,7 @@ pipeline {
                                 def platformPort = Utilities.getPlatformPort(this)
                                 def storefrontPort = Utilities.getStorefrontPort(this)
                                 def sqlPort = Utilities.getSqlPort(this)
-                                withEnv(["PLATFORM_DOCKER_TAG=3.0-dev", "STOREFRONT_DOCKER_TAG=3.0-dev", "DOCKER_PLATFORM_PORT=${platformPort}", "DOCKER_STOREFRONT_PORT=${storefrontPort}", "DOCKER_SQL_PORT=${sqlPort}", "COMPOSE_PROJECT_NAME=${env.BUILD_TAG}"]) {
+                                withEnv(["PLATFORM_DOCKER_TAG=${platformTag}", "STOREFRONT_DOCKER_TAG=${storefrontTag}", "DOCKER_PLATFORM_PORT=${platformPort}", "DOCKER_STOREFRONT_PORT=${storefrontPort}", "DOCKER_SQL_PORT=${sqlPort}", "COMPOSE_PROJECT_NAME=${env.BUILD_TAG}"]) {
                                     bat "docker-compose up -d"
                                 }
                             }
