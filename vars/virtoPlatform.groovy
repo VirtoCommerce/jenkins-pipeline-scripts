@@ -111,7 +111,7 @@ def call(body) {
 							def websitePath = Utilities.getWebPublishFolder(this, websiteDir)
 							dir(env.BRANCH_NAME == 'support/2.x-dev' || env.BRANCH_NAME == 'support/2.x' ? env.WORKSPACE : workspace)
 							{
-								dockerImage = Packaging.createDockerImage(this, zipArtifact.replaceAll('\\.','/'), websitePath, ".", dockerTag, runtimeImage)	
+								dockerImage = Packaging.createDockerImage(this, zipArtifact.replaceAll('\\.','/'), websitePath, ".", dockerTag)	
 							}		
 						}
 					}
