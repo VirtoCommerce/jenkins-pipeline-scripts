@@ -93,25 +93,29 @@ def call(body) {
                     powershell "vc-build Compress -skip Clean+Restore+Compile+Test"
                 }
 
-                if(env.BRANCH_NAME == 'feature/migrate-to-vc30')
+                def artifacts
+                def artifactFileName
+                def moduleId
+                stage('Saving Artifacts')
                 {
-                    def artifacts = findFiles(glob: 'artifacts\\*.zip')
-                    def artifactFileName = artifacts[0].path.split("\\\\").last()
-                    def moduleId = artifactFileName.split("_").first()
-                    echo "Module id: ${moduleId}"
-                    Packaging.saveArtifact(this, 'vc', 'module', moduleId, artifacts[0].path)
+                    timestamps
+                    {
+                        artifacts = findFiles(glob: 'artifacts\\*.zip')
+                        artifactFileName = artifacts[0].path.split("\\\\").last()
+                        moduleId = artifactFileName.split("_").first()
+                        echo "Module id: ${moduleId}"
+
+                        if(env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'feature/migrate-to-vc30' || env.BRANCH_NAME.startsWith("feature/") || env.BRANCH_NAME.startsWith("bug/"))
+                        {
+                            Packaging.saveArtifact(this, 'vc', 'module', moduleId, artifacts[0].path)
+                        }
+                    }
                 }
 
                 if(env.BRANCH_NAME == 'dev')
                 {
                     stage('Publish')
                     {
-                        def artifacts = findFiles(glob: 'artifacts\\*.zip')
-                        def artifactFileName = artifacts[0].path.split("\\\\").last()
-                        def moduleId = artifactFileName.split("_").first()
-                        echo "Module id: ${moduleId}"
-						Packaging.saveArtifact(this, 'vc', 'module', moduleId, artifacts[0].path)
-
                         def gitversionOutput = powershell (script: "dotnet gitversion", returnStdout: true, label: 'Gitversion', encoding: 'UTF-8').trim()
                         def gitversionJson = new groovy.json.JsonSlurperClassic().parseText(gitversionOutput)
                         def commitNumber = gitversionJson['CommitsSinceVersionSource']
@@ -138,12 +142,6 @@ def call(body) {
                 {
                     stage('Publish')
                     {
-						def artifacts = findFiles(glob: 'artifacts\\*.zip')
-                        def artifactFileName = artifacts[0].path.split("\\\\").last()
-                        def moduleId = artifactFileName.split("_").first()
-                        echo "Module id: ${moduleId}"
-						Packaging.saveArtifact(this, 'vc', 'module', moduleId, artifacts[0].path)
-                        
                         def ghReleaseResult = powershell script: "vc-build PublishPackages -ApiKey ${env.NUGET_KEY} -skip Clean+Restore+Compile+Test", returnStatus: true
                         if(ghReleaseResult == 409)
                         {

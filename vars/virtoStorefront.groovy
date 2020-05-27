@@ -219,20 +219,26 @@ def call(body) {
 					}
 				}
 
+				def artifacts
+                stage('Saving Artifacts')
+                {
+                    timestamps
+                    {
+                        artifacts = findFiles(glob: 'artifacts\\*.zip')
+
+                        if(env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'feature/migrate-to-vc30' || env.BRANCH_NAME.startsWith("feature/") || env.BRANCH_NAME.startsWith("bug/"))
+                        {
+                            Packaging.saveArtifact(this, 'vc', Utilities.getProjectType(this), '', artifacts[0].path)
+                        }
+                    }
+                }
+
 				if (env.BRANCH_NAME == 'support/2.x-dev' || env.BRANCH_NAME == 'support/2.x' || env.BRANCH_NAME == 'dev' || env.BRANCH_NAME =='master') 
 				{
 					stage('Publish')
 					{
 						timestamps 
-						{ 
-							def packagesDir = Utilities.getArtifactFolder(this)
-							def artifacts
-							dir(packagesDir)
-							{ 
-								artifacts = findFiles(glob: '*.zip')
-							}
-							Packaging.saveArtifact(this, 'vc', Utilities.getProjectType(this), '', "artifacts/${artifacts[0].path}")
-
+						{
 							Packaging.pushDockerImage(this, dockerImage, dockerTag)
 							if(Utilities.isNetCore(projectType) && dockerImageLinux != null)
 							{
