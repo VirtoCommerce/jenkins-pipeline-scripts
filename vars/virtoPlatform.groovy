@@ -31,12 +31,19 @@ def call(body) {
 			def websiteDir = 'VirtoCommerce.Platform.Web'
 			def deployScript = 'VC-WebApp2Azure.ps1'
 			def dockerTag = "${env.BRANCH_NAME}-branch"
-			def dockerTagLinux = "3.0-dev-linux"
+			def dockerTagLinux = "2.0-dev-linux"
 			def storefrontImageName = 'virtocommerce/storefront'
 			def buildOrder = Utilities.getNextBuildOrder(this)
-			if (env.BRANCH_NAME == 'support/2.x') {
-				dockerTag = "latest"
-				dockerTagLinux = '3.0-preview-linux'
+			switch(env.BRANCH_NAME)
+			{
+				case 'support/2.x':
+					dockerTag = "2.0"
+					dockerTagLinux = '2.0-linux'
+				break
+				case 'support/2.x-dev':
+					dockerTag = "2.0-dev-branch"
+					dockerTagLinux = '2.0-dev-linux'
+				break
 			}
 
 			def SETTINGS
@@ -102,18 +109,10 @@ def call(body) {
 						Packaging.createReleaseArtifact(this, version, webProject, zipArtifact, websiteDir)
 						if (env.BRANCH_NAME == 'support/2.x-dev' || env.BRANCH_NAME == 'support/2.x') {
 							def websitePath = Utilities.getWebPublishFolder(this, websiteDir)
-							dockerImage = Packaging.createDockerImage(this, zipArtifact.replaceAll('\\.','/'), websitePath, ".", dockerTag)		
-							if(Utilities.isNetCore(projectType))
+							dir(env.BRANCH_NAME == 'support/2.x-dev' || env.BRANCH_NAME == 'support/2.x' ? env.WORKSPACE : workspace)
 							{
-								stash includes: 'VirtoCommerce.Storefront/**', name: 'artifact'
-								node('linux')
-								{
-									unstash 'artifact'
-									def dockerfileContent = libraryResource 'docker.core/linux/storefront/Dockerfile'
-									writeFile file: "${workspace}/Dockerfile", text: dockerfileContent
-									dockerImageLinux = docker.build("${storefrontImageName}:${dockerTagLinux}", "--build-arg SOURCE=./VirtoCommerce.Storefront .")
-								}
-							}	
+								dockerImage = Packaging.createDockerImage(this, zipArtifact.replaceAll('\\.','/'), websitePath, ".", dockerTag, runtimeImage)	
+							}		
 						}
 					}
 				}
