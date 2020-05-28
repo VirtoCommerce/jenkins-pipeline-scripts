@@ -9,9 +9,8 @@ foreach ($lr in $releases) {
     }    
 }
 
-$json = $latestRelease.Content | ConvertFrom-Json
-$latestZipUrl = $json.assets.browser_download_url
-$latestZipName = $json.assets.name
+$latestZipUrl = $latestRelease.assets.browser_download_url
+$latestZipName = $latestRelease.assets.name
 Write-Host "Download url is $latestZipUrl"
 $Path2Zip = "$((Get-Location).Path)\$latestZipName"
 Write-Host "Path to zip is $Path2Zip"
