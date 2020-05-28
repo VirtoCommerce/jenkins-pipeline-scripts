@@ -1,6 +1,14 @@
 $ErrorActionPreference = 'Stop'
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-$latestRelease = Invoke-WebRequest https://api.github.com/repos/VirtoCommerce/vc-platform/releases/latest -Headers @{"Accept"="application/json"} -UseBasicParsing
+$releases = Invoke-RestMethod https://api.github.com/repos/VirtoCommerce/vc-platform/releases -Headers @{"Accept"="application/json"} -UseBasicParsing
+$latestRelease=''
+foreach ($lr in $releases) {
+    if ($lr.tag_name.StartsWith("v2")) {
+        $latestRelease = $lr
+        break
+    }    
+}
+
 $json = $latestRelease.Content | ConvertFrom-Json
 $latestZipUrl = $json.assets.browser_download_url
 $latestZipName = $json.assets.name
