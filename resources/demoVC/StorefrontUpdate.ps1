@@ -2,10 +2,18 @@ $ErrorActionPreference = 'Stop'
 if (-not ([Net.ServicePointManager]::SecurityProtocol).ToString().Contains([Net.SecurityProtocolType]::Tls12)) {
   [Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol.toString() + ', ' + [Net.SecurityProtocolType]::Tls12
 }
-$latestRelease = Invoke-WebRequest https://api.github.com/repos/VirtoCommerce/vc-storefront-core/releases/latest -Headers @{"Accept"="application/json"} -UseBasicParsing
-$json = $latestRelease.Content | ConvertFrom-Json
-$latestZipUrl = $json.assets.browser_download_url
-$latestZipName = $json.assets.name
+
+$releases = Invoke-RestMethod https://api.github.com/repos/VirtoCommerce/vc-storefront-core/releases -Headers @{"Accept"="application/json"} -UseBasicParsing
+$latestRelease=''
+foreach ($lr in $releases) {
+    if ($lr.tag_name.StartsWith("v4")) {
+        $latestRelease = $lr
+        break
+    }
+}
+
+$latestZipUrl = $latestRelease.assets.browser_download_url
+$latestZipName = $latestRelease.assets.name
 Write-Host "Download url is $latestZipUrl"
 $Path2Zip = "$((Get-Location).Path)\$latestZipName"
 Write-Host "Path to zip is $Path2Zip"

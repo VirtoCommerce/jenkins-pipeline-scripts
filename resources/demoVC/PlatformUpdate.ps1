@@ -6,7 +6,7 @@ foreach ($lr in $releases) {
     if ($lr.tag_name.StartsWith("v2")) {
         $latestRelease = $lr
         break
-    }    
+    }
 }
 
 $latestZipUrl = $latestRelease.assets.browser_download_url
