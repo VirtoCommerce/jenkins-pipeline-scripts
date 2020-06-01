@@ -50,8 +50,7 @@ def call(body) {
             def coverageFolder = Utilities.getCoverageFolder(this)
             
             def commitNumber = Utilities.getCommitHash(this)
-            def versionSuffixArg = env.BRANCH_NAME == 'dev' ? "-CustomVersionSuffix \"_build_${commitNumber}\"" : ""
-            echo "versionSuffixArg ${versionSuffixArg}"
+            def versionSuffixArg = env.BRANCH_NAME == 'dev' ? "-CustomTagSuffix \"_build_${commitNumber}\"" : ""
 
             try {
                 stage('Checkout'){
