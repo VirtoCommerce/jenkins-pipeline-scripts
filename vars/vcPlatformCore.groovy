@@ -50,7 +50,7 @@ def call(body) {
             def coverageFolder = Utilities.getCoverageFolder(this)
             
             def commitNumber = Utilities.getCommitHash(this)
-            def vesrionSuffix = env.BRANCH_NAME == 'dev' ? "-CustomVersionSuffix \"-${commitNumber}\"" : "" 
+            def versionSuffixArg = env.BRANCH_NAME == 'dev' ? "-CustomVersionSuffix \"-${commitNumber}\"" : "" 
 
             try {
                 stage('Checkout'){
@@ -122,7 +122,7 @@ def call(body) {
 
                 stage('Packaging'){
                              
-                    powershell "vc-build Compress -skip Clean+Restore+Compile+Test ${vesrionSuffix}"
+                    powershell "vc-build Compress ${versionSuffixArg} -skip Clean+Restore+Compile+Test"
 
                     if(env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'dev'){
                         def websitePath = Utilities.getWebPublishFolder(this, "docker")
@@ -220,7 +220,7 @@ def call(body) {
                             def orgName = Utilities.getOrgName(this)
                             def releaseNotesFile = new File(releaseNotesPath)
                             def releaseNotesArg = releaseNotesFile.exists() ? "-ReleaseNotes ${releaseNotesFile}" : ""
-                            def releaseResult = powershell script: "vc-build Release -GitHubUser ${orgName} -GitHubToken ${env.GITHUB_TOKEN} ${releaseNotesArg} -PreRelease ${vesrionSuffix} -skip Clean+Restore+Compile+Test", returnStatus: true
+                            def releaseResult = powershell script: "vc-build Release -GitHubUser ${orgName} -GitHubToken ${env.GITHUB_TOKEN} ${releaseNotesArg} -PreRelease ${versionSuffixArg} -skip Clean+Restore+Compile+Test", returnStatus: true
                             if(releaseResult == 422){
                                 UNSTABLE_CAUSES.add("Release already exists on github")
                             } else if(releaseResult !=0 ) {
