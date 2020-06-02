@@ -35,12 +35,15 @@ def call(body) {
             // SETTINGS = globalLib.Settings.new(settingsFileContent)
             // SETTINGS.setProject('platform-core')
             // SETTINGS.setBranch(env.BRANCH_NAME)
-            def commitNumber = Utilities.getCommitHash(this)
-            def versionSuffixArg = env.BRANCH_NAME == 'dev' ? "-CustomTagSuffix \"_build_${commitNumber}\"" : ""
+            def commitNumber
+            def versionSuffixArg
             try {
                 stage('Checkout'){
                     deleteDir()
                     checkout scm
+
+                    commitNumber = Utilities.getCommitHash(this)
+                    versionSuffixArg = env.BRANCH_NAME == 'dev' ? "-CustomTagSuffix \"_build_${commitNumber}\"" : ""
 
                     try
                     {

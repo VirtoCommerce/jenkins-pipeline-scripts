@@ -49,14 +49,17 @@ def call(body) {
             Utilities.notifyBuildStatus(this, SETTINGS['of365hook'], '', 'STARTED')
             def coverageFolder = Utilities.getCoverageFolder(this)
             
-            def commitNumber = Utilities.getCommitHash(this)
-            def versionSuffixArg = env.BRANCH_NAME == 'dev' ? "-CustomTagSuffix \"_build_${commitNumber}\"" : ""
+            def commitNumber
+            def versionSuffixArg
 
             try {
                 stage('Checkout'){
                     deleteDir()
                     
                     checkout scm
+
+                    commitNumber = Utilities.getCommitHash(this)
+                    versionSuffixArg = env.BRANCH_NAME == 'dev' ? "-CustomTagSuffix \"_build_${commitNumber}\"" : ""
 
                     try
                     {
