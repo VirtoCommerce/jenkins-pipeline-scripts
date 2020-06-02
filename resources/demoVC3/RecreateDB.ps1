@@ -37,6 +37,7 @@ Select-AzureRmSubscription -SubscriptionId $SubscriptionID
 
 #$publishSettingsFile = "$env:VC_RES\azure\Configs\demovc.publishsettings"
 #$SubscriptionName = "demo.vc"
+$MainAppName = "production"
 $SlotName = "staging"
 $modulesInstallStateUrl = "https://$WebAppAdminName-$SlotName.azurewebsites.net/api/platform/modules/autoinstall/state"
 $modulesInstallUrl = "https://$WebAppAdminName-$SlotName.azurewebsites.net/api/platform/modules/autoinstall"
@@ -372,12 +373,14 @@ Remove-Item $b2bPath -Recurse -Force
 Remove-Item $clothPath -Recurse -Force
 Remove-Item $dentalPath -Recurse -Force
 
-Write-Output "Switching $WebAppAdminName slot"
+Write-Output "Switching $WebAppAdminName and stop slot"
 
-Switch-AzureRmWebAppSlot -Name $WebAppAdminName -ResourceGroupName $DestResourceGroupName -SourceSlotName "staging" -DestinationSlotName "production"
+Switch-AzureRmWebAppSlot -ResourceGroupName $DestResourceGroupName -Name $WebAppAdminName -SourceSlotName $SlotName -DestinationSlotName $MainAppName
+Stop-AzureRmWebAppSlot -ResourceGroupName $DestResourceGroupName -Name $WebAppAdminName -Slot $SlotName
 
-Write-Output "Switching $WebAppPublicName slot"
+Write-Output "Switching $WebAppPublicName and stop slot"
  
-Switch-AzureRmWebAppSlot -Name $WebAppPublicName -ResourceGroupName $DestResourceGroupName -SourceSlotName "staging" -DestinationSlotName "production"
+Switch-AzureRmWebAppSlot -ResourceGroupName $DestResourceGroupName -Name $WebAppPublicName -SourceSlotName $SlotName -DestinationSlotName $MainAppName
+Stop-AzureRmWebAppSlot -ResourceGroupName $DestResourceGroupName -Name $WebAppPublicName -Slot $SlotName
 
 Write-Output "Completed"
