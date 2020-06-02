@@ -63,13 +63,13 @@ Invoke-RestMethod -Uri $DestKuduPath `
 
 Start-Sleep -s 15
 
-Write-Host "Uploading License File $LicFile to $DestKuduPutPath"
+# Write-Host "Uploading License File $LicFile to $DestKuduPutPath"
 
-Invoke-RestMethod -Uri $DestKuduPutPath `
-                        -Headers @{"Authorization"=$DestKuduApiAuthorisationToken;"If-Match"="*"} `
-                        -Method PUT `
-                        -InFile $LicFile `
-                        -ContentType "multipart/form-data"
+# Invoke-RestMethod -Uri $DestKuduPutPath `
+#                         -Headers @{"Authorization"=$DestKuduApiAuthorisationToken;"If-Match"="*"} `
+#                         -Method PUT `
+#                         -InFile $LicFile `
+#                         -ContentType "multipart/form-data"
 
 Write-Host "Start WebApp $DestWebAppName-$slotName"
 
