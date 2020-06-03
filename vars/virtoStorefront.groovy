@@ -107,8 +107,6 @@ def call(body) {
 
 						checkout scm
 
-						powershell "if(!(Test-Path -Path .\\.nuke)){ Get-ChildItem *.sln -Name > .nuke }"
-
 						commitNumber = Utilities.getCommitHash(this)
                     	versionSuffixArg = env.BRANCH_NAME == 'dev' ? "-CustomTagSuffix \"_build_${commitNumber}\"" : ""
 
@@ -156,7 +154,7 @@ def call(body) {
 				}
 
 				stage('Unit Tests'){
-                    powershell "vc-build Test -TestsFilter \"Category=Unit|Category=CI\" -skip Restore+Compile"
+                    powershell "vc-build Test -skip Restore+Compile"
                 } 
 
                 stage('Quality Gate'){
