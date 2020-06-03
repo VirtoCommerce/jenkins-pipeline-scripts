@@ -36,6 +36,7 @@ def call(body) {
 			def storefrontImageName = 'virtocommerce/storefront'
 			def buildOrder = Utilities.getNextBuildOrder(this)
 			def themeBranch
+        	def releaseNotesPath = "${workspace}\\release_notes.txt"
 			if (env.BRANCH_NAME == 'support/2.x') {
 				
 			}
@@ -94,16 +95,36 @@ def call(body) {
 				SETTINGS.setProject('platform')
 			}
 
+			def commitNumber
+			def versionSuffixArg
 			
 			try {
 				Utilities.notifyBuildStatus(this, SETTINGS['of365hook'], '', 'STARTED')
 
 				stage('Checkout') {
 					timestamps { 
-						if (Packaging.getShouldPublish(this)) {
-							powershell "Remove-Item ${workspace}\\* -Recurse -Force"
-						}
+						deleteDir()
+
 						checkout scm
+
+						powershell "if(!(Test-Path -Path .\\.nuke)){ Get-ChildItem *.sln -Name > .nuke }"
+
+						commitNumber = Utilities.getCommitHash(this)
+                    	versionSuffixArg = env.BRANCH_NAME == 'dev' ? "-CustomTagSuffix \"_build_${commitNumber}\"" : ""
+
+						try
+						{
+							def release = GithubRelease.getLatestGithubReleaseV3(this, Utilities.getOrgName(this), Utilities.getRepoName(this))
+							echo release.published_at
+							def releaseNotes = Utilities.getReleaseNotesFromCommits(this, release.published_at)
+							echo releaseNotes
+							writeFile file: releaseNotesPath, text: releaseNotes
+						}
+						catch(any)
+						{
+							echo "exception:"
+							echo any.getMessage()
+						}
 					}				
 				}
 
@@ -114,10 +135,37 @@ def call(body) {
 
 				stage('Build') {		
 					timestamps { 						
-						Packaging.startAnalyzer(this)
-						Packaging.runBuild(this, solution)
+						if(Utilities.isPullRequest(this))
+						{
+							withSonarQubeEnv('VC Sonar Server'){
+								withEnv(["BRANCH_NAME=${env.CHANGE_BRANCH}"])
+								{
+									powershell "vc-build SonarQubeStart -SonarUrl ${env.SONAR_HOST_URL} -SonarAuthToken \"${env.SONAR_AUTH_TOKEN}\" -PullRequest -GitHubToken ${env.GITHUB_TOKEN} -skip Restore+Compile"
+									powershell "vc-build Compile"
+								}
+							}
+						}
+						else
+						{
+							withSonarQubeEnv('VC Sonar Server'){
+								powershell "vc-build SonarQubeStart -SonarUrl ${env.SONAR_HOST_URL} -SonarAuthToken \"${env.SONAR_AUTH_TOKEN}\" -skip Restore+Compile"
+							}
+							powershell "vc-build Compile"
+						}
 					}
 				}
+
+				stage('Unit Tests'){
+                    powershell "vc-build Test -TestsFilter \"Category=Unit|Category=CI\" -skip Restore+Compile"
+                } 
+
+                stage('Quality Gate'){
+                    // Packaging.endAnalyzer(this)
+                    withSonarQubeEnv('VC Sonar Server'){
+                        powershell "vc-build SonarQubeEnd -SonarUrl ${env.SONAR_HOST_URL} -SonarAuthToken ${env.SONAR_AUTH_TOKEN} -skip Restore+Compile+SonarQubeStart"
+                    }
+                    Packaging.checkAnalyzerGate(this)
+                }  
 			
 				def version = Utilities.getAssemblyVersion(this, webProject)
 				def dockerImage
@@ -125,7 +173,7 @@ def call(body) {
 
 				stage('Packaging') {
 					timestamps { 
-						Packaging.createReleaseArtifact(this, version, webProject, zipArtifact, websiteDir)
+						powershell "vc-build Compress ${versionSuffixArg} -skip Clean+Restore+Compile+Test"
 						if (env.BRANCH_NAME == 'support/2.x-dev' || env.BRANCH_NAME == 'support/2.x' || env.BRANCH_NAME == 'dev' || env.BRANCH_NAME =='master') {
 							def websitePath = Utilities.getWebPublishFolder(this, websiteDir)
 							dir(env.BRANCH_NAME == 'support/2.x-dev' || env.BRANCH_NAME == 'support/2.x' ? env.WORKSPACE : workspace)
@@ -146,27 +194,9 @@ def call(body) {
 						}
 					}
 				}
-
-				def tests = Utilities.getTestDlls(this)
-				if(tests.size() > 0)
-				{
-					stage('Unit Tests') {
-						timestamps { 
-							Packaging.runUnitTests(this, tests)
-						}
-					}
-				}		
-
-				stage('Code Analysis') {
-					timestamps { 
-						Packaging.endAnalyzer(this)
-						Packaging.checkAnalyzerGate(this)
-					}
-				}
-
 				if(solution == 'VirtoCommerce.Platform.sln' || projectType == 'NETCORE2') // skip docker and publishing for NET4
 				{
-					if (env.BRANCH_NAME == 'support/2.x' || env.BRANCH_NAME == 'release') {
+					if (env.BRANCH_NAME == 'support/2.x') {
 						stage('Create Test Environment') {
 							timestamps { 
 								// Start docker environment				
@@ -252,11 +282,33 @@ def call(body) {
 									Packaging.pushDockerImage(this, dockerImageLinux, dockerTagLinux)
 								}
 							}
-							if (env.BRANCH_NAME == 'support/2.x' || env.BRANCH_NAME =='master') 
+							if (env.BRANCH_NAME == 'support/2.x' ) 
 							{
 								Packaging.createNugetPackages(this)
 								def notes = Utilities.getReleaseNotes(this, webProject)
 								Packaging.publishRelease(this, version, notes)
+							}
+							else if (env.BRANCH_NAME == 'master')
+							{
+								def ghReleaseResult = powershell script: "vc-build PublishPackages -ApiKey ${env.NUGET_KEY} -skip Clean+Restore+Compile+Test", returnStatus: true
+								if(ghReleaseResult == 409)
+								{
+									UNSTABLE_CAUSES.add("Nuget package already exists.")
+								} 
+								else if(ghReleaseResult != 0)
+								{
+									throw new Exception("ERROR: script returned ${ghReleaseResult}")
+								}
+
+								def orgName = Utilities.getOrgName(this)
+								def releaseNotesFile = new File(releaseNotesPath)
+								def releaseNotesArg = releaseNotesFile.exists() ? "-ReleaseNotes ${releaseNotesFile}" : ""
+								def releaseResult = powershell script: "vc-build Release -GitHubUser ${orgName} -GitHubToken ${env.GITHUB_TOKEN} ${releaseNotesArg} -skip Clean+Restore+Compile+Test", returnStatus: true
+								if(releaseResult == 422){
+									UNSTABLE_CAUSES.add("Release already exists on github")
+								} else if(releaseResult !=0 ) {
+									throw new Exception("Github release error")
+								}
 							}
 
 							// if((solution == 'VirtoCommerce.Platform.sln' || projectType == 'NETCORE2') && env.BRANCH_NAME == 'dev')
@@ -273,10 +325,6 @@ def call(body) {
 						}
 					}
 				}
-
-
-
-			
 			}
 			catch (any) {
 				currentBuild.result = 'FAILURE'
