@@ -156,7 +156,18 @@ def call(body) {
 				}
 
 				stage('Unit Tests'){
-                    powershell "vc-build Test -TestsFilter \"Category=Unit|Category=CI\" -skip Restore+Compile"
+					if(env.BRANCH_NAME == 'support/2.x-dev' || env.BRANCH_NAME == 'support/2.x')
+					{
+						def tests = Utilities.getTestDlls(this)
+						if(tests.size() > 0)
+						{
+							Packaging.runUnitTests(this, tests)
+						}
+					}
+					else
+					{
+                    	powershell "vc-build Test -TestsFilter \"Category=Unit|Category=CI\" -skip Restore+Compile"
+					}
                 } 
 
                 stage('Quality Gate'){
