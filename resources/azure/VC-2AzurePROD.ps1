@@ -5,7 +5,8 @@
     $AzureBlobKey,
     $WebAppName,
     $ResourceGroupName,
-    $SubscriptionID
+    $SubscriptionID,
+    $ExcludePattern
 )
 
 $ErrorActionPreference = "Stop"
@@ -53,10 +54,14 @@ if($StagingName -eq "deploy")
     Get-AzureStorageBlob -Container "cms-content" -Context $BlobContext | Start-AzureStorageBlobCopy -DestContainer "cms-content-staging" -Force
 }
 
+if($null -eq $ExcludePattern)
+{
+    $ExcludePattern="*.htm;*.html;*.md;*.page"
+}
+
 Write-Host "Sync $StoreName"
 $token = $env:AzureBlobToken
-#& "${env:Utils}\AzCopy10\AzCopy" sync $SourceDir https://$($AzureBlobName).blob.core.windows.net/$StoreName$token --recursive --exclude-pattern="*.htm;*.html;*.md;*.page"
-& "${env:Utils}\AzCopy10\AzCopy" cp $SourceDir/* https://$($AzureBlobName).blob.core.windows.net/$StoreName$token --recursive --exclude-pattern="*.htm;*.html;*.md;*.page" --overwrite true #--delete-destination=true
+& "${env:Utils}\AzCopy10\AzCopy" cp $SourceDir/* https://$($AzureBlobName).blob.core.windows.net/$StoreName$token --recursive --exclude-pattern="$ExcludePattern" --overwrite true #--delete-destination=true
 if($LASTEXITCODE -ne 0)
 {
     exit 1
