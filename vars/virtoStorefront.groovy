@@ -16,7 +16,7 @@ def call(body) {
 		def hmacAppId = env.HMAC_APP_ID
 		def hmacSecret = env.HMAC_SECRET
 		def solution = config.solution
-		projectType = config.projectType
+		projectType = 'NETCORE2'
 
 		def globalLib = library('global-shared-lib').com.test
 		def Utilities = globalLib.Utilities
@@ -74,10 +74,6 @@ def call(body) {
 			SETTINGS = globalLib.Settings.new(settingsFileContent)
 			SETTINGS.setBranch(env.BRANCH_NAME)
 			
-			if(projectType == null)
-			{
-				projectType = "NET4"
-			}
 
 			if(solution == null)
 			{
@@ -141,7 +137,7 @@ def call(body) {
 								withEnv(["BRANCH_NAME=${env.CHANGE_BRANCH}"])
 								{
 									powershell "vc-build SonarQubeStart -SonarUrl ${env.SONAR_HOST_URL} -SonarAuthToken \"${env.SONAR_AUTH_TOKEN}\" -PullRequest -GitHubToken ${env.GITHUB_TOKEN} -skip Restore+Compile"
-									powershell "vc-build Compile"
+									powershell "vc-build Compile -Configuration Debug"
 								}
 							}
 						}
@@ -150,7 +146,7 @@ def call(body) {
 							withSonarQubeEnv('VC Sonar Server'){
 								powershell "vc-build SonarQubeStart -SonarUrl ${env.SONAR_HOST_URL} -SonarAuthToken \"${env.SONAR_AUTH_TOKEN}\" -skip Restore+Compile"
 							}
-							powershell "vc-build Compile"
+							powershell "vc-build Compile -Configuration Debug"
 						}
 					}
 				}
