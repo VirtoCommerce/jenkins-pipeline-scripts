@@ -48,12 +48,18 @@ def call(body) {
             SETTINGS.setBranch(env.BRANCH_NAME)
             Utilities.notifyBuildStatus(this, SETTINGS['of365hook'], '', 'STARTED')
             def coverageFolder = Utilities.getCoverageFolder(this)
+            
+            def commitNumber
+            def versionSuffixArg
 
             try {
                 stage('Checkout'){
                     deleteDir()
                     
                     checkout scm
+
+                    commitNumber = Utilities.getCommitHash(this)
+                    versionSuffixArg = env.BRANCH_NAME == 'dev' ? "-CustomTagSuffix \"_build_${commitNumber}\"" : ""
 
                     try
                     {
@@ -117,8 +123,9 @@ def call(body) {
                 //     }
                 // }
 
-                stage('Packaging'){                
-                    powershell "vc-build Compress -skip Clean+Restore+Compile+Test"
+                stage('Packaging'){
+                             
+                    powershell "vc-build Compress ${versionSuffixArg} -skip Clean+Restore+Compile+Test"
 
                     if(env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'dev'){
                         def websitePath = Utilities.getWebPublishFolder(this, "docker")
@@ -208,14 +215,20 @@ def call(body) {
 
                         if(env.BRANCH_NAME == 'dev')
                         {
-                            def gitversionOutput = powershell (script: "dotnet gitversion", returnStdout: true, label: 'Gitversion', encoding: 'UTF-8').trim()
-                            def gitversionJson = new groovy.json.JsonSlurperClassic().parseText(gitversionOutput)
-                            def commitNumber = gitversionJson['CommitsSinceVersionSource']
-                            def platformArtifactName = "VirtoCommerce.Platform_3.0.0-build.${commitNumber}"
-                            echo "artifact version: ${platformArtifactName}"
-                            def artifactPath = "${workspace}\\artifacts\\${platformArtifactName}.zip"
-                            powershell "Copy-Item ${artifacts[0].path} -Destination ${artifactPath}"
-                            powershell script: "${env.Utils}\\AzCopy10\\AzCopy.exe copy \"${artifactPath}\" \"https://vc3prerelease.blob.core.windows.net/packages${env.ARTIFACTS_BLOB_TOKEN}\"", label: "AzCopy"
+                            // def platformArtifactName = "VirtoCommerce.Platform_3.0.0-build.${commitNumber}"
+                            // echo "artifact version: ${platformArtifactName}"
+                            // def artifactPath = "${workspace}\\artifacts\\${platformArtifactName}.zip"
+                            // powershell "Copy-Item ${artifacts[0].path} -Destination ${artifactPath}"
+                            // powershell script: "${env.Utils}\\AzCopy10\\AzCopy.exe copy \"${artifactPath}\" \"https://vc3prerelease.blob.core.windows.net/packages${env.ARTIFACTS_BLOB_TOKEN}\"", label: "AzCopy"
+                            def orgName = Utilities.getOrgName(this)
+                            def releaseNotesFile = new File(releaseNotesPath)
+                            def releaseNotesArg = releaseNotesFile.exists() ? "-ReleaseNotes ${releaseNotesFile}" : ""
+                            def releaseResult = powershell script: "vc-build Release -GitHubUser ${orgName} -GitHubToken ${env.GITHUB_TOKEN} ${releaseNotesArg} -PreRelease ${versionSuffixArg} -skip Clean+Restore+Compile+Test", returnStatus: true
+                            if(releaseResult == 422){
+                                UNSTABLE_CAUSES.add("Release already exists on github")
+                            } else if(releaseResult !=0 ) {
+                                throw new Exception("Github release error")
+                            }
                             return 0
                         }
                         
@@ -253,7 +266,7 @@ def call(body) {
                         def orgName = Utilities.getOrgName(this)
                         def releaseNotesFile = new File(releaseNotesPath)
                         def releaseNotesArg = releaseNotesFile.exists() ? "-ReleaseNotes ${releaseNotesFile}" : ""
-                        def releaseResult = powershell script: "vc-build Release -GitHubUser ${orgName} -GitHubToken ${env.GITHUB_TOKEN} ${releaseNotesArg} -PreRelease -skip Clean+Restore+Compile+Test", returnStatus: true
+                        def releaseResult = powershell script: "vc-build Release -GitHubUser ${orgName} -GitHubToken ${env.GITHUB_TOKEN} ${releaseNotesArg} -skip Clean+Restore+Compile+Test", returnStatus: true
                         if(releaseResult == 422){
                             UNSTABLE_CAUSES.add("Release already exists on github")
                         } else if(releaseResult !=0 ) {

@@ -35,10 +35,15 @@ def call(body) {
             // SETTINGS = globalLib.Settings.new(settingsFileContent)
             // SETTINGS.setProject('platform-core')
             // SETTINGS.setBranch(env.BRANCH_NAME)
+            def commitNumber
+            def versionSuffixArg
             try {
                 stage('Checkout'){
                     deleteDir()
                     checkout scm
+
+                    commitNumber = Utilities.getCommitHash(this)
+                    versionSuffixArg = env.BRANCH_NAME == 'dev' ? "-CustomTagSuffix \"_build_${commitNumber}\"" : ""
 
                     try
                     {
@@ -90,7 +95,7 @@ def call(body) {
                  
 
                 stage('Packaging'){                
-                    powershell "vc-build Compress -skip Clean+Restore+Compile+Test"
+                    powershell "vc-build Compress ${versionSuffixArg} -skip Clean+Restore+Compile+Test"
                 }
 
                 def artifacts
@@ -116,17 +121,26 @@ def call(body) {
                 {
                     stage('Publish')
                     {
-                        def gitversionOutput = powershell (script: "dotnet gitversion", returnStdout: true, label: 'Gitversion', encoding: 'UTF-8').trim()
-                        def gitversionJson = new groovy.json.JsonSlurperClassic().parseText(gitversionOutput)
-                        def commitNumber = gitversionJson['CommitsSinceVersionSource']
-                        def moduleArtifactName = "${moduleId}_3.0.0-build.${commitNumber}"
-                        echo "artifact version: ${moduleArtifactName}"
-                        def artifactPath = "${workspace}\\artifacts\\${moduleArtifactName}.zip"
-                        powershell "Copy-Item ${artifacts[0].path} -Destination ${artifactPath}"
-                        powershell script: "${env.Utils}\\AzCopy10\\AzCopy.exe copy \"${artifactPath}\" \"https://vc3prerelease.blob.core.windows.net/packages${env.ARTIFACTS_BLOB_TOKEN}\"", label: "AzCopy"
+                        // def gitversionOutput = powershell (script: "dotnet gitversion", returnStdout: true, label: 'Gitversion', encoding: 'UTF-8').trim()
+                        // def gitversionJson = new groovy.json.JsonSlurperClassic().parseText(gitversionOutput)
+                        // def commitNumber = gitversionJson['CommitsSinceVersionSource']
+                        // def moduleArtifactName = "${moduleId}_3.0.0-build.${commitNumber}"
+                        // echo "artifact version: ${moduleArtifactName}"
+                        // def artifactPath = "${workspace}\\artifacts\\${moduleArtifactName}.zip"
+                        // powershell "Copy-Item ${artifacts[0].path} -Destination ${artifactPath}"
+                        // powershell script: "${env.Utils}\\AzCopy10\\AzCopy.exe copy \"${artifactPath}\" \"https://vc3prerelease.blob.core.windows.net/packages${env.ARTIFACTS_BLOB_TOKEN}\"", label: "AzCopy"
 
-                        def packageUri = "https://vc3prerelease.blob.core.windows.net/packages/${moduleArtifactName}.zip"
-                        def manifestResult = powershell script: "vc-build PublishModuleManifest -CustomModulePackageUri \"${packageUri}\" -ModulesJsonName \"modules_v3_prerelease.json\"", returnStatus: true
+                        def orgName = Utilities.getOrgName(this)
+                        def releaseNotesFile = new File(releaseNotesPath)
+                        def releaseNotesArg = releaseNotesFile.exists() ? "-ReleaseNotes ${releaseNotesFile}" : ""
+                        def releaseResult = powershell script: "vc-build Release -GitHubUser ${orgName} -GitHubToken ${env.GITHUB_TOKEN} ${releaseNotesArg} -PreRelease ${versionSuffixArg} -skip Clean+Restore+Compile+Test", returnStatus: true
+                        if(releaseResult == 422){
+                            UNSTABLE_CAUSES.add("Release already exists on github")
+                        } else if(releaseResult !=0 ) {
+                            throw new Exception("Github release error")
+                        }
+                        
+                        def manifestResult = powershell script: "vc-build PublishModuleManifest -ModulesJsonName \"modules_v3_prerelease.json\"", returnStatus: true
                         if(manifestResult == 423)
                         {
                             UNSTABLE_CAUSES.add("Module Manifest: nothing to commit, working tree clean")
