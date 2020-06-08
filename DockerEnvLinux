@@ -1,3 +1,12 @@
+import groovy.util.*
+import groovy.json.JsonSlurperClassic
+
+def globalLib = library('global-shared-lib').com.test
+def Utilities = globalLib.Utilities
+def Packaging = globalLib.Packaging
+def Modules = globalLib.Modules
+def Settings = globalLib.Settings
+
 def solutionRoot = "C:/tmp/solution"
 node{
     stage('Init')
