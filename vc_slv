@@ -25,7 +25,8 @@ def deployScript = 'VC-2AzureDEV.ps1'
 
 pipeline
 {
-    agent {label 'slave'}
+    agent any
+    //agent {label 'slave'}
 
     options
     {
@@ -40,8 +41,9 @@ pipeline
             {
                 script
                 {
-                    wakeUpNode("slave")
-                    node("slave")
+                    //wakeUpNode("slave")
+                    node
+                    //node("slave")
                     {
                         deleteDir()
                         checkout scm
@@ -109,130 +111,130 @@ pipeline
             }
         }
 
-        stage("Docker Environment")
-        {
-            steps
-            {
-                script
-                {
-                    node(SETTINGS['agentLabel'])
-                    {
-                        stage('Create Test Environment')
-                        {
-                            timestamps
-                            {
-                                // Start docker environment
-                                def composeFolder = "${env.WORKSPACE}\\${SETTINGS['composeDir']}"
-                                dir(composeFolder)
-                                {
-                                    DOCKER_SQL_PORT = Utilities.getSqlPort(this)
-                                    DOCKER_PLATFORM_PORT = Utilities.getPlatformPort(this)
-                                    DOCKER_STOREFRONT_PORT = Utilities.getStorefrontPort(this)
-                                    DOCKER_PREFIX = 'vc'
-                                    switch(BASE_BRANCH)
-                                    {
-                                        case 'dev':
-                                        DOCKER_TAG = 'dev-branch'
-                                        break
-                                        case 'master':
-                                        // DOCKER_TAG = 'latest'
-                                        DOCKER_TAG = 'dev-branch'
-                                        break
-                                    }
+        // stage("Docker Environment")
+        // {
+        //     steps
+        //     {
+        //         script
+        //         {
+        //             node(SETTINGS['agentLabel'])
+        //             {
+        //                 stage('Create Test Environment')
+        //                 {
+        //                     timestamps
+        //                     {
+        //                         // Start docker environment
+        //                         def composeFolder = "${env.WORKSPACE}\\${SETTINGS['composeDir']}"
+        //                         dir(composeFolder)
+        //                         {
+        //                             DOCKER_SQL_PORT = Utilities.getSqlPort(this)
+        //                             DOCKER_PLATFORM_PORT = Utilities.getPlatformPort(this)
+        //                             DOCKER_STOREFRONT_PORT = Utilities.getStorefrontPort(this)
+        //                             DOCKER_PREFIX = 'vc'
+        //                             switch(BASE_BRANCH)
+        //                             {
+        //                                 case 'dev':
+        //                                 DOCKER_TAG = 'dev-branch'
+        //                                 break
+        //                                 case 'master':
+        //                                 // DOCKER_TAG = 'latest'
+        //                                 DOCKER_TAG = 'dev-branch'
+        //                                 break
+        //                             }
 
-                                    echo "DOCKER_PLATFORM_PORT=${DOCKER_PLATFORM_PORT}, DOCKER_STOREFRONT_PORT=${DOCKER_STOREFRONT_PORT}, DOCKER_SQL_PORT=${DOCKER_SQL_PORT}"
-                                    // 1. stop containers
-                                    // 2. remove instances including database
-                                    // 3. start up new containers
-                                    withEnv(["DOCKER_TAG=${DOCKER_TAG}", "DOCKER_PREFIX=${DOCKER_PREFIX}", "DOCKER_PLATFORM_PORT=${DOCKER_PLATFORM_PORT}", "DOCKER_STOREFRONT_PORT=${DOCKER_STOREFRONT_PORT}", "DOCKER_SQL_PORT=${DOCKER_SQL_PORT}", "COMPOSE_PROJECT_NAME=${env.BUILD_TAG}"])
-                                    {
-                                        // bat "docker-compose stop"
-                                        // bat "docker-compose rm -f -v"
-                                        bat "docker-compose up -d"
-                                    }
-                                }
-                            }
-                        }
+        //                             echo "DOCKER_PLATFORM_PORT=${DOCKER_PLATFORM_PORT}, DOCKER_STOREFRONT_PORT=${DOCKER_STOREFRONT_PORT}, DOCKER_SQL_PORT=${DOCKER_SQL_PORT}"
+        //                             // 1. stop containers
+        //                             // 2. remove instances including database
+        //                             // 3. start up new containers
+        //                             withEnv(["DOCKER_TAG=${DOCKER_TAG}", "DOCKER_PREFIX=${DOCKER_PREFIX}", "DOCKER_PLATFORM_PORT=${DOCKER_PLATFORM_PORT}", "DOCKER_STOREFRONT_PORT=${DOCKER_STOREFRONT_PORT}", "DOCKER_SQL_PORT=${DOCKER_SQL_PORT}", "COMPOSE_PROJECT_NAME=${env.BUILD_TAG}"])
+        //                             {
+        //                                 // bat "docker-compose stop"
+        //                                 // bat "docker-compose rm -f -v"
+        //                                 bat "docker-compose up -d"
+        //                             }
+        //                         }
+        //                     }
+        //                 }
 
-                        stage('Install Platform')
-                        {
-                            timestamps
-                            {
-                                if(PLATFORM_INSTALL)
-                                {
-                                    def platformContainer = Utilities.getPlatformContainer(this)
-                                    def platformDir = "${backendPath}\\platform"
-                                    bat "docker stop ${platformContainer}"
-                                    bat "docker cp ${platformDir} ${platformContainer}:/vc-platform/."
-                                    bat "docker start ${platformContainer}"
-                                }
-                            }
-                        }
+        //                 stage('Install Platform')
+        //                 {
+        //                     timestamps
+        //                     {
+        //                         if(PLATFORM_INSTALL)
+        //                         {
+        //                             def platformContainer = Utilities.getPlatformContainer(this)
+        //                             def platformDir = "${backendPath}\\platform"
+        //                             bat "docker stop ${platformContainer}"
+        //                             bat "docker cp ${platformDir} ${platformContainer}:/vc-platform/."
+        //                             bat "docker start ${platformContainer}"
+        //                         }
+        //                     }
+        //                 }
 
-                        stage('Install Modules')
-                        {
-                            timestamps
-                            {
-                                def platformContainer = Utilities.getPlatformContainer(this)
-                                // install modules
-                                runPS('qaenv/install-modules.ps1', "-ApiUrl \"${Utilities.getPlatformHost(this)}\" -PlatformContainer ${platformContainer} -ModulesDir ${backendPath}\\modules")
-                            }
-                        }
+        //                 stage('Install Modules')
+        //                 {
+        //                     timestamps
+        //                     {
+        //                         def platformContainer = Utilities.getPlatformContainer(this)
+        //                         // install modules
+        //                         runPS('qaenv/install-modules.ps1', "-ApiUrl \"${Utilities.getPlatformHost(this)}\" -PlatformContainer ${platformContainer} -ModulesDir ${backendPath}\\modules")
+        //                     }
+        //                 }
 
-                        stage('Install Sample Data')
-                        {
-                            timestamps
-                            {
-                                def sampleDataSrcParam = ""
-                                if(SETTINGS['sampledata'] != null){
-                                    sampleDataSrcParam = "-sampleDataSrc ${SETTINGS['sampledata']}"
-                                    echo "using url from settings file"
-                                }
-                                runPS("vc-setup-sampledata.ps1", "-apiurl \"http://localhost:${DOCKER_PLATFORM_PORT}\" ${sampleDataSrcParam} -Verbose -Debug")
-                            }
-                        }
+        //                 stage('Install Sample Data')
+        //                 {
+        //                     timestamps
+        //                     {
+        //                         def sampleDataSrcParam = ""
+        //                         if(SETTINGS['sampledata'] != null){
+        //                             sampleDataSrcParam = "-sampleDataSrc ${SETTINGS['sampledata']}"
+        //                             echo "using url from settings file"
+        //                         }
+        //                         runPS("vc-setup-sampledata.ps1", "-apiurl \"http://localhost:${DOCKER_PLATFORM_PORT}\" ${sampleDataSrcParam} -Verbose -Debug")
+        //                     }
+        //                 }
 
-                        stage('Install Storefront')
-                        {
-                            timestamps
-                            {
-                                if(STOREFRONT_INSTALL)
-                                {
-                                    def storefrontContainer = Utilities.getStorefrontContainer(this)
-                                    def storefrontDir = "${backendPath}\\storefront"
-                                    bat "docker stop ${storefrontContainer}"
-                                    bat "docker cp ${storefrontDir} ${storefrontContainer}:/vc-storefront/."
-                                    bat "docker start ${storefrontContainer}"
-                                }
-                            }
-                        }
+        //                 stage('Install Storefront')
+        //                 {
+        //                     timestamps
+        //                     {
+        //                         if(STOREFRONT_INSTALL)
+        //                         {
+        //                             def storefrontContainer = Utilities.getStorefrontContainer(this)
+        //                             def storefrontDir = "${backendPath}\\storefront"
+        //                             bat "docker stop ${storefrontContainer}"
+        //                             bat "docker cp ${storefrontDir} ${storefrontContainer}:/vc-storefront/."
+        //                             bat "docker start ${storefrontContainer}"
+        //                         }
+        //                     }
+        //                 }
 
-                        stage('Install Theme')
-                        {
-                            timestamps
-                            {
-                                def platformContainer = Utilities.getPlatformContainer(this)
-                                def themeFolder = "${SETTINGS['themeFolder']}\\cms-content"
-                                // Utilities.runSharedPS(this, "vc-install-theme.ps1", "-themeZip \"${themeFolder}\" -platformContainer ${platformContainer}")
-                                // bat "docker exec ${platformContainer} powershell -Command \"Remove-Item C:\\vc-platform\\App_Data\\cms-content\\Themes -Recurse -Force\""
-                                bat "docker exec ${platformContainer} powershell -Command \"mkdir tmp\""
-                                bat "docker cp ${themeFolder} ${platformContainer}:/tmp"
-                                bat "docker exec ${platformContainer} powershell -Command \"Copy-Item -Path C:\\tmp\\cms-content\\* -Destination C:\\vc-platform\\App_Data\\cms-content -Recurse -Force\""
-                            }
-                        }
+        //                 stage('Install Theme')
+        //                 {
+        //                     timestamps
+        //                     {
+        //                         def platformContainer = Utilities.getPlatformContainer(this)
+        //                         def themeFolder = "${SETTINGS['themeFolder']}\\cms-content"
+        //                         // Utilities.runSharedPS(this, "vc-install-theme.ps1", "-themeZip \"${themeFolder}\" -platformContainer ${platformContainer}")
+        //                         // bat "docker exec ${platformContainer} powershell -Command \"Remove-Item C:\\vc-platform\\App_Data\\cms-content\\Themes -Recurse -Force\""
+        //                         bat "docker exec ${platformContainer} powershell -Command \"mkdir tmp\""
+        //                         bat "docker cp ${themeFolder} ${platformContainer}:/tmp"
+        //                         bat "docker exec ${platformContainer} powershell -Command \"Copy-Item -Path C:\\tmp\\cms-content\\* -Destination C:\\vc-platform\\App_Data\\cms-content -Recurse -Force\""
+        //                     }
+        //                 }
 
-                        stage('Awaiting Proceed')
-                        {
-                            timeout(time: "${SETTINGS['timeoutMinutes']}", unit: 'DAYS')
-                            {
-                                def message = "Platform url: ${SETTINGS["platformContainerUrl"]}:${DOCKER_PLATFORM_PORT}\nStorefront: ${SETTINGS["storefrontContainerUrl"]}:${DOCKER_STOREFRONT_PORT}"
-                                input(message)
-                            }
-                        }
-                    }
-                }
-            }
-        }
+        //                 stage('Awaiting Proceed')
+        //                 {
+        //                     timeout(time: "${SETTINGS['timeoutMinutes']}", unit: 'DAYS')
+        //                     {
+        //                         def message = "Platform url: ${SETTINGS["platformContainerUrl"]}:${DOCKER_PLATFORM_PORT}\nStorefront: ${SETTINGS["storefrontContainerUrl"]}:${DOCKER_STOREFRONT_PORT}"
+        //                         input(message)
+        //                     }
+        //                 }
+        //             }
+        //         }
+        //     }
+        // }
 
         stage('Delivery')
         {
