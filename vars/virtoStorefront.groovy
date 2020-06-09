@@ -186,7 +186,7 @@ def call(body) {
 							powershell script: "Copy-Item ${workspace}\\artifacts\\publish\\* ${websitePath}\\VirtoCommerce.Storefront -Recurse -Force"
 							dir(env.BRANCH_NAME == 'support/2.x-dev' || env.BRANCH_NAME == 'support/2.x' ? env.WORKSPACE : workspace)
 							{
-								dockerImage = Packaging.createDockerImage(this, zipArtifact.replaceAll('\\.','/'), websitePath, ".", dockerTag, runtimeImage)	
+								dockerImage = Packaging.createDockerImage(this, zipArtifact.replaceAll('\\.','/'), websitePath, "VirtoCommerce.Storefront", dockerTag, runtimeImage)	
 							}	
 							if(Utilities.isNetCore(projectType) && (env.BRANCH_NAME == 'dev' || env.BRANCH_NAME =='master'))
 							{
