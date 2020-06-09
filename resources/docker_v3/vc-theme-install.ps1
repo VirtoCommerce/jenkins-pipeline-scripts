@@ -11,7 +11,7 @@ Write-Output "docker cp"
 if($IsLinux)
 {
     Write-Output "Linux"
-    docker exec ${storefrontContainer} bash -c "mkdir /vc-storefront/wwwroot/cms-content/Themes"
+    docker exec ${storefrontContainer} bash -c "mkdir -p /vc-storefront/wwwroot/cms-content/Themes"
     docker cp $ThemePath/. ${StorefrontContainer}:/vc-storefront/wwwroot/cms-content/Themes
 }
 else 
