@@ -1,6 +1,6 @@
 FROM mcr.microsoft.com/dotnet/core/aspnet:3.1
 
-ARG SOURCE=VirtoCommerce.StoreFront
+ARG SOURCE=VirtoCommerce.Storefront
 
 ADD $SOURCE /vc-storefront/
 
