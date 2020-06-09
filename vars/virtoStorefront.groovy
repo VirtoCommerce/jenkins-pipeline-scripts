@@ -189,13 +189,13 @@ def call(body) {
 							}	
 							if(Utilities.isNetCore(projectType) && (env.BRANCH_NAME == 'dev' || env.BRANCH_NAME =='master'))
 							{
-								stash includes: 'VirtoCommerce.Storefront/**', name: 'artifact'
+								stash includes: 'artifacts/**', name: 'artifact'
 								node('linux')
 								{
 									unstash 'artifact'
 									def dockerfileContent = libraryResource 'docker.core/linux/storefront/Dockerfile'
 									writeFile file: "${env.WORKSPACE}/Dockerfile", text: dockerfileContent
-									dockerImageLinux = docker.build("${storefrontImageName}:${dockerTagLinux}", "--build-arg SOURCE=./VirtoCommerce.Storefront .")
+									dockerImageLinux = docker.build("${storefrontImageName}:${dockerTagLinux}", "--build-arg SOURCE=./publish .")
 								}
 							}	
 						}
