@@ -195,7 +195,7 @@ def call(body) {
 									unstash 'artifact'
 									def dockerfileContent = libraryResource 'docker.core/linux/storefront/Dockerfile'
 									writeFile file: "${env.WORKSPACE}/Dockerfile", text: dockerfileContent
-									dockerImageLinux = docker.build("${storefrontImageName}:${dockerTagLinux}", "--build-arg SOURCE=./publish .")
+									dockerImageLinux = docker.build("${storefrontImageName}:${dockerTagLinux}", "--build-arg SOURCE=./artifacts/publish .")
 								}
 							}	
 						}
