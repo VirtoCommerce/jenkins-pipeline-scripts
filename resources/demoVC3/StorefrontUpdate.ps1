@@ -67,7 +67,7 @@ Invoke-RestMethod -Uri $DestKuduPath `
                         -InFile $Path2Zip `
                         -ContentType "multipart/form-data"
 
-Start-Sleep -s 5
+Start-Sleep -s 15
 
 Write-Host "Add Rewrite rule to web.config $DestWebAppName-$slotName"
 

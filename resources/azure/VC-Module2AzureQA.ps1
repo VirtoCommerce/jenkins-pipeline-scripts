@@ -1,7 +1,8 @@
 param(
     $SubscriptionID,
     $WebAppName,
-    $ResourceGroupName
+    $ResourceGroupName,
+    $Path2Zip = $null
 )
 # Get Module Name
 
@@ -13,7 +14,10 @@ $ModuleName = Select-Xml -Xml $fileContents -XPath "/module/id"
 
 # Get Module Zip File
 
-$Path2Zip = Get-Childitem -Recurse -Path "${env:WORKSPACE}\artifacts\" -File -Include *.zip
+if($null -eq $Path2Zip)
+{
+    $Path2Zip = Get-Childitem -Recurse -Path "${env:WORKSPACE}\artifacts\" -File -Include *.zip
+}
 
 # Upload Module Zip File to Azure
 

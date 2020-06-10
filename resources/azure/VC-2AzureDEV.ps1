@@ -5,7 +5,8 @@
     $AzureBlobKey,
     $WebAppName,
     $ResourceGroupName,
-    $SubscriptionID
+    $SubscriptionID,
+    $ExcludePattern
 )
 
 $ErrorActionPreference = "Stop"
@@ -31,8 +32,6 @@ $psCred = New-Object System.Management.Automation.PSCredential($ApplicationID, $
 $TenantID = "${env:AzureTenantID}"
 
 Add-AzureRmAccount -Credential $psCred -TenantId $TenantID -ServicePrincipal -Subscription $SubscriptionID
-#Add-AzureRmAccount -Credential $psCred -TenantId $TenantID -ServicePrincipal
-#Select-AzureRmSubscription -SubscriptionId $SubscriptionID
 
 $DestWebAppName = $WebAppName
 $DestResourceGroupName = $ResourceGroupName
@@ -43,9 +42,15 @@ Stop-AzureRmWebApp -ResourceGroupName $DestResourceGroupName -Name $DestWebAppNa
 New-AzureStorageContainer -Name $DestContainer -Context $BlobContext -Permission Container
 Get-AzureStorageBlob -Container $StoreName -Context $BlobContext | Start-AzureStorageBlobCopy -DestContainer "$DestContainer" -Force
 
+
+if($null -eq $ExcludePattern)
+{
+    $ExcludePattern = "*.htm;*.html;*.md;*.page"
+}
+
 Write-Host "Sync $StoreName"
 $token = $env:AzureBlobToken
-& "${env:Utils}\AzCopy10\AzCopy" cp $SourceDir/* https://$($AzureBlobName).blob.core.windows.net/$StoreName$token --recursive --exclude-pattern="*.htm;*.html;*.md;*.page" --overwrite true #--delete-destination=true
+& "${env:Utils}\AzCopy10\AzCopy" cp $SourceDir/* https://$($AzureBlobName).blob.core.windows.net/$StoreName$token --recursive --exclude-pattern="$ExcludePattern" --overwrite true #--delete-destination=true
 if($LASTEXITCODE -ne 0)
 {
     exit 1

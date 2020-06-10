@@ -26,13 +26,17 @@ def call(body) {
         def workspace = "S:\\Buildsv3\\${repoName}\\${escapedBranch}"
         projectType = 'NETCORE2'
         def platformDockerTag = '3.0-preview'
+        def platformLinuxDockerTag = '3.0-preview-linux'
         def storefrontDockerTag = 'latest'
-        def releaseNotes
-        if(env.BRANCH_NAME == 'dev-3.0.0')
+        def releaseNotesPath = "${workspace}\\release_notes.txt"
+        if(env.BRANCH_NAME == 'dev')
         {
             platformDockerTag = '3.0-dev'
+            platformLinuxDockerTag = '3.0-dev-linux'
             storefrontDockerTag = 'dev-branch'
         }
+        def dockerWinImage
+        def dockerLinImage
         dir(workspace){
             def SETTINGS
             def settingsFileContent
@@ -44,6 +48,9 @@ def call(body) {
             SETTINGS.setBranch(env.BRANCH_NAME)
             Utilities.notifyBuildStatus(this, SETTINGS['of365hook'], '', 'STARTED')
             def coverageFolder = Utilities.getCoverageFolder(this)
+            
+            def commitNumber
+            def versionSuffixArg
 
             try {
                 stage('Checkout'){
@@ -51,57 +58,22 @@ def call(body) {
                     
                     checkout scm
 
+                    commitNumber = Utilities.getCommitHash(this)
+                    versionSuffixArg = env.BRANCH_NAME == 'dev' ? "-CustomTagSuffix \"_build_${commitNumber}\"" : ""
+
                     try
                     {
-                        def release = GithubRelease.getLatestGithubReleaseRegexp(this, Utilities.getOrgName(this), Utilities.getRepoName(this), /\d\.\d\.\d[\s]{0,1}[\w]*/, true)
+                        def release = GithubRelease.getLatestGithubReleaseV3(this, Utilities.getOrgName(this), Utilities.getRepoName(this))
                         echo release.published_at
-                        releaseNotes = Utilities.getReleaseNotesFromCommits(this, release.published_at)
+                        def releaseNotes = Utilities.getReleaseNotesFromCommits(this, release.published_at)
                         echo releaseNotes
+                        writeFile file: releaseNotesPath, text: releaseNotes
                     }
                     catch(any)
                     {
                         echo "exception:"
                         echo any.getMessage()
                     }
-                    
-//                     if(env.BRANCH_NAME == 'release/3.0.0')
-//                     {
-//                         def commitId = pwsh(returnStdout: true, script: 'git rev-parse HEAD').trim()
-//                         def prevCommitId = pwsh(returnStdout: true, script: 'git rev-parse HEAD^1').trim()
-// 					def changelog = gitChangelog from: [type: 'REF', value: "3.0.0-rc.5.248"], to: [type: 'REF', value: "3.0.0-rc.5.250"], returnType: 'STRING', template: '''# Changelog
-
-// Changelog for {{ownerName}} {{repoName}}.
-
-// {{#tags}}
-// ## {{name}}
-//  {{#issues}}
-//   {{#hasIssue}}
-//    {{#hasLink}}
-// ### {{name}} [{{issue}}]({{link}}) {{title}} {{#hasIssueType}} *{{issueType}}* {{/hasIssueType}} {{#hasLabels}} {{#labels}} *{{.}}* {{/labels}} {{/hasLabels}}
-//    {{/hasLink}}
-//    {{^hasLink}}
-// ### {{name}} {{issue}} {{title}} {{#hasIssueType}} *{{issueType}}* {{/hasIssueType}} {{#hasLabels}} {{#labels}} *{{.}}* {{/labels}} {{/hasLabels}}
-//    {{/hasLink}}
-//   {{/hasIssue}}
-//   {{^hasIssue}}
-// ### {{name}}
-//   {{/hasIssue}}
-
-//   {{#commits}}
-// **{{{messageTitle}}}**
-
-// {{#messageBodyItems}}
-//  * {{.}} 
-// {{/messageBodyItems}}
-
-// [{{hash}}](https://github.com/{{ownerName}}/{{repoName}}/commit/{{hash}}) {{authorName}} *{{commitTime}}*
-
-//   {{/commits}}
-
-//  {{/issues}}
-// {{/tags}}'''
-//                     echo changelog
-//                     }
                 }
 
                 if(!Utilities.areThereCodeChanges(this))
@@ -112,18 +84,6 @@ def call(body) {
                 }
 
                 stage('Build'){
-                    
-                    // Packaging.startAnalyzer(this, true)
-                    // withSonarQubeEnv('VC Sonar Server'){
-                    //     if(Utilities.isPullRequest(this))
-                    //     {
-                    //         powershell "vc-build SonarQubeStart -SonarUrl ${env.SONAR_HOST_URL} -SonarAuthToken \"${env.SONAR_AUTH_TOKEN}\" -PullRequest -GitHubToken ${env.GITHUB_TOKEN} -skip Restore+Compile"
-                    //     }
-                    //     else
-                    //     {
-                    //         powershell "vc-build SonarQubeStart -SonarUrl ${env.SONAR_HOST_URL} -SonarAuthToken \"${env.SONAR_AUTH_TOKEN}\" -skip Restore+Compile"
-                    //     }
-                    // }
                     if(Utilities.isPullRequest(this))
                     {
                         withSonarQubeEnv('VC Sonar Server'){
@@ -163,22 +123,44 @@ def call(body) {
                 //     }
                 // }
 
-                stage('Packaging'){                
-                    powershell "vc-build Compress -skip Clean+Restore+Compile+Test"
+                stage('Packaging'){
+                             
+                    powershell "vc-build Compress ${versionSuffixArg} -skip Clean+Restore+Compile+Test"
 
-                    if(env.BRANCH_NAME == 'release/3.0.0' || env.BRANCH_NAME == 'dev-3.0.0'){
+                    if(env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'dev'){
                         def websitePath = Utilities.getWebPublishFolder(this, "docker")
                         def dockerImageName = "virtocommerce/platform"
                         powershell script: "Copy-Item ${workspace}\\artifacts\\publish\\* ${websitePath}\\VirtoCommerce.Platform -Recurse -Force"
                         powershell script: "Copy-Item ${env.WORKSPACE}\\..\\workspace@libs\\virto-shared-library\\resources\\docker.core\\windowsnano\\PlatformCore\\* ${websitePath} -Force"
                         dir(websitePath){
-                            bat "dotnet dev-certs https -ep \"${websitePath}\\devcert.pfx\" -p virto"
-                            docker.build("${dockerImageName}:${platformDockerTag}")
+                            dockerWinImage = docker.build("${dockerImageName}:${platformDockerTag}")
+                            stash includes: 'VirtoCommerce.Platform/**', name: 'artifact'
+                        }
+                        node('linux')
+                        {
+                            unstash 'artifact'
+                            def dockerfileContent = libraryResource 'docker.core/linux/platform/Dockerfile'
+                            writeFile file: "${env.WORKSPACE}/Dockerfile", text: dockerfileContent
+                            dockerLinImage = docker.build("${dockerImageName}:${platformLinuxDockerTag}")
                         }
                     }
                 }
 
-                if(env.BRANCH_NAME == 'release/3.0.0' || env.BRANCH_NAME == 'dev-3.0.0')
+                def artifacts
+                stage('Saving Artifacts')
+                {
+                    timestamps
+                    {
+                        artifacts = findFiles(glob: 'artifacts\\*.zip')
+
+                        if(env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'feature/migrate-to-vc30' || env.BRANCH_NAME.startsWith("feature/") || env.BRANCH_NAME.startsWith("bug/"))
+                        {
+                            Packaging.saveArtifact(this, 'vc', Utilities.getProjectType(this), '', artifacts[0].path)
+                        }
+                    }
+                }
+
+                if(env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'dev')
                 {
                     stage('Create Test Environment')
                     {
@@ -226,77 +208,35 @@ def call(body) {
                             }
                         }
                     }
-                }
-
-                if(env.BRANCH_NAME == 'release/3.0.0' || env.BRANCH_NAME == 'dev-3.0.0')
-                {
-                    try
-                    {
-                        stage('Create Test Environment')
-                        {
-                            timestamps
-                            {
-                                dir(Utilities.getComposeFolderV3(this))
-                                {
-                                    def platformPort = Utilities.getPlatformPort(this)
-                                    def storefrontPort = Utilities.getStorefrontPort(this)
-                                    def sqlPort = Utilities.getSqlPort(this)
-                                    withEnv(["DOCKER_TAG=dev-branch", "DOCKER_PLATFORM_PORT=${platformPort}", "DOCKER_STOREFRONT_PORT=${storefrontPort}", "DOCKER_SQL_PORT=${sqlPort}", "COMPOSE_PROJECT_NAME=${env.BUILD_TAG}" ]) {
-                                        bat "docker-compose up -d"
-                                    }
-                                }
-                            }
-                        }
-                        stage('Install Modules')
-                        {
-                            timestamps
-                            {
-                                def platformHost = Utilities.getPlatformCoreHost(this)
-                                def platformContainerId = Utilities.getPlatformContainer(this)
-                                echo "Platform Host: ${platformHost}"
-                                Utilities.runPS(this, "docker_v3/vc-setup-modules.ps1", "-ApiUrl ${platformHost} -needRestart 1 -ContainerId ${platformContainerId} -Verbose")
-                            }
-                        }
-                        stage('Install Sample Data')
-                        {
-                            timestamps
-                            {
-                                Utilities.runPS(this, "docker_v3/vc-setup-sampledata.ps1", "-ApiUrl ${Utilities.getPlatformCoreHost(this)} -Verbose")
-                            }
-                        }
-                        stage("Swagger Schema Validation")
-                        {
-                            timestamps
-                            {
-                                Utilities.runPS(this, "docker_v3/vc-get-swagger.ps1", "-ApiUrl ${Utilities.getPlatformCoreHost(this)} -OutFile ${workspace}\\artifacts\\swaggerSchema${env.BUILD_NUMBER}.json -Verbose")
-                            }
-                        }
-                    }
-                    catch(any)
-                    {
-                        echo any.getMessage()
-                    }
 
                     stage('Publish')
                     {
                         // powershell "vc-build PublishPackages -ApiKey ${env.NUGET_KEY} -skip Clean+Restore+Compile+Test"
-						def artifacts = findFiles(glob: 'artifacts\\*.zip')
-						Packaging.saveArtifact(this, 'vc', Utilities.getProjectType(this), '', artifacts[0].path)
 
-                        if(env.BRANCH_NAME == 'dev-3.0.0')
+                        if(env.BRANCH_NAME == 'dev')
                         {
-                            def gitversionOutput = powershell (script: "dotnet gitversion", returnStdout: true, label: 'Gitversion', encoding: 'UTF-8').trim()
-                            def gitversionJson = new groovy.json.JsonSlurperClassic().parseText(gitversionOutput)
-                            def commitNumber = gitversionJson['CommitsSinceVersionSource']
-                            def platformArtifactName = "VirtoCommerce.Platform_3.0.0-build.${commitNumber}"
-                            echo "artifact version: ${platformArtifactName}"
-                            def artifactPath = "${workspace}\\artifacts\\${platformArtifactName}.zip"
-                            powershell "Copy-Item ${artifacts[0].path} -Destination ${artifactPath}"
-                            powershell script: "${env.Utils}\\AzCopy10\\AzCopy.exe copy \"${artifactPath}\" \"https://vc3prerelease.blob.core.windows.net/packages${env.ARTIFACTS_BLOB_TOKEN}\"", label: "AzCopy"
+                            // def platformArtifactName = "VirtoCommerce.Platform_3.0.0-build.${commitNumber}"
+                            // echo "artifact version: ${platformArtifactName}"
+                            // def artifactPath = "${workspace}\\artifacts\\${platformArtifactName}.zip"
+                            // powershell "Copy-Item ${artifacts[0].path} -Destination ${artifactPath}"
+                            // powershell script: "${env.Utils}\\AzCopy10\\AzCopy.exe copy \"${artifactPath}\" \"https://vc3prerelease.blob.core.windows.net/packages${env.ARTIFACTS_BLOB_TOKEN}\"", label: "AzCopy"
+                            def orgName = Utilities.getOrgName(this)
+                            def releaseNotesFile = new File(releaseNotesPath)
+                            def releaseNotesArg = releaseNotesFile.exists() ? "-ReleaseNotes ${releaseNotesFile}" : ""
+                            def releaseResult = powershell script: "vc-build Release -GitHubUser ${orgName} -GitHubToken ${env.GITHUB_TOKEN} ${releaseNotesArg} -PreRelease ${versionSuffixArg} -skip Clean+Restore+Compile+Test", returnStatus: true
+                            if(releaseResult == 422){
+                                UNSTABLE_CAUSES.add("Release already exists on github")
+                            } else if(releaseResult !=0 ) {
+                                throw new Exception("Github release error")
+                            }
                             return 0
                         }
                         
-
+                        Packaging.pushDockerImage(this, dockerWinImage, platformDockerTag)
+                        node('linux')
+                        {
+                            Packaging.pushDockerImage(this, dockerLinImage, platformLinuxDockerTag)
+                        }
                         // def ghReleaseResult = Utilities.runBatchScript(this, "@vc-build PublishPackages -ApiKey ${env.NUGET_KEY} -skip Clean+Restore+Compile+Test")
                         // if(ghReleaseResult['status'] != 0){
                         //     def nugetAlreadyExists = false
@@ -324,8 +264,9 @@ def call(body) {
                         }
 
                         def orgName = Utilities.getOrgName(this)
-                        def releaseNotesArg = releaseNotes == null ? "" : "-GithubReleaseDescription ${releaseNotes}"
-                        def releaseResult = powershell script: "vc-build Release -GitHubUser ${orgName} -GitHubToken ${env.GITHUB_TOKEN} ${releaseNotesArg} -PreRelease -skip Clean+Restore+Compile+Test", returnStatus: true
+                        def releaseNotesFile = new File(releaseNotesPath)
+                        def releaseNotesArg = releaseNotesFile.exists() ? "-ReleaseNotes ${releaseNotesFile}" : ""
+                        def releaseResult = powershell script: "vc-build Release -GitHubUser ${orgName} -GitHubToken ${env.GITHUB_TOKEN} ${releaseNotesArg} -skip Clean+Restore+Compile+Test", returnStatus: true
                         if(releaseResult == 422){
                             UNSTABLE_CAUSES.add("Release already exists on github")
                         } else if(releaseResult !=0 ) {
@@ -353,7 +294,7 @@ def call(body) {
                 throw any
             }
             finally {
-                if(env.BRANCH_NAME == 'release/3.0.0' || env.BRANCH_NAME == 'dev-3.0.0')
+                if(env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'dev')
                 {
                     dir(Utilities.getComposeFolderV3(this))
                     {

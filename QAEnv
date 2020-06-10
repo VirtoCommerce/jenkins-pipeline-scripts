@@ -155,20 +155,12 @@ pipeline
                             switch(SRC_BRANCH)
                             {
                                 case 'dev':
-                                PLATFORM_DOCKER_TAG = 'dev-branch'
-                                STOREFRONT_DOCKER_TAG = 'dev-branch'
+                                PLATFORM_DOCKER_TAG = '3.0-dev'
+                                STOREFRONT_DOCKER_TAG = '3.0-dev'
                                 break
                                 case 'master':
-                                PLATFORM_DOCKER_TAG = 'latest'
-                                STOREFRONT_DOCKER_TAG = 'latest'
-                                break
-                                case 'dev-3.0.0':
-                                PLATFORM_DOCKER_TAG = '3.0-dev'
-                                STOREFRONT_DOCKER_TAG = 'dev-branch'
-                                break
-                                case 'release_3.0.0':
-                                PLATFORM_DOCKER_TAG = '3.0-preview'
-                                STOREFRONT_DOCKER_TAG = 'latest'
+                                PLATFORM_DOCKER_TAG = '3.0'
+                                STOREFRONT_DOCKER_TAG = '3.0'
                                 break
                             }
                             // Start docker environment	

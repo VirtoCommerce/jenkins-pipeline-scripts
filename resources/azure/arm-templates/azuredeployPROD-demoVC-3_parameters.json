@@ -1,0 +1,76 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "sqlServerName": {
+      "value": "prod-demovc3-srv"
+    },
+    "sqlAdministratorLogin": {
+      "value": "vc-admin"
+    },
+    "sqlAdministratorLoginPassword": {
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/973d0b8c-44bf-438d-a4b7-1c4162d3ccba/resourceGroups/PROD-demoVC-3/providers/Microsoft.KeyVault/vaults/prod-demovc3"
+        },
+        "secretName": "sqlAdministratorLoginPassword-prod"
+      }
+    },
+    "sqlDatabaseName": {
+      "value": "prod-demovc3-db"
+    },
+    "storageAccountName": {
+      "value": "proddemovc3"
+    },
+    "platformAppServicePlanName": {
+      "value": "prod-demovc3-admin"
+    },
+    "frontAppServicePlanName": {
+      "value": "prod-demovc3-store"
+    },
+    "platformAppInsights": {
+      "value": "prod-demovc3-admin"
+    },
+    "frontAppInsights": {
+      "value": "prod-demovc3-store"
+    },
+    "platformWebAppName": {
+      "value": "prod-demovc3-admin"
+    },
+    "frontWebAppName": {
+      "value": "prod-demovc3-store"
+    },
+    "platformVirtoCommerce": {
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/973d0b8c-44bf-438d-a4b7-1c4162d3ccba/resourceGroups/PROD-demoVC-3/providers/Microsoft.KeyVault/vaults/prod-demovc3"
+        },
+        "secretName": "platformVirtoCommerce-prod"
+      }
+    },
+    "platformAppinsightsInstrumentationKey": {
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/973d0b8c-44bf-438d-a4b7-1c4162d3ccba/resourceGroups/PROD-demoVC-3/providers/Microsoft.KeyVault/vaults/prod-demovc3"
+        },
+        "secretName": "platformAppinsightsInstrumentationKey-prod"
+      }
+    },
+    "frontVirtoCommerceEndpointUrl": {
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/973d0b8c-44bf-438d-a4b7-1c4162d3ccba/resourceGroups/PROD-demoVC-3/providers/Microsoft.KeyVault/vaults/prod-demovc3"
+        },
+        "secretName": "frontVirtoCommerceEndpointUrl-prod"
+      }
+    },
+    "frontAppinsightsInstrumentationKey": {
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/973d0b8c-44bf-438d-a4b7-1c4162d3ccba/resourceGroups/PROD-demoVC-3/providers/Microsoft.KeyVault/vaults/prod-demovc3"
+        },
+        "secretName": "frontAppinsightsInstrumentationKey-prod"
+      }
+    }
+  }
+}

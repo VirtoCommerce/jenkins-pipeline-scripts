@@ -16,7 +16,7 @@ def call(body) {
 		def hmacAppId = env.HMAC_APP_ID
 		def hmacSecret = env.HMAC_SECRET
 		def solution = config.solution
-		projectType = config.projectType
+		projectType = 'NETCORE2'
 
 		def globalLib = library('global-shared-lib').com.test
 		def Utilities = globalLib.Utilities
@@ -31,10 +31,15 @@ def call(body) {
 			def websiteDir = 'VirtoCommerce.Platform.Web'
 			def deployScript = 'VC-WebApp2Azure.ps1'
 			def dockerTag = "${env.BRANCH_NAME}-branch"
-			def dockerTagLinux = "2.0-dev-linux"
+			def dockerTagLinux = "3.0-dev-linux"
+			def runtimeImage = ""
 			def storefrontImageName = 'virtocommerce/storefront'
 			def buildOrder = Utilities.getNextBuildOrder(this)
 			def themeBranch
+        	def releaseNotesPath = "${workspace}\\release_notes.txt"
+			if (env.BRANCH_NAME == 'support/2.x') {
+				
+			}
 			switch(env.BRANCH_NAME)
 			{
 				case 'support/2.x':
@@ -47,6 +52,18 @@ def call(body) {
 					dockerTagLinux = '2.0-dev-linux'
 					themeBranch = 'dev'
 				break
+				case 'dev':
+					dockerTag = "3.0-dev"
+					dockerTagLinux = '3.0-dev-linux'
+					runtimeImage = "mcr.microsoft.com/dotnet/core/aspnet:3.1"
+					themeBranch = 'dev'
+				break
+				case 'master':
+					dockerTag = "3.0"
+					dockerTagLinux = '3.0-linux'
+					runtimeImage = "mcr.microsoft.com/dotnet/core/aspnet:3.1"
+					themeBranch = 'master'
+				break
 			}
 
 			def SETTINGS
@@ -57,10 +74,6 @@ def call(body) {
 			SETTINGS = globalLib.Settings.new(settingsFileContent)
 			SETTINGS.setBranch(env.BRANCH_NAME)
 			
-			if(projectType == null)
-			{
-				projectType = "NET4"
-			}
 
 			if(solution == null)
 			{
@@ -78,16 +91,36 @@ def call(body) {
 				SETTINGS.setProject('platform')
 			}
 
+			def commitNumber
+			def versionSuffixArg
 			
 			try {
 				Utilities.notifyBuildStatus(this, SETTINGS['of365hook'], '', 'STARTED')
 
 				stage('Checkout') {
 					timestamps { 
-						if (Packaging.getShouldPublish(this)) {
-							powershell "Remove-Item ${workspace}\\* -Recurse -Force"
-						}
+						deleteDir()
+
 						checkout scm
+
+						powershell "if(!(Test-Path -Path .\\.nuke)){ Get-ChildItem *.sln -Name > .nuke }"
+
+						commitNumber = Utilities.getCommitHash(this)
+                    	versionSuffixArg = env.BRANCH_NAME == 'dev' ? "-CustomTagSuffix \"_build_${commitNumber}\"" : ""
+
+						try
+						{
+							def release = GithubRelease.getLatestGithubReleaseV3(this, Utilities.getOrgName(this), Utilities.getRepoName(this))
+							echo release.published_at
+							def releaseNotes = Utilities.getReleaseNotesFromCommits(this, release.published_at)
+							echo releaseNotes
+							writeFile file: releaseNotesPath, text: releaseNotes
+						}
+						catch(any)
+						{
+							echo "exception:"
+							echo any.getMessage()
+						}
 					}				
 				}
 
@@ -98,10 +131,48 @@ def call(body) {
 
 				stage('Build') {		
 					timestamps { 						
-						Packaging.startAnalyzer(this)
-						Packaging.runBuild(this, solution)
+						if(Utilities.isPullRequest(this))
+						{
+							withSonarQubeEnv('VC Sonar Server'){
+								withEnv(["BRANCH_NAME=${env.CHANGE_BRANCH}"])
+								{
+									powershell "vc-build SonarQubeStart -SonarUrl ${env.SONAR_HOST_URL} -SonarAuthToken \"${env.SONAR_AUTH_TOKEN}\" -PullRequest -GitHubToken ${env.GITHUB_TOKEN} -skip Restore+Compile"
+									powershell "vc-build Compile -Configuration Debug"
+								}
+							}
+						}
+						else
+						{
+							withSonarQubeEnv('VC Sonar Server'){
+								powershell "vc-build SonarQubeStart -SonarUrl ${env.SONAR_HOST_URL} -SonarAuthToken \"${env.SONAR_AUTH_TOKEN}\" -skip Restore+Compile"
+							}
+							powershell "vc-build Compile -Configuration Debug"
+						}
 					}
 				}
+
+				stage('Unit Tests'){
+					if(env.BRANCH_NAME == 'support/2.x-dev' || env.BRANCH_NAME == 'support/2.x')
+					{
+						def tests = Utilities.getTestDlls(this)
+						if(tests.size() > 0)
+						{
+							Packaging.runUnitTests(this, tests)
+						}
+					}
+					else
+					{
+                    	powershell "vc-build Test -TestsFilter \"Category=Unit|Category=CI\" -skip Restore+Compile"
+					}
+                } 
+
+                stage('Quality Gate'){
+                    // Packaging.endAnalyzer(this)
+                    withSonarQubeEnv('VC Sonar Server'){
+                        powershell "vc-build SonarQubeEnd -SonarUrl ${env.SONAR_HOST_URL} -SonarAuthToken ${env.SONAR_AUTH_TOKEN} -skip Restore+Compile+SonarQubeStart"
+                    }
+                    Packaging.checkAnalyzerGate(this)
+                }  
 			
 				def version = Utilities.getAssemblyVersion(this, webProject)
 				def dockerImage
@@ -109,37 +180,31 @@ def call(body) {
 
 				stage('Packaging') {
 					timestamps { 
-						Packaging.createReleaseArtifact(this, version, webProject, zipArtifact, websiteDir)
-						if (env.BRANCH_NAME == 'support/2.x-dev' || env.BRANCH_NAME == 'support/2.x') {
+						powershell "vc-build Compress ${versionSuffixArg} -skip Clean+Restore+Compile+Test"
+						if (env.BRANCH_NAME == 'support/2.x-dev' || env.BRANCH_NAME == 'support/2.x' || env.BRANCH_NAME == 'dev' || env.BRANCH_NAME =='master') {
 							def websitePath = Utilities.getWebPublishFolder(this, websiteDir)
+							powershell script: "Copy-Item ${workspace}\\artifacts\\publish\\* ${websitePath}\\VirtoCommerce.Storefront -Recurse -Force"
 							dir(env.BRANCH_NAME == 'support/2.x-dev' || env.BRANCH_NAME == 'support/2.x' ? env.WORKSPACE : workspace)
 							{
-								dockerImage = Packaging.createDockerImage(this, zipArtifact.replaceAll('\\.','/'), websitePath, ".", dockerTag)	
-							}		
+								dockerImage = Packaging.createDockerImage(this, zipArtifact.replaceAll('\\.','/'), websitePath, "VirtoCommerce.Storefront", dockerTag, runtimeImage)	
+							}	
+							if(Utilities.isNetCore(projectType) && (env.BRANCH_NAME == 'dev' || env.BRANCH_NAME =='master'))
+							{
+								stash includes: 'artifacts/**', name: 'artifact'
+								node('linux')
+								{
+									unstash 'artifact'
+									def dockerfileContent = libraryResource 'docker.core/linux/storefront/Dockerfile'
+									writeFile file: "${env.WORKSPACE}/Dockerfile", text: dockerfileContent
+									dockerImageLinux = docker.build("${storefrontImageName}:${dockerTagLinux}", "--build-arg SOURCE=./artifacts/publish .")
+								}
+							}	
 						}
 					}
 				}
-
-				def tests = Utilities.getTestDlls(this)
-				if(tests.size() > 0)
-				{
-					stage('Unit Tests') {
-						timestamps { 
-							Packaging.runUnitTests(this, tests)
-						}
-					}
-				}		
-
-				stage('Code Analysis') {
-					timestamps { 
-						Packaging.endAnalyzer(this)
-						Packaging.checkAnalyzerGate(this)
-					}
-				}
-
 				if(solution == 'VirtoCommerce.Platform.sln' || projectType == 'NETCORE2') // skip docker and publishing for NET4
 				{
-					if (env.BRANCH_NAME == 'support/2.x' || env.BRANCH_NAME == 'release') {
+					if (env.BRANCH_NAME == 'support/2.x') {
 						stage('Create Test Environment') {
 							timestamps { 
 								// Start docker environment				
@@ -197,32 +262,61 @@ def call(body) {
 					}
 				}
 
-				if (env.BRANCH_NAME == 'support/2.x-dev' || env.BRANCH_NAME == 'support/2.x') {
-					stage('Publish'){
-						timestamps { 
-							def packagesDir = Utilities.getArtifactFolder(this)
-							def artifacts
-							dir(packagesDir)
-							{ 
-								artifacts = findFiles(glob: '*.zip')
-							}
-							Packaging.saveArtifact(this, 'vc', Utilities.getProjectType(this), '', "artifacts/${artifacts[0].path}")
+				def artifacts
+                stage('Saving Artifacts')
+                {
+                    timestamps
+                    {
+                        artifacts = findFiles(glob: 'artifacts\\*.zip')
 
-							if(solution == 'VirtoCommerce.Platform.sln' || projectType == 'NETCORE2')
+                        if(env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'feature/migrate-to-vc30' || env.BRANCH_NAME.startsWith("feature/") || env.BRANCH_NAME.startsWith("bug/") || env.BRANCH_NAME.startsWith("meds/"))
+                        {
+                            Packaging.saveArtifact(this, 'vc', Utilities.getProjectType(this), '', artifacts[0].path)
+                        }
+                    }
+                }
+
+				if (env.BRANCH_NAME == 'support/2.x-dev' || env.BRANCH_NAME == 'support/2.x' || env.BRANCH_NAME == 'dev' || env.BRANCH_NAME =='master') 
+				{
+					stage('Publish')
+					{
+						timestamps 
+						{
+							Packaging.pushDockerImage(this, dockerImage, dockerTag)
+							if(Utilities.isNetCore(projectType) && dockerImageLinux != null)
 							{
-								Packaging.pushDockerImage(this, dockerImage, dockerTag)
-								if(Utilities.isNetCore(projectType))
+								node('linux')
 								{
-									node('linux')
-									{
-										Packaging.pushDockerImage(this, dockerImageLinux, dockerTagLinux)
-									}
+									Packaging.pushDockerImage(this, dockerImageLinux, dockerTagLinux)
 								}
 							}
-							if (env.BRANCH_NAME == 'support/2.x') {
+							if (env.BRANCH_NAME == 'support/2.x' ) 
+							{
 								Packaging.createNugetPackages(this)
 								def notes = Utilities.getReleaseNotes(this, webProject)
 								Packaging.publishRelease(this, version, notes)
+							}
+							else if (env.BRANCH_NAME == 'master')
+							{
+								def ghReleaseResult = powershell script: "vc-build PublishPackages -ApiKey ${env.NUGET_KEY} -skip Clean+Restore+Compile+Test", returnStatus: true
+								if(ghReleaseResult == 409)
+								{
+									UNSTABLE_CAUSES.add("Nuget package already exists.")
+								} 
+								else if(ghReleaseResult != 0)
+								{
+									throw new Exception("ERROR: script returned ${ghReleaseResult}")
+								}
+
+								def orgName = Utilities.getOrgName(this)
+								def releaseNotesFile = new File(releaseNotesPath)
+								def releaseNotesArg = releaseNotesFile.exists() ? "-ReleaseNotes ${releaseNotesFile}" : ""
+								def releaseResult = powershell script: "vc-build Release -GitHubUser ${orgName} -GitHubToken ${env.GITHUB_TOKEN} ${releaseNotesArg} -skip Clean+Restore+Compile+Test", returnStatus: true
+								if(releaseResult == 422){
+									UNSTABLE_CAUSES.add("Release already exists on github")
+								} else if(releaseResult !=0 ) {
+									throw new Exception("Github release error")
+								}
 							}
 
 							// if((solution == 'VirtoCommerce.Platform.sln' || projectType == 'NETCORE2') && env.BRANCH_NAME == 'dev')
@@ -239,10 +333,6 @@ def call(body) {
 						}
 					}
 				}
-
-
-
-			
 			}
 			catch (any) {
 				currentBuild.result = 'FAILURE'

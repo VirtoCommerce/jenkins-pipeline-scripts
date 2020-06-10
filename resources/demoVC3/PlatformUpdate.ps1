@@ -47,7 +47,7 @@ Write-Host "Stop WebApp $DestWebAppName-$slotName"
 
 Stop-AzureRmWebAppSlot -ResourceGroupName $DestResourceGroupName -Name $DestWebAppName -Slot $slotName
 
-Start-Sleep -s 5
+Start-Sleep -s 15
 
 Write-Host "Deleting Files at $DestKuduDelPath"
 
@@ -61,15 +61,15 @@ Invoke-RestMethod -Uri $DestKuduPath `
                         -InFile $Path2Zip `
                         -ContentType "multipart/form-data"
 
-Start-Sleep -s 5
+Start-Sleep -s 15
 
-Write-Host "Uploading License File $LicFile to $DestKuduPutPath"
+# Write-Host "Uploading License File $LicFile to $DestKuduPutPath"
 
-Invoke-RestMethod -Uri $DestKuduPutPath `
-                        -Headers @{"Authorization"=$DestKuduApiAuthorisationToken;"If-Match"="*"} `
-                        -Method PUT `
-                        -InFile $LicFile `
-                        -ContentType "multipart/form-data"
+# Invoke-RestMethod -Uri $DestKuduPutPath `
+#                         -Headers @{"Authorization"=$DestKuduApiAuthorisationToken;"If-Match"="*"} `
+#                         -Method PUT `
+#                         -InFile $LicFile `
+#                         -ContentType "multipart/form-data"
 
 Write-Host "Start WebApp $DestWebAppName-$slotName"
 

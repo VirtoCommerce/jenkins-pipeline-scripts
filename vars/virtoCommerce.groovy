@@ -16,6 +16,7 @@ import jobs.scripts.*
 		properties([disableConcurrentBuilds()])
 	    def deployScript = 'VC-2AzureDEV.ps1'
 		def dockerTag = "${env.BRANCH_NAME}-branch"
+		def azureCopyExcludePattern = config.azureCopyExcludePattern
 		def buildOrder = Utilities.getNextBuildOrder(this)
 		projectType = config.projectType
 
@@ -69,7 +70,7 @@ import jobs.scripts.*
 						def subscriptionID = SETTINGS['subscriptionID']
 						def blobToken = SETTINGS['tokenSas']
 						withEnv(["AzureBlobToken=${blobToken}"]){
-							Utilities.runSharedPS(this, "${deployScript}", "-StagingName ${stagingName} -StoreName ${storeName} -AzureBlobName ${azureBlobName} -AzureBlobKey ${azureBlobKey} -WebAppName ${webAppName} -ResourceGroupName ${resourceGroupName} -SubscriptionID ${subscriptionID}")
+							Utilities.runSharedPS(this, "${deployScript}", "-StagingName ${stagingName} -StoreName ${storeName} -AzureBlobName ${azureBlobName} -AzureBlobKey ${azureBlobKey} -WebAppName ${webAppName} -ResourceGroupName ${resourceGroupName} -SubscriptionID ${subscriptionID} -ExcludePattern ${azureCopyExcludePattern}")
 						}
 					}
 				}
@@ -90,7 +91,7 @@ import jobs.scripts.*
 						def subscriptionID = SETTINGS['subscriptionID']
 						def blobToken = SETTINGS['tokenSasStage']
 						withEnv(["AzureBlobToken=${blobToken}"]){
-							Utilities.runSharedPS(this, "${deployScript}", "-StagingName ${stagingName} -StoreName ${storeName} -AzureBlobName ${azureBlobName} -AzureBlobKey ${azureBlobKey} -WebAppName ${webAppName} -ResourceGroupName ${resourceGroupName} -SubscriptionID ${subscriptionID}")
+							Utilities.runSharedPS(this, "${deployScript}", "-StagingName ${stagingName} -StoreName ${storeName} -AzureBlobName ${azureBlobName} -AzureBlobKey ${azureBlobKey} -WebAppName ${webAppName} -ResourceGroupName ${resourceGroupName} -SubscriptionID ${subscriptionID} -ExcludePattern ${azureCopyExcludePattern}")
 						}
 					}
 				}
@@ -116,7 +117,7 @@ import jobs.scripts.*
 							def subscriptionID = SETTINGS['subscriptionID']
 							def blobToken = SETTINGS['tokenSasProd']
 							withEnv(["AzureBlobToken=${blobToken}"]){
-								Utilities.runSharedPS(this, "${deployScript}", "-StagingName ${stagingName} -StoreName ${storeName} -AzureBlobName ${azureBlobName} -AzureBlobKey ${azureBlobKey} -WebAppName ${webAppName} -ResourceGroupName ${resourceGroupName} -SubscriptionID ${subscriptionID}")
+								Utilities.runSharedPS(this, "${deployScript}", "-StagingName ${stagingName} -StoreName ${storeName} -AzureBlobName ${azureBlobName} -AzureBlobKey ${azureBlobKey} -WebAppName ${webAppName} -ResourceGroupName ${resourceGroupName} -SubscriptionID ${subscriptionID} -ExcludePattern ${azureCopyExcludePattern}")
 							}
 						}
 					}
