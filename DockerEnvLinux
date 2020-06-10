@@ -11,7 +11,7 @@ node{
     if(!solutionRoot || !platformTag || !storefrontTag)
     {
         echo "Solution root: ${solutionRoot}\nPlatform Tag: ${platformTag}\nStorefront Tag: ${storefrontTag}"
-        throw new Exception("This pipeline must be the downstream")
+        throw new Exception("This pipeline must be the upstream")
     }
     stage('Init')
     {
