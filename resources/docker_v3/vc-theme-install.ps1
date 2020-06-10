@@ -8,5 +8,14 @@ Param(
 Write-Output $StorefrontContainer
 Write-Output $ThemePath
 Write-Output "docker cp"
-docker exec ${storefrontContainer} cmd /c mkdir \vc-storefront\wwwroot\cms-content
-docker cp $ThemePath ${StorefrontContainer}:/vc-storefront/wwwroot/cms-content/Themes
+if($IsLinux)
+{
+    Write-Output "Linux"
+    docker exec ${storefrontContainer} bash -c "mkdir -p /vc-storefront/wwwroot/cms-content/Themes"
+    docker cp $ThemePath/. ${StorefrontContainer}:/vc-storefront/wwwroot/cms-content/Themes
+}
+else 
+{
+    docker exec ${storefrontContainer} cmd /c mkdir \vc-storefront\wwwroot\cms-content
+    docker cp $ThemePath ${StorefrontContainer}:/vc-storefront/wwwroot/cms-content/Themes
+}
