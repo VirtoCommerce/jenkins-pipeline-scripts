@@ -3,12 +3,15 @@ import groovy.json.JsonSlurperClassic
 
 def globalLib = library('global-shared-lib').com.test
 def Utilities = globalLib.Utilities
-def Packaging = globalLib.Packaging
-def Modules = globalLib.Modules
-def Settings = globalLib.Settings
 
-def solutionRoot = "C:/tmp/solution"
+def solutionRoot = params.SolutionRoot
+def dockerTag = params.DockerTag
 node{
+    if(!solutionRoot || !dockerTag)
+    {
+        echo "Solution root: ${solutionRoot}\nDocker Tag: ${dockerTag}"
+        throw new Exception("This pipeline must be the downstream")
+    }
     stage('Init')
     {
         dir(solutionRoot)
@@ -75,7 +78,7 @@ node('linux')
         //         }
         //     }
         // }
-        
+
         // stage("E2E")
         // {
         //     timestamps
