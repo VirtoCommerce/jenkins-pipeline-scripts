@@ -55,13 +55,13 @@ node('linux')
                 Utilities.runPS(this, "docker_v3/vc-setup-sampledata.ps1", "-ApiUrl ${Utilities.getPlatformCoreHost(this)} -Verbose -Debug")
             }
         }
-        // stage('Theme Install')
-        // {
-        //     timestamps
-        //     {
-        //         Utilities.runPS(this, "docker_v3/vc-theme-install.ps1", "-ThemePath ${env.WORKSPACE}/theme -StorefrontContainer ${Utilities.getStorefrontContainer(this)}")
-        //     }
-        // }
+        stage('Theme Install')
+        {
+            timestamps
+            {
+                Utilities.runPS(this, "docker_v3/vc-theme-install.ps1", "-ThemePath ${env.WORKSPACE}/theme -StorefrontContainer ${Utilities.getStorefrontContainer(this)}")
+            }
+        }
         // stage("Swagger Schema Validation")
         // {
         //     timestamps
