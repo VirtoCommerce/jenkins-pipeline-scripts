@@ -160,21 +160,29 @@ pipeline {
                     {
                         timestamps
                         {
+
                             dir(Utilities.getComposeFolderV3(this))
                             {
                                 def platformTag
                                 def storefrontTag
+                                def platformTagLinux
+                                def storefrontTagLinux
                                 switch(BRANCH_NAME)
                                 {
                                     case 'dev':
                                     platformTag = '3.0-dev'
                                     storefrontTag = '3.0-dev'
+                                    platformTagLinux = '3.0-dev-linux'
+                                    storefrontTagLinux = '3.0-dev-linux'
                                     break
                                     case 'master':
                                     platformTag = '3.0'
                                     storefrontTag = '3.0'
+                                    platformTagLinux = '3.0-linux'
+                                    storefrontTagLinux = '3.0-linux'
                                     break
                                 }
+                                build job: 'DockerEnvLinux', propagate: false, wait: false, [string(name:'SolutionRoot', value:"${env.WORKSPACE}/CS"), string(name:'PlatformTag', value:platformTagLinux), string(name:'StorefrontTag', value:storefrontTagLinux)]
                                 def platformPort = Utilities.getPlatformPort(this)
                                 def storefrontPort = Utilities.getStorefrontPort(this)
                                 def sqlPort = Utilities.getSqlPort(this)
