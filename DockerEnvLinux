@@ -61,44 +61,44 @@ node('linux')
             {
                 Utilities.runPS(this, "docker_v3/vc-theme-install.ps1", "-ThemePath ${env.WORKSPACE}/theme -StorefrontContainer ${Utilities.getStorefrontContainer(this)}")
             }
-        }
-        stage("Swagger Schema Validation")
-        {
-            timestamps
-            {
-                def swaggerSchemaPath = "${workspace}\\swaggerSchema${env.BUILD_NUMBER}.json"
-                Utilities.runPS(this, "docker_v3/vc-get-swagger.ps1", "-ApiUrl ${Utilities.getPlatformCoreHost(this)} -OutFile ${swaggerSchemaPath} -Verbose -Debug")
-                def swaggerResult = pwsh script: "vc-build ValidateSwaggerSchema -SwaggerSchemaPath ${swaggerSchemaPath}", returnStatus: true
-                if(swaggerResult != 0)
-                {
-                    echo "Swagger Schema contains error"
-                }
-            }
-        }
-        // stage("E2E")
+        // }
+        // stage("Swagger Schema Validation")
         // {
         //     timestamps
         //     {
-        //         def e2eDir = "${env.WORKSPACE}\\e2e"
-        //         dir(e2eDir)
+        //         def swaggerSchemaPath = "${workspace}\\swaggerSchema${env.BUILD_NUMBER}.json"
+        //         Utilities.runPS(this, "docker_v3/vc-get-swagger.ps1", "-ApiUrl ${Utilities.getPlatformCoreHost(this)} -OutFile ${swaggerSchemaPath} -Verbose -Debug")
+        //         def swaggerResult = pwsh script: "vc-build ValidateSwaggerSchema -SwaggerSchemaPath ${swaggerSchemaPath}", returnStatus: true
+        //         if(swaggerResult != 0)
         //         {
-        //             git changelog: false, credentialsId: '38b768a3-7d9c-4203-9389-d6c6d8d6aff4', poll: false, url: 'https://github.com/VirtoCommerce/vc-quality-gate-katalon.git'
-        //             def e2eStatus = 'success'
-        //             try{
-        //                 pwsh "${env.KATALON_DIR}\\katalonc.exe -projectPath=\"${e2eDir}\\platform_storefront.prj\" -testSuitePath=\"Test Suites/StorefrontPlatform\" -apiKey=\"${env.KATALON_API_KEY}\" -browserType=\"Chrome (headless)\" -g_StoreURL=\"http://localhost:${Utilities.getStorefrontPort(this)}\" -executionProfile=\"default\""
-        //             }
-        //             catch(any)
-        //             {
-        //                 echo any.getMessage()
-        //                 e2eStatus = 'failed'
-        //             }
-        //             def platformPort = Utilities.getPlatformPort(this)
-        //             def storefrontPort = Utilities.getStorefrontPort(this)
-        //             def msg = "E2E ${e2eStatus}\nStorefront:\nhttp://ci.virtocommerce.com:${storefrontPort}\nPlatform:\nhttp://ci.virtocommerce.com:${platformPort}"
-        //             input message: msg
+        //             echo "Swagger Schema contains error"
         //         }
         //     }
         // }
+        stage("E2E")
+        {
+            timestamps
+            {
+                def e2eDir = "${env.WORKSPACE}/e2e"
+                dir(e2eDir)
+                {
+                    git changelog: false, credentialsId: '38b768a3-7d9c-4203-9389-d6c6d8d6aff4', poll: false, url: 'https://github.com/VirtoCommerce/vc-quality-gate-katalon.git'
+                    def e2eStatus = 'success'
+                    try{
+                        pwsh "/opt/KRE/katalonc -projectPath=\"${e2eDir}/platform_storefront.prj\" -testSuitePath=\"Test Suites/StorefrontPlatform\" -apiKey=\"${env.KATALON_API_KEY}\" -browserType=\"Chrome (headless)\" -g_StoreURL=\"http://localhost:${Utilities.getStorefrontPort(this)}\" -executionProfile=\"default\""
+                    }
+                    catch(any)
+                    {
+                        echo any.getMessage()
+                        e2eStatus = 'failed'
+                    }
+                    def platformPort = Utilities.getPlatformPort(this)
+                    def storefrontPort = Utilities.getStorefrontPort(this)
+                    def msg = "E2E ${e2eStatus}\nStorefront:\nhttp://ci.virtocommerce.com:${storefrontPort}\nPlatform:\nhttp://ci.virtocommerce.com:${platformPort}"
+                    input message: msg
+                }
+            }
+        }
     }
     catch(any)
     {
