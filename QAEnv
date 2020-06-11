@@ -52,7 +52,7 @@ pipeline
                     // ]
                     // SRC_BRANCH = userInput["Source Branch"]
                     // TRG_BRANCH = userInput["Target Branch"]
-                    // DELIVERY_AZURE = userInput["Delivery to Azure"]
+                    DELIVERY_AZURE = userInput["Delivery to Azure"]
                     // echo "Source Branch: ${SRC_BRANCH}; Target Branch: ${TRG_BRANCH};"
                     def settingsFileContent
                     configFileProvider([configFile(fileId: 'delivery_settings', variable: 'SETTINGS_FILE')]) {
@@ -140,107 +140,107 @@ pipeline
                 }
             }
         }
-        stage("Docker Environment")
-        {
-            steps
-            {
-                script
-                {
-                    stage('Create Test Environment') 
-                    {
-                        timestamps 
-                        { 
-                            DOCKER_SQL_PORT = Utilities.getSqlPort(this)
-                            DOCKER_PLATFORM_PORT = Utilities.getPlatformPort(this)
-                            DOCKER_STOREFRONT_PORT = Utilities.getStorefrontPort(this)
-                            switch(SRC_BRANCH)
-                            {
-                                case 'dev':
-                                PLATFORM_DOCKER_TAG = '3.0-dev'
-                                STOREFRONT_DOCKER_TAG = '3.0-dev'
-                                break
-                                case 'master':
-                                PLATFORM_DOCKER_TAG = '3.0'
-                                STOREFRONT_DOCKER_TAG = '3.0'
-                                break
-                            }
-                            // Start docker environment	
-                            dir(Utilities.getComposeFolderV3(this))
-                            {
-                                echo "PLATFORM_DOCKER_TAG=${PLATFORM_DOCKER_TAG}, STOREFRONT_DOCKER_TAG=${STOREFRONT_DOCKER_TAG}, DOCKER_PLATFORM_PORT=${DOCKER_PLATFORM_PORT}, DOCKER_STOREFRONT_PORT=${DOCKER_STOREFRONT_PORT}, DOCKER_SQL_PORT=${DOCKER_SQL_PORT}"
-                                // 1. stop containers
-                                // 2. remove instances including database
-                                // 3. start up new containers
-                                withEnv(["PLATFORM_DOCKER_TAG=${PLATFORM_DOCKER_TAG}", "STOREFRONT_DOCKER_TAG=${STOREFRONT_DOCKER_TAG}", "DOCKER_PLATFORM_PORT=${DOCKER_PLATFORM_PORT}", "DOCKER_STOREFRONT_PORT=${DOCKER_STOREFRONT_PORT}", "DOCKER_SQL_PORT=${DOCKER_SQL_PORT}", "COMPOSE_PROJECT_NAME=${env.BUILD_TAG}"])
-                                {
-                                    bat "docker-compose up -d"
-                                }
-                            }			
-                        }
-                    }
-                    stage('Install Modules')
-                    {
-                        timestamps
-                        {
-                            def platformContainer = Utilities.getPlatformContainer(this)
-                            def platformHost = Utilities.getPlatformCoreHost(this)
+        // stage("Docker Environment")
+        // {
+        //     steps
+        //     {
+        //         script
+        //         {
+        //             stage('Create Test Environment') 
+        //             {
+        //                 timestamps 
+        //                 { 
+        //                     DOCKER_SQL_PORT = Utilities.getSqlPort(this)
+        //                     DOCKER_PLATFORM_PORT = Utilities.getPlatformPort(this)
+        //                     DOCKER_STOREFRONT_PORT = Utilities.getStorefrontPort(this)
+        //                     switch(SRC_BRANCH)
+        //                     {
+        //                         case 'dev':
+        //                         PLATFORM_DOCKER_TAG = '3.0-dev'
+        //                         STOREFRONT_DOCKER_TAG = '3.0-dev'
+        //                         break
+        //                         case 'master':
+        //                         PLATFORM_DOCKER_TAG = '3.0'
+        //                         STOREFRONT_DOCKER_TAG = '3.0'
+        //                         break
+        //                     }
+        //                     // Start docker environment	
+        //                     dir(Utilities.getComposeFolderV3(this))
+        //                     {
+        //                         echo "PLATFORM_DOCKER_TAG=${PLATFORM_DOCKER_TAG}, STOREFRONT_DOCKER_TAG=${STOREFRONT_DOCKER_TAG}, DOCKER_PLATFORM_PORT=${DOCKER_PLATFORM_PORT}, DOCKER_STOREFRONT_PORT=${DOCKER_STOREFRONT_PORT}, DOCKER_SQL_PORT=${DOCKER_SQL_PORT}"
+        //                         // 1. stop containers
+        //                         // 2. remove instances including database
+        //                         // 3. start up new containers
+        //                         withEnv(["PLATFORM_DOCKER_TAG=${PLATFORM_DOCKER_TAG}", "STOREFRONT_DOCKER_TAG=${STOREFRONT_DOCKER_TAG}", "DOCKER_PLATFORM_PORT=${DOCKER_PLATFORM_PORT}", "DOCKER_STOREFRONT_PORT=${DOCKER_STOREFRONT_PORT}", "DOCKER_SQL_PORT=${DOCKER_SQL_PORT}", "COMPOSE_PROJECT_NAME=${env.BUILD_TAG}"])
+        //                         {
+        //                             bat "docker-compose up -d"
+        //                         }
+        //                     }			
+        //                 }
+        //             }
+        //             stage('Install Modules')
+        //             {
+        //                 timestamps
+        //                 {
+        //                     def platformContainer = Utilities.getPlatformContainer(this)
+        //                     def platformHost = Utilities.getPlatformCoreHost(this)
 
-                            // install modules
-                            Utilities.runPS(this, 'docker_v3/setup-modulesFromDir.ps1', "-PlatformContainer ${platformContainer} -ModulesDir ${env.WORKSPACE}\\CS\\modules -Verbose -Debug")
-                            Utilities.runPS(this, "docker_v3/vc-check-installed-modules.ps1", "-ApiUrl ${platformHost} -Verbose -Debug")
-                        }
-                    }
-                    stage('Install Sample Data')
-                    {
-                        timestamps
-                        {
-                            Utilities.runPS(this, "docker_v3/vc-setup-sampledata.ps1", "-ApiUrl ${Utilities.getPlatformCoreHost(this)} -Verbose -Debug")
-                        }
-                    }
-                    stage('Storefront Install')
-                    {
-                        timestamps
-                        {
-                            if(STOREFRONT_INSTALL)
-                            {
-                                def storefrontContainer = Utilities.getStorefrontContainer(this)
-                                def storefrontDir = "${env.WORKSPACE}\\CS\\storefront"
-                                //bat "docker exec ${storefrontContainer} cmd /c \"rmdir /S /Q C:\\vc-storefront\""
-                                bat "docker stop ${storefrontContainer}"
-                                bat "docker cp ${storefrontDir} ${storefrontContainer}:/vc-storefront/."
-                                bat "docker start ${storefrontContainer}"
-                            }
-                        }
-                    }
-                    stage('Theme Install')
-                    {
-                        timestamps 
-                        {
-                            // //def storefrontContainer = Utilities.getStorefrontContainer(this)
-                            // def platformContainer = Utilities.getPlatformContainer(this)
-                            // def themeFolder = "${env.WORKSPACE}\\CS\\theme"
-                            // //Utilities.runSharedPS(this, "vc-install-theme.ps1", "-themeZip \"${themeFolder}\" -platformContainer ${platformContainer}")
-                            // bat "docker exec ${platformContainer} powershell -Command \"Remove-Item C:\\vc-platform\\App_Data\\cms-content\\Themes -Recurse -Force\""
-                            // bat "docker exec ${platformContainer} powershell -Command \"mkdir tmp\""
-                            // bat "docker cp ${themeFolder} ${platformContainer}:/tmp/Themes"
-                            // bat "docker exec ${platformContainer} powershell -Command \"Copy-Item -Path C:\\tmp\\Themes -Destination C:\\vc-platform\\App_Data\\cms-content\\Themes -Recurse -Force\""
-                            Utilities.runPS(this, "docker_v3/vc-theme-install.ps1", "-ThemePath ${env.WORKSPACE}\\CS\\theme -StorefrontContainer ${Utilities.getStorefrontContainer(this)}")
-                        }
-                    }
+        //                     // install modules
+        //                     Utilities.runPS(this, 'docker_v3/setup-modulesFromDir.ps1', "-PlatformContainer ${platformContainer} -ModulesDir ${env.WORKSPACE}\\CS\\modules -Verbose -Debug")
+        //                     Utilities.runPS(this, "docker_v3/vc-check-installed-modules.ps1", "-ApiUrl ${platformHost} -Verbose -Debug")
+        //                 }
+        //             }
+        //             stage('Install Sample Data')
+        //             {
+        //                 timestamps
+        //                 {
+        //                     Utilities.runPS(this, "docker_v3/vc-setup-sampledata.ps1", "-ApiUrl ${Utilities.getPlatformCoreHost(this)} -Verbose -Debug")
+        //                 }
+        //             }
+        //             stage('Storefront Install')
+        //             {
+        //                 timestamps
+        //                 {
+        //                     if(STOREFRONT_INSTALL)
+        //                     {
+        //                         def storefrontContainer = Utilities.getStorefrontContainer(this)
+        //                         def storefrontDir = "${env.WORKSPACE}\\CS\\storefront"
+        //                         //bat "docker exec ${storefrontContainer} cmd /c \"rmdir /S /Q C:\\vc-storefront\""
+        //                         bat "docker stop ${storefrontContainer}"
+        //                         bat "docker cp ${storefrontDir} ${storefrontContainer}:/vc-storefront/."
+        //                         bat "docker start ${storefrontContainer}"
+        //                     }
+        //                 }
+        //             }
+        //             stage('Theme Install')
+        //             {
+        //                 timestamps 
+        //                 {
+        //                     // //def storefrontContainer = Utilities.getStorefrontContainer(this)
+        //                     // def platformContainer = Utilities.getPlatformContainer(this)
+        //                     // def themeFolder = "${env.WORKSPACE}\\CS\\theme"
+        //                     // //Utilities.runSharedPS(this, "vc-install-theme.ps1", "-themeZip \"${themeFolder}\" -platformContainer ${platformContainer}")
+        //                     // bat "docker exec ${platformContainer} powershell -Command \"Remove-Item C:\\vc-platform\\App_Data\\cms-content\\Themes -Recurse -Force\""
+        //                     // bat "docker exec ${platformContainer} powershell -Command \"mkdir tmp\""
+        //                     // bat "docker cp ${themeFolder} ${platformContainer}:/tmp/Themes"
+        //                     // bat "docker exec ${platformContainer} powershell -Command \"Copy-Item -Path C:\\tmp\\Themes -Destination C:\\vc-platform\\App_Data\\cms-content\\Themes -Recurse -Force\""
+        //                     Utilities.runPS(this, "docker_v3/vc-theme-install.ps1", "-ThemePath ${env.WORKSPACE}\\CS\\theme -StorefrontContainer ${Utilities.getStorefrontContainer(this)}")
+        //                 }
+        //             }
                     
-                    stage('Awaiting Proceed')
-                    {
-                        timestamps
-                        {  
-                            def platformPort = Utilities.getPlatformPort(this)
-                            def storefrontPort = Utilities.getStorefrontPort(this)
-                            def msg = "Storefront:\nhttp://ci.virtocommerce.com:${storefrontPort}\nPlatform:\nhttp://ci.virtocommerce.com:${platformPort}"
-                            input message: msg
-                        }
-                    }
-                }
-            }
-        }
+        //             stage('Awaiting Proceed')
+        //             {
+        //                 timestamps
+        //                 {  
+        //                     def platformPort = Utilities.getPlatformPort(this)
+        //                     def storefrontPort = Utilities.getStorefrontPort(this)
+        //                     def msg = "Storefront:\nhttp://ci.virtocommerce.com:${storefrontPort}\nPlatform:\nhttp://ci.virtocommerce.com:${platformPort}"
+        //                     input message: msg
+        //                 }
+        //             }
+        //         }
+        //     }
+        // }
         
         stage("Create / Update Environment"){
             when {
