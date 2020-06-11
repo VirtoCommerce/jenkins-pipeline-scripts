@@ -59,20 +59,21 @@ pipeline
                         settingsFileContent = readFile(SETTINGS_FILE)
                     }
                     SETTINGS = Settings.new(settingsFileContent)
-                    // def regionChoices = SETTINGS.getProjects().join("\n")
-                    // def buildOrder = Utilities.getNextBuildOrder(this)
-                    // def userInputRegion = input message: "Select Region", parameters: [
-                    //     choice(name: 'Region', choices: regionChoices)
-                    // ]
-                    // PROJECT_TYPE = 'SOLUTION'
-                    REGION = "demo3"//userInputRegion
+                    def regionChoices = SETTINGS.getProjects().join("\n")
+                    def buildOrder = Utilities.getNextBuildOrder(this)
+                    def userInputRegion = input message: "Select Region", parameters: [
+                        choice(name: 'Region', choices: regionChoices)
+                    ]
+                    PROJECT_TYPE = 'SOLUTION'
+                    REGION = userInputRegion
+                    UPDATE_CS = true
                     SETTINGS.setProject(REGION)
 
-                    // def envChoices = SETTINGS.getBranches().join("\n")
-                    // def userEnvInput = input message: "Select Environment", parameters: [
-                    //     choice(name: 'Environments', choices: envChoices)
-                    // ]
-                    ENV_NAME = "DEV"//userEnvInput
+                    def envChoices = SETTINGS.getBranches().join("\n")
+                    def userEnvInput = input message: "Select Environment", parameters: [
+                        choice(name: 'Environments', choices: envChoices)
+                    ]
+                    ENV_NAME = userEnvInput
                     SETTINGS.setBranch(ENV_NAME)
                     
                     def srcBranches = SETTINGS['branch'] as String[]
@@ -241,17 +242,47 @@ pipeline
             }
         }
         
-        stage('Delivery')
-        {
-            when
-            {
-                equals expected: true, actual: DELIVERY_AZURE
+        stage("Create / Update Environment"){
+            when {
+                expression {
+                    UPDATE_CS
+                }
             }
-            steps
-            {
-                script
-                {
-                    echo "stub"
+            steps {
+                script{
+                    def resourceGroupName = SETTINGS['resourceGroupName']
+                    Utilities.createInfrastructure(this, "${resourceGroupName}")
+                }
+            }
+        }
+
+        stage("Update Solution"){
+            when {
+                expression {
+                    UPDATE_CS
+                }
+            }
+            steps {
+                script{
+                    def csRoot = "${env.WORKSPACE}\\CS"
+                    def webAppName = SETTINGS['webAppName']
+                    def webAppPublicName = SETTINGS['webAppPublicName']
+                    def resourceGroupName = SETTINGS['resourceGroupName']
+                    def subscriptionID = SETTINGS['subscriptionID']
+                    def blobToken = SETTINGS['blobToken']
+                    def themeSrcDir = "${csRoot}\\theme"
+                    def themeBlobPath = ""
+                    def themeBlobPathParam = ""
+                    // if(SETTINGS['themeName'] != null)
+                    // {
+                    //     themeBlobPath = "Themes/${SETTINGS['themeName']}"
+                    //     themeSrcDir = "${themeSrcDir}\\${SETTINGS['themeName']}"
+                    //     themeBlobPathParam = "-ThemeBlobPath ${themeBlobPath}"
+                    // }
+                    withEnv(["AzureBlobToken=${blobToken}"]){
+                        Utilities.runSharedPS(this, 'delivery/upload-CS.ps1', 
+                            "-PlatformDir ${csRoot}\\platform -ModulesDir ${csRoot}\\modules -StorefrontDir ${csRoot}\\storefront -ThemeDir ${themeSrcDir} -WebAppName ${webAppName} -WebAppPublicName ${webAppPublicName} -ResourceGroupName ${resourceGroupName} -SubscriptionID ${subscriptionID} -StorageAccount ${SETTINGS['storageAccount']} -BlobContainerName ${SETTINGS['blobContainerName']} ${themeBlobPathParam}")
+                    }
                 }
             }
         }
