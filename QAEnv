@@ -81,6 +81,7 @@ pipeline
                     def userInputBranch = input message: "Select Branch", parameters: [
                             choice(name:'Source Branch', choices:srcBranches.join("\n")),
                             choice(name:'Target Branch', choices:targetBranches)
+                            booleanParam(defaultValue: false, name: 'Delviery to Azure')
                         ]
                     SRC_BRANCH = userInputBranch['Source Branch']
                     TRG_BRANCH = userInputBranch['Target Branch']
