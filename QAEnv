@@ -52,7 +52,7 @@ pipeline
                     // ]
                     // SRC_BRANCH = userInput["Source Branch"]
                     // TRG_BRANCH = userInput["Target Branch"]
-                    DELIVERY_AZURE = userInput["Delivery to Azure"]
+                    // DELIVERY_AZURE = userInput["Delivery to Azure"]
                     // echo "Source Branch: ${SRC_BRANCH}; Target Branch: ${TRG_BRANCH};"
                     def settingsFileContent
                     configFileProvider([configFile(fileId: 'delivery_settings', variable: 'SETTINGS_FILE')]) {
@@ -84,6 +84,7 @@ pipeline
                         ]
                     SRC_BRANCH = userInputBranch['Source Branch']
                     TRG_BRANCH = userInputBranch['Target Branch']
+                    DELIVERY_AZURE = userInput["Delivery to Azure"]
                     echo "Vars: REGION - ${REGION}, DELIVERY_AZURE - ${DELIVERY_AZURE}, ENV_NAME - ${ENV_NAME}, SRC_BRANCH - ${SRC_BRANCH}, TRG_BRANCH - ${TRG_BRANCH}"
                 }
             }
