@@ -299,7 +299,8 @@ pipeline
                 dir(Utilities.getComposeFolderV3(this))
                 {
                     withEnv(["PLATFORM_DOCKER_TAG=${PLATFORM_DOCKER_TAG}", "STOREFRONT_DOCKER_TAG=${STOREFRONT_DOCKER_TAG}", "DOCKER_PLATFORM_PORT=${DOCKER_PLATFORM_PORT}", "DOCKER_STOREFRONT_PORT=${DOCKER_STOREFRONT_PORT}", "DOCKER_SQL_PORT=${DOCKER_SQL_PORT}", "COMPOSE_PROJECT_NAME=${env.BUILD_TAG}"]){
-                        bat "docker-compose down -v"
+                        echo "Stop Docker ;)"
+                        // bat "docker-compose down -v"
                     }
                 }
             }
