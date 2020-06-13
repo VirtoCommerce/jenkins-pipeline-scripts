@@ -101,7 +101,7 @@ pipeline
                     powershell "Remove-Item -Path ${env.WORKSPACE}\\CS\\* -Recurse -Force -ErrorAction Continue"
                     powershell "Copy-Item -Path ${csSrc}\\module -Destination ${env.WORKSPACE}\\CS -Recurse -Force"
                     
-                    if(SRC_BRANCH == 'release_3.0.0' || SRC_BRANCH == 'dev-3.0.0')
+                    if(BRANCH_NAME == 'support_2.x' || BRANCH_NAME == 'support_2.x-dev' || BRANCH_NAME == 'dev' || BRANCH_NAME == 'master')
                     {
                         def solutionRoot = "${env.SOLUTION_FOLDER}\\${SETTINGS['prefix']}"
                         //theme
