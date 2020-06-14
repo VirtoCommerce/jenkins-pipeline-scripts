@@ -101,7 +101,7 @@ pipeline
                     powershell "Remove-Item -Path ${env.WORKSPACE}\\CS\\* -Recurse -Force -ErrorAction Continue"
                     powershell "Copy-Item -Path ${csSrc}\\module -Destination ${env.WORKSPACE}\\CS -Recurse -Force"
                     
-                    if(SRC_BRANCH == 'support_2.x' || SRC_BRANCH == 'support_2.x-dev' || SRC_BRANCH == 'dev' || SRC_BRANCH == 'master')
+                    if(TRG_BRANCH == 'support_2.x' || TRG_BRANCH == 'support_2.x-dev' || TRG_BRANCH == 'dev' || TRG_BRANCH == 'master')
                     {
                         def solutionRoot = "${env.SOLUTION_FOLDER}\\${SETTINGS['prefix']}"
                         //theme
@@ -135,16 +135,10 @@ pipeline
 
                     dir(modulesRoot)
                     {
-                        powershell "Get-ChildItem ${csTarget}\\module -Name | Remove-Item -ErrorAction SilentlyContinue -Force -Recurse"
-                    }
-                    powershell "Copy-Item -Path ${csTarget}\\* -Destination ${env.WORKSPACE}\\CS -Recurse -Force"
-                    powershell "Rename-Item -Path ${modulesRoot} -NewName modules"
-
-                    dir(modulesRoot)
-                    {
                         powershell "Get-ChildItem ${csSrc}\\module -Name | Remove-Item -ErrorAction SilentlyContinue -Force -Recurse"
                     }
                     powershell "Copy-Item -Path ${csSrc}\\* -Destination ${env.WORKSPACE}\\CS -Recurse -Force"
+                    powershell "Remove-Item ${env.WORKSPACE}\\CS\\modules -ErrorAction Ignore -Recurse -Force"
                     powershell "Rename-Item -Path ${modulesRoot} -NewName modules"
                 }
             }
@@ -282,12 +276,6 @@ pipeline
                     def themeSrcDir = "${csRoot}\\theme"
                     def themeBlobPath = ""
                     def themeBlobPathParam = ""
-                    // if(SETTINGS['themeName'] != null)
-                    // {
-                    //     themeBlobPath = "Themes/${SETTINGS['themeName']}"
-                    //     themeSrcDir = "${themeSrcDir}\\${SETTINGS['themeName']}"
-                    //     themeBlobPathParam = "-ThemeBlobPath ${themeBlobPath}"
-                    // }
                     withEnv(["AzureBlobToken=${blobToken}"]){
                         Utilities.runSharedPS(this, 'delivery/upload-CS.ps1', 
                             "-PlatformDir ${csRoot}\\platform -ModulesDir ${csRoot}\\modules -StorefrontDir ${csRoot}\\storefront -ThemeDir ${themeSrcDir} -WebAppName ${webAppName} -WebAppPublicName ${webAppPublicName} -ResourceGroupName ${resourceGroupName} -SubscriptionID ${subscriptionID} -StorageAccount ${SETTINGS['storageAccount']} -BlobContainerName ${SETTINGS['blobContainerName']} ${themeBlobPathParam}")
@@ -306,10 +294,11 @@ pipeline
                 dir(Utilities.getComposeFolderV3(this))
                 {
                     withEnv(["PLATFORM_DOCKER_TAG=${PLATFORM_DOCKER_TAG}", "STOREFRONT_DOCKER_TAG=${STOREFRONT_DOCKER_TAG}", "DOCKER_PLATFORM_PORT=${DOCKER_PLATFORM_PORT}", "DOCKER_STOREFRONT_PORT=${DOCKER_STOREFRONT_PORT}", "DOCKER_SQL_PORT=${DOCKER_SQL_PORT}", "COMPOSE_PROJECT_NAME=${env.BUILD_TAG}"]){
-                        echo "Stop Docker ;)"
                         // bat "docker-compose down -v"
+                        echo "Stop Docker ;)"
                     }
                 }
+                Utilities.cleanPRFolder(this)
             }
         }
     }
