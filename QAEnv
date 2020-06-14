@@ -135,9 +135,9 @@ pipeline
                     
                     dir(modulesRoot)
                     {
-                        powershell "Get-ChildItem ${csTarget}\\module -Name | Remove-Item -ErrorAction SilentlyContinue -Force -Recurse"
+                        powershell "Get-ChildItem ${csSrc}\\module -Name | Remove-Item -ErrorAction SilentlyContinue -Force -Recurse"
                     }
-                    powershell "Copy-Item -Path ${csTarget}\\* -Destination ${env.WORKSPACE}\\CS -Recurse -Force"
+                    powershell "Copy-Item -Path ${csSrc}\\* -Destination ${env.WORKSPACE}\\CS -Recurse -Force"
                     powershell "Rename-Item -Path ${modulesRoot} -NewName modules"
                 }
             }
