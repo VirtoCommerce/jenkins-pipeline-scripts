@@ -98,9 +98,9 @@ pipeline
                     def csSrc = "${env.SOLUTION_FOLDER}\\${SETTINGS['prefix']}\\${SRC_BRANCH}"
                     def csTarget = "${env.SOLUTION_FOLDER}\\${SETTINGS['prefix']}\\${TRG_BRANCH}"
                     def modulesRoot = "${env.WORKSPACE}\\CS\\module"
-                    powershell "Remove-Item -Path ${env.WORKSPACE}\\CS\\* -Recurse -Force -ErrorAction Continue"
-                    powershell "Copy-Item -Path ${csSrc}\\module -Destination ${env.WORKSPACE}\\CS -Recurse -Force"
-                    
+                    powershell script: "Remove-Item -Path ${env.WORKSPACE}\\CS\\* -Recurse -Force -ErrorAction Continue", label: "Clean Workspace"
+                    powershell script: "Copy-Item -Path ${csSrc}\\* -Destination ${env.WORKSPACE}\\CS -Recurse -Force", label: "Copy Solution to Workspace"
+
                     if(SRC_BRANCH == 'support_2.x' || SRC_BRANCH == 'support_2.x-dev' || SRC_BRANCH == 'dev' || SRC_BRANCH == 'master')
                     {
                         def solutionRoot = "${env.SOLUTION_FOLDER}\\${SETTINGS['prefix']}"
