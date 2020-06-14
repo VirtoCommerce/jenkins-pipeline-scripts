@@ -101,7 +101,7 @@ pipeline
                     powershell "Remove-Item -Path ${env.WORKSPACE}\\CS\\* -Recurse -Force -ErrorAction Continue"
                     powershell "Copy-Item -Path ${csSrc}\\module -Destination ${env.WORKSPACE}\\CS -Recurse -Force"
                     
-                    if(TRG_BRANCH == 'support_2.x' || TRG_BRANCH == 'support_2.x-dev' || TRG_BRANCH == 'dev' || TRG_BRANCH == 'master')
+                    if(SRC_BRANCH == 'support_2.x' || SRC_BRANCH == 'support_2.x-dev' || SRC_BRANCH == 'dev' || SRC_BRANCH == 'master')
                     {
                         def solutionRoot = "${env.SOLUTION_FOLDER}\\${SETTINGS['prefix']}"
                         //theme
@@ -135,9 +135,9 @@ pipeline
 
                     dir(modulesRoot)
                     {
-                        powershell "Get-ChildItem ${csSrc}\\module -Name | Remove-Item -ErrorAction SilentlyContinue -Force -Recurse"
+                        powershell "Get-ChildItem ${csTarget}\\module -Name | Remove-Item -ErrorAction SilentlyContinue -Force -Recurse"
                     }
-                    powershell "Copy-Item -Path ${csSrc}\\* -Destination ${env.WORKSPACE}\\CS -Recurse -Force"
+                    powershell "Copy-Item -Path ${csTarget}\\* -Destination ${env.WORKSPACE}\\CS -Recurse -Force"
                     powershell "Remove-Item ${env.WORKSPACE}\\CS\\modules -ErrorAction Ignore -Recurse -Force"
                     powershell "Rename-Item -Path ${modulesRoot} -NewName modules"
                 }
