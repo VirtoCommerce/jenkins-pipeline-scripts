@@ -176,9 +176,9 @@ pipeline {
                                     storefrontTagLinux = '3.0-dev-linux'
                                     break
                                     case 'master':
-                                    platformTag = '3.0'
+                                    platformTag = 'latest-win'
                                     storefrontTag = '3.0'
-                                    platformTagLinux = '3.0-linux'
+                                    platformTagLinux = 'latest'
                                     storefrontTagLinux = '3.0-linux'
                                     break
                                 }
