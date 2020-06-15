@@ -25,8 +25,8 @@ def call(body) {
         def repoName = Utilities.getRepoName(this)
         def workspace = "S:\\Buildsv3\\${repoName}\\${escapedBranch}"
         projectType = 'NETCORE2'
-        def platformDockerTag = '3.0-preview'
-        def platformLinuxDockerTag = '3.0-preview-linux'
+        def platformDockerTag = 'latest-win'
+        def platformLinuxDockerTag = 'latest'
         def storefrontDockerTag = 'latest'
         def releaseNotesPath = "${workspace}\\release_notes.txt"
         if(env.BRANCH_NAME == 'dev')
@@ -49,7 +49,8 @@ def call(body) {
             Utilities.notifyBuildStatus(this, SETTINGS['of365hook'], '', 'STARTED')
             def coverageFolder = Utilities.getCoverageFolder(this)
             
-            def commitNumber
+            def commitHash
+            def platformVersion
             def versionSuffixArg
 
             try {
@@ -58,8 +59,8 @@ def call(body) {
                     
                     checkout scm
 
-                    commitNumber = Utilities.getCommitHash(this)
-                    versionSuffixArg = env.BRANCH_NAME == 'dev' ? "-CustomTagSuffix \"_build_${commitNumber}\"" : ""
+                    commitHash = Utilities.getCommitHash(this)
+                    versionSuffixArg = env.BRANCH_NAME == 'dev' ? "-CustomTagSuffix \"_build_${commitHash}\"" : ""
 
                     try
                     {
@@ -126,6 +127,9 @@ def call(body) {
                 stage('Packaging'){
                              
                     powershell "vc-build Compress ${versionSuffixArg} -skip Clean+Restore+Compile+Test"
+
+                    platformVersion = pwsh (script: "(Get-Item artifacts\\publish\\VirtoCommerce.Platform.Web.dll).VersionInfo.ProductVersion", returnStdout: true, label: "Get platform version").trim()
+                    echo "Platform version: ${platformVersion}"
 
                     if(env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'dev'){
                         def websitePath = Utilities.getWebPublishFolder(this, "docker")
@@ -215,7 +219,7 @@ def call(body) {
 
                         if(env.BRANCH_NAME == 'dev')
                         {
-                            // def platformArtifactName = "VirtoCommerce.Platform_3.0.0-build.${commitNumber}"
+                            // def platformArtifactName = "VirtoCommerce.Platform_3.0.0-build.${commitHash}"
                             // echo "artifact version: ${platformArtifactName}"
                             // def artifactPath = "${workspace}\\artifacts\\${platformArtifactName}.zip"
                             // powershell "Copy-Item ${artifacts[0].path} -Destination ${artifactPath}"
@@ -233,9 +237,17 @@ def call(body) {
                         }
                         
                         Packaging.pushDockerImage(this, dockerWinImage, platformDockerTag)
+                        if(env.BRANCH_NAME == 'master')
+                        {
+                            Packaging.pushDockerImage(this, dockerWinImage, "${platformVersion}-${commitHash}-win")
+                        }
                         node('linux')
                         {
                             Packaging.pushDockerImage(this, dockerLinImage, platformLinuxDockerTag)
+                            if(env.BRANCH_NAME == 'master')
+                            {
+                                Packaging.pushDockerImage(this, dockerLinImage, "${platformVersion}-${commitHash}")
+                            }
                         }
                         // def ghReleaseResult = Utilities.runBatchScript(this, "@vc-build PublishPackages -ApiKey ${env.NUGET_KEY} -skip Clean+Restore+Compile+Test")
                         // if(ghReleaseResult['status'] != 0){
