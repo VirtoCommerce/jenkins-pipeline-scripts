@@ -80,13 +80,13 @@ pipeline
                     
                     def srcBranches = SETTINGS['branch'] as String[]
                     def targetBranches = Utilities.getSubfolders("${env.SOLUTION_FOLDER}\\vc").join("\n")
-                    def userInputBranch = input message: "Select Branch", parameters: [
-                            booleanParam(defaultValue: true, name: 'Disable docker / Delviery to Azure'),
+                    def userInputBranch = input message: "Select Branch and docker state", parameters: [
+                            booleanParam(defaultValue: true, name: 'Disable docker'),
                             choice(name:'Source Branch', choices:srcBranches.join("\n")),
                             choice(name:'Target Branch', choices:targetBranches),
                             
                         ]
-                    DELIVERY_AZURE = userInputBranch['Disable docker / Delviery to Azure']
+                    DELIVERY_AZURE = userInputBranch['Disable docker']
                     SRC_BRANCH = userInputBranch['Source Branch']
                     TRG_BRANCH = userInputBranch['Target Branch']                    
                     echo "Vars: REGION - ${REGION}, DELIVERY_AZURE - ${DELIVERY_AZURE}, ENV_NAME - ${ENV_NAME}, SRC_BRANCH - ${SRC_BRANCH}, TRG_BRANCH - ${TRG_BRANCH}"
@@ -120,7 +120,7 @@ pipeline
                         {
                             themeIncludeParam = "-Include ${SETTINGS['themeName'].join(',')}"
                         }
-                        powershell script: "[system.io.directory]::CreateDirectory(${themeDst})"
+                        powershell script: "[system.io.directory]::CreateDirectory("${themeDst}")"
                         powershell script: "Copy-Item -Path ${themeSrc}\\* ${themeIncludeParam} -Destination ${themeDst} -Recurse -Force", label: "Copy Theme to Workspace"
                         //storefront
                         def storefrontSrc = "${solutionRoot}\\${SETTINGS['storefrontBranch']}"
