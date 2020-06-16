@@ -21,6 +21,8 @@ def STOREFRONT_DOCKER_TAG
 
 def STOREFRONT_INSTALL
 
+def UNSTABLE_CAUSES = []
+
 pipeline
 {
     agent any
@@ -118,7 +120,7 @@ pipeline
                         {
                             themeIncludeParam = "-Include ${SETTINGS['themeName'].join(',')}"
                         }
-                        powershell script: "mkdir ${themeDst}"
+                        powershell script: "[system.io.directory]::CreateDirectory(${themeDst})"
                         powershell script: "Copy-Item -Path ${themeSrc}\\* ${themeIncludeParam} -Destination ${themeDst} -Recurse -Force", label: "Copy Theme to Workspace"
                         //storefront
                         def storefrontSrc = "${solutionRoot}\\${SETTINGS['storefrontBranch']}"
