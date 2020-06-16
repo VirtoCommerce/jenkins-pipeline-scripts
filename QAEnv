@@ -79,13 +79,14 @@ pipeline
                     def srcBranches = SETTINGS['branch'] as String[]
                     def targetBranches = Utilities.getSubfolders("${env.SOLUTION_FOLDER}\\vc").join("\n")
                     def userInputBranch = input message: "Select Branch", parameters: [
+                            booleanParam(defaultValue: true, name: 'Disable docker / Delviery to Azure'),
                             choice(name:'Source Branch', choices:srcBranches.join("\n")),
                             choice(name:'Target Branch', choices:targetBranches),
-                            booleanParam(defaultValue: true, name: 'Delviery to Azure')
+                            
                         ]
+                    DELIVERY_AZURE = userInputBranch['Disable docker / Delviery to Azure']
                     SRC_BRANCH = userInputBranch['Source Branch']
-                    TRG_BRANCH = userInputBranch['Target Branch']
-                    DELIVERY_AZURE = userInputBranch['Delviery to Azure']
+                    TRG_BRANCH = userInputBranch['Target Branch']                    
                     echo "Vars: REGION - ${REGION}, DELIVERY_AZURE - ${DELIVERY_AZURE}, ENV_NAME - ${ENV_NAME}, SRC_BRANCH - ${SRC_BRANCH}, TRG_BRANCH - ${TRG_BRANCH}"
                 }
             }
@@ -297,11 +298,23 @@ pipeline
         {
             script
             {
-                dir(Utilities.getComposeFolderV3(this))
-                {
-                    withEnv(["PLATFORM_DOCKER_TAG=${PLATFORM_DOCKER_TAG}", "STOREFRONT_DOCKER_TAG=${STOREFRONT_DOCKER_TAG}", "DOCKER_PLATFORM_PORT=${DOCKER_PLATFORM_PORT}", "DOCKER_STOREFRONT_PORT=${DOCKER_STOREFRONT_PORT}", "DOCKER_SQL_PORT=${DOCKER_SQL_PORT}", "COMPOSE_PROJECT_NAME=${env.BUILD_TAG}"]){
-                        if(!DELIVERY_AZURE){
-                            bat "docker-compose down -v"
+                catch (any){
+                    currentBuild.result = 'FAILURE'
+                    throw any
+                }   
+                finally{
+                    if(currentBuild.resultIsBetterOrEqualTo('SUCCESS') && UNSTABLE_CAUSES.size()>0){
+                        currentBuild.result = 'UNSTABLE'
+                        for(cause in UNSTABLE_CAUSES){
+                            echo cause
+                        }
+                    }
+                    dir(Utilities.getComposeFolderV3(this))
+                    {
+                        withEnv(["PLATFORM_DOCKER_TAG=${PLATFORM_DOCKER_TAG}", "STOREFRONT_DOCKER_TAG=${STOREFRONT_DOCKER_TAG}", "DOCKER_PLATFORM_PORT=${DOCKER_PLATFORM_PORT}", "DOCKER_STOREFRONT_PORT=${DOCKER_STOREFRONT_PORT}", "DOCKER_SQL_PORT=${DOCKER_SQL_PORT}", "COMPOSE_PROJECT_NAME=${env.BUILD_TAG}"]){
+                            if(!DELIVERY_AZURE){
+                                bat "docker-compose down -v"
+                            }
                         }
                     }
                 }
