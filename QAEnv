@@ -120,7 +120,7 @@ pipeline
                         {
                             themeIncludeParam = "-Include ${SETTINGS['themeName'].join(',')}"
                         }
-                        powershell script: "[system.io.directory]::CreateDirectory("${themeDst}")"
+                        powershell script: "New-Item -Path ${themeDst} -ItemType "directory" -Force"
                         powershell script: "Copy-Item -Path ${themeSrc}\\* ${themeIncludeParam} -Destination ${themeDst} -Recurse -Force", label: "Copy Theme to Workspace"
                         //storefront
                         def storefrontSrc = "${solutionRoot}\\${SETTINGS['storefrontBranch']}"
