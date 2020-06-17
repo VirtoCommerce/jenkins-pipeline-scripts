@@ -124,11 +124,13 @@ pipeline {
                         if(SETTINGS['themeName'] != '' && SETTINGS['themeName'] != null)
                         {
                             themeIncludeParam = "-Include ${SETTINGS['themeName'].join(',')}"
+                            echo "themeName: not empty"
                         }
                         powershell script: "mkdir ${themeDst}"
                         powershell script: "Copy-Item -Path ${themeSrc}\\* ${themeIncludeParam} -Destination ${themeDst} -Recurse -Force", label: "Copy Theme to Workspace"
                         //storefront
                         def storefrontSrc = "${solutionRoot}\\${SETTINGS['storefrontBranch']}"
+                        echo "storefrontSrc: ${storefrontSrc}"
                         powershell script: "Copy-Item -Path ${storefrontSrc}\\* -Destination ${env.WORKSPACE}\\CS -Include storefront -Recurse -Force", label: "Copy Storefron to Workspace"
                     } 
                     else if(BRANCH_NAME == 'feature_migrate-to-vc30')
