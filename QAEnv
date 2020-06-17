@@ -172,11 +172,11 @@ pipeline
                                 STOREFRONT_DOCKER_TAG = '3.0-dev'
                                 break
                                 case 'master':
-                                PLATFORM_DOCKER_TAG = '3.0'
+                                PLATFORM_DOCKER_TAG = '3.0-preview'
                                 STOREFRONT_DOCKER_TAG = '3.0'
                                 break
                             }
-                            // Start docker environment	
+                            // Start docker environment
                             dir(Utilities.getComposeFolderV3(this))
                             {
                                 echo "PLATFORM_DOCKER_TAG=${PLATFORM_DOCKER_TAG}, STOREFRONT_DOCKER_TAG=${STOREFRONT_DOCKER_TAG}, DOCKER_PLATFORM_PORT=${DOCKER_PLATFORM_PORT}, DOCKER_STOREFRONT_PORT=${DOCKER_STOREFRONT_PORT}, DOCKER_SQL_PORT=${DOCKER_SQL_PORT}"
