@@ -154,7 +154,7 @@ pipeline {
             {
                 script
                 {
-                    if(UPDATE_CS && Utilities.isDockerRegion(REGION, BRANCH_NAME))
+                    if(UPDATE_CS && isDockerRegion(REGION, BRANCH_NAME))
                     {
                         stage('Create Test Environment')
                         {
@@ -341,6 +341,12 @@ pipeline {
             }
         }
     }
+}
+def isDockerRegion(REGION, BRANCH_NAME){
+    if(REGION == 'demo3' && BRANCH_NAME == 'dev'){
+        return true
+    }
+    return false
 }
 def runPS(psName, args){
     def psPath = libraryResource "delivery/${psName}"
