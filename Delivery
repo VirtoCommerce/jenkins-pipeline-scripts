@@ -202,7 +202,7 @@ pipeline {
                                 echo "Platform Host: ${platformHost}"
                                 sleep 10
                                 Utilities.runPS(this, "docker_v3/setup-modulesFromDir.ps1", "-PlatformContainer ${platformContainerId} -ModulesDir ${env.WORKSPACE}/CS/modules -Verbose -Debug")
-                                sleep 10
+                                sleep 20
                                 Utilities.runPS(this, "docker_v3/vc-check-installed-modules.ps1", "-ApiUrl ${platformHost} -Verbose -Debug")
                             }
                         }
