@@ -3,7 +3,7 @@ version: '3'
 services:
 
   vc-db:
-    image: kkbruce/mssql-server-windows-express:windowsservercore-1809
+    image: octopusdeploy/mssql-server-windows-express:1809
     ports:
       - "${DOCKER_SQL_PORT:-1433}:1433"
     environment: 
