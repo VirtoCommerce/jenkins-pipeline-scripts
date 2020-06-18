@@ -16,6 +16,7 @@ services:
     image: virtocommerce/platform:${PLATFORM_DOCKER_TAG:-3.0-preview}
     ports:
       - "${DOCKER_PLATFORM_PORT:-8091}:80"
+    entrypoint: ping 127.0.0.1 -n 6 > nul && dotnet VirtoCommerce.Platform.Web.dll
     environment:
       - ConnectionStrings:VirtoCommerce=Data Source=vc-db;Initial Catalog=VirtoCommerce3;Persist Security Info=True;User ID=sa;Password=v!rto_Labs!;MultipleActiveResultSets=False;Connect Timeout=30;
       - Assets:Provider=FileSystem
