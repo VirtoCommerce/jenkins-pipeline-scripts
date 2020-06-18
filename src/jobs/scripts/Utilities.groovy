@@ -663,4 +663,11 @@ class Utilities
         }
         return result
     }
+
+    def isDockerRegion(REGION, BRANCH_NAME){
+        if(REGION == 'demo3' && BRANCH_NAME == 'dev'){
+            return true
+        }
+        return false
+    }
 }
