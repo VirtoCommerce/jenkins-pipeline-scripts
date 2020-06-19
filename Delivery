@@ -270,19 +270,19 @@ pipeline {
             }
         }
 
-        stage("Create / Update Environment"){
-            when {
-                expression {
-                    UPDATE_CS
-                }
-            }
-            steps {
-                script{
-                    def resourceGroupName = SETTINGS['resourceGroupName']
-                    Utilities.createInfrastructure(this, "${resourceGroupName}")
-                }
-            }
-        }
+        // stage("Create / Update Environment"){
+        //     when {
+        //         expression {
+        //             UPDATE_CS
+        //         }
+        //     }
+        //     steps {
+        //         script{
+        //             def resourceGroupName = SETTINGS['resourceGroupName']
+        //             Utilities.createInfrastructure(this, "${resourceGroupName}")
+        //         }
+        //     }
+        // }
 
         stage("Update Solution"){
             when {
