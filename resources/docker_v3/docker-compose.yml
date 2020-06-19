@@ -16,11 +16,13 @@ services:
     image: virtocommerce/platform:${PLATFORM_DOCKER_TAG:-3.0-preview}
     ports:
       - "${DOCKER_PLATFORM_PORT:-8091}:80"
+    entrypoint: cmd /c "ping 127.0.0.1 -n 10 > nul && dotnet VirtoCommerce.Platform.Web.dll"
     environment:
-      - ConnectionStrings:VirtoCommerce=Data Source=vc-db;Initial Catalog=VirtoCommerce3;Persist Security Info=True;User ID=sa;Password=v!rto_Labs!;MultipleActiveResultSets=False;Connect Timeout=30;
+      - ConnectionStrings:VirtoCommerce=Data Source=vc-db;Initial Catalog=VirtoCommerce3;Persist Security Info=True;User ID=sa;Password=v!rto_Labs!;MultipleActiveResultSets=False;Connect Timeout=60;
       - Assets:Provider=FileSystem
       - Assets:FileSystem:RootPath=~/App_Data/Assets
       - Assets:FileSystem:PublicUrl=http://localhost:${DOCKER_PLATFORM_PORT:-8090}/assets
+      - VirtoCommerce:Hangfire:JobStorageType=SqlServer
       - ASPNETCORE_ENVIRONMENT=Production
       - ASPNETCORE_URLS=http://+;
     depends_on:
