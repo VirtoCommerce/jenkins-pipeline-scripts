@@ -140,7 +140,7 @@ def call(body) {
                             throw new Exception("Github release error")
                         }
                         
-                        def manifestResult = powershell script: "vc-build PublishModuleManifest -VersionTag \"alpha\" ${versionSuffixArg}", returnStatus: true
+                        def manifestResult = powershell script: "vc-build PublishModuleManifest -VersionTag \"alpha\" ${versionSuffixArg.replaceAll('_', '-')}", returnStatus: true
                         if(manifestResult == 423)
                         {
                             UNSTABLE_CAUSES.add("Module Manifest: nothing to commit, working tree clean")
