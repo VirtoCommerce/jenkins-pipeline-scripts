@@ -8,7 +8,8 @@ def Settings = globalLib.Settings
 
 def SETTINGS
 
-def TRG_BRANCH
+def UPDATE_CS = false
+
 def SRC_BRANCH
 
 def UNSTABLE_CAUSES = []
@@ -29,37 +30,8 @@ pipeline
             {
                 script
                 {
-                    checkout scm
-                    def settingsFileContent
-                    configFileProvider([configFile(fileId: 'delivery_settings', variable: 'SETTINGS_FILE')]) {
-                        settingsFileContent = readFile(SETTINGS_FILE)
-                    }
-                    SETTINGS = Settings.new(settingsFileContent)
-                    def regionChoices = SETTINGS.getProjects().join("\n")
-                    def buildOrder = Utilities.getNextBuildOrder(this)
-                    def userInputRegion = input message: "Select Region", parameters: [
-                        choice(name: 'Region', choices: regionChoices)
-                    ]
-                    PROJECT_TYPE = 'SOLUTION'
-                    REGION = userInputRegion
                     UPDATE_CS = true
-                    SETTINGS.setProject(REGION)
-
-                    def envChoices = SETTINGS.getBranches().join("\n")
-                    def userEnvInput = input message: "Select Environment", parameters: [
-                        choice(name: 'Environments', choices: envChoices)
-                    ]
-                    ENV_NAME = userEnvInput
-                    SETTINGS.setBranch(ENV_NAME)
-                    
-                    def srcBranches = SETTINGS['branch'] as String[]
-                    def targetBranches = Utilities.getSubfolders("${env.SOLUTION_FOLDER}\\vc").join("\n")
-                    def userInputBranch = input message: "Select Branch and docker state", parameters: [
-                            choice(name:'Source Branch', choices:srcBranches.join("\n"))
-                        ]
-                    SRC_BRANCH = userInputBranch['Source Branch']
-                    echo "Vars: REGION - ${REGION}, DELIVERY_AZURE - ${DELIVERY_AZURE}, ENV_NAME - ${ENV_NAME}, SRC_BRANCH - ${SRC_BRANCH}, TRG_BRANCH - ${TRG_BRANCH}"
-                }
+                 }
             }
         }
         stage("Preparing Solution"){
