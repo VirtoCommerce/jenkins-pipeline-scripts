@@ -41,20 +41,18 @@ pipeline
                 {
                     def solutionRoot = "${env.SOLUTION_FOLDER}\\vc"
                     def csSrc = "${solutionRoot}\\master"
-                    def modulesRoot = "${env.WORKSPACE}\\CS\\module"
+                    def modulesRoot = "${env.WORKSPACE}\\CS\\platform\\modules"
                     def platformRoot = "${env.WORKSPACE}\\CS\\platform"
                     def platformDocsSite = "${env.WORKSPACE}\\CS\\platform\\site"
                     powershell script: "Remove-Item -Path ${env.WORKSPACE}\\CS\\* -Recurse -Force -ErrorAction Continue", label: "Clean Workspace"
                     // powershell script: "Copy-Item -Path ${csSrc}\\* -Destination ${env.WORKSPACE}\\CS -Recurse -Force", label: "Copy Solution to Workspace"
-                    powershell script: "Copy-Item -Path ${csSrc}\\module\\* -Destination ${env.WORKSPACE}\\CS -Recurse -Force", label: "Copy Solution to Workspace"
-                    powershell script: "Copy-Item -Path ${csSrc}\\platform\\* -Destination ${env.WORKSPACE}\\CS -Recurse -Force", label: "Copy Solution to Workspace"
+                    powershell script: "Copy-Item -Path ${csSrc}\\platform\\* -Destination ${env.WORKSPACE}\\CS\\platform -Recurse -Force", label: "Copy Solution to Workspace"
+                    powershell script: "Copy-Item -Path ${csSrc}\\module\\* -Destination ${modulesRoot} -Recurse -Force", label: "Copy Modules to Platform Docs"
 
                     dir(modulesRoot)
                     {
                         powershell "Get-ChildItem ${modulesRoot} -Name | Rename-Item $_ $_.Name.Replace("VirtoCommerce.", "") -ErrorAction SilentlyContinue -Force -Recurse"
                     }
-
-                    powershell script: "Copy-Item -Path ${modulesRoot}\\* -Destination ${platformRoot}\\docs\\modules -Recurse -Force", label: "Copy Modules to Platform Docs"
 
                     powershell script: "${env.WORKSPACE}\\CS\\platform\\mkdocs build", label: "Build docs"
                 }
