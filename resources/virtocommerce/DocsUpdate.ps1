@@ -1,4 +1,4 @@
-$ErrorActionPreference = 'Stop'
+$ErrorActionPreference = 'Continue'
 
 $DestContentPath = ""
 $ZipFile = "${env:ArtifactPath}"
