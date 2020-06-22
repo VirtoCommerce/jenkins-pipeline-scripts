@@ -7,14 +7,22 @@ $ApplicationID ="${env:AzureAppID}"
 $APIKey = ConvertTo-SecureString "${env:AzureAPIKey}" -AsPlainText -Force
 $psCred = New-Object System.Management.Automation.PSCredential($ApplicationID, $APIKey)
 $TenantID = "${env:AzureTenantID}"
-
 $SubscriptionID = "${env:AzureSubscriptionIDProd}"
+
+Write-Host "ApplicationID: $ApplicationID"
+Write-Host "APIKey: $APIKey"
+Write-Host "psCred: $psCred"
+Write-Host "TenantID: $TenantID"
+Write-Host "SubscriptionID: $SubscriptionID"
 
 Add-AzureRmAccount -Credential $psCred -TenantId $TenantID -ServicePrincipal
 Select-AzureRmSubscription -SubscriptionId $SubscriptionID
 
 $DestResourceGroupName = "${env:AzureResourceGroupNameProd}"
 $DestWebAppName = "${env:AzureWebAppNameProd}"
+
+Write-Host "DestResourceGroupName: $DestResourceGroupName"
+Write-Host "DestWebAppName: $DestWebAppName"
 
 Write-Host "Stop WebApp $DestWebAppName"
 Stop-AzureRmWebApp -ResourceGroupName $DestResourceGroupName -Name $DestWebAppName
