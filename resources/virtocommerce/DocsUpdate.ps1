@@ -4,6 +4,7 @@ if (-not ([Net.ServicePointManager]::SecurityProtocol).ToString().Contains([Net.
 }
 
 $Path2Zip="${env:Artifact}"
+Write-Host "Artifact: $Path2Zip"
 
 # Upload Storefront Zip File to Azure
 $ApplicationID ="${env:AzureAppID}"
@@ -19,8 +20,8 @@ $DestResourceGroupName = "${env:AzureResourceGroupNameProd}"
 $DestWebAppName = "${env:AzureWebAppNameProd}"
 $slotName = " "
 Write-Host "$slotName is..."
-$DestKuduDelPath = "https://$DestWebAppName.scm.azurewebsites.net/api/vfs/site/wwwdocs/?recursive=true"
-$DestKuduPath = "https://$DestWebAppName.scm.azurewebsites.net/api/zip/site/wwwdocs/"
+$DestKuduDelPath = "https://$DestWebAppName.scm.azurewebsites.net/api/vfs/site/wwwdocs/latest/?recursive=true"
+$DestKuduPath = "https://$DestWebAppName.scm.azurewebsites.net/api/zip/site/wwwdocs/latest/"
 
 function Get-AzureRmWebAppPublishingCredentials($DestResourceGroupName, $DestWebAppName, $slotName = $null){
 
