@@ -49,7 +49,6 @@ pipeline
                 {
                     def csRoot = "${env.WORKSPACE}\\CS"
                     def platformRoot = "${env.WORKSPACE}\\CS\\vc-platform"
-                    def artifactPath = "${env.WORKSPACE}\\CS\\vc-platform\\site"
                     def psfolder = "${env.WORKSPACE}\\resources\\virtocommerce"
                     powershell script: "Remove-Item -Path ${csRoot}\\* -Recurse -Force -ErrorAction Continue", label: "Clean Workspace"
                     dir(csRoot)
@@ -76,13 +75,11 @@ pipeline
                 script{
                     def csRoot = "${env.WORKSPACE}\\CS"
                     def artifact = "${csRoot}\\site.zip"
-                    // def webAppPublicName = SETTINGS['webAppPublicName']
-                    // def resourceGroupName = SETTINGS['resourceGroupName']
-                    // def subscriptionID = SETTINGS['subscriptionID']
-                    // def blobToken = SETTINGS['blobToken']
-                    // withEnv(["AzureBlobToken=${blobToken}"]){
-                    //     Utilities.runSharedPS(this, 'delivery/upload-CS.ps1', "-StorefrontDir ${csRoot}\\storefront")
-                    // }
+                    def psfolder = "${env.WORKSPACE}\\resources\\virtocommerce"
+                    SETTINGS.setEnvironment('master')
+                    withEnv(["AzureSubscriptionIDProd=${SETTINGS['subscriptionID']}", "AzureResourceGroupNameProd=${SETTINGS['resourceGroupName']}", "AzureWebAppNameProd=${SETTINGS['appName']}, Artifact=${artifact}"]){
+                        pwsh "${psfolder}\\DocsUpdate.ps1"
+                    }
                 }
             }
         }
