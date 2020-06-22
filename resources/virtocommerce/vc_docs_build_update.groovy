@@ -58,7 +58,7 @@ pipeline
                     }
                     dir(platformRoot)
                     {
-                        pwsh script: "mkdocs build", label: "Build mkdocs"
+                        // pwsh script: "mkdocs build", label: "Build mkdocs"
                         def zipFile = "${csRoot}\\site.zip"
                         //  zip zipFile: zipFile, dir: "site"
                     }
