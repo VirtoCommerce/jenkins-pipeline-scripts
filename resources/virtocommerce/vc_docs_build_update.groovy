@@ -50,10 +50,11 @@ pipeline
                     def solutionRoot = "${env.WORKSPACE}\\CS"
                     def platformRoot = "${env.WORKSPACE}\\CS\\vc-platform"
                     def artifactPath = "${env.WORKSPACE}\\CS\\vc-platform\\site"
+                    def psfolder = "${env.WORKSPACE}\\resources\\virtocommerce"
                     powershell script: "Remove-Item -Path ${solutionRoot}\\* -Recurse -Force -ErrorAction Continue", label: "Clean Workspace"
                     dir(solutionRoot)
                     {
-                        Utilities.runPS(this, "virtocommerce/vc_docs_get_sources.ps1", "-Verbose -Debug")
+                        pwsh "${psfolder}\\vc_docs_get_sources.ps1"
                     }
                     dir(platformRoot)
                     {
