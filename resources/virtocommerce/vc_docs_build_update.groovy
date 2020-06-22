@@ -60,7 +60,7 @@ pipeline
                     {
                         pwsh script: "mkdocs build", label: "Build mkdocs"
                         def zipFile = "${csRoot}\\site.zip"
-                        zip zipFile: zipFile, dir: "./"
+                        zip zipFile: zipFile, dir: "site"
                     }
                 }
             }
@@ -75,6 +75,7 @@ pipeline
             steps {
                 script{
                     def csRoot = "${env.WORKSPACE}\\CS"
+                    def artifact = "${csRoot}\\site.zip"
                     // def webAppPublicName = SETTINGS['webAppPublicName']
                     // def resourceGroupName = SETTINGS['resourceGroupName']
                     // def subscriptionID = SETTINGS['subscriptionID']
