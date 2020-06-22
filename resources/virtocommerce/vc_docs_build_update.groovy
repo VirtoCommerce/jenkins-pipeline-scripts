@@ -39,6 +39,7 @@ pipeline
                     }
                     SETTINGS = new Settings(settingsFileContent)
                     SETTINGS.setRegion('virtocommerce')
+                    SETTINGS.setEnvironment('master')
                 }
             }
         }
@@ -76,8 +77,8 @@ pipeline
                     def csRoot = "${env.WORKSPACE}\\CS"
                     def artifact = "${csRoot}\\site.zip"
                     def psfolder = "${env.WORKSPACE}\\resources\\virtocommerce"
-                    SETTINGS.setEnvironment('master')
-                    withEnv(["AzureSubscriptionIDProd=${SETTINGS['subscriptionID']}", "AzureResourceGroupNameProd=${SETTINGS['resourceGroupName']}", "AzureWebAppNameProd=${SETTINGS['webAppNameStage']}", "Artifact=${artifact}"]){
+
+                    withEnv(["AzureSubscriptionIDProd=${SETTINGS['subscriptionID']}", "AzureResourceGroupNameProd=${SETTINGS['resourceGroupName']}", "AzureWebAppNameProd=${SETTINGS['webAppNameStage']}", "ArtifactPath=${csRoot}"]){
                         pwsh "${psfolder}\\DocsUpdate.ps1"
                     }
                 }
