@@ -21,7 +21,8 @@ services:
       - Assets:Provider=FileSystem
       - Assets:FileSystem:RootPath=~/App_Data/Assets
       - Assets:FileSystem:PublicUrl=http://localhost:${DOCKER_PLATFORM_PORT:-8090}/assets
-      - VirtoCommerce:Hangfire:JobStorageType=Memory
+      - VirtoCommerce:Hangfire:JobStorageType=SQLServer
+      - VirtoCommerce:Hangfire:AutomaticRetryCount=3
       - ASPNETCORE_ENVIRONMENT=Production
       - ASPNETCORE_URLS=http://+;
     depends_on:

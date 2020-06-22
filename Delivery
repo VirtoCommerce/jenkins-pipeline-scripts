@@ -198,9 +198,9 @@ pipeline {
                             {
                                 def platformHost = Utilities.getPlatformCoreHost(this)
                                 def platformContainerId = Utilities.getPlatformContainer(this)
-                                pwsh script: "docker logs ${platformContainerId}", label: "platform container log"
                                 echo "Platform Host: ${platformHost}"
-                                sleep 10
+                                sleep 30
+                                pwsh script: "docker logs ${platformContainerId}", label: "platform container log"
                                 Utilities.runPS(this, "docker_v3/setup-modulesFromDir.ps1", "-PlatformContainer ${platformContainerId} -ModulesDir ${env.WORKSPACE}/CS/modules -Verbose -Debug")
                                 Utilities.runPS(this, "docker_v3/vc-check-installed-modules.ps1", "-ApiUrl ${platformHost} -Verbose -Debug")
                             }
