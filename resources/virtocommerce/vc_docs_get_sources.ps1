@@ -1,4 +1,4 @@
-$ErrorActionPreference = 'Stop'
+$ErrorActionPreference = 'Continue'
 
 #Get platform src
 git clone https://github.com/VirtoCommerce/vc-platform.git --branch master --single-branch
@@ -20,5 +20,5 @@ foreach ($module in $modulesv3) {
 		cd vc-module-$moduleName
         Copy-Item -Path "docs" -Destination "..\vc-platform\docs\modules\$moduleName" -Recurse -Force
 		cd ..
-    }    
+    }
 }
