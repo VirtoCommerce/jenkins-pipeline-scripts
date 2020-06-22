@@ -47,48 +47,44 @@ pipeline
             {
                 script
                 {
-                    def solutionRoot = "${env.WORKSPACE}\\CS"
+                    def csRoot = "${env.WORKSPACE}\\CS"
                     def platformRoot = "${env.WORKSPACE}\\CS\\vc-platform"
                     def artifactPath = "${env.WORKSPACE}\\CS\\vc-platform\\site"
                     def psfolder = "${env.WORKSPACE}\\resources\\virtocommerce"
-                    powershell script: "Remove-Item -Path ${solutionRoot}\\* -Recurse -Force -ErrorAction Continue", label: "Clean Workspace"
-                    dir(solutionRoot)
+                    powershell script: "Remove-Item -Path ${csRoot}\\* -Recurse -Force -ErrorAction Continue", label: "Clean Workspace"
+                    dir(csRoot)
                     {
                         pwsh "${psfolder}\\vc_docs_get_sources.ps1"
                     }
                     dir(platformRoot)
                     {
                         pwsh script: "mkdocs build", label: "Build mkdocs"
-                        zip zipFile: artifactPath, dir: solutionRoot
+                        def zipFile = "${csRoot}\\site.zip"
+                        zip zipFile: zipFile, dir: "./"
                     }
                 }
             }
         }
 
-        // stage("Update Solution"){
-        //     when {
-        //         expression {
-        //             UPDATE_CS
-        //         }
-        //     }
-        //     steps {
-        //         script{
-        //             def csRoot = "${env.WORKSPACE}\\CS"
-        //             def webAppName = SETTINGS['webAppName']
-        //             def webAppPublicName = SETTINGS['webAppPublicName']
-        //             def resourceGroupName = SETTINGS['resourceGroupName']
-        //             def subscriptionID = SETTINGS['subscriptionID']
-        //             def blobToken = SETTINGS['blobToken']
-        //             def themeSrcDir = "${csRoot}\\theme"
-        //             def themeBlobPath = ""
-        //             def themeBlobPathParam = ""
-        //             withEnv(["AzureBlobToken=${blobToken}"]){
-        //                 Utilities.runSharedPS(this, 'delivery/upload-CS.ps1', 
-        //                     "-PlatformDir ${csRoot}\\platform -ModulesDir ${csRoot}\\modules -StorefrontDir ${csRoot}\\storefront -ThemeDir ${themeSrcDir} -WebAppName ${webAppName} -WebAppPublicName ${webAppPublicName} -ResourceGroupName ${resourceGroupName} -SubscriptionID ${subscriptionID} -StorageAccount ${SETTINGS['storageAccount']} -BlobContainerName ${SETTINGS['blobContainerName']} ${themeBlobPathParam}")
-        //             }
-        //         }
-        //     }
-        // }
+        stage("Update Solution"){
+            when {
+                expression {
+                    UPDATE_CS
+                }
+            }
+            steps {
+                script{
+                    def csRoot = "${env.WORKSPACE}\\CS"
+                    // def webAppPublicName = SETTINGS['webAppPublicName']
+                    // def resourceGroupName = SETTINGS['resourceGroupName']
+                    // def subscriptionID = SETTINGS['subscriptionID']
+                    // def blobToken = SETTINGS['blobToken']
+                    // withEnv(["AzureBlobToken=${blobToken}"]){
+                    //     Utilities.runSharedPS(this, 'delivery/upload-CS.ps1', "-StorefrontDir ${csRoot}\\storefront")
+                    // }
+                }
+            }
+        }
     }
 
     post

@@ -20,5 +20,5 @@ foreach ($module in $modulesv3) {
 		cd vc-module-$moduleName
         Copy-Item -Path "docs" -Destination "..\vc-platform\docs\modules\$moduleName" -Recurse -Force
 		cd ..
-    }
+	}
 }
