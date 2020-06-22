@@ -78,7 +78,9 @@ pipeline
                     def artifact = "${csRoot}\\site.zip"
                     def psfolder = "${env.WORKSPACE}\\resources\\virtocommerce"
 
-                    withEnv(["AzureSubscriptionIDProd=${SETTINGS['subscriptionID']}", "AzureResourceGroupNameProd=${SETTINGS['resourceGroupName']}", "AzureWebAppNameProd=${SETTINGS['webAppNameStage']}", "ArtifactPath=${artifact}"]){
+                    withEnv(["AzureSubscriptionIDProd=${SETTINGS['subscriptionID']}", "AzureResourceGroupNameProd=${SETTINGS['resourceGroupName']}", "AzureWebAppNameProd=${SETTINGS['webAppNameStage']}", "ArtifactPath=${csRoot}"]){
+                        echo "csRoot: ${csRoot}"
+                        echo "artifact: ${artifact}"
                         pwsh script: "${psfolder}\\DocsUpdate.ps1", label: "Upload artifact."
                     }
                 }

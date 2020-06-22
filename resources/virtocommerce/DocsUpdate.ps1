@@ -15,9 +15,6 @@ Select-AzureRmSubscription -SubscriptionId $SubscriptionID
 $DestResourceGroupName = "${env:AzureResourceGroupNameProd}"
 $DestWebAppName = "${env:AzureWebAppNameProd}"
 
-Write-Host "DestResourceGroupName: $DestResourceGroupName"
-Write-Host "DestWebAppName: $DestWebAppName"
-
 Write-Host "Stop WebApp $DestWebAppName"
 Stop-AzureRmWebApp -ResourceGroupName $DestResourceGroupName -Name $DestWebAppName
 
