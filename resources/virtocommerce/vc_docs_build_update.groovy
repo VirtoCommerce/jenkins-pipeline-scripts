@@ -24,14 +24,21 @@ pipeline
     }
     stages
     {
-        stage("User Input")
+        stage("Init")
         {
             steps
             {
                 script
                 {
                     UPDATE_CS = true
-                 }
+                    def settingsFileContent
+                    configFileProvider([configFile(fileId: 'shared_lib_settings', variable: 'SETTINGS_FILE')])
+                    {
+                        settingsFileContent = readFile(SETTINGS_FILE)
+                    }
+                    SETTINGS = new Settings(settingsFileContent)
+                    SETTINGS.setRegion('virtocommerce')
+                }
             }
         }
         stage("Preparing Solution"){
@@ -39,22 +46,19 @@ pipeline
             {
                 script
                 {
-                    def solutionRoot = "${env.SOLUTION_FOLDER}\\vc"
-                    def csSrc = "${solutionRoot}\\master"
-                    def modulesRoot = "${env.WORKSPACE}\\CS\\platform\\modules"
-                    def platformRoot = "${env.WORKSPACE}\\CS\\platform"
-                    def platformDocsSite = "${env.WORKSPACE}\\CS\\platform\\site"
-                    powershell script: "Remove-Item -Path ${env.WORKSPACE}\\CS\\* -Recurse -Force -ErrorAction Continue", label: "Clean Workspace"
-                    // powershell script: "Copy-Item -Path ${csSrc}\\* -Destination ${env.WORKSPACE}\\CS -Recurse -Force", label: "Copy Solution to Workspace"
-                    powershell script: "Copy-Item -Path ${csSrc}\\platform\\* -Destination ${env.WORKSPACE}\\CS\\platform -Recurse -Force", label: "Copy Solution to Workspace"
-                    powershell script: "Copy-Item -Path ${csSrc}\\module\\* -Destination ${modulesRoot} -Recurse -Force", label: "Copy Modules to Platform Docs"
-
-                    dir(modulesRoot)
+                    def solutionRoot = "${env.WORKSPACE}\\CS"
+                    def platformRoot = "${env.WORKSPACE}\\CS\\vc-platform"
+                    def artifactPath = "${env.WORKSPACE}\\CS\\vc-platform\\site"
+                    powershell script: "Remove-Item -Path ${solutionRoot}\\* -Recurse -Force -ErrorAction Continue", label: "Clean Workspace"
+                    dir(solutionRoot)
                     {
-                        powershell "Get-ChildItem ${modulesRoot} -Name | Rename-Item $_ $_.Name.Replace("VirtoCommerce.", "") -ErrorAction SilentlyContinue -Force -Recurse"
+                        Utilities.runPS(this, "virtocommerce/vc_docs_get_sources.ps1", "-Verbose -Debug")
                     }
-
-                    powershell script: "${env.WORKSPACE}\\CS\\platform\\mkdocs build", label: "Build docs"
+                    dir(platformRoot)
+                    {
+                        pwsh script: "mkdocs build", label: "Build mkdocs"
+                        zip zipFile: artifactPath, dir: solutionRoot
+                    }
                 }
             }
         }
