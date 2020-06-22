@@ -16,9 +16,9 @@ $DestResourceGroupName = "${env:AzureResourceGroupNameProd}"
 $DestWebAppName = "${env:AzureWebAppNameProd}"
 
 Write-Host "Stop WebApp $DestWebAppName"
-Stop-AzureRmWebApp -ResourceGroupName $DestResourceGroupName -Name $DestWebAppName
+# Stop-AzureRmWebApp -ResourceGroupName $DestResourceGroupName -Name $DestWebAppName
 
-Start-Sleep -s 35
+# Start-Sleep -s 35
 
 # Getting Publish Profile
 Write-Output "Getting publishing profile for $DestWebAppName app"
@@ -31,14 +31,14 @@ $contentPath = $DestContentPath
 $msdeploy = "${env:MSDEPLOY_DIR}\msdeploy.exe"
 $sourcewebapp_msdeployUrl = "https://${DestWebAppName}.scm.azurewebsites.net/msdeploy.axd?site=${DestWebAppName}"
 & $msdeploy -verb:sync -dest:contentPath="D:\home\site\wwwdocs\latest\$contentPath",computerName=$sourcewebapp_msdeployUrl,publishSettings=$tmpPublishProfile -source:package=$ZipFile
-if($LASTEXITCODE -ne 0)
-{
-    exit 1
-}
+# if($LASTEXITCODE -ne 0)
+# {
+#     exit 1
+# }
 
-Start-Sleep -s 5
+# Start-Sleep -s 5
 
 Write-Host "Start WebApp $DestWebAppName"
-Start-AzureRmWebApp -ResourceGroupName $DestResourceGroupName -Name $DestWebAppName
+# Start-AzureRmWebApp -ResourceGroupName $DestResourceGroupName -Name $DestWebAppName
 
 Remove-Item $tmpPublishProfile -Force
