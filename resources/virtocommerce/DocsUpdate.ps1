@@ -4,6 +4,8 @@ if (-not ([Net.ServicePointManager]::SecurityProtocol).ToString().Contains([Net.
 }
 
 $Path2Zip="${env:Artifact}"
+Write-Host "env:Artifact: ${env:Artifact}"
+Write-Host "env:AzureWebAppNameProd: ${env:AzureWebAppNameProd}"
 Write-Host "Artifact: $Path2Zip"
 
 # Upload Storefront Zip File to Azure
