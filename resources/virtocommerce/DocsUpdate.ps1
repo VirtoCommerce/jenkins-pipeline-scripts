@@ -9,12 +9,6 @@ $psCred = New-Object System.Management.Automation.PSCredential($ApplicationID, $
 $TenantID = "${env:AzureTenantID}"
 $SubscriptionID = "${env:AzureSubscriptionIDProd}"
 
-Write-Host "ApplicationID: $ApplicationID"
-Write-Host "APIKey: $APIKey"
-Write-Host "psCred: $psCred"
-Write-Host "TenantID: $TenantID"
-Write-Host "SubscriptionID: $SubscriptionID"
-
 Add-AzureRmAccount -Credential $psCred -TenantId $TenantID -ServicePrincipal
 Select-AzureRmSubscription -SubscriptionId $SubscriptionID
 
