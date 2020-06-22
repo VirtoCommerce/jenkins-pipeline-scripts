@@ -1,4 +1,5 @@
 import groovy.json.JsonSlurperClassic
+import jobs.scripts.Settings
 
 def globalLib = library('global-shared-lib').com.test
 def Utilities = globalLib.Utilities
