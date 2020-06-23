@@ -68,6 +68,7 @@ def call(body) {
                             withEnv(["BRANCH_NAME=${env.CHANGE_BRANCH}"])
                             {
                                 powershell "vc-build SonarQubeStart -SonarUrl ${env.SONAR_HOST_URL} -SonarAuthToken \"${env.SONAR_AUTH_TOKEN}\" -PullRequest -GitHubToken ${env.GITHUB_TOKEN} -skip Restore+Compile"
+                                echo "vc-build Compile ${versionSuffixArg}"
                                 powershell "vc-build Compile ${versionSuffixArg}"
                             }
                         }
