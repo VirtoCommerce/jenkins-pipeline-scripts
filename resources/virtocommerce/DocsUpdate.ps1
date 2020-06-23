@@ -15,15 +15,8 @@ Select-AzureRmSubscription -SubscriptionId $SubscriptionID
 $DestResourceGroupName = "${env:AzureResourceGroupNameProd}"
 $DestWebAppName = "${env:AzureWebAppNameProd}"
 
-Write-Host "Stop WebApp $DestWebAppName"
+# Write-Host "Stop WebApp $DestWebAppName"
 # Stop-AzureRmWebApp -ResourceGroupName $DestResourceGroupName -Name $DestWebAppName
-
-Write-Host "ZipFile: $ZipFile"
-Write-Host "ApplicationID: $ApplicationID"
-Write-Host "TenantID: $TenantID"
-Write-Host "SubscriptionID: $SubscriptionID"
-Write-Host "DestResourceGroupName: $DestResourceGroupName"
-Write-Host "DestWebAppName: $DestWebAppName"
 
 # Start-Sleep -s 35
 
@@ -45,7 +38,7 @@ if($LASTEXITCODE -ne 0)
 
 # Start-Sleep -s 5
 
-Write-Host "Start WebApp $DestWebAppName"
+# Write-Host "Start WebApp $DestWebAppName"
 # Start-AzureRmWebApp -ResourceGroupName $DestResourceGroupName -Name $DestWebAppName
 
 Remove-Item $tmpPublishProfile -Force
