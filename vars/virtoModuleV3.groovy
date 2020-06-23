@@ -43,7 +43,7 @@ def call(body) {
                     checkout scm
 
                     commitNumber = Utilities.getCommitHash(this)
-                    versionSuffixArg = env.BRANCH_NAME == 'dev' ? "-CustomTagSuffix \"_build_${commitNumber}\"" : ""
+                    versionSuffixArg = env.BRANCH_NAME == 'dev' ? "-CustomVersionSuffix \"alpha.${commitNumber}\"" : ""
 
                     try
                     {
@@ -66,7 +66,7 @@ def call(body) {
                         withSonarQubeEnv('VC Sonar Server'){
                             withEnv(["BRANCH_NAME=${env.CHANGE_BRANCH}"])
                             {
-                                powershell "vc-build SonarQubeStart -SonarUrl ${env.SONAR_HOST_URL} -SonarAuthToken \"${env.SONAR_AUTH_TOKEN}\" -PullRequest -GitHubToken ${env.GITHUB_TOKEN} -skip Restore+Compile"
+                                powershell "vc-build SonarQubeStart -SonarUrl ${env.SONAR_HOST_URL} -SonarAuthToken \"${env.SONAR_AUTH_TOKEN}\" -PullRequest -GitHubToken ${env.GITHUB_TOKEN} ${versionSuffixArg} -skip Restore+Compile"
                                 powershell "vc-build Compile"
                             }
                         }
@@ -95,7 +95,7 @@ def call(body) {
                  
 
                 stage('Packaging'){                
-                    powershell "vc-build Compress ${versionSuffixArg} -skip Clean+Restore+Compile+Test"
+                    powershell "vc-build Compress -skip Clean+Restore+Compile+Test"
                 }
 
                 def artifacts
@@ -129,18 +129,27 @@ def call(body) {
                         // def artifactPath = "${workspace}\\artifacts\\${moduleArtifactName}.zip"
                         // powershell "Copy-Item ${artifacts[0].path} -Destination ${artifactPath}"
                         // powershell script: "${env.Utils}\\AzCopy10\\AzCopy.exe copy \"${artifactPath}\" \"https://vc3prerelease.blob.core.windows.net/packages${env.ARTIFACTS_BLOB_TOKEN}\"", label: "AzCopy"
+                        def ghReleaseResult = powershell script: "vc-build PublishPackages -ApiKey ${env.NUGET_KEY} -skip Clean+Restore+Compile+Test", returnStatus: true
+                        if(ghReleaseResult == 409)
+                        {
+                            UNSTABLE_CAUSES.add("Nuget package already exists.")
+                        } 
+                        else if(ghReleaseResult != 0)
+                        {
+                            throw new Exception("ERROR: script returned ${ghReleaseResult}")
+                        }
 
                         def orgName = Utilities.getOrgName(this)
                         def releaseNotesFile = new File(releaseNotesPath)
                         def releaseNotesArg = releaseNotesFile.exists() ? "-ReleaseNotes ${releaseNotesFile}" : ""
-                        def releaseResult = powershell script: "vc-build Release -GitHubUser ${orgName} -GitHubToken ${env.GITHUB_TOKEN} ${releaseNotesArg} -PreRelease ${versionSuffixArg} -skip Clean+Restore+Compile+Test", returnStatus: true
+                        def releaseResult = powershell script: "vc-build Release -GitHubUser ${orgName} -GitHubToken ${env.GITHUB_TOKEN} ${releaseNotesArg} -PreRelease -skip Clean+Restore+Compile+Test", returnStatus: true
                         if(releaseResult == 422){
                             UNSTABLE_CAUSES.add("Release already exists on github")
                         } else if(releaseResult !=0 ) {
                             throw new Exception("Github release error")
                         }
                         
-                        def manifestResult = powershell script: "vc-build PublishModuleManifest -VersionTag \"alpha\" ${versionSuffixArg}", returnStatus: true
+                        def manifestResult = powershell script: "vc-build PublishModuleManifest", returnStatus: true
                         if(manifestResult == 423)
                         {
                             UNSTABLE_CAUSES.add("Module Manifest: nothing to commit, working tree clean")
