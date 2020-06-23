@@ -100,7 +100,7 @@ def call(body) {
                         withSonarQubeEnv('VC Sonar Server'){
                             powershell "vc-build SonarQubeStart -SonarUrl ${env.SONAR_HOST_URL} -SonarAuthToken \"${env.SONAR_AUTH_TOKEN}\" -skip Restore+Compile"
                         }
-                        powershell "vc-build Compile"
+                        powershell "vc-build Compile ${versionSuffixArg}"
                     }
                     
                 }
@@ -126,7 +126,7 @@ def call(body) {
 
                 stage('Packaging'){
                              
-                    powershell "vc-build Compress ${versionSuffixArg} -skip Clean+Restore+Compile+Test"
+                    powershell "vc-build Compress -skip Clean+Restore+Compile+Test"
 
                     platformVersion = pwsh (script: "(Get-Item artifacts\\publish\\VirtoCommerce.Platform.Web.dll).VersionInfo.ProductVersion", returnStdout: true, label: "Get platform version").trim()
                     echo "Platform version: ${platformVersion}"
@@ -227,7 +227,7 @@ def call(body) {
                             def orgName = Utilities.getOrgName(this)
                             def releaseNotesFile = new File(releaseNotesPath)
                             def releaseNotesArg = releaseNotesFile.exists() ? "-ReleaseNotes ${releaseNotesFile}" : ""
-                            def releaseResult = powershell script: "vc-build Release -GitHubUser ${orgName} -GitHubToken ${env.GITHUB_TOKEN} ${releaseNotesArg} -PreRelease ${versionSuffixArg} -skip Clean+Restore+Compile+Test", returnStatus: true
+                            def releaseResult = powershell script: "vc-build Release -GitHubUser ${orgName} -GitHubToken ${env.GITHUB_TOKEN} ${releaseNotesArg} -PreRelease -skip Clean+Restore+Compile+Test", returnStatus: true
                             if(releaseResult == 422){
                                 UNSTABLE_CAUSES.add("Release already exists on github")
                             } else if(releaseResult !=0 ) {
