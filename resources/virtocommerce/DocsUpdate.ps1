@@ -2,7 +2,6 @@ $ErrorActionPreference = 'Continue'
 
 $DestContentPath = ""
 $ZipFile = "${env:ArtifactPath}"
-Write-Host "ZipFile: $ZipFile"
 
 $ApplicationID ="${env:AzureAppID}"
 $APIKey = ConvertTo-SecureString "${env:AzureAPIKey}" -AsPlainText -Force
@@ -16,10 +15,17 @@ Select-AzureRmSubscription -SubscriptionId $SubscriptionID
 $DestResourceGroupName = "${env:AzureResourceGroupNameProd}"
 $DestWebAppName = "${env:AzureWebAppNameProd}"
 
-# Write-Host "Stop WebApp $DestWebAppName"
-# Stop-AzureRmWebApp -ResourceGroupName $DestResourceGroupName -Name $DestWebAppName
+Write-Host "Stop WebApp $DestWebAppName"
+Stop-AzureRmWebApp -ResourceGroupName $DestResourceGroupName -Name $DestWebAppName
 
-# Start-Sleep -s 35
+Write-Host "ZipFile: $ZipFile"
+Write-Host "ApplicationID: $ApplicationID"
+Write-Host "TenantID: $TenantID"
+Write-Host "SubscriptionID: $SubscriptionID"
+Write-Host "DestResourceGroupName: $DestResourceGroupName"
+Write-Host "DestWebAppName: $DestWebAppName"
+
+Start-Sleep -s 35
 
 # Getting Publish Profile
 Write-Output "Getting publishing profile for $DestWebAppName app"
@@ -37,9 +43,9 @@ if($LASTEXITCODE -ne 0)
     exit 1
 }
 
-# Start-Sleep -s 5
+Start-Sleep -s 5
 
-# Write-Host "Start WebApp $DestWebAppName"
-# Start-AzureRmWebApp -ResourceGroupName $DestResourceGroupName -Name $DestWebAppName
+Write-Host "Start WebApp $DestWebAppName"
+Start-AzureRmWebApp -ResourceGroupName $DestResourceGroupName -Name $DestWebAppName
 
 Remove-Item $tmpPublishProfile -Force
