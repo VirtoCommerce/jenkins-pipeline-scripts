@@ -1,7 +1,7 @@
 $ErrorActionPreference = 'Continue'
 
 #Get platform src
-git clone https://github.com/VirtoCommerce/vc-platform.git --branch master --single-branch
+git clone https://github.com/VirtoCommerce/vc-platform.git --branch dev --single-branch
 
 # Get all modules from master branch
 $modulesv3=Invoke-RestMethod https://raw.githubusercontent.com/VirtoCommerce/vc-modules/master/modules_v3.json
