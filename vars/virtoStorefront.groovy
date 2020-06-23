@@ -91,7 +91,7 @@ def call(body) {
 				SETTINGS.setProject('platform')
 			}
 
-			def commitNumber
+			def commitHash
 			def versionSuffixArg
 			
 			try {
@@ -105,8 +105,8 @@ def call(body) {
 
 						powershell "if(!(Test-Path -Path .\\.nuke)){ Get-ChildItem *.sln -Name > .nuke }"
 
-						commitNumber = Utilities.getCommitHash(this)
-                    	versionSuffixArg = env.BRANCH_NAME == 'dev' ? "-CustomTagSuffix \"_build_${commitNumber}\"" : ""
+						commitHash = Utilities.getCommitHash(this)
+                    	versionSuffixArg = env.BRANCH_NAME == 'dev' ? "-CustomVersionSuffix \"alpha.${commitHash}\"" : ""
 
 						try
 						{
@@ -137,7 +137,7 @@ def call(body) {
 								withEnv(["BRANCH_NAME=${env.CHANGE_BRANCH}"])
 								{
 									powershell "vc-build SonarQubeStart -SonarUrl ${env.SONAR_HOST_URL} -SonarAuthToken \"${env.SONAR_AUTH_TOKEN}\" -PullRequest -GitHubToken ${env.GITHUB_TOKEN} -skip Restore+Compile"
-									powershell "vc-build Compile -Configuration Debug"
+									powershell "vc-build Compile ${versionSuffixArg} -Configuration Debug"
 								}
 							}
 						}
@@ -180,7 +180,7 @@ def call(body) {
 
 				stage('Packaging') {
 					timestamps { 
-						powershell "vc-build Compress ${versionSuffixArg} -skip Clean+Restore+Compile+Test"
+						powershell "vc-build Compress -skip Clean+Restore+Compile+Test"
 						if (env.BRANCH_NAME == 'support/2.x-dev' || env.BRANCH_NAME == 'support/2.x' || env.BRANCH_NAME == 'dev' || env.BRANCH_NAME =='master') {
 							def websitePath = Utilities.getWebPublishFolder(this, websiteDir)
 							powershell script: "Copy-Item ${workspace}\\artifacts\\publish\\* ${websitePath}\\VirtoCommerce.Storefront -Recurse -Force"
