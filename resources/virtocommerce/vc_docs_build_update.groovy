@@ -51,16 +51,16 @@ pipeline
                     def csRoot = "${env.WORKSPACE}\\CS"
                     def platformRoot = "${env.WORKSPACE}\\CS\\vc-platform"
                     def psfolder = "${env.WORKSPACE}\\resources\\virtocommerce"
-                    // powershell script: "Remove-Item -Path ${csRoot}\\* -Recurse -Force -ErrorAction Continue", label: "Clean Workspace"
+                    powershell script: "Remove-Item -Path ${csRoot}\\* -Recurse -Force -ErrorAction Continue", label: "Clean Workspace"
                     dir(csRoot)
                     {
-                        // pwsh "${psfolder}\\vc_docs_get_sources.ps1"
+                        pwsh "${psfolder}\\vc_docs_get_sources.ps1"
                     }
                     dir(platformRoot)
                     {
-                        // pwsh script: "mkdocs build", label: "Build mkdocs"
+                        pwsh script: "mkdocs build", label: "Build mkdocs"
                         def zipFile = "${csRoot}\\site.zip"
-                        //  zip zipFile: zipFile, dir: "site"
+                         zip zipFile: zipFile, dir: "site"
                     }
                 }
             }
@@ -78,7 +78,7 @@ pipeline
                     def artifact = "${csRoot}\\site.zip"
                     def psfolder = "${env.WORKSPACE}\\resources\\virtocommerce"
 
-                    withEnv(["AzureSubscriptionIDProd=${SETTINGS['subscriptionID']}", "AzureResourceGroupNameProd=${SETTINGS['resourceGroupName']}", "AzureWebAppNameProd=${SETTINGS['webAppNameStage']}", "ArtifactPath=${artifact}"]){
+                    withEnv(["AzureSubscriptionIDProd=${SETTINGS['subscriptionID']}", "AzureResourceGroupNameProd=${SETTINGS['resourceGroupName']}", "AzureWebAppNameProd=${SETTINGS['webAppNameProd']}", "ArtifactPath=${artifact}"]){
                         pwsh script: "${psfolder}\\DocsUpdate.ps1", label: "Upload artifact."
                     }
                 }
