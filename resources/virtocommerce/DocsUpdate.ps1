@@ -25,7 +25,7 @@ Write-Host "SubscriptionID: $SubscriptionID"
 Write-Host "DestResourceGroupName: $DestResourceGroupName"
 Write-Host "DestWebAppName: $DestWebAppName"
 
-Start-Sleep -s 35
+# Start-Sleep -s 35
 
 # Getting Publish Profile
 Write-Output "Getting publishing profile for $DestWebAppName app"
@@ -43,7 +43,7 @@ if($LASTEXITCODE -ne 0)
     exit 1
 }
 
-Start-Sleep -s 5
+# Start-Sleep -s 5
 
 Write-Host "Start WebApp $DestWebAppName"
 # Start-AzureRmWebApp -ResourceGroupName $DestResourceGroupName -Name $DestWebAppName
