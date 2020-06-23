@@ -16,7 +16,7 @@ $DestResourceGroupName = "${env:AzureResourceGroupNameProd}"
 $DestWebAppName = "${env:AzureWebAppNameProd}"
 
 Write-Host "Stop WebApp $DestWebAppName"
-Stop-AzureRmWebApp -ResourceGroupName $DestResourceGroupName -Name $DestWebAppName
+# Stop-AzureRmWebApp -ResourceGroupName $DestResourceGroupName -Name $DestWebAppName
 
 Write-Host "ZipFile: $ZipFile"
 Write-Host "ApplicationID: $ApplicationID"
@@ -32,7 +32,7 @@ Write-Output "Getting publishing profile for $DestWebAppName app"
 $tmpPublishProfile = [System.IO.Path]::GetTempFileName() + ".xml"
 $xml = Get-AzureRmWebAppPublishingProfile -Name $DestWebAppName `
            -ResourceGroupName $DestResourceGroupName `
-           -OutputFile $tmpPublishProfile -Format WebDeploy -ErrorAction Stop
+           -OutputFile $tmpPublishProfile -Format WebDeploy -ErrorAction Continue
 
 $contentPath = $DestContentPath
 $msdeploy = "${env:MSDEPLOY_DIR}\msdeploy.exe"
@@ -46,6 +46,6 @@ if($LASTEXITCODE -ne 0)
 Start-Sleep -s 5
 
 Write-Host "Start WebApp $DestWebAppName"
-Start-AzureRmWebApp -ResourceGroupName $DestResourceGroupName -Name $DestWebAppName
+# Start-AzureRmWebApp -ResourceGroupName $DestResourceGroupName -Name $DestWebAppName
 
 Remove-Item $tmpPublishProfile -Force
