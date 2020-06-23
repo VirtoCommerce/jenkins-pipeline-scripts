@@ -60,7 +60,7 @@ def call(body) {
                     checkout scm
 
                     commitHash = Utilities.getCommitHash(this)
-                    versionSuffixArg = env.BRANCH_NAME == 'dev' ? "-CustomTagSuffix \"_build_${commitHash}\"" : ""
+                    versionSuffixArg = env.BRANCH_NAME == 'dev' ? "-CustomVersionSuffix \"alpha.${commitHash}\"" : ""
 
                     try
                     {
