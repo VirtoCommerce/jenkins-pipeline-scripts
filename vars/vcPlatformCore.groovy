@@ -212,81 +212,61 @@ def call(body) {
                             }
                         }
                     }
-
-                    stage('Publish')
+                    if(env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'master')
                     {
-                        // powershell "vc-build PublishPackages -ApiKey ${env.NUGET_KEY} -skip Clean+Restore+Compile+Test"
-
-                        if(env.BRANCH_NAME == 'dev')
+                        stage('Publish')
                         {
-                            // def platformArtifactName = "VirtoCommerce.Platform_3.0.0-build.${commitHash}"
-                            // echo "artifact version: ${platformArtifactName}"
-                            // def artifactPath = "${workspace}\\artifacts\\${platformArtifactName}.zip"
-                            // powershell "Copy-Item ${artifacts[0].path} -Destination ${artifactPath}"
-                            // powershell script: "${env.Utils}\\AzCopy10\\AzCopy.exe copy \"${artifactPath}\" \"https://vc3prerelease.blob.core.windows.net/packages${env.ARTIFACTS_BLOB_TOKEN}\"", label: "AzCopy"
+                            def ghReleaseResult = powershell script: "vc-build PublishPackages -ApiKey ${env.NUGET_KEY} -skip Clean+Restore+Compile+Test", returnStatus: true
+                            if(ghReleaseResult == 409)
+                            {
+                                UNSTABLE_CAUSES.add("Nuget package already exists.")
+                            } 
+                            else if(ghReleaseResult != 0)
+                            {
+                                throw new Exception("ERROR: script returned ${ghReleaseResult}")
+                            }
+
+                            if(env.BRANCH_NAME == 'dev')
+                            {
+                                def orgName = Utilities.getOrgName(this)
+                                def releaseNotesFile = new File(releaseNotesPath)
+                                def releaseNotesArg = releaseNotesFile.exists() ? "-ReleaseNotes ${releaseNotesFile}" : ""
+                                def releaseResult = powershell script: "vc-build Release -GitHubUser ${orgName} -GitHubToken ${env.GITHUB_TOKEN} ${releaseNotesArg} -PreRelease -skip Clean+Restore+Compile+Test", returnStatus: true
+                                if(releaseResult == 422){
+                                    UNSTABLE_CAUSES.add("Release already exists on github")
+                                } else if(releaseResult !=0 ) {
+                                    throw new Exception("Github release error")
+                                }
+                                return 0
+                            }
+                            
+                            Packaging.pushDockerImage(this, dockerWinImage, platformDockerTag)
+                            if(env.BRANCH_NAME == 'master')
+                            {
+                                Packaging.pushDockerImage(this, dockerWinImage, "${platformVersion}-${commitHash}-win")
+                            }
+                            node('linux')
+                            {
+                                Packaging.pushDockerImage(this, dockerLinImage, platformLinuxDockerTag)
+                                if(env.BRANCH_NAME == 'master')
+                                {
+                                    Packaging.pushDockerImage(this, dockerLinImage, "${platformVersion}-${commitHash}")
+                                }
+                            }
+                            
                             def orgName = Utilities.getOrgName(this)
                             def releaseNotesFile = new File(releaseNotesPath)
                             def releaseNotesArg = releaseNotesFile.exists() ? "-ReleaseNotes ${releaseNotesFile}" : ""
-                            def releaseResult = powershell script: "vc-build Release -GitHubUser ${orgName} -GitHubToken ${env.GITHUB_TOKEN} ${releaseNotesArg} -PreRelease -skip Clean+Restore+Compile+Test", returnStatus: true
+                            def releaseResult = powershell script: "vc-build Release -GitHubUser ${orgName} -GitHubToken ${env.GITHUB_TOKEN} ${releaseNotesArg} -skip Clean+Restore+Compile+Test", returnStatus: true
                             if(releaseResult == 422){
                                 UNSTABLE_CAUSES.add("Release already exists on github")
                             } else if(releaseResult !=0 ) {
                                 throw new Exception("Github release error")
                             }
-                            return 0
-                        }
-                        
-                        Packaging.pushDockerImage(this, dockerWinImage, platformDockerTag)
-                        if(env.BRANCH_NAME == 'master')
-                        {
-                            Packaging.pushDockerImage(this, dockerWinImage, "${platformVersion}-${commitHash}-win")
-                        }
-                        node('linux')
-                        {
-                            Packaging.pushDockerImage(this, dockerLinImage, platformLinuxDockerTag)
-                            if(env.BRANCH_NAME == 'master')
-                            {
-                                Packaging.pushDockerImage(this, dockerLinImage, "${platformVersion}-${commitHash}")
-                            }
-                        }
-                        // def ghReleaseResult = Utilities.runBatchScript(this, "@vc-build PublishPackages -ApiKey ${env.NUGET_KEY} -skip Clean+Restore+Compile+Test")
-                        // if(ghReleaseResult['status'] != 0){
-                        //     def nugetAlreadyExists = false
-                        //     for(line in ghReleaseResult['stdout']){
-                        //         if(line.contains("error: Response status code does not indicate success: 409")){
-                        //             nugetAlreadyExists = true
-                        //         }
-                        //     }
-                        //     if(nugetAlreadyExists){
-                        //         UNSTABLE_CAUSES.add("Nuget package already exists.")
-                        //     }
-                        //     else{
-                        //         echo "${ghReleaseResult['stdout']}"
-                        //         throw new Exception("ERROR: script returned exit code -1")
-                        //     }
-                        // }
-                        def ghReleaseResult = powershell script: "vc-build PublishPackages -ApiKey ${env.NUGET_KEY} -skip Clean+Restore+Compile+Test", returnStatus: true
-                        if(ghReleaseResult == 409)
-                        {
-                            UNSTABLE_CAUSES.add("Nuget package already exists.")
-                        } 
-                        else if(ghReleaseResult != 0)
-                        {
-                            throw new Exception("ERROR: script returned ${ghReleaseResult}")
-                        }
 
-                        def orgName = Utilities.getOrgName(this)
-                        def releaseNotesFile = new File(releaseNotesPath)
-                        def releaseNotesArg = releaseNotesFile.exists() ? "-ReleaseNotes ${releaseNotesFile}" : ""
-                        def releaseResult = powershell script: "vc-build Release -GitHubUser ${orgName} -GitHubToken ${env.GITHUB_TOKEN} ${releaseNotesArg} -skip Clean+Restore+Compile+Test", returnStatus: true
-                        if(releaseResult == 422){
-                            UNSTABLE_CAUSES.add("Release already exists on github")
-                        } else if(releaseResult !=0 ) {
-                            throw new Exception("Github release error")
+                        //     def orgName = Utilities.getOrgName(this)
+                        //     powershell "vc-build Release -GitHubUser ${orgName} -GitHubToken ${env.GITHUB_TOKEN} -PreRelease -skip Clean+Restore+Compile+Test"
                         }
-
-                    //     def orgName = Utilities.getOrgName(this)
-                    //     powershell "vc-build Release -GitHubUser ${orgName} -GitHubToken ${env.GITHUB_TOKEN} -PreRelease -skip Clean+Restore+Compile+Test"
                     }
                     // stage('Deploy')
                     // {
