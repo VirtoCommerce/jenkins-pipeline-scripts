@@ -106,7 +106,7 @@ def call(body) {
 						powershell "if(!(Test-Path -Path .\\.nuke)){ Get-ChildItem *.sln -Name > .nuke }"
 
 						commitHash = Utilities.getCommitHash(this)
-                    	versionSuffixArg = env.BRANCH_NAME == 'dev' ? "-CustomVersionSuffix \"alpha.${commitHash}\"" : ""
+                    	versionSuffixArg = env.BRANCH_NAME == 'dev' ? "-CustomVersionSuffix \"alpha.hash${commitHash}\"" : ""
 
 						try
 						{
