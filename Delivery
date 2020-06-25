@@ -177,9 +177,9 @@ pipeline {
                                         break
                                         case 'master':
                                         platformTag = 'latest-win'
-                                        storefrontTag = '3.0'
+                                        storefrontTag = 'latest-win'
                                         platformTagLinux = 'latest'
-                                        storefrontTagLinux = '3.0-linux'
+                                        storefrontTagLinux = 'latest'
                                         break
                                     }
                                     build job: 'DockerEnvLinux', propagate: false, wait: false, parameters:[string(name:'SolutionRoot', value:"${env.WORKSPACE}/CS"), string(name:'PlatformTag', value:platformTagLinux), string(name:'StorefrontTag', value:storefrontTagLinux)]

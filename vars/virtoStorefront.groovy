@@ -59,8 +59,8 @@ def call(body) {
 					themeBranch = 'dev'
 				break
 				case 'master':
-					dockerTag = "3.0"
-					dockerTagLinux = '3.0-linux'
+					dockerTag = "latest-win"
+					dockerTagLinux = 'latest'
 					runtimeImage = "mcr.microsoft.com/dotnet/core/aspnet:3.1"
 					themeBranch = 'master'
 				break
@@ -93,6 +93,7 @@ def call(body) {
 
 			def commitHash
 			def versionSuffixArg
+			def storefrontVersion
 			
 			try {
 				Utilities.notifyBuildStatus(this, SETTINGS['of365hook'], '', 'STARTED')
@@ -181,6 +182,9 @@ def call(body) {
 				stage('Packaging') {
 					timestamps { 
 						powershell "vc-build Compress -skip Clean+Restore+Compile+Test"
+
+						storefrontVersion = pwsh (script: "(Get-Item artifacts\\publish\\VirtoCommerce.Storefront.dll).VersionInfo.ProductVersion", returnStdout: true, label: "Get storefront version").trim()
+
 						if (env.BRANCH_NAME == 'support/2.x-dev' || env.BRANCH_NAME == 'support/2.x' || env.BRANCH_NAME == 'dev' || env.BRANCH_NAME =='master') {
 							def websitePath = Utilities.getWebPublishFolder(this, websiteDir)
 							powershell script: "Copy-Item ${workspace}\\artifacts\\publish\\* ${websitePath}\\VirtoCommerce.Storefront -Recurse -Force"
@@ -283,11 +287,19 @@ def call(body) {
 						timestamps 
 						{
 							Packaging.pushDockerImage(this, dockerImage, dockerTag)
+							if(env.BRANCH_NAME == 'master')
+                            {
+                                Packaging.pushDockerImage(this, dockerWinImage, "${storefrontVersion}-${commitHash}-win")
+                            }
 							if(Utilities.isNetCore(projectType) && dockerImageLinux != null)
 							{
 								node('linux')
 								{
 									Packaging.pushDockerImage(this, dockerImageLinux, dockerTagLinux)
+									if(env.BRANCH_NAME == 'master')
+									{
+										Packaging.pushDockerImage(this, dockerImageLinux, "${storefrontVersion}-${commitHash}")
+									}
 								}
 							}
 							if (env.BRANCH_NAME == 'support/2.x' ) 
