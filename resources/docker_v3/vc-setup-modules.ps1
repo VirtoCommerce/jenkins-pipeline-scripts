@@ -29,7 +29,7 @@ function Get-AuthToken {
     }
 }   
 Write-Output "Pause"
-Start-Sleep -Seconds 30
+Start-Sleep -Seconds 90
 # Initialize paths used by the script
 Write-Output "Initialize paths used by the script"
 $modulesStateUrl = "$ApiUrl/api/platform/pushnotifications"
@@ -78,7 +78,7 @@ try {
     do {
         # Retrieve notification state
         $moduleState = Invoke-RestMethod "$modulesStateUrl" -Body $NotificationStateJson -Method Post -ContentType "application/json" -Headers $headers -SkipCertificateCheck
-
+        Write-Output $moduleState
         # display all statuses
         if ($moduleState.NotifyEvents -ne $null -and $moduleState.NotifyEvents.Length -ne 0) {
             $notificationState = $moduleState.NotifyEvents[0]
