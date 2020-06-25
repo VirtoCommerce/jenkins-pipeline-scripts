@@ -28,6 +28,7 @@ function Get-AuthToken {
         exit 1
     }
 }   
+
 docker restart $ContainerId
 Write-Output "Pause"
 Start-Sleep -Seconds 90
