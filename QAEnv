@@ -169,8 +169,8 @@ pipeline
                                     STOREFRONT_DOCKER_TAG = '3.0-dev'
                                     break
                                     case 'master':
-                                    PLATFORM_DOCKER_TAG = '3.0-preview'
-                                    STOREFRONT_DOCKER_TAG = '3.0'
+                                    PLATFORM_DOCKER_TAG = 'latest-win'
+                                    STOREFRONT_DOCKER_TAG = 'latest-win'
                                     break
                                 }
                                 // Start docker environment
@@ -194,6 +194,7 @@ pipeline
                                 def platformContainer = Utilities.getPlatformContainer(this)
                                 def platformHost = Utilities.getPlatformCoreHost(this)
 
+                                sleep 30
                                 // install modules
                                 Utilities.runPS(this, 'docker_v3/setup-modulesFromDir.ps1', "-PlatformContainer ${platformContainer} -ModulesDir ${env.WORKSPACE}\\CS\\modules -Verbose -Debug")
                                 Utilities.runPS(this, "docker_v3/vc-check-installed-modules.ps1", "-ApiUrl ${platformHost} -Verbose -Debug")
