@@ -50,6 +50,7 @@ def call(body) {
             def coverageFolder = Utilities.getCoverageFolder(this)
             
             def commitHash
+            def commitNumber
             def platformVersion
             def versionSuffixArg
 
@@ -60,7 +61,8 @@ def call(body) {
                     checkout scm
 
                     commitHash = Utilities.getCommitHash(this)
-                    versionSuffixArg = env.BRANCH_NAME == 'dev' ? "-CustomVersionSuffix \"alpha.hash${commitHash}\"" : ""
+                    commitNumber = Utilities.getCommitNumber(this)
+                    versionSuffixArg = env.BRANCH_NAME == 'dev' ? "-CustomVersionSuffix \"alpha.${commitNumber}\"" : ""
 
                     try
                     {

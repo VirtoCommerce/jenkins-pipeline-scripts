@@ -92,6 +92,7 @@ def call(body) {
 			}
 
 			def commitHash
+			def commitNumber
 			def versionSuffixArg
 			def storefrontVersion
 			
@@ -107,7 +108,8 @@ def call(body) {
 						powershell "if(!(Test-Path -Path .\\.nuke)){ Get-ChildItem *.sln -Name > .nuke }"
 
 						commitHash = Utilities.getCommitHash(this)
-                    	versionSuffixArg = env.BRANCH_NAME == 'dev' ? "-CustomVersionSuffix \"alpha.hash${commitHash}\"" : ""
+						commitNumber = Utilities.getCommitNumber(this)
+                    	versionSuffixArg = env.BRANCH_NAME == 'dev' ? "-CustomVersionSuffix \"alpha.${commitNumber}\"" : ""
 
 						try
 						{

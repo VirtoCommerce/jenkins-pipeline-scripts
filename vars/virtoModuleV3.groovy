@@ -36,6 +36,7 @@ def call(body) {
             // SETTINGS.setProject('platform-core')
             // SETTINGS.setBranch(env.BRANCH_NAME)
             def commitHash
+            def commitNumber
             def versionSuffixArg
             try {
                 stage('Checkout'){
@@ -43,7 +44,8 @@ def call(body) {
                     checkout scm
 
                     commitHash = Utilities.getCommitHash(this)
-                    versionSuffixArg = env.BRANCH_NAME == 'dev' ? "-CustomVersionSuffix \"alpha.hash${commitHash}\"" : ""
+                    commitNumber = Utilities.getCommitNumber(this)
+                    versionSuffixArg = env.BRANCH_NAME == 'dev' ? "-CustomVersionSuffix \"alpha.${commitNumber}\"" : ""
                     echo versionSuffixArg
 
                     try
