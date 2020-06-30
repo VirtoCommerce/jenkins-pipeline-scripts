@@ -109,7 +109,7 @@ def call(body) {
                     timestamps
                     {
                         artifacts = findFiles(glob: 'artifacts\\*.zip')
-                        artifactFileName = artifacts[0].path.split("\\\\").last()
+                        artifactFileName = artifacts[0].name
                         moduleId = artifactFileName.split("_").first()
                         echo "Module id: ${moduleId}"
 
@@ -129,9 +129,8 @@ def call(body) {
                         // def commitNumber = gitversionJson['CommitsSinceVersionSource']
                         // def moduleArtifactName = "${moduleId}_3.0.0-build.${commitNumber}"
                         // echo "artifact version: ${moduleArtifactName}"
-                        // def artifactPath = "${workspace}\\artifacts\\${moduleArtifactName}.zip"
-                        // powershell "Copy-Item ${artifacts[0].path} -Destination ${artifactPath}"
-                        // powershell script: "${env.Utils}\\AzCopy10\\AzCopy.exe copy \"${artifactPath}\" \"https://vc3prerelease.blob.core.windows.net/packages${env.ARTIFACTS_BLOB_TOKEN}\"", label: "AzCopy"
+                        def artifactPath = artifacts[0].path
+                        powershell script: "${env.Utils}\\AzCopy10\\AzCopy.exe copy \"${artifactPath}\" \"https://vc3prerelease.blob.core.windows.net/packages${env.ARTIFACTS_BLOB_TOKEN}\"", label: "AzCopy"
                         def ghReleaseResult = powershell script: "vc-build PublishPackages -ApiKey ${env.NUGET_KEY} -skip Clean+Restore+Compile+Test", returnStatus: true
                         if(ghReleaseResult == 409)
                         {
