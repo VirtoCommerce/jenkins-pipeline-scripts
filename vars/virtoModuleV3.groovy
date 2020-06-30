@@ -142,15 +142,15 @@ def call(body) {
                             throw new Exception("ERROR: script returned ${ghReleaseResult}")
                         }
 
-                        def orgName = Utilities.getOrgName(this)
-                        def releaseNotesFile = new File(releaseNotesPath)
-                        def releaseNotesArg = releaseNotesFile.exists() ? "-ReleaseNotes ${releaseNotesFile}" : ""
-                        def releaseResult = powershell script: "vc-build Release -GitHubUser ${orgName} -GitHubToken ${env.GITHUB_TOKEN} ${releaseNotesArg} -PreRelease -skip Clean+Restore+Compile+Test", returnStatus: true
-                        if(releaseResult == 422){
-                            UNSTABLE_CAUSES.add("Release already exists on github")
-                        } else if(releaseResult !=0 ) {
-                            throw new Exception("Github release error")
-                        }
+                        // def orgName = Utilities.getOrgName(this)
+                        // def releaseNotesFile = new File(releaseNotesPath)
+                        // def releaseNotesArg = releaseNotesFile.exists() ? "-ReleaseNotes ${releaseNotesFile}" : ""
+                        // def releaseResult = powershell script: "vc-build Release -GitHubUser ${orgName} -GitHubToken ${env.GITHUB_TOKEN} ${releaseNotesArg} -PreRelease -skip Clean+Restore+Compile+Test", returnStatus: true
+                        // if(releaseResult == 422){
+                        //     UNSTABLE_CAUSES.add("Release already exists on github")
+                        // } else if(releaseResult !=0 ) {
+                        //     throw new Exception("Github release error")
+                        // }
                         
                         def manifestResult = powershell script: "vc-build PublishModuleManifest -CustomModulePackageUri \"${blobDownloadUrl}\"", returnStatus: true
                         if(manifestResult == 423)
