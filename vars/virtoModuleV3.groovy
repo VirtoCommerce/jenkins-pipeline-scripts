@@ -131,6 +131,7 @@ def call(body) {
                         // echo "artifact version: ${moduleArtifactName}"
                         def artifactPath = artifacts[0].path
                         powershell script: "${env.Utils}\\AzCopy10\\AzCopy.exe copy \"${artifactPath}\" \"https://vc3prerelease.blob.core.windows.net/packages${env.ARTIFACTS_BLOB_TOKEN}\"", label: "AzCopy"
+                        def blobDownloadUrl = "https://vc3prerelease.blob.core.windows.net/packages/${artifactFileName}"
                         def ghReleaseResult = powershell script: "vc-build PublishPackages -ApiKey ${env.NUGET_KEY} -skip Clean+Restore+Compile+Test", returnStatus: true
                         if(ghReleaseResult == 409)
                         {
@@ -151,7 +152,7 @@ def call(body) {
                             throw new Exception("Github release error")
                         }
                         
-                        def manifestResult = powershell script: "vc-build PublishModuleManifest", returnStatus: true
+                        def manifestResult = powershell script: "vc-build PublishModuleManifest -CustomModulePackageUri \"${blobDownloadUrl}\"", returnStatus: true
                         if(manifestResult == 423)
                         {
                             UNSTABLE_CAUSES.add("Module Manifest: nothing to commit, working tree clean")
