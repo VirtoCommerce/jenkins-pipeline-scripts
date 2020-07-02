@@ -458,7 +458,7 @@ class Utilities
 
     @NonCPS
     def static cleanNugetFolder(context){
-        String folderPath = "${context.env.WORKSPACE}\\NuGet"
+        String folderPath = "${context.pwd()}\\NuGet"
         new File(folderPath).eachFile (FileType.FILES) { file ->
             context.echo "found file: ${file.name}"
             if (file.name.contains('nupkg')) {
