@@ -22,7 +22,7 @@ Select-AzureRmSubscription -SubscriptionId $SubscriptionID
 Write-Host "Stop WebApp $WebAppName"
 Stop-AzureRmWebApp -ResourceGroupName $ResourceGroupName -Name $WebAppName
 
-$ExcludePattern="google-tag-manager-body.liquid;google-tag-manager-head.liquid"
+$ExcludePattern="google-tag-manager-body.liquid;google-tag-manager-head.liquid;Themes"
 & "${env:Utils}\AzCopy10\AzCopy" cp https://${sourceStorage}.blob.core.windows.net/cms-content${sourceSAS} https://${destStorage}.blob.core.windows.net/cms-content${destSAS} --recursive --exclude-pattern="$ExcludePattern" --overwrite true #--delete-destination=true
 
 Write-Host "Start WebApp $WebAppName"
