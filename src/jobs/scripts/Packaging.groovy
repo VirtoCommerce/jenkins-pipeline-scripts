@@ -243,7 +243,7 @@ class Packaging {
             def prNumber = Utilities.getPullRequestNumber(context)
             def orgName = Utilities.getOrgName(context)
             if(Utilities.isPullRequest(context)){
-                context.bat "${scannerPath} begin /o:\"virto-commerce\" /d:\"sonar.branch=${context.env.BRANCH_NAME}\" /n:\"${fullJobName}\" /k:\"${fullJobName}\" /d:sonar.verbose=true /d:sonar.github.oauth=${context.env.GITHUB_TOKEN} /d:sonar.analysis.mode=preview /d:sonar.github.pullRequest=\"${prNumber}\" /d:sonar.github.repository=${orgName}/${repoName} /d:sonar.host.url=%SONAR_HOST_URL% /d:sonar.login=%SONAR_AUTH_TOKEN% /d:sonar.cs.${coverageReportType}.reportsPaths=\"${coverageFolder}\\VisualStudio.Unit.coveragexml\""
+                context.bat "${scannerPath} begin /o:\"virto-commerce\" /d:\"sonar.branch=${context.env.BRANCH_NAME}\" /n:\"${fullJobName}\" /k:\"${fullJobName}\" /d:sonar.verbose=true /d:sonar.pullrequest.base=\"${context.env.CHANGE_TARGET}\" /d:sonar.pullrequest.branch=\"${context.env.CHANGE_BRANCH}\" /d:sonar.pullrequest.key=\"${context.env.CHANGE_ID}\" /d:sonar.host.url=%SONAR_HOST_URL% /d:sonar.login=%SONAR_AUTH_TOKEN% /d:sonar.cs.${coverageReportType}.reportsPaths=\"${coverageFolder}\\VisualStudio.Unit.coveragexml\""
             }
             else{
                 context.bat "${scannerPath} begin /o:\"virto-commerce\" /d:\"sonar.branch=${context.env.BRANCH_NAME}\" /n:\"${fullJobName}\" /k:\"${fullJobName}\" /d:sonar.verbose=true /d:sonar.host.url=%SONAR_HOST_URL% /d:sonar.login=%SONAR_AUTH_TOKEN% /d:sonar.cs.${coverageReportType}.reportsPaths=\"${coverageFolder}\\VisualStudio.Unit.coveragexml\""
@@ -261,7 +261,7 @@ class Packaging {
         def orgName = Utilities.getOrgName(context)
         def projectKey = "${fullJobName}_${context.env.BRANCH_NAME}".replaceAll('/', '_')
 
-        context.withSonarQubeEnv('SonarCloud') {
+        context.withSonarQubeEnv('VC Sonar Server') {
             context.timeout(activity: true, time: 15){
                 if(Utilities.isPullRequest(context)){
                     context.bat "\"${sqScanner}\\bin\\sonar-scanner.bat\" scan -Dsonar.projectKey=${projectKey} -Dsonar.sources=${sources} -Dsonar.branch=${context.env.BRANCH_NAME} -Dsonar.projectName=\"${fullJobName}\" -Dsonar.host.url=%SONAR_HOST_URL% -Dsonar.login=%SONAR_AUTH_TOKEN% -Dsonar.github.oauth=${context.env.GITHUB_TOKEN} -Dsonar.analysis.mode=preview -Dsonar.github.pullRequest=\"${prNumber}\" -Dsonar.github.repository=${orgName}/${repoName}"
@@ -283,7 +283,7 @@ class Packaging {
         {
             scannerPath = "dotnet sonarscanner"
         }
-        context.withSonarQubeEnv('VC Sonar Server') {
+        context.withSonarQubeEnv('SonarCloud') {
             context.bat "${scannerPath} end /d:sonar.login=%SONAR_AUTH_TOKEN%"
         }          
     }
