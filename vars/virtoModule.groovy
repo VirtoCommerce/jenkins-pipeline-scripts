@@ -167,7 +167,7 @@ def call(body) {
 							artifactPath = artifacts[0].path
 							Packaging.saveArtifact(this, 'vc', 'module', moduleId, artifactPath)
 							if (env.BRANCH_NAME == 'support/2.x' || env.BRANCH_NAME =='1.1.3') {
-								processManifests(true) // publish artifacts to github releases
+								// processManifests(true) // publish artifacts to github releases
 							}
 							switch(env.BRANCH_NAME){
 								case ['support/2.x', '1.1.3']:
