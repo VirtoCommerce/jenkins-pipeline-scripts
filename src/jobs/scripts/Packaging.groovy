@@ -452,7 +452,8 @@ class Packaging {
 	}    
 
     def static createNugetPackages(context){
-        String nugetFolder = "${context.env.WORKSPACE}\\NuGet"
+        def currentFolder = context.env.WORKSPACE.contains('%') ? context.pwd() : context.env.WORKSPACE
+        String nugetFolder = "${currentFolder}\\NuGet"
         if(!(new File(nugetFolder).exists()))
             return
 
