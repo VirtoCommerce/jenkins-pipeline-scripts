@@ -89,11 +89,11 @@ def call(body) {
 
                 stage('Quality Gate'){
                     sleep time: 15
-                    // withSonarQubeEnv('VC Sonar Server'){
-                    //     powershell "vc-build SonarQubeEnd -SonarUrl ${env.SONAR_HOST_URL} -SonarAuthToken ${env.SONAR_AUTH_TOKEN} -skip Restore+Compile+SonarQubeStart"
-                    // }
-                    Packaging.endAnalyzer(this)
+                    withSonarQubeEnv('VC Sonar Server'){
+                        powershell "vc-build SonarQubeEnd -SonarUrl ${env.SONAR_HOST_URL} -SonarAuthToken ${env.SONAR_AUTH_TOKEN} -skip"
+                    }
                     Packaging.checkAnalyzerGate(this)
+                    // Packaging.endAnalyzer(this)
                 }
                  
 
