@@ -78,7 +78,7 @@ pipeline
 
                     //get backend
                     runPS("get-backend.ps1", "-AppName ${appName} -BackendPath ${backendPath} -ResourceGroupName \"${SETTINGS['resourceGroupName']}\" -SubscriptionID \"${SETTINGS['subscriptionID']}\"")
-                    def platform_version = pwsh script:"Write-Output \"\$([System.Diagnostics.FileVersionInfo]::GetVersionInfo(\"${backendPath}\\platform\\bin\\VirtoCommerce.Platform.Web.dll\").FileVersion)\"", returnStdout: true
+                    def platform_version = powershell script:"Write-Output \"\$([System.Diagnostics.FileVersionInfo]::GetVersionInfo(\"${backendPath}\\platform\\bin\\VirtoCommerce.Platform.Web.dll\").FileVersion)\"", returnStdout: true
                     platform_version = platform_version.replace('.0', '').trim()
 
                     //get frontend
@@ -96,8 +96,8 @@ pipeline
                     {
                         deleteDir()
                         git branch: "${BRANCH_NAME}", credentialsId: "${githubCredId}", url: "https://github.com/${repoOrg}/${repoName}.git"
-                        pwsh "Copy-Item .\\theme .\\cms-content\\Themes\\vccom\\default -Recurse -Force"
-                        pwsh "Copy-Item .\\pages .\\cms-content\\Pages\\vccom -Recurse -Force"
+                        powershell "Copy-Item .\\theme .\\cms-content\\Themes\\vccom\\default -Recurse -Force"
+                        powershell "Copy-Item .\\pages .\\cms-content\\Pages\\vccom -Recurse -Force"
                     }
                 }
             }
@@ -208,10 +208,10 @@ pipeline
         //                         def platformContainer = Utilities.getPlatformContainer(this)
         //                         def themeFolder = "${SETTINGS['themeFolder']}\\cms-content"
         //                         // Utilities.runSharedPS(this, "vc-install-theme.ps1", "-themeZip \"${themeFolder}\" -platformContainer ${platformContainer}")
-        //                         // bat "docker exec ${platformContainer} pwsh -Command \"Remove-Item C:\\vc-platform\\App_Data\\cms-content\\Themes -Recurse -Force\""
-        //                         bat "docker exec ${platformContainer} pwsh -Command \"mkdir tmp\""
+        //                         // bat "docker exec ${platformContainer} powershell -Command \"Remove-Item C:\\vc-platform\\App_Data\\cms-content\\Themes -Recurse -Force\""
+        //                         bat "docker exec ${platformContainer} powershell -Command \"mkdir tmp\""
         //                         bat "docker cp ${themeFolder} ${platformContainer}:/tmp"
-        //                         bat "docker exec ${platformContainer} pwsh -Command \"Copy-Item -Path C:\\tmp\\cms-content\\* -Destination C:\\vc-platform\\App_Data\\cms-content -Recurse -Force\""
+        //                         bat "docker exec ${platformContainer} powershell -Command \"Copy-Item -Path C:\\tmp\\cms-content\\* -Destination C:\\vc-platform\\App_Data\\cms-content -Recurse -Force\""
         //                     }
         //                 }
 
@@ -244,8 +244,8 @@ pipeline
                     def themeFolder = SETTINGS['themeFolder']
                     dir("${themeFolder}")
                     {
-                        pwsh "Copy-Item .\\pages ${env.WORKSPACE}\\pages -Recurse -Force"
-                        pwsh "Copy-Item .\\theme ${env.WORKSPACE}\\theme -Recurse -Force"
+                        powershell "Copy-Item .\\pages ${env.WORKSPACE}\\pages -Recurse -Force"
+                        powershell "Copy-Item .\\theme ${env.WORKSPACE}\\theme -Recurse -Force"
                     }
 
                     def stagingName = "qa"
@@ -304,5 +304,5 @@ def wakeUpNode(nodeLabel)
 def runPS(psName, args)
 {
     def script = "${env.WORKSPACE}\\resources\\azure\\${psName} ${args} -ErrorAction Stop"
-    pwsh script: script, label: "${psName} ${args}"
+    powershell script: script, label: "${psName} ${args}"
 }
