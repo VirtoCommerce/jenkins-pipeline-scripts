@@ -7,8 +7,8 @@ class Utilities
 
     private static String DefaultSharedLibName = 'virto-shared-library'
     private static String DefaultAdminDockerPrefix = 'http://localhost'
-    private static Integer DefaultPlatformPort = 8100
-    private static Integer DefaultStorefrontPort = 8080
+    private static Integer DefaultPlatformPort = 8101
+    private static Integer DefaultStorefrontPort = 8081
     private static Integer DefaultSqlPort = 1434
 
     /**
