@@ -7,9 +7,9 @@ class Utilities
 
     private static String DefaultSharedLibName = 'virto-shared-library'
     private static String DefaultAdminDockerPrefix = 'http://localhost'
-    private static Integer DefaultPlatformPort = 8090
+    private static Integer DefaultPlatformPort = 8100
     private static Integer DefaultStorefrontPort = 8080
-    private static Integer DefaultSqlPort = 1434  
+    private static Integer DefaultSqlPort = 1434
 
     /**
      * Get the folder name for a job.
@@ -242,7 +242,7 @@ class Utilities
         {
             currentOrder = tempCurrentOrder.toInteger() + 1
             
-            if(currentOrder >= 10) // reset, we can't have more than 10 builders at the same time
+            if(currentOrder >= 20) // reset, we can't have more than 20 builders at the same time
             {
                 currentOrder = 0
             }
