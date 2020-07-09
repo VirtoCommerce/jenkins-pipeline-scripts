@@ -56,7 +56,7 @@ if($StagingName -eq "deploy")
 
 if($null -eq $ExcludePattern)
 {
-    $ExcludePattern="*.htm;*.html;*.md;*.page"
+    $ExcludePattern = "*.htm;*.html;*.md;*.page;google-tag-manager-body.liquid;google-tag-manager-head.liquid"
 }
 
 Write-Host "Sync $StoreName"

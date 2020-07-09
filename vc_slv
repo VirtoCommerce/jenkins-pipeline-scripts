@@ -41,32 +41,27 @@ pipeline
             {
                 script
                 {
-                    //wakeUpNode("slave")
-                    node
-                    //node("slave")
-                    {
-                        deleteDir()
-                        checkout scm
-                        configFileProvider([configFile(fileId: 'virtocommerce', variable: 'SETTINGS_FILE')]) {
-                            SETTINGS = new Settings(readFile(SETTINGS_FILE))
-                        }
-                        SETTINGS.setRegion("virtocommerce")
-                        SETTINGS.setEnvironment("qa")
-                        def branches = Utilities.getSubfolders("${env.SOLUTION_FOLDER}\\${SETTINGS['prefix']}").join("\n")
+                    deleteDir()
+                    checkout scm
+                    configFileProvider([configFile(fileId: 'virtocommerce', variable: 'SETTINGS_FILE')]) {
+                        SETTINGS = new Settings(readFile(SETTINGS_FILE))
+                    }
+                    SETTINGS.setRegion("virtocommerce")
+                    SETTINGS.setEnvironment("qa")
+                    def branches = Utilities.getSubfolders("${env.SOLUTION_FOLDER}\\${SETTINGS['prefix']}").join("\n")
 
-                        timeout(time: "${SETTINGS['timeoutMinutes']}", unit: 'MINUTES')
-                        {
-                            def userInput = input message: "Select Branch", parameters: 
-                            [
-                                choice(name:'Start from', choices:SETTINGS['sourceBranches']),
-                                choice(name:'Take Theme from', choices:branches),
-                                booleanParam(defaultValue: true, name: 'Delviery to Azure')
-                            ]
-                            BASE_BRANCH = userInput["Start from"]
-                            BRANCH_NAME = userInput["Take Theme from"]
-                            DELIVERY_AZURE = userInput["Delivery to Azure"]
-                            echo "Start from: ${BASE_BRANCH}; Take Theme from: ${BRANCH_NAME};"
-                        }
+                    timeout(time: "${SETTINGS['timeoutMinutes']}", unit: 'MINUTES')
+                    {
+                        def userInput = input message: "Select Branch", parameters: 
+                        [
+                            choice(name:'Start from', choices:SETTINGS['sourceBranches']),
+                            choice(name:'Take Theme from', choices:branches),
+                            booleanParam(defaultValue: true, name: 'Delviery to Azure')
+                        ]
+                        BASE_BRANCH = userInput["Start from"]
+                        BRANCH_NAME = userInput["Take Theme from"]
+                        DELIVERY_AZURE = userInput["Delivery to Azure"]
+                        echo "Start from: ${BASE_BRANCH}; Take Theme from: ${BRANCH_NAME};"
                     }
                 }
             }
@@ -78,34 +73,31 @@ pipeline
             {
                 script
                 {
-                    node(SETTINGS['agentLabel'])
+                    backendPath = "${env.WORKSPACE}@tmp\\tmpBackend${env.BUILD_NUMBER}"
+                    def appName = SETTINGS['appName']
+
+                    //get backend
+                    runPS("get-backend.ps1", "-AppName ${appName} -BackendPath ${backendPath} -ResourceGroupName \"${SETTINGS['resourceGroupName']}\" -SubscriptionID \"${SETTINGS['subscriptionID']}\"")
+                    def platform_version = powershell script:"Write-Output \"\$([System.Diagnostics.FileVersionInfo]::GetVersionInfo(\"${backendPath}\\platform\\bin\\VirtoCommerce.Platform.Web.dll\").FileVersion)\"", returnStdout: true
+                    platform_version = platform_version.replace('.0', '').trim()
+
+                    //get frontend
+                    appName = SETTINGS['appNamePublic']
+                    runPS("get-frontend.ps1", "-AppName ${appName} -BackendPath ${backendPath} -ResourceGroupName \"${SETTINGS['resourceGroupName']}\" -SubscriptionID \"${SETTINGS['subscriptionID']}\"")
+
+                    //get theme
+                    def repoOrg = "${SETTINGS['repoOrg']}"
+                    def repoName = "${SETTINGS['prefix']}-content"
+                    def tagContains = THEME_VERSION
+                    def githubCredId = "${SETTINGS['githubCredentialsId']}"
+                    echo "${repoOrg} and ${githubCredId}"
+                    def themeFolder = SETTINGS['themeFolder']
+                    dir("${themeFolder}")
                     {
-                        backendPath = "${env.WORKSPACE}@tmp\\tmpBackend${env.BUILD_NUMBER}"
-                        def appName = SETTINGS['appName']
-
-                        //get backend
-                        runPS("get-backend.ps1", "-AppName ${appName} -BackendPath ${backendPath} -ResourceGroupName \"${SETTINGS['resourceGroupName']}\" -SubscriptionID \"${SETTINGS['subscriptionID']}\"")
-                        def platform_version = powershell script:"Write-Output \"\$([System.Diagnostics.FileVersionInfo]::GetVersionInfo(\"${backendPath}\\platform\\bin\\VirtoCommerce.Platform.Web.dll\").FileVersion)\"", returnStdout: true
-                        platform_version = platform_version.replace('.0', '').trim()
-
-                        //get frontend
-                        appName = SETTINGS['appNamePublic']
-                        runPS("get-frontend.ps1", "-AppName ${appName} -BackendPath ${backendPath} -ResourceGroupName \"${SETTINGS['resourceGroupName']}\" -SubscriptionID \"${SETTINGS['subscriptionID']}\"")
-
-                        //get theme
-                        def repoOrg = "${SETTINGS['repoOrg']}"
-                        def repoName = "${SETTINGS['prefix']}-content"
-                        def tagContains = THEME_VERSION
-                        def githubCredId = "${SETTINGS['githubCredentialsId']}"
-                        echo "${repoOrg} and ${githubCredId}"
-                        def themeFolder = SETTINGS['themeFolder']
-                        dir("${themeFolder}")
-                        {
-                            deleteDir()
-                            git branch: "${BRANCH_NAME}", credentialsId: "${githubCredId}", url: "https://github.com/${repoOrg}/${repoName}.git"
-                            powershell "Copy-Item .\\theme .\\cms-content\\Themes\\vccom\\default -Recurse -Force"
-                            powershell "Copy-Item .\\pages .\\cms-content\\Pages\\vccom -Recurse -Force"
-                        }
+                        deleteDir()
+                        git branch: "${BRANCH_NAME}", credentialsId: "${githubCredId}", url: "https://github.com/${repoOrg}/${repoName}.git"
+                        powershell "Copy-Item .\\theme .\\cms-content\\Themes\\vccom\\default -Recurse -Force"
+                        powershell "Copy-Item .\\pages .\\cms-content\\Pages\\vccom -Recurse -Force"
                     }
                 }
             }
@@ -249,28 +241,24 @@ pipeline
             {
                 script
                 {
-                    node(SETTINGS['agentLabel'])
+                    def themeFolder = SETTINGS['themeFolder']
+                    dir("${themeFolder}")
                     {
-                        def themeFolder = SETTINGS['themeFolder']
-                        dir("${themeFolder}")
-                        {
-                            powershell "Copy-Item .\\pages ${env.WORKSPACE}\\pages -Recurse -Force"
-                            powershell "Copy-Item .\\theme ${env.WORKSPACE}\\theme -Recurse -Force"
-                        }
+                        powershell "Copy-Item .\\pages ${env.WORKSPACE}\\pages -Recurse -Force"
+                        powershell "Copy-Item .\\theme ${env.WORKSPACE}\\theme -Recurse -Force"
+                    }
 
-                        def stagingName = "qa"
-                        def storeName = "cms-content"
-                        def azureBlobName = SETTINGS['azureBlobName']
-                        def azureBlobKey = SETTINGS['azureBlobKey']
-                        def webAppName = SETTINGS['appNamePublic']
-                        def resourceGroupName = SETTINGS['resourceGroupName']
-                        def subscriptionID = SETTINGS['subscriptionID']
-                        def blobToken = SETTINGS['tokenSas']
-                        withEnv(["AzureBlobToken=${blobToken}"]){
-                            def args = "-StagingName ${stagingName} -StoreName ${storeName} -AzureBlobName ${azureBlobName} -AzureBlobKey ${azureBlobKey} -WebAppName ${webAppName} -ResourceGroupName ${resourceGroupName} -SubscriptionID ${subscriptionID}"
-                            def script = "${env.WORKSPACE}\\resources\\azure\\VC-2AzureDEV.ps1 ${args} -ErrorAction Stop"
-                            powershell script: script, label: "${script} ${args}"
-                        }
+                    def stagingName = "qa"
+                    def storeName = "cms-content"
+                    def azureBlobName = SETTINGS['azureBlobName']
+                    def azureBlobKey = SETTINGS['azureBlobKey']
+                    def webAppName = SETTINGS['appNamePublic']
+                    def resourceGroupName = SETTINGS['resourceGroupName']
+                    def subscriptionID = SETTINGS['subscriptionID']
+                    def blobToken = SETTINGS['tokenSas']
+                    withEnv(["AzureBlobToken=${blobToken}"]){
+                        def args = "-StagingName ${stagingName} -StoreName ${storeName} -AzureBlobName ${azureBlobName} -AzureBlobKey ${azureBlobKey} -WebAppName ${webAppName} -ResourceGroupName ${resourceGroupName} -SubscriptionID ${subscriptionID}"
+                        runPS("${deployScript}", "${args}")
                     }
                 }
             }
@@ -283,18 +271,15 @@ pipeline
         {
             script
             {
-                node(SETTINGS['agentLabel'])
+                def composeFolder = "${env.WORKSPACE}\\${SETTINGS['composeDir']}"
+                dir(composeFolder)
                 {
-                    def composeFolder = "${env.WORKSPACE}\\${SETTINGS['composeDir']}"
-                    dir(composeFolder)
-                    {
-                        withEnv(["DOCKER_TAG=${DOCKER_TAG}", "DOCKER_PREFIX=${DOCKER_PREFIX}", "DOCKER_PLATFORM_PORT=${DOCKER_PLATFORM_PORT}", "DOCKER_STOREFRONT_PORT=${DOCKER_STOREFRONT_PORT}", "DOCKER_SQL_PORT=${DOCKER_SQL_PORT}", "COMPOSE_PROJECT_NAME=${env.BUILD_TAG}"]){
-                            echo "docker-compose down -v"
-                            //bat "docker-compose down -v"
-                        }
-                        echo "docker image prune -f"
-                        //bat "docker image prune -f"
+                    withEnv(["DOCKER_TAG=${DOCKER_TAG}", "DOCKER_PREFIX=${DOCKER_PREFIX}", "DOCKER_PLATFORM_PORT=${DOCKER_PLATFORM_PORT}", "DOCKER_STOREFRONT_PORT=${DOCKER_STOREFRONT_PORT}", "DOCKER_SQL_PORT=${DOCKER_SQL_PORT}", "COMPOSE_PROJECT_NAME=${env.BUILD_TAG}"]){
+                        echo "docker-compose down -v"
+                        //bat "docker-compose down -v"
                     }
+                    echo "docker image prune -f"
+                    //bat "docker image prune -f"
                 }
             }
         }
