@@ -244,9 +244,9 @@ pipeline {
                                         echo any.getMessage()
                                         e2eStatus = 'failed'
                                     }
-                                    def platformPort = Utilities.getPlatformPort(this)
-                                    def storefrontPort = Utilities.getStorefrontPort(this)
-                                    def msg = "E2E ${e2eStatus}\nStorefront:\nhttp://ci.virtocommerce.com:${storefrontPort}\nPlatform:\nhttp://ci.virtocommerce.com:${platformPort}"
+                                    def platformPort = (Utilities.getPlatformPort(this) as int) - 1000
+                                    def storefrontPort = (Utilities.getStorefrontPort(this) as int) - 1000
+                                    def msg = "E2E ${e2eStatus}\nStorefront:\nhttps://docker.virtocommerce.com:${storefrontPort}\nPlatform:\nhttps://docker.virtocommerce.com:${platformPort}"
                                     input message: msg
                                 }
                             }
