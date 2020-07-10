@@ -242,9 +242,9 @@ pipeline
                         {
                             timestamps
                             {  
-                                def platformPort = Utilities.getPlatformPort(this)
-                                def storefrontPort = Utilities.getStorefrontPort(this)
-                                def msg = "Storefront:\nhttp://ci.virtocommerce.com:${storefrontPort}\nPlatform:\nhttp://ci.virtocommerce.com:${platformPort}"
+                                def platformPort = (Utilities.getPlatformPort(this) as int) - 1000
+                                def storefrontPort = (Utilities.getStorefrontPort(this) as int) - 1000
+                                def msg = "Storefront:\nhttps://docker.virtocommerce.com:${storefrontPort}\nPlatform:\nhttps://docker.virtocommerce.com:${platformPort}"
                                 input message: msg
                             }
                         }
