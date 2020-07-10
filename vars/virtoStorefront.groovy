@@ -132,24 +132,30 @@ def call(body) {
 					return true
 				}
 
-				stage('Build') {		
-					timestamps { 						
+				stage('Build') 
+				{		
+					timestamps 
+					{
 						if(Utilities.isPullRequest(this))
 						{
-							withSonarQubeEnv('VC Sonar Server'){
-								withEnv(["BRANCH_NAME=${env.CHANGE_BRANCH}"])
+							withEnv(["BRANCH_NAME=${env.CHANGE_BRANCH}"])
+							{
+								//powershell "vc-build SonarQubeStart -SonarUrl ${env.SONAR_HOST_URL} -SonarAuthToken \"${env.SONAR_AUTH_TOKEN}\" -PullRequest -GitHubToken ${env.GITHUB_TOKEN} -skip Restore+Compile"
+								if(env.BRANCH_NAME.startsWith('support/2.x') || (Utilities.isPullRequest && env.CHANGE_TARGET.startsWith('support/2.x')))
 								{
-									powershell "vc-build SonarQubeStart -SonarUrl ${env.SONAR_HOST_URL} -SonarAuthToken \"${env.SONAR_AUTH_TOKEN}\" -PullRequest -GitHubToken ${env.GITHUB_TOKEN} -skip Restore+Compile"
-									powershell "vc-build Compile ${versionSuffixArg}"
+									Packaging.startAnalyzer(this, true)
 								}
+								powershell "vc-build Compile ${versionSuffixArg}"
 							}
 						}
 						else
 						{
-							withSonarQubeEnv('VC Sonar Server'){
-								powershell "vc-build SonarQubeStart -SonarUrl ${env.SONAR_HOST_URL} -SonarAuthToken \"${env.SONAR_AUTH_TOKEN}\" -skip Restore+Compile"
+							//powershell "vc-build SonarQubeStart -SonarUrl ${env.SONAR_HOST_URL} -SonarAuthToken \"${env.SONAR_AUTH_TOKEN}\" -skip Restore+Compile"
+							if(env.BRANCH_NAME.startsWith('support/2.x'))
+							{
+								Packaging.startAnalyzer(this, true)
 							}
-							powershell "vc-build Compile"
+							powershell "vc-build Compile ${versionSuffixArg}"
 						}
 					}
 				}
@@ -165,17 +171,20 @@ def call(body) {
 					}
 					else
 					{
-                    	powershell "vc-build Test -TestsFilter \"Category=Unit|Category=CI\" -skip Restore+Compile"
+                    	powershell "vc-build Test -TestsFilter \"Category=Unit|Category=CI\" -skip"
 					}
                 } 
 
-                stage('Quality Gate'){
-                    // Packaging.endAnalyzer(this)
-                    withSonarQubeEnv('VC Sonar Server'){
-                        powershell "vc-build SonarQubeEnd -SonarUrl ${env.SONAR_HOST_URL} -SonarAuthToken ${env.SONAR_AUTH_TOKEN} -skip Restore+Compile+SonarQubeStart"
-                    }
-                    Packaging.checkAnalyzerGate(this)
-                }  
+				if(env.BRANCH_NAME.startsWith('support/2.x') || (Utilities.isPullRequest && env.CHANGE_TARGET.startsWith('support/2.x')))
+				{
+					stage('Quality Gate'){
+						// withSonarQubeEnv('VC Sonar Server'){
+						// 	powershell "vc-build SonarQubeEnd -SonarUrl ${env.SONAR_HOST_URL} -SonarAuthToken ${env.SONAR_AUTH_TOKEN} -skip Restore+Compile+SonarQubeStart"
+						// }
+						Packaging.endAnalyzer(this)
+						Packaging.checkAnalyzerGate(this)
+					} 
+				} 
 			
 				def version = Utilities.getAssemblyVersion(this, webProject)
 				def dockerImage

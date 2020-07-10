@@ -66,35 +66,35 @@ def call(body) {
                 stage('Build'){
                     if(Utilities.isPullRequest(this))
                     {
-                        withSonarQubeEnv('VC Sonar Server'){
+                        // withSonarQubeEnv('VC Sonar Server'){
                             withEnv(["BRANCH_NAME=${env.CHANGE_BRANCH}"])
                             {
-                                powershell "vc-build SonarQubeStart -SonarUrl ${env.SONAR_HOST_URL} -SonarAuthToken \"${env.SONAR_AUTH_TOKEN}\" -PullRequest -GitHubToken ${env.GITHUB_TOKEN} -skip Restore+Compile"
+                                // powershell "vc-build SonarQubeStart -SonarUrl ${env.SONAR_HOST_URL} -SonarAuthToken \"${env.SONAR_AUTH_TOKEN}\" -PullRequest -GitHubToken ${env.GITHUB_TOKEN} -skip Restore+Compile"
                                 powershell "vc-build Compile"
                             }
-                        }
+                        // }
                     }
                     else
                     {
-                        withSonarQubeEnv('VC Sonar Server'){
-                            powershell "vc-build SonarQubeStart -SonarUrl ${env.SONAR_HOST_URL} -SonarAuthToken \"${env.SONAR_AUTH_TOKEN}\" -skip Restore+Compile"
-                        }
+                        // withSonarQubeEnv('VC Sonar Server'){
+                        //     powershell "vc-build SonarQubeStart -SonarUrl ${env.SONAR_HOST_URL} -SonarAuthToken \"${env.SONAR_AUTH_TOKEN}\" -skip Restore+Compile"
+                        // }
                         powershell "vc-build Compile ${versionSuffixArg}"
                     }
                 }
 
                 stage('Unit Tests'){
-                    powershell "vc-build Test -skip Restore+Compile"
+                    powershell "vc-build Test -skip"
                 } 
 
-                stage('Quality Gate'){
-                    sleep time: 15
-                    withSonarQubeEnv('VC Sonar Server'){
-                        powershell "vc-build SonarQubeEnd -SonarUrl ${env.SONAR_HOST_URL} -SonarAuthToken ${env.SONAR_AUTH_TOKEN} -skip"
-                    }
-                    Packaging.checkAnalyzerGate(this)
-                    // Packaging.endAnalyzer(this)
-                }
+                // stage('Quality Gate'){
+                //     sleep time: 15
+                //     withSonarQubeEnv('VC Sonar Server'){
+                //         powershell "vc-build SonarQubeEnd -SonarUrl ${env.SONAR_HOST_URL} -SonarAuthToken ${env.SONAR_AUTH_TOKEN} -skip"
+                //     }
+                //     Packaging.checkAnalyzerGate(this)
+                //     // Packaging.endAnalyzer(this)
+                // }
                  
 
                 stage('Packaging'){                
