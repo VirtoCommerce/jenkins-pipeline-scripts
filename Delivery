@@ -74,11 +74,11 @@ pipeline {
 
                     def envChoices = SETTINGS.getBranches().join("\n")
                     def userEnvInput = input message: "Select Environment", parameters: [
-                        booleanParam(name: 'Update AZURE Environment', defaultValue: false),
+                        booleanParam(name: 'AZURE Environment Update', defaultValue: false),
                         choice(name: 'Environments', choices: envChoices)
                     ]
-                    CREATE_AZURE_ENV = envChoices['Update AZURE Environment']
-                    ENV_NAME = userEnvInput
+                    CREATE_AZURE_ENV = userEnvInput['AZURE Environment Update']
+                    ENV_NAME = userEnvInput['Environments']
                     SETTINGS.setBranch(ENV_NAME)
                     
                     def userInputBranch
