@@ -1,7 +1,4 @@
-def Modules
-def Packaging
-def Utilities
-def GithubRelease
+import jobs.scripts.*
 
 def call(body) {
 	// evaluate the body block, and collect configuration into the object
@@ -14,12 +11,6 @@ def call(body) {
 
     node {
         properties([disableConcurrentBuilds()])
-
-        def globalLib = library('global-shared-lib').com.test
-		Utilities = globalLib.Utilities
-		Packaging = globalLib.Packaging
-		Modules = globalLib.Modules
-        GithubRelease = globalLib.GithubRelease
 
         def escapedBranch = env.BRANCH_NAME.replaceAll('/', '_')
         def repoName = Utilities.getRepoName(this)

@@ -2,43 +2,29 @@ package jobs.scripts;
 
 import groovy.io.FileType
 
-class Utilities
-{
-
+class Utilities {
     private static String DefaultSharedLibName = 'virto-shared-library'
     private static String DefaultAdminDockerPrefix = 'http://localhost'
-    private static Integer DefaultPlatformPort = 8101
-    private static Integer DefaultStorefrontPort = 8081
-    private static Integer DefaultSqlPort = 1434
+    private static String DefaultPlatformCoreDockerPrefix = 'http://localhost'
+    private static String DefaultOrgName = 'VirtoCommerce'
+    private static Integer DefaultPlatformPort = 9101
+    private static Integer DefaultStorefrontPort = 9081
+    private static Integer DefaultSqlPort = 1434 
 
-    /**
-     * Get the folder name for a job.
-     *
-     * @param project Project name (e.g. dotnet/coreclr)
-     * @return Folder name for the project. Typically project name with / turned to _
-     */
-    def static getFolderName(String project) {
-        return project.replace('/', '_')
+    def static getOrgName(context){
+        return DefaultOrgName
     }
-
     def static getRepoName(context)
     {
         def tokens = "${context.env.JOB_NAME}".tokenize('/')
         def REPO_NAME = tokens[1]
         return REPO_NAME
     }
-
-    def static getOrgName(context)
-    {
-        return "VirtoCommerce"
-    }
-
     def static getRepoNamePrefix(context){
         def repoName = getRepoName(context)
         def tokens = repoName.tokenize("-")
         return tokens[0]
     }
-
     def static getProjectType(context){
         def repoName = getRepoName(context)
         def tokens = repoName.tokenize("-")
@@ -47,7 +33,26 @@ class Utilities
 
     def static runSharedPS(context, scriptName, args = '')
     {
- 	    context.bat script: "powershell.exe -File \"${context.env.WORKSPACE}\\..\\workspace@libs\\${DefaultSharedLibName}\\resources\\azure\\${scriptName}\" ${args} -ErrorAction Stop".replaceAll('%', '%%'), label: scriptName
+        context.bat script: "powershell.exe -File \"${context.env.WORKSPACE}\\..\\workspace@libs\\${DefaultSharedLibName}\\resources\\azure\\${scriptName}\" ${args} -ErrorAction Stop".replaceAll('%', '%%'), label: scriptName
+    }
+    def static runPS(context, scriptName, args = '')
+    {
+        def scriptRoot = "${context.env.WORKSPACE}/../workspace@libs/${DefaultSharedLibName}/resources/"
+        if(context.env.NODE_NAME != 'master')
+            scriptRoot = "${context.env.WORKSPACE}/resources/"
+        context.pwsh script: "${scriptRoot}${scriptName} ${args} -ErrorAction Stop", label: scriptName
+    }
+    def static setSharedLibName(name){
+        DefaultSharedLibName = name
+    }
+
+    def static runGlobalScript(context, scriptName, args = ''){
+        def scriptsRoot = "scripts"
+        def scriptContent = context.libraryResource("${scriptsRoot}\\${scriptName}")
+        def tmpScriptFile = "${context.env.WORKSPACE}@tmp\\scripts\\${scriptName}"
+        context.writeFile file: tmpScriptFile, text: scriptContent
+        context.powershell script: "${tmpScriptFile} ${args}", label: scriptName
+        new File(tmpScriptFile).delete()
     }
 
     def static getAssemblyVersion(context, projectFile)
@@ -78,7 +83,7 @@ class Utilities
     {
         context.echo "Searching for version inside package.json file"
         def inputFile = context.readFile('package.json')
-        def json = Utilities.jsonParse(inputFile)
+        def json = jsonParse(inputFile)
 
         def version = json.version
         context.echo "Found version ${version}"
@@ -116,7 +121,7 @@ class Utilities
 
     def static getComposeFolder(context)
     {
-        def wsFolder = context.pwd()
+        def wsFolder = context.env.WORKSPACE
 		def composeDir = "$wsFolder\\..\\workspace@libs\\${DefaultSharedLibName}\\resources"
 		if(context.projectType == 'NETCORE2') {
 		    composeDir = "$composeDir\\docker.core\\windowsnano"
@@ -124,7 +129,15 @@ class Utilities
 		    composeDir = "$composeDir\\docker"
 		}
         return composeDir
-    }    
+    }
+
+    def static getComposeFolderV3(context)
+    {
+        def wsFolder = context.env.WORKSPACE
+        def composeDir = "$wsFolder\\..\\workspace@libs\\${DefaultSharedLibName}\\resources"
+        composeDir = "$composeDir\\docker_v3"
+        return composeDir
+    }
 
     def static getArtifactFolder(context)
     {
@@ -142,14 +155,18 @@ class Utilities
 
     def static getWebPublishFolder(context, String websiteDir)
     {
-        def tempFolder = Utilities.getTempFolder(context)
-        def websitePath = "$tempFolder\\_PublishedWebsites\\${websiteDir}"
+        def tempFolder = getTempFolder(context)
+        def websitePath = "${tempFolder}\\_PublishedWebsites\\${websiteDir}"
         return websitePath 
     }
 
     def static getPlatformHost(context)
     {
         return "${DefaultAdminDockerPrefix}:${getPlatformPort(context)}"
+    }
+    def static getPlatformCoreHost(context)
+    {
+        return "${DefaultPlatformCoreDockerPrefix}:${getPlatformPort(context)}"
     }
 
     def static getTempFolder(context)
@@ -158,19 +175,12 @@ class Utilities
         return tempFolder
     }
 
-    def static checkLogForWarnings(context){
-        if(context.env['WARNINGS'] && context.currentBuild.result != 'FAILED'){
-            context.currentBuild.result = 'UNSTABLE'
-            context.echo "WARNINGS:\n${context.env.WARNINGS}"
-        }
-    }
-
     def static notifyBuildStatus(context, webHook, message='', status = '')
     {
         def warnings = context.env.WARNINGS ? "WARNINGS:<br/>${context.env.WARNINGS}" : ''
         if(message != '')
             message = "${message}<br/>${warnings}"
-        def color 
+        def color
         switch(status) {
             case 'STARTED':
                 color = '428bca'
@@ -196,7 +206,7 @@ class Utilities
         }
         context.echo "Status is: ${status}; color: ${color}"
         context.office365ConnectorSend message: message, status:status, webhookUrl:webHook, color: color
-    }    
+    }
 
     def static getPlatformPort(context)
     {
@@ -223,7 +233,6 @@ class Utilities
         def instance = Jenkins.getInstance()
         def globalNodeProperties = instance.getGlobalNodeProperties()
         def envVarsNodePropertyList = globalNodeProperties.getAll(hudson.slaves.EnvironmentVariablesNodeProperty.class)
-
         def newEnvVarsNodeProperty = null
         def envVars = null
 
@@ -242,7 +251,7 @@ class Utilities
         {
             currentOrder = tempCurrentOrder.toInteger() + 1
             
-            if(currentOrder >= 20) // reset, we can't have more than 20 builders at the same time
+            if(currentOrder >= 20) // reset, we can't have more than 10 builders at the same time
             {
                 currentOrder = 0
             }
@@ -285,13 +294,14 @@ class Utilities
             throw new Exception("can't create coverage folder: " + coverageFolder); 
         } 
 
+        def oldStyle = Utilities.getProjectType(context) == 'storefront' || context.env.BRANCH_NAME == 'release/3.0.0' ? '-oldStyle' : ''
             
         def pdbDirs = getPDBDirsStr(context)
         if(isNetCore(context.projectType)){
-            context.bat "\"${context.env.OPENCOVER}\\opencover.console.exe\" -returntargetcode -oldStyle -searchdirs:\"${pdbDirs}\" -register:user -filter:\"+[Virto*]* -[xunit*]*\" -output:\"${coverageFolder}\\VisualStudio.Unit.coveragexml\" -target:\"${context.env.DOTNET_PATH}\\dotnet.exe\" -targetargs:\"vstest ${paths} /TestCaseFilter:(${traits}) /Enablecodecoverage\""
+            context.powershell "${context.env.OPENCOVER}\\opencover.console.exe --% -returntargetcode ${oldStyle} -searchdirs:\"${pdbDirs}\" -register:user -filter:\"+[Virto*]* -[xunit*]*\" -output:\"${coverageFolder}\\VisualStudio.Unit.coveragexml\" -target:\"${context.env.DOTNET_PATH}\\dotnet.exe\" -targetargs:\"vstest ${paths} /TestCaseFilter:(${traits}) /Enablecodecoverage\""
         }
         else{
-            context.bat "\"${context.env.OPENCOVER}\\opencover.console.exe\" -returntargetcode -oldStyle -searchdirs:\"${pdbDirs}\" -register:user -filter:\"+[*]* -[Moq]* -[xunit*]* -[Common.*]*\" -output:\"${coverageFolder}\\VisualStudio.Unit.coveragexml\" -target:\"${context.env.DOTNET_PATH}\\dotnet.exe\" -targetargs:\"vstest ${paths} /TestCaseFilter:(${traits}) /Enablecodecoverage\""
+            context.powershell "${context.env.OPENCOVER}\\opencover.console.exe --% -returntargetcode ${oldStyle} -searchdirs:\"${pdbDirs}\" -register:user -filter:\"+[*]* -[Moq]* -[xunit*]* -[Common.*]*\" -output:\"${coverageFolder}\\VisualStudio.Unit.coveragexml\" -target:\"${context.env.DOTNET_PATH}\\dotnet.exe\" -targetargs:\"vstest ${paths} /TestCaseFilter:(${traits}) /Enablecodecoverage\""
         }
         context.step([$class: 'XUnitPublisher', testTimeMargin: '3000', thresholdMode: 1, thresholds: [[$class: 'FailedThreshold', failureNewThreshold: '', failureThreshold: '', unstableNewThreshold: '', unstableThreshold: ''], [$class: 'SkippedThreshold', failureNewThreshold: '', failureThreshold: '', unstableNewThreshold: '', unstableThreshold: '']], tools: [[$class: 'XUnitDotNetTestType', deleteOutputFiles: true, failIfNotNew: false, pattern: resultsFileName, skipNoTestFiles: true, stopProcessingIfError: false]]])
     }
@@ -379,12 +389,13 @@ class Utilities
         def pdbDirs = []
         def currentDir = new File(context.pwd())
         currentDir.eachDirRecurse(){ dir->
-            if(dir.getPath() =~ /.*\\bin/)
+            if(dir.getPath() =~ /.*\\bin/ && !dir.getPath().contains("runtimes"))
                 pdbDirs << dir.path
         }
         return pdbDirs
     }
-    def static getPDBDirsStr(context){
+    def static getPDBDirsStr(context)
+    {
         return getPDBDirs(context).join(';')
     }
     def static isNetCore(projectType){
@@ -404,17 +415,18 @@ class Utilities
         return swagPaths
     }
 
-    def static validateSwagger(context, schemaPath) {
-        context.echo "Swagger validation"
+    def static validateSwagger(context, schemaPath)
+    {
         Packaging.createSwaggerSchema(context, schemaPath)
-        
+
         def schemaFile = new File(schemaPath)
         if(schemaFile.exists() && schemaFile.length()>500){
-		    context.bat "node.exe ${context.env.NODE_MODULES}\\swagger-cli\\bin\\swagger-cli.js validate ${schemaPath}"
+            context.bat "node.exe ${context.env.NODE_MODULES}\\swagger-cli\\bin\\swagger-cli.js validate ${schemaPath}"
         }
     }
 
-    def static getFailedStageStr(logArray) {
+    def static getFailedStageStr(logArray)
+    {
         def log = logArray
         def startIndex = 30
         def i = 1
@@ -437,14 +449,20 @@ class Utilities
 			name = 'Not found'
         return name
     }
-    def static getMailBody(context, stageName, stageLog) {
+    def static getMailBody(context, stageName, stageLog)
+    {
         def result = "Failed Stage: ${stageName}\n${context.env.JOB_URL}\n\n\n${stageLog}"
         return result
     }
 
-    def static getPlatformContainer(context){
+    def static getPlatformContainer(context)
+    {
         def tag = context.env.BUILD_TAG.toLowerCase()
-        tag = tag.replaceAll("\\.", '')
+        tag = tag.replaceAll("\\.", '').replaceAll('%', '')
+        if(context.isUnix())
+        {
+            tag = tag.replaceAll("-", "")
+        }
         def containerId = 'vc-platform-web'
         return "${tag}_${containerId}_1"
     }
@@ -452,12 +470,17 @@ class Utilities
         def tag = context.env.BUILD_TAG.toLowerCase()
         tag = tag.replaceAll("%", '')
         tag = tag.replaceAll("\\.", '')
+        if(context.isUnix())
+        {
+            tag = tag.replaceAll("-", "")
+        }
         def containerId = 'vc-storefront-web'
         return "${tag}_${containerId}_1"
     }
 
     @NonCPS
-    def static cleanNugetFolder(context){
+    def static cleanNugetFolder(context)
+    {
         String folderPath = "${context.pwd()}\\NuGet"
         new File(folderPath).eachFile (FileType.FILES) { file ->
             context.echo "found file: ${file.name}"
@@ -468,24 +491,25 @@ class Utilities
         }
     }
 
-    def static getE2EDir(context){
+    def static getE2EDir(context)
+    {
         def tmp = Utilities.getTempFolder(context)
 		return "${tmp}\\e2e"
     }
 
 
-    def static getE2ETests(context){
+    def static getE2ETests(context, repoUrl, branchName)
+    {
         //context.git credentialsId: 'github', url: 'https://github.com/VirtoCommerce/vc-platform-qg.git'
-        context.git credentialsId: 'github', url: 'https://github.com/VirtoCommerce/vc-com-qg.git', branch: 'dev'
+        context.git credentialsId: 'github', url: repoUrl, branch: branchName
     }
 
-    def static runE2E(context)
+    def static runE2E(context, e2eDir, config)
     {
-        def e2eDir = Utilities.getE2EDir(context)
         context.dir(e2eDir){
             context.deleteDir()
             getE2ETests(context)
-            def sfPort = Utilities.getStorefrontPort(context)
+            def sfPort = getStorefrontPort(context)
             def DefaultAdminDockerPrefix = "https://vc-public-test.azurewebsites.net/"
             def autoPilot = "https://api2.autopilothq.com/"
             def allureResultsPath = "${context.env.WORKSPACE}\\allure-results"
@@ -494,9 +518,8 @@ class Utilities
                 context.deleteDir()
             }
             def allureResultsEsc = allureResultsPath.replace("\\", "\\\\")
-            def jsonConf = "{\\\"output\\\":\\\"${allureResultsEsc}\\\",\\\"helpers\\\":{\\\"REST\\\":{\\\"endpoint\\\":\\\"${autoPilot}\\\"},\\\"WebDriver\\\":{\\\"url\\\":\\\"${DefaultAdminDockerPrefix}\\\"}}}"
-            context.withEnv(["vcapikey=${context.env.vcapikey_e2e}"])
-            {
+            def jsonConf = config//"{\\\"output\\\":\\\"${allureResultsEsc}\\\",\\\"helpers\\\":{\\\"REST\\\":{\\\"endpoint\\\":\\\"${autoPilot}\\\"},\\\"WebDriver\\\":{\\\"url\\\":\\\"${DefaultAdminDockerPrefix}\\\"}}}"
+            context.withEnv(["vcapikey=${context.env.vcapikey_e2e}"]){
                 context.bat "${context.env.NODE_MODULES}\\.bin\\codeceptjs.cmd run -o \"${jsonConf}\""
             }
         }
@@ -506,66 +529,22 @@ class Utilities
         context.allure includeProperties: false, jdk: '', results: [[path: "./../workspace@tmp/output"]]
     }
 
-    def static getAzureTemplateDir(context)
+    def static isPullRequest(context)
     {
-        def tmp = Utilities.getTempFolder(context)
-		return "${tmp}\\azure_template"
-    }
-
-    def static getAzureTemplate(context)
-    {
-        def prefix = getRepoNamePrefix(context)
-        context.git credentialsId: context.env.GITHUB_CREDENTIALS_ID, url: "https://github.com/VirtoCommerce/${prefix}-arm-templates.git"
-    }
-
-    def static createInfrastructure(context, project = 'blank')
-    {
-        //def AzureTempDir = Utilities.getAzureTemplateDir(context)
-        def AzureTempDir = "..\\workspace@libs\\virto-shared-library\\resources\\azure\\arm-templates" // Azure Resource Manager templates path
-        context.dir(AzureTempDir)
-        {
-            switch(project)
-            {
-                case 'bulk-update/dev':
-                    Utilities.runSharedPS(context, "arm-templates//vc-CreateInfrastructureBulkUpdateDev.ps1")
-                    break
-                case 'bulk-update/master':
-                    Utilities.runSharedPS(context, "arm-templates//vc-CreateInfrastructureBulkUpdateQA.ps1")
-                    break
-                case 'JS':
-                    Utilities.runSharedPS(context, "arm-templates//vc-CreateInfrastructureJsShoppingCartIntegrationSample.ps1")
-                    break
-                case 'DEV-VC':
-                    Utilities.runSharedPS(context, "arm-templates//vc-CreateInfrastructureDEV-VC.ps1")
-                    break
-                case 'PROD-VC':
-                    Utilities.runSharedPS(context, "arm-templates//vc-CreateInfrastructurePROD-VC.ps1")
-                    break
-                case 'DEV-demoVC':
-                    Utilities.runSharedPS(context, "arm-templates//vc-CreateInfrastructureDEV-demoVC.ps1")
-                    break
-                case 'QA-demoVC':
-                    Utilities.runSharedPS(context, "arm-templates//vc-CreateInfrastructureQA-demoVC.ps1")
-                    break
-                case 'PROD-demoVC':
-                    Utilities.runSharedPS(context, "arm-templates//vc-CreateInfrastructurePROD-demoVC.ps1")
-                    break
-            }
-        }
-    }
-
-    def static isPullRequest(context){
         return context.env.BRANCH_NAME.startsWith("PR-")
     }
-    def static getPullRequestNumber(context){
+    def static getPullRequestNumber(context)
+    {
         def number = context.env.BRANCH_NAME.replace('PR-', '')
         return number
     }
 
     
     @NonCPS
-    def getUserCause(){
-        for (cause in currentBuild.rawBuild.getCauses()) {
+    def getUserCause()
+    {
+        for (cause in currentBuild.rawBuild.getCauses())
+        {
             if (cause instanceof Cause.UserIdCause) {
                 return cause.getUserName()
             }
@@ -601,15 +580,17 @@ class Utilities
         ])
     }
 
-    def static cleanPRFolder(context){
+    def static cleanPRFolder(context)
+    {
         if(Utilities.isPullRequest(context)){
             context.cleanWs notFailBuild: true
         }
     }
 
-    def static runBatchScript(context, command){
+    def static runBatchScript(context, command)
+    {
         def outFile = "log${context.env.BUILD_NUMBER}.out"
-        def exitCode = context.bat script: "${command} > ${outFile}", returnStatus:true
+        def exitCode = context.bat script: "${command} > ${outFile}", returnStatus:true, label: command
         def res = [:]
         def fileContent = context.readFile(outFile).trim()
         context.echo fileContent
@@ -618,21 +599,31 @@ class Utilities
         context.bat "del ${outFile} /F /Q"
         return res
     }
-    
-    @NonCPS
-    def static getSubfolders(path){
-        def  dirsl = [] 
-        new File(path).eachDir()
-        {
-            dirs ->
-            if (!dirs.getName().startsWith('.')) {
-                dirsl.add(dirs.getName())
-            }
+
+    def static checkLogForWarnings(context)
+    {
+        if(context.env['WARNINGS'] && context.currentBuild.result != 'FAILED'){
+            context.currentBuild.result = 'UNSTABLE'
+            context.echo "WARNINGS:\n${context.env.WARNINGS}"
         }
+    }
+
+    @NonCPS
+    def static getSubfolders(path)
+    {
+        def  dirsl = []
+        new File(path).eachDir()
+            {
+            dirs ->
+                if (!dirs.getName().startsWith('.')) {
+                    dirsl.add(dirs.getName())
+                }
+            }
         return dirsl
     }
 
-    def static checkReleaseVersion(context, version){
+    def static checkReleaseVersion(context, version)
+    {
         if(Utilities.isReleaseBranch(context)){
             def ghAssetNameStartsWith = "v"
             def latestAsset = GithubRelease.getLatestGithubRelease(context, Utilities.getOrgName(context), Utilities.getRepoName(context), ghAssetNameStartsWith)
@@ -646,7 +637,7 @@ class Utilities
 
     def static getRepoChanges(context)
     {
-        String result = context.bat (returnStdout: true, script: "@\"${context.tool 'Git'}\" log -1 --pretty=\"format:\" --name-only", label: "git log -1").trim()        
+        String result = context.bat (returnStdout: true, script: "@\"${context.tool 'Git'}\" log -1 --pretty=\"format:\" --name-only", label: "git log -1").trim()
         def lines = result.split("\r?\n")
         return lines as String[]
     }
@@ -663,11 +654,71 @@ class Utilities
         }
         return result
     }
-
-    def isDockerRegion(REGION, BRANCH_NAME){
-        if(REGION == 'demo3' && BRANCH_NAME == 'dev'){
-            return true
+    def static createInfrastructure(context, project = 'blank')
+    {
+        //def AzureTempDir = Utilities.getAzureTemplateDir(context)
+        def AzureTempDir = "..\\workspace@libs\\virto-shared-library\\resources\\azure\\arm-templates" // Azure Resource Manager templates path
+        context.dir(AzureTempDir)
+        {
+            switch(project)
+            {
+                case 'bulk-update/dev':
+                    Utilities.runSharedPS(context, "arm-templates//vc-CreateInfrastructureBulkUpdateDev.ps1")
+                    break
+                case 'bulk-update/master':
+                    Utilities.runSharedPS(context, "arm-templates//vc-CreateInfrastructureBulkUpdateQA.ps1")
+                    break
+                case 'JS':
+                    Utilities.runSharedPS(context, "arm-templates//vc-CreateInfrastructureJsShoppingCartIntegrationSample.ps1")
+                    break
+                case 'DEV-VC':
+                    Utilities.runSharedPS(context, "arm-templates//vc-CreateInfrastructureDEV-VC.ps1")
+                    break
+                case 'PROD-VC':
+                    Utilities.runSharedPS(context, "arm-templates//vc-CreateInfrastructurePROD-VC.ps1")
+                    break
+                case 'DEV-demoVC':
+                    Utilities.runSharedPS(context, "arm-templates//vc-CreateInfrastructureDEV-demoVC.ps1")
+                    break
+                case 'QA-demoVC':
+                    Utilities.runSharedPS(context, "arm-templates//vc-CreateInfrastructureQA-demoVC.ps1")
+                    break
+                case 'PROD-demoVC':
+                    Utilities.runSharedPS(context, "arm-templates//vc-CreateInfrastructurePROD-demoVC.ps1")
+                    break
+            }
         }
-        return false
+    }
+    @NonCPS
+    def static cleanReleaseNotes(context, text)
+    {
+        def jiraTasksRegex = /(?m)^#*[A-Z]{2,5}-\d{2,4}:{0,1}\s*/
+        def mergeRegex = /(?m)^Merge.*$/
+        def result = text.replaceAll(jiraTasksRegex, "").replaceAll(mergeRegex, "")
+        return result
+    }
+    def static getReleaseNotesFromCommits(context, since)
+    {
+        def gitOut = context.pwsh(script: "git log --pretty=format:\"%s (%h)\" --since=\"${since}\"", returnStdout: true).trim()
+        return cleanReleaseNotes(context, gitOut).replaceAll("\r", "").replaceAll("\n", "<br />").replaceAll("\"", "").replaceAll("<br /><br />", "<br />")
+    }
+
+    def static getCommitNumber(context)
+    {
+        def result = context.pwsh(script: "git rev-list --count ${context.env.BRANCH_NAME}", returnStdout: true).trim()
+        if(!result.isNumber())
+        {
+            throw new Exception("Wrong commit number!")
+        }
+        return result
+    }
+    def static getCommitHash(context)
+    {
+        if(Utilities.isPullRequest(context))
+        {
+            return null
+        }
+        def result = context.pwsh(script: "git log --pretty=format:\"%h\" -1", returnStdout: true).trim()
+        return result
     }
 }

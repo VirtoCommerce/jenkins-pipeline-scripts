@@ -1,4 +1,5 @@
 #!groovy
+import jobs.scripts.*
 
 // module script
 def call(body) {
@@ -18,12 +19,6 @@ def call(body) {
 		def solution = 'VirtoCommerce.Storefront'
 		projectType = "NETCORE2"
 
-		
-		def globalLib = library('global-shared-lib').com.test
-		def Utilities = globalLib.Utilities
-		def Packaging = globalLib.Packaging
-		def Docker = globalLib.Docker
-		
 		def webProject = 'VirtoCommerce.Platform.Web\\VirtoCommerce.Platform.Web.csproj'
 		def zipArtifact = 'VirtoCommerce.Platform'
 		def websiteDir = 'VirtoCommerce.Platform.Web'
@@ -39,7 +34,7 @@ def call(body) {
 		configFileProvider([configFile(fileId: 'shared_lib_settings', variable: 'SETTINGS_FILE')]) {
 			settingsFileContent = readFile(SETTINGS_FILE)
 		}
-		SETTINGS = globalLib.Settings.new(settingsFileContent)
+		SETTINGS = new Settings(settingsFileContent)
 		SETTINGS.setBranch(env.BRANCH_NAME)
 		
 		if(projectType == null)

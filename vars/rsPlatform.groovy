@@ -1,6 +1,4 @@
-def Modules
-def Packaging
-def Utilities
+import jobs.scripts.*
 
 def call(body) {
 	// evaluate the body block, and collect configuration into the object
@@ -14,11 +12,6 @@ def call(body) {
     node {
         properties([disableConcurrentBuilds()])
 
-        def globalLib = library('global-shared-lib').com.test
-		Utilities = globalLib.Utilities
-		Packaging = globalLib.Packaging
-		Modules = globalLib.Modules
-
         def escapedBranch = env.BRANCH_NAME.replaceAll('/', '_')
         def repoName = Utilities.getRepoName(this)
         def workspace = "D:\\Buildsv3\\${repoName}\\${escapedBranch}"
@@ -30,7 +23,7 @@ def call(body) {
             configFileProvider([configFile(fileId: 'shared_lib_settings', variable: 'SETTINGS_FILE')]) {
                 settingsFileContent = readFile(SETTINGS_FILE)
             }
-            SETTINGS = globalLib.Settings.new(settingsFileContent)
+            SETTINGS = new Settings(settingsFileContent)
             SETTINGS.setProject('platform-core')
             SETTINGS.setBranch(env.BRANCH_NAME)
             Utilities.notifyBuildStatus(this, SETTINGS['of365hook'], '', 'STARTED')
