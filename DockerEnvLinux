@@ -1,8 +1,6 @@
 import groovy.util.*
 import groovy.json.JsonSlurperClassic
-
-def globalLib = library('global-shared-lib').com.test
-def Utilities = globalLib.Utilities
+import jobs.scripts.*
 
 def solutionRoot = params.SolutionRoot
 def platformTag = params.PlatformTag

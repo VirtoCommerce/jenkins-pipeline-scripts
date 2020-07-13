@@ -1,7 +1,4 @@
-def Modules
-def Packaging
-def Utilities
-def GithubRelease
+import jobs.scripts.*
 
 def call(body) {
 	// evaluate the body block, and collect configuration into the object
@@ -15,18 +12,11 @@ def call(body) {
     node {
         properties([disableConcurrentBuilds()])
 
-        def globalLib = library('global-shared-lib').com.test
-		Utilities = globalLib.Utilities
-		Packaging = globalLib.Packaging
-		Modules = globalLib.Modules
-        GithubRelease = globalLib.GithubRelease
-
-        def escapedBranch = env.BRANCH_NAME.replaceAll('/', '_')
-        def repoName = Utilities.getRepoName(this)
-        def workspace = "S:\\Buildsv3\\${repoName}\\${escapedBranch}"
-        def releaseNotesPath = "${workspace}\\release_notes.txt"
         projectType = 'NETCORE2'
-        dir(workspace){
+        def workspace = env.WORKSPACE.replaceAll('%2F', '_')
+        def releaseNotesPath = "${workspace}\\release_notes.txt"
+		dir(workspace)
+        {
             // def SETTINGS
             // def settingsFileContent
             // configFileProvider([configFile(fileId: 'shared_lib_settings', variable: 'SETTINGS_FILE')]) {

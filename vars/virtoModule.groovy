@@ -1,10 +1,8 @@
 #!groovy
 import groovy.json.*
 import groovy.util.*
+import jobs.scripts.*
 
-def Modules
-def Packaging
-def Utilities
 
 def call(body) {
 
@@ -17,10 +15,6 @@ def call(body) {
     node
     {
 		properties([disableConcurrentBuilds()])
-		def globalLib = library('global-shared-lib').com.test
-		Utilities = globalLib.Utilities
-		Packaging = globalLib.Packaging
-		Modules = globalLib.Modules
 
 		def workspace = env.WORKSPACE.replaceAll('%2F', '_')
 		dir(workspace)
@@ -40,7 +34,7 @@ def call(body) {
 			configFileProvider([configFile(fileId: 'shared_lib_settings', variable: 'SETTINGS_FILE')]) {
 				settingsFileContent = readFile(SETTINGS_FILE)
 			}
-			SETTINGS = globalLib.Settings.new(settingsFileContent)
+			SETTINGS = new Settings(settingsFileContent)
 			SETTINGS.setBranch(env.BRANCH_NAME)
 			SETTINGS.setProject('module')
 			if(env.BRANCH_NAME == '1.1.3')

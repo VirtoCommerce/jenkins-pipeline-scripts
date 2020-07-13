@@ -5,7 +5,7 @@ class Modules {
     private static String DefaultBranchOrCommitPR = '${sha1}'
     private static String DefaultBranchOrCommitPush = '*/master'
     private static String DefaultRefSpec = '+refs/pull/*:refs/remotes/origin/pr/*'
-    private static String DefaultMSBuild = 'MSBuild'  
+    private static String DefaultMSBuild = 'MSBuild'
 
     def static createModuleArtifact(context, def manifestDirectory)
     {
@@ -14,23 +14,23 @@ class Modules {
         def packagesDir = Utilities.getArtifactFolder(context)
 
         context.dir(packagesDir)
-        {
-            context.deleteDir()
-        }
+                {
+                    context.deleteDir()
+                }
 
         // create artifacts
         context.dir(manifestDirectory)
-        {
-            def projects = context.findFiles(glob: '*.csproj')
-            if (projects.size() > 0) {
-                for (int i = 0; i < projects.size(); i++)
                 {
-                    def project = projects[i]
-                    def path = project.name
-                    context.bat "\"${context.tool DefaultMSBuild}\" \"${path}\" /nologo /verbosity:m /t:Clean,PackModule /p:Configuration=Release /p:Platform=AnyCPU /p:DebugType=none /p:AllowedReferenceRelatedFileExtensions=.xml \"/p:OutputPath=$tempDir\" \"/p:VCModulesOutputDir=$modulesDir\" \"/p:VCModulesZipDir=$packagesDir\""
+                    def projects = context.findFiles(glob: '*.csproj')
+                    if (projects.size() > 0) {
+                        for (int i = 0; i < projects.size(); i++)
+                        {
+                            def project = projects[i]
+                            def path = project.name
+                            context.bat "\"${context.tool DefaultMSBuild}\" \"${path}\" /nologo /verbosity:m /t:Clean,PackModule /p:Configuration=Release /p:Platform=AnyCPU /p:DebugType=none /p:AllowedReferenceRelatedFileExtensions=.xml \"/p:OutputPath=$tempDir\" \"/p:VCModulesOutputDir=$modulesDir\" \"/p:VCModulesZipDir=$packagesDir\""
+                        }
+                    }
                 }
-            }
-        }
     }
 
     def static installModuleArtifacts(context)
@@ -38,9 +38,9 @@ class Modules {
         def packagesDir = Utilities.getArtifactFolder(context)
         def packages;
         context.dir(packagesDir)
-        {
-            packages = context.findFiles(glob: '*.zip')
-        }
+                {
+                    packages = context.findFiles(glob: '*.zip')
+                }
 
         if (packages.size() > 0) {
             for (int i = 0; i < packages.size(); i++)
@@ -71,7 +71,7 @@ class Modules {
     {
         def paths = Modules.prepareTestEnvironment(context)
         Utilities.runUnitTest(context, traits, paths, resultsFileName)
-    }    
+    }
 
     def static prepareTestEnvironment(context)
     {
@@ -85,7 +85,7 @@ class Modules {
             }
         }
 
-            // add platform dll to test installs
+        // add platform dll to test installs
         def packagesDir = Utilities.getArtifactFolder(context)
         def allModulesDir = "c:\\Builds\\Jenkins\\VCF\\modules"
 
@@ -97,10 +97,10 @@ class Modules {
         // copy artifacts to global location that can be used by other modules, but don't do that for master branch as we need to test it with real manifest
         // if (context.env.BRANCH_NAME != 'master') {
         //     context.dir(packagesDir)
-        //     {		
+        //     {
         //         // copy all files to modules
-        //         context.bat "xcopy *.zip \"${allModulesDir}\" /y" 
-        //     }	
+        //         context.bat "xcopy *.zip \"${allModulesDir}\" /y"
+        //     }
         // }
 
         //paths += "\"..\\..\\..\\vc-platform\\${testFolderName}\\workspace\\virtocommerce.platform.tests\\bin\\debug\\VirtoCommerce.Platform.Test.dll\""

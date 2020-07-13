@@ -4,48 +4,55 @@ import groovy.json.JsonSlurperClassic
 
 class Settings implements Serializable
 {
-    private Object _settings
-    private String _environment
-    private String _region
+    private HashMap _settings
+    private String _branch
+    private String _project
     Settings(String json){
         _settings = new JsonSlurperClassic().parseText(json)
     }
     def getAt(String item)
     {
-        if(_region == null)
-            throw new Exception("Settings error: Region is not set")
-        if(_environment == null)
-            throw new Exception("Settings error: Environment is not set")
-        if((item == 'approvers' || item == 'approvers_e2e') & !_settings.containsKey(item))
-            return ''
-        if(_environment.startsWith('PR-')){
+        if(_project == null)
+            throw new Exception("Settings error: Project name is not set")
+        if(_branch == null)
+            throw new Exception("Settings error: Branch name is not set")
+        if(!_settings[_project][_branch]?.containsKey(item))
+        {
             return ''
         }
-        return _settings[_region][_environment][item]
+        def result = _settings[_project][_branch][item]
+        return result
+    }
+    def setProject(String project)
+    {
+        _project = project
     }
     def setRegion(String region)
     {
-        _region = region
+        _project = region
+    }
+    def setBranch(String branch)
+    {
+        _branch = branch
     }
     def setEnvironment(String environment)
     {
-        _environment = environment
+        _branch = environment
     }
-    def getRegions()
+    def getBranches(String project = '')
+    {
+        if(project == '' && _project.trim()){
+
+            return _settings[_project].keySet() as String[]
+        }
+        return _settings[project].keySet() as String[]
+    }
+    String[] getProjects()
     {
         return _settings.keySet() as String[]
     }
-  
-    def getEnvironments(String region = '')
+    def containsProject(String project)
     {
-        if(region == '' && _region.trim()){
-          
-            return _settings[_region].keySet() as String[]
-        }
-        return _settings[region].keySet() as String[]
-    }
-    def containsRegion(String region)
-    {
-        return _settings.containsKey(region)
+        return _settings.containsKey(project)
     }
 }

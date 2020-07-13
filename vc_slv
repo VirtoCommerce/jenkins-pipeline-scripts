@@ -1,5 +1,4 @@
 import jobs.scripts.*
-def GHRelease = library('virto-shared-library').jobs.scripts.GithubRelease
 import groovy.json.JsonSlurperClassic
 
 def SETTINGS
