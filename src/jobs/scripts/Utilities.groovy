@@ -526,20 +526,8 @@ class Utilities
         {
             switch(project)
             {
-                case 'bulk-update/dev':
-                    Utilities.runSharedPS(context, "arm-templates//vc-CreateInfrastructureBulkUpdateDev.ps1")
-                    break
-                case 'bulk-update/master':
-                    Utilities.runSharedPS(context, "arm-templates//vc-CreateInfrastructureBulkUpdateQA.ps1")
-                    break
-                case 'JS':
-                    Utilities.runSharedPS(context, "arm-templates//vc-CreateInfrastructureJsShoppingCartIntegrationSample.ps1")
-                    break
                 case 'DEV-VC':
                     Utilities.runSharedPS(context, "arm-templates//vc-CreateInfrastructureDEV-VC.ps1")
-                    break
-                case 'PROD-VC':
-                    Utilities.runSharedPS(context, "arm-templates//vc-CreateInfrastructurePROD-VC.ps1")
                     break
                 case 'DEV-demoVC':
                     Utilities.runSharedPS(context, "arm-templates//vc-CreateInfrastructureDEV-demoVC.ps1")
@@ -547,8 +535,14 @@ class Utilities
                 case 'QA-demoVC':
                     Utilities.runSharedPS(context, "arm-templates//vc-CreateInfrastructureQA-demoVC.ps1")
                     break
-                case 'PROD-demoVC':
-                    Utilities.runSharedPS(context, "arm-templates//vc-CreateInfrastructurePROD-demoVC.ps1")
+                case 'DEV-demoVC-3':
+                    Utilities.runSharedPS(context, "arm-templates//vc-CreateInfrastructureDEV-demoVC-3.ps1")
+                    break
+                case 'QA-demoVC-3':
+                    Utilities.runSharedPS(context, "arm-templates//vc-CreateInfrastructureQA-demoVC-3.ps1")
+                    break
+                default:
+                    context.echo "No match found."
                     break
             }
         }

@@ -10,6 +10,7 @@ def Settings = globalLib.Settings
 
 def SETTINGS
 
+def CREATE_AZURE_ENV = false
 def DELIVERY_BACKEND = false
 def DELIVERY_FRONTEND = false
 def DELIVERY_THEME = false
@@ -73,8 +74,10 @@ pipeline {
 
                     def envChoices = SETTINGS.getBranches().join("\n")
                     def userEnvInput = input message: "Select Environment", parameters: [
+                        booleanParam(name: 'Update AZURE Environment', defaultValue: false),
                         choice(name: 'Environments', choices: envChoices)
                     ]
+                    CREATE_AZURE_ENV = envChoices['Update AZURE Environment']
                     ENV_NAME = userEnvInput
                     SETTINGS.setBranch(ENV_NAME)
                     
@@ -265,19 +268,22 @@ pipeline {
             }
         }
 
-        // stage("Create / Update Environment"){
-        //     when {
-        //         expression {
-        //             UPDATE_CS
-        //         }
-        //     }
-        //     steps {
-        //         script{
-        //             def resourceGroupName = SETTINGS['resourceGroupName']
-        //             Utilities.createInfrastructure(this, "${resourceGroupName}")
-        //         }
-        //     }
-        // }
+        stage("Create / Update Environment"){
+            when {
+                expression {
+                    UPDATE_CS
+                }
+            }
+            steps {
+                script{
+                    def resourceGroupName = SETTINGS['resourceGroupName']
+                    if(CREATE_AZURE_ENV)
+                    {
+                        Utilities.createInfrastructure(this, "${resourceGroupName}")    
+                    }                    
+                }
+            }
+        }
 
         stage("Update Solution"){
             when {

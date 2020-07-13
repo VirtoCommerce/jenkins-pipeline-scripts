@@ -8,6 +8,7 @@ def Settings = globalLib.Settings
 
 def SETTINGS
 
+def CREATE_AZURE_ENV = false
 def TRG_BRANCH
 def SRC_BRANCH
 def DELIVERY_AZURE = false
@@ -261,7 +262,7 @@ pipeline
                 }
             }
         }
-        
+
         stage("Create / Update Environment"){
             when {
                 expression {
@@ -271,7 +272,10 @@ pipeline
             steps {
                 script{
                     def resourceGroupName = SETTINGS['resourceGroupName']
-                    Utilities.createInfrastructure(this, "${resourceGroupName}")
+                    if(CREATE_AZURE_ENV)
+                    {
+                        Utilities.createInfrastructure(this, "${resourceGroupName}")    
+                    }                    
                 }
             }
         }
