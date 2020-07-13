@@ -285,7 +285,7 @@ pipeline
             steps {
                 script{
                     def csRoot = "${env.WORKSPACE}\\CS"
-                    def webAppName = SETTINGS['webAppName']
+                    def webAppName = SETTINGS['webAppName'].join(',')
                     def webAppPublicName = SETTINGS['webAppPublicName']
                     def resourceGroupName = SETTINGS['resourceGroupName']
                     def subscriptionID = SETTINGS['subscriptionID']
