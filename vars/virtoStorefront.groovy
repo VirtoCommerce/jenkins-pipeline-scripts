@@ -141,7 +141,7 @@ def call(body) {
 							withEnv(["BRANCH_NAME=${env.CHANGE_BRANCH}"])
 							{
 								//powershell "vc-build SonarQubeStart -SonarUrl ${env.SONAR_HOST_URL} -SonarAuthToken \"${env.SONAR_AUTH_TOKEN}\" -PullRequest -GitHubToken ${env.GITHUB_TOKEN} -skip Restore+Compile"
-								if(env.BRANCH_NAME.startsWith('support/2.x') || (Utilities.isPullRequest && env.CHANGE_TARGET.startsWith('support/2.x')))
+								if(env.BRANCH_NAME.startsWith('support/2.x') || (Utilities.isPullRequest(this) && env.CHANGE_TARGET?.startsWith('support/2.x')))
 								{
 									Packaging.startAnalyzer(this, true)
 								}
@@ -175,7 +175,7 @@ def call(body) {
 					}
                 } 
 
-				if(env.BRANCH_NAME.startsWith('support/2.x') || (Utilities.isPullRequest && env.CHANGE_TARGET.startsWith('support/2.x')))
+				if(env.BRANCH_NAME.startsWith('support/2.x') || (Utilities.isPullRequest(this) && env.CHANGE_TARGET?.startsWith('support/2.x')))
 				{
 					stage('Quality Gate'){
 						// withSonarQubeEnv('VC Sonar Server'){
