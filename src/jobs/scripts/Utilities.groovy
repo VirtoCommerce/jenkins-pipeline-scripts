@@ -294,7 +294,7 @@ class Utilities {
             throw new Exception("can't create coverage folder: " + coverageFolder); 
         } 
 
-        def oldStyle = Utilities.getProjectType(context) == 'storefront' || context.env.BRANCH_NAME == 'release/3.0.0' ? '-oldStyle' : ''
+        def oldStyle = Utilities.getProjectType(context) == 'storefront' ? '-oldStyle' : ''
             
         def pdbDirs = getPDBDirsStr(context)
         if(isNetCore(context.projectType)){

@@ -12,12 +12,11 @@ def call(body) {
     node {
         properties([disableConcurrentBuilds()])
 
-        def escapedBranch = env.BRANCH_NAME.replaceAll('/', '_')
-        def repoName = Utilities.getRepoName(this)
-        def workspace = "S:\\Buildsv3\\${repoName}\\${escapedBranch}"
-        def releaseNotesPath = "${workspace}\\release_notes.txt"
         projectType = 'NETCORE2'
-        dir(workspace){
+        def workspace = env.WORKSPACE.replaceAll('%2F', '_')
+        def releaseNotesPath = "${workspace}\\release_notes.txt"
+		dir(workspace)
+        {
             // def SETTINGS
             // def settingsFileContent
             // configFileProvider([configFile(fileId: 'shared_lib_settings', variable: 'SETTINGS_FILE')]) {
