@@ -721,4 +721,9 @@ class Utilities {
         def result = context.pwsh(script: "git log --pretty=format:\"%h\" -1", returnStdout: true).trim()
         return result
     }
+
+    def static getReleaseBranch(context)
+    {
+        return context.env.BRANCH_NAME
+    }
 }

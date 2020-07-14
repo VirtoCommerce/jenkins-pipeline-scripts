@@ -171,7 +171,8 @@ def call(body) {
                         def orgName = Utilities.getOrgName(this)
                         def releaseNotesFile = new File(releaseNotesPath)
                         def releaseNotesArg = releaseNotesFile.exists() ? "-ReleaseNotes ${releaseNotesFile}" : ""
-                        def releaseResult = powershell script: "vc-build Release -GitHubUser ${orgName} -GitHubToken ${env.GITHUB_TOKEN} ${releaseNotesArg} -skip Clean+Restore+Compile+Test", returnStatus: true
+                        def releaseBranchArg = "-ReleaseBranch ${Utilities.getReleaseBranch(this)}"
+                        def releaseResult = powershell script: "vc-build Release -GitHubUser ${orgName} -GitHubToken ${env.GITHUB_TOKEN} ${releaseBranchArg} ${releaseNotesArg} -skip Clean+Restore+Compile+Test", returnStatus: true
                         if(releaseResult == 422){
                             UNSTABLE_CAUSES.add("Release already exists on github")
                         } else if(releaseResult !=0 ) {
