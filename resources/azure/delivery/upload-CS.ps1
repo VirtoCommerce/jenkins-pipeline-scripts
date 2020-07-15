@@ -3,7 +3,7 @@ param(
     $ModulesDir,
     $StorefrontDir,
     $ThemeDir,
-    [Array] $WebAppName,
+    $WebAppName,
     $WebAppPublicName,
     $ResourceGroupName,
     $SubscriptionID,
@@ -23,6 +23,7 @@ Add-AzureRmAccount -Credential $psCred -TenantId $TenantID -ServicePrincipal
 Select-AzureRmSubscription -SubscriptionId $SubscriptionID
 
 # Getting Backend Publish Profile
+$WebAppName = $WebAppName.Split(',')
 $BackendPublishProfile = @()    # Init empty for easy add with +=
 foreach ($App in $WebAppName)
 {
