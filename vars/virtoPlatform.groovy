@@ -1,4 +1,5 @@
 #!groovy
+import jobs.scripts.*
 
 // module script
 def call(body) {
@@ -17,11 +18,6 @@ def call(body) {
 		def hmacSecret = env.HMAC_SECRET
 		def solution = config.solution
 		projectType = config.projectType
-
-		def globalLib = library('global-shared-lib').com.test
-		def Utilities = globalLib.Utilities
-		def Packaging = globalLib.Packaging
-		def Docker = globalLib.Docker
 
         def workspace = env.WORKSPACE.replaceAll('%2F', '_')
 		dir(workspace)
@@ -54,7 +50,7 @@ def call(body) {
 			configFileProvider([configFile(fileId: 'shared_lib_settings', variable: 'SETTINGS_FILE')]) {
 				settingsFileContent = readFile(SETTINGS_FILE)
 			}
-			SETTINGS = globalLib.Settings.new(settingsFileContent)
+			SETTINGS = new Settings(settingsFileContent)
 			SETTINGS.setBranch(env.BRANCH_NAME)
 			
 			if(projectType == null)

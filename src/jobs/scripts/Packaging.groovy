@@ -26,27 +26,29 @@ class Packaging {
      * @param version current version of the build
      * @return reference to a docker image created
      */
-    def static createDockerImage(context, String dockerImageName, String dockerContextFolder, String dockerSourcePath, String version) {
+
+    def static createDockerImage(context, dockerImageName, dockerContextFolder, dockerSourcePath, version, runtimeImage="") {
         def dockerFileFolder = dockerImageName.replaceAll("/", ".")
-		def dockerFolder = ""
+        def dockerFolder = ""
         if(context.projectType == 'NETCORE2') {
-		    dockerFolder = "docker.core\\windowsnano"
-			dockerImageName = dockerImageName // + "-core" 
+            dockerFolder = "docker.core\\windowsnano"
+            dockerImageName = dockerImageName // + "-core"
         }
         else {
-		    dockerFolder = "docker"
+            dockerFolder = "docker"
         }
         context.echo "Building docker image \"${dockerImageName}\" using \"${dockerContextFolder}\" as context folder"
         context.bat "xcopy \"..\\workspace@libs\\virto-shared-library\\resources\\${dockerFolder}\\${dockerFileFolder}\\*\" \"${dockerContextFolder}\\\" /Y /E"
         def dockerImage
+        def runtimeImageArg = runtimeImage == "" ? "" : "--build-arg RUNTIME_IMAGE=\"${runtimeImage}\""
         context.dir(dockerContextFolder)
         {
-            dockerImage = context.docker.build("${dockerImageName}:${version}".toLowerCase(), "--build-arg SOURCE=\"${dockerSourcePath}\" .")
+            dockerImage = context.docker.build("${dockerImageName}:${version}".toLowerCase(), "--build-arg SOURCE=\"${dockerSourcePath}\" ${runtimeImageArg} .")
         }
         return dockerImage
     }
 
-    def static startDockerTestEnvironment(context, String dockerTag)
+    def static startDockerTestEnvironment(context, dockerTag)
     {
         def composeFolder = Utilities.getComposeFolder(context)
         context.dir(composeFolder)
@@ -70,11 +72,11 @@ class Packaging {
                 // 5. try running it again
                 context.withEnv(["DOCKER_TAG=${dockerTag}", "DOCKER_PLATFORM_PORT=${platformPort}", "DOCKER_STOREFRONT_PORT=${storefrontPort}", "DOCKER_SQL_PORT=${sqlPort}", "COMPOSE_PROJECT_NAME=${context.env.BUILD_TAG}" ]) {
                     context.bat "docker-compose up -d"
-                }            
+                }
 
                 // 6. check one more time
                 if(!Packaging.checkAllDockerTestEnvironments(context)) {
-                    throw new Exception("can't start one or more docker containers"); 
+                    throw new Exception("can't start one or more docker containers");
                 }
             }
         }
@@ -89,12 +91,12 @@ class Packaging {
         return true
     }
 
-    def static checkDockerTestEnvironment(context, String containerId)
+    def static checkDockerTestEnvironment(context, containerId)
     {
         //def tag = context.env.BUILD_TAG.replace("-", "").toLowerCase()
         def tag = context.env.BUILD_TAG.toLowerCase()
         def containerName = "${tag}_${containerId}_1"
-        containerName = containerName.replaceAll("\\.", '')
+        containerName = containerName.replaceAll("\\.", '').replaceAll('%', '')
         context.echo "Checking ${containerName} state ..."
         String result = context.bat(returnStdout: true, script: "docker inspect -f {{.State.Running}} ${containerName}").trim()
 
@@ -110,7 +112,7 @@ class Packaging {
         }
     }
 
-    def static stopDockerTestEnvironment(context, String dockerTag)
+    def static stopDockerTestEnvironment(context, dockerTag)
     {
         def composeFolder = Utilities.getComposeFolder(context)
         context.dir(composeFolder)
@@ -123,22 +125,22 @@ class Packaging {
 
     def static createSampleData(context)
     {
-    	def wsFolder = context.pwd()
-         Utilities.runSharedPS(context, "vc-setup-sampledata.ps1", "-apiurl \"${Utilities.getPlatformHost(context)}\"")
+        def wsFolder = context.pwd()
+        Utilities.runSharedPS(context, "vc-setup-sampledata.ps1", "-apiurl \"${Utilities.getPlatformHost(context)}\"")
     }
 
     def static installModules(context, needRestart)
     {
-    	def wsFolder = context.pwd()
+        def wsFolder = context.pwd()
         Utilities.runSharedPS(context, 'vc-setup-modules.ps1', "-apiurl \"${Utilities.getPlatformHost(context)}\" -needRestart ${needRestart}")
-    }    
+    }
 
-    def static pushDockerImage(context, dockerImage, String dockerTag)
+    def static pushDockerImage(context, dockerImage, dockerTag)
     {
-		context.withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: 'docker-hub-credentials', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD']]) {
-			context.sh "docker login --password=${context.PASSWORD} --username=${context.USERNAME}"
-		}
-		dockerImage.push(dockerTag)
+        context.withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: 'docker-hub-credentials', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD']]) {
+            context.sh "docker login --password=${context.PASSWORD} --username=${context.USERNAME}"
+        }
+        dockerImage.push(dockerTag)
     }
 
     def static checkInstalledModules(context){
@@ -153,13 +155,13 @@ class Packaging {
     {
         context.echo "Preparing release for ${version}"
         def tempFolder = Utilities.getTempFolder(context)
-        def websitePath = Utilities.getWebPublishFolder(context, websiteDir)     
+        def websitePath = Utilities.getWebPublishFolder(context, websiteDir)
         def packagesDir = Utilities.getArtifactFolder(context)
 
         context.dir(packagesDir)
-        {
-            context.deleteDir()
-        }
+                {
+                    context.deleteDir()
+                }
 
         // create artifacts
         if(context.projectType == 'NETCORE2')
@@ -184,8 +186,8 @@ class Packaging {
                 def solution = solutions[i]
                 Packaging.runBuild(context, solution.name)
             }
-        } 
-    }    
+        }
+    }
 
     def static runBuild(context, solution)
     {
@@ -199,7 +201,7 @@ class Packaging {
         }
         else
         {
-		    context.bat "${context.env.NUGET}\\nuget.exe restore ${solution}"
+            context.bat "${context.env.NUGET}\\nuget.exe restore ${solution}"
             context.bat "\"${context.tool DefaultMSBuild}\" \"${solution}\" /p:Configuration=Debug /p:Platform=\"Any CPU\" /t:rebuild /m"
         }
     }
@@ -215,13 +217,12 @@ class Packaging {
                 Packaging.cleanBuild(context, solution.name)
             }
         }
-    } 
+    }
 
     def static cleanBuild(context, solution)
     {
-        context.cho "MSBuild Clean Task"
         context.bat "\"${context.tool DefaultMSBuild}\" \"${solution}\" /t:clean /p:Configuration=Debug /p:Platform=\"Any CPU\" /m"
-    }    
+    }
 
     def static startAnalyzer(context, dotnet = false)
     {
@@ -261,7 +262,7 @@ class Packaging {
         context.withSonarQubeEnv('SonarCloud') {
             context.timeout(activity: true, time: 15){
                 if(Utilities.isPullRequest(context)){
-                    context.bat "\"${sqScanner}\\bin\\sonar-scanner.bat\" scan -Dsonar.organization=virto-commerce -Dsonar.projectKey=${projectKey} -Dsonar.sources=${sources} -D\"sonar.host.url=https://sonarcloud.io\" -Dsonar.branch.name=${context.env.BRANCH_NAME} -Dsonar.projectName=\"${fullJobName}\" -Dsonar.host.url=%SONAR_HOST_URL% -Dsonar.login=%SONAR_AUTH_TOKEN% -Dsonar.pullrequest.base=\"${context.env.CHANGE_TARGET}\" -Dsonar.pullrequest.branch=\"${context.env.CHANGE_BRANCH}\" -Dsonar.pullrequest.key=\"${context.env.CHANGE_ID}\""
+                    context.bat "\"${sqScanner}\\bin\\sonar-scanner.bat\" scan -Dsonar.organization=virto-commerce -Dsonar.projectKey=${projectKey} -Dsonar.sources=${sources} -D\"sonar.host.url=https://sonarcloud.io\" -Dsonar.projectName=\"${fullJobName}\" -Dsonar.host.url=%SONAR_HOST_URL% -Dsonar.login=%SONAR_AUTH_TOKEN% -Dsonar.pullrequest.base=\"${context.env.CHANGE_TARGET}\" -Dsonar.pullrequest.branch=\"${context.env.CHANGE_BRANCH}\" -Dsonar.pullrequest.key=\"${context.env.CHANGE_ID}\""
                 }
                 else{
                     context.bat "\"${sqScanner}\\bin\\sonar-scanner.bat\" scan -Dsonar.organization=virto-commerce -Dsonar.projectKey=${projectKey} -Dsonar.sources=${sources} -D\"sonar.host.url=https://sonarcloud.io\" -Dsonar.branch.name=${context.env.BRANCH_NAME} -Dsonar.projectName=\"${fullJobName}\" -Dsonar.host.url=%SONAR_HOST_URL% -Dsonar.login=%SONAR_AUTH_TOKEN%"
@@ -288,16 +289,16 @@ class Packaging {
     def static checkAnalyzerGate(context)
     {
         context.echo "Waiting for Quality Gate"
-		if(Utilities.isPullRequest(context))
+        if(Utilities.isPullRequest(context))
         {
             return
         }
-		context.timeout(time: 1, unit: 'HOURS') { // Just in case something goes wrong, pipeline will be killed after a timeout
-			def qg = context.waitForQualityGate() // Reuse taskId previously collected by withSonarQubeEnv
-			if (qg.status != 'OK' && qg.status != 'WARN') {
-			    context.error "Pipeline aborted due to quality gate failure: ${qg.status}"
-			}
-		}        
+        context.timeout(time: 1, unit: 'HOURS') { // Just in case something goes wrong, pipeline will be killed after a timeout
+            def qg = context.waitForQualityGate() // Reuse taskId previously collected by withSonarQubeEnv
+            if (qg.status != 'OK' && qg.status != 'WARN') {
+                context.error "Pipeline aborted due to quality gate failure: ${qg.status}"
+            }
+        }
     }
 
     def static runGulpBuild(context)
@@ -307,9 +308,9 @@ class Packaging {
             def packagesDir = Utilities.getArtifactFolder(context)
 
             context.dir(packagesDir)
-            {
-                context.deleteDir()
-            }        
+                    {
+                        context.deleteDir()
+                    }
             context.bat "npm install --prefer-offline --dev"
             def bowerjs = new File("${context.env.WORKSPACE}\\bower.json")
             if(bowerjs.exists()){
@@ -317,10 +318,10 @@ class Packaging {
             }
             context.bat "node node_modules\\gulp\\bin\\gulp.js compress"
         }
-    }    
+    }
 
     def static runUnitTests(context, tests)
-    {        
+    {
         String paths = ""
         for(int i = 0; i < tests.size(); i++)
         {
@@ -331,121 +332,121 @@ class Packaging {
         Utilities.runUnitTest(context, "Category=Unit|Category=CI", paths, "xUnit.UnitTests.xml")
     }
 
-	def static publishRelease(context, version, releaseNotes)
-	{
-		def tempFolder = Utilities.getTempFolder(context)
-		def packagesDir = Utilities.getArtifactFolder(context)
-		def packageUrl
+    def static publishRelease(context, version, releaseNotes)
+    {
+        def tempFolder = Utilities.getTempFolder(context)
+        def packagesDir = Utilities.getArtifactFolder(context)
+        def packageUrl
 
-		context.dir(packagesDir)
-		{
-			def artifacts = context.findFiles(glob: '*.zip')
-			if (artifacts.size() > 0) {
-				for (int i = 0; i < artifacts.size(); i++)
-				{
-					packageUrl = Packaging.publishGithubRelease(context, version, releaseNotes, artifacts[i])
-				}
-			}
-		}
+        context.dir(packagesDir)
+                {
+                    def artifacts = context.findFiles(glob: '*.zip')
+                    if (artifacts.size() > 0) {
+                        for (int i = 0; i < artifacts.size(); i++)
+                        {
+                            packageUrl = Packaging.publishGithubRelease(context, version, releaseNotes, artifacts[i])
+                        }
+                    }
+                }
 
-		return packageUrl
-	} 
+        return packageUrl
+    }
 
-	def static publishGithubRelease(context, version, releaseNotes, artifact)   
-	{
-		def REPO_NAME = Utilities.getRepoName(context)
-		def REPO_ORG = Utilities.getOrgName(context)
+    def static publishGithubRelease(context, version, releaseNotes, artifact)
+    {
+        def REPO_NAME = Utilities.getRepoName(context)
+        def REPO_ORG = Utilities.getOrgName(context)
 
         def platformLineSeparator = System.properties['line.separator']
         releaseNotes = releaseNotes.denormalize().replace(platformLineSeparator, '<br>')
         releaseNotes = releaseNotes.replace("\"", "^\"")
 
-		context.bat "${context.env.Utils}\\github-release release --user $REPO_ORG --repo $REPO_NAME --tag v${version} --description \"${releaseNotes}\""
-		context.bat "${context.env.Utils}\\github-release upload --user $REPO_ORG --repo $REPO_NAME --tag v${version} --name \"${artifact}\" --file \"${artifact}\""
-		context.echo "uploaded to https://github.com/$REPO_ORG/$REPO_NAME/releases/download/v${version}/${artifact}"
-		return "https://github.com/$REPO_ORG/$REPO_NAME/releases/download/v${version}/${artifact}"
-	}
+        context.bat "${context.env.Utils}\\github-release release --user $REPO_ORG --repo $REPO_NAME --target ${context.env.BRANCH_NAME} --tag v${version} --description \"${releaseNotes}\""
+        context.bat "${context.env.Utils}\\github-release upload --user $REPO_ORG --repo $REPO_NAME --tag v${version} --name \"${artifact}\" --file \"${artifact}\""
+        context.echo "uploaded to https://github.com/$REPO_ORG/$REPO_NAME/releases/download/v${version}/${artifact}"
+        return "https://github.com/$REPO_ORG/$REPO_NAME/releases/download/v${version}/${artifact}"
+    }
 
-	def static getShouldPublish(context)
-	{
-		if (context.env.BRANCH_NAME == 'master') {
-			return true
-		}
+    def static getShouldPublish(context)
+    {
+        if (context.env.BRANCH_NAME == 'master') {
+            return true
+        }
 
-		return false
-	}
+        return false
+    }
 
-	def static getShouldStage(context)
-	{
-		if ((context.env.BRANCH_NAME == 'master' || context.env.BRANCH_NAME == 'dev') && !isDraft(context)) {
-			return true
-		}
+    def static getShouldStage(context)
+    {
+        if ((context.env.BRANCH_NAME == 'master' || context.env.BRANCH_NAME == 'dev') && !isDraft(context)) {
+            return true
+        }
 
-		return false
-	}
+        return false
+    }
 
-	def static isDraft(context)
-	{
-	    context.bat "\"${context.tool 'Git'}\" log -1 --pretty=%%B > LAST_COMMIT_MESSAGE"
-		def git_last_commit = context.readFile('LAST_COMMIT_MESSAGE')
-	    return git_last_commit.contains('[draft]')
-	}
+    def static isDraft(context)
+    {
+        context.bat "\"${context.tool 'Git'}\" log -1 --pretty=%%B > LAST_COMMIT_MESSAGE"
+        def git_last_commit = context.readFile('LAST_COMMIT_MESSAGE')
+        return git_last_commit.contains('[draft]')
+    }
 
-	def static updateModulesDefinitions(context, def directory, def module, def version)
-	{
-		context.dir(directory)
-		{
-			context.bat "\"${context.tool 'Git'}\" config user.email \"ci@virtocommerce.com\""
-			context.bat "\"${context.tool 'Git'}\" config user.name \"Virto Jenkins\""
-			/*
-			if(!foundRecord)
-				{
-					bat "\"${tool 'Git'}\" commit -am \"Updated module ${id}\""
-				}
-				else
-				{
-					bat "\"${tool 'Git'}\" commit -am \"Added new module ${id}\""
-				}
-				*/
-			context.bat "\"${context.tool 'Git'}\" commit -am \"${module} ${version}\""
-			context.bat "\"${context.tool 'Git'}\" push origin HEAD:master -f"
-		}
-	}    
+    def static updateModulesDefinitions(context, def directory, def module, def version)
+    {
+        context.dir(directory)
+                {
+                    context.bat "\"${context.tool 'Git'}\" config user.email \"ci@virtocommerce.com\""
+                    context.bat "\"${context.tool 'Git'}\" config user.name \"Virto Jenkins\""
+                    /*
+                    if(!foundRecord)
+                        {
+                            bat "\"${tool 'Git'}\" commit -am \"Updated module ${id}\""
+                        }
+                        else
+                        {
+                            bat "\"${tool 'Git'}\" commit -am \"Added new module ${id}\""
+                        }
+                        */
+                    context.bat "\"${context.tool 'Git'}\" commit -am \"${module} ${version}\""
+                    context.bat "\"${context.tool 'Git'}\" push origin HEAD:master -f"
+                }
+    }
 
-	def static installModule(context, path)
-	{
+    def static installModule(context, path)
+    {
         def moduleId = Modules.getModuleId(context)
         def platformContainer = Utilities.getPlatformContainer(context)
         Utilities.runSharedPS(context, "vc-install-module.ps1", "-apiurl \"${Utilities.getPlatformHost(context)}\" -moduleZipArchievePath \"${path}\" -moduleId \"${moduleId}\" -platformContainer ${platformContainer}")
-	}   
+    }
 
     def static installTheme(context, path){
         def platformContainer = Utilities.getPlatformContainer(context)
         Utilities.runSharedPS(context, "vc-install-theme.ps1", "-themeZip \"${path}\" -platformContainer ${platformContainer}")
-    }  
+    }
 
-	def static publishThemePackage(context)
-	{
-		// find all manifests
-		def inputFile = context.readFile file: 'package.json', encoding: 'utf-8'
-		def json = Utilities.jsonParse(inputFile)
+    def static publishThemePackage(context)
+    {
+        // find all manifests
+        def inputFile = context.readFile file: 'package.json', encoding: 'utf-8'
+        def json = Utilities.jsonParse(inputFile)
 
-		def name = json.name;
-		def version = json.version;
+        def name = json.name;
+        def version = json.version;
 
-		def packagesDir = Utilities.getArtifactFolder(context)
+        def packagesDir = Utilities.getArtifactFolder(context)
 
-		context.dir(packagesDir)
-		{
-			def artifacts = context.findFiles(glob: '*.zip')
-			if (artifacts.size() > 0) {
-				for (int i = 0; i < artifacts.size(); i++)
-				{
-					Packaging.publishGithubRelease(context, version, artifacts[i])
-				}
-			}	
-		}
-	}    
+        context.dir(packagesDir)
+                {
+                    def artifacts = context.findFiles(glob: '*.zip')
+                    if (artifacts.size() > 0) {
+                        for (int i = 0; i < artifacts.size(); i++)
+                        {
+                            Packaging.publishGithubRelease(context, version, artifacts[i])
+                        }
+                    }
+                }
+    }
 
     def static createNugetPackages(context){
         def currentFolder = context.env.WORKSPACE.contains('%') ? context.pwd() : context.env.WORKSPACE
@@ -471,7 +472,7 @@ class Packaging {
         }
         context.dir(nugetFolder){
             for(csproj in csprojs){
-                context.bat "${context.env.NUGET}\\nuget pack \"${context.env.WORKSPACE}\\${csproj.path}\" -IncludeReferencedProjects -Symbols -Properties Configuration=Release"
+                context.bat "${context.env.NUGET}\\nuget pack \"${currentFolder}\\${csproj.path}\" -IncludeReferencedProjects -Symbols -Properties Configuration=Release"
             }
             def nugets = context.findFiles(glob: "**\\*.nupkg")
             for(nuget in nugets){
@@ -489,8 +490,7 @@ class Packaging {
         def destinationFolderPath = "${context.env.SOLUTION_FOLDER}\\${prefix}\\${branchEscaped}\\${projectType}"
         switch(projectType){
             case ['module','theme']:
-                if(id != null)
-                    destinationFolderPath = destinationFolderPath + "\\${id}"
+                destinationFolderPath = destinationFolderPath + "\\${id}"
                 break
         }
         def destinationFolder = new File(destinationFolderPath)

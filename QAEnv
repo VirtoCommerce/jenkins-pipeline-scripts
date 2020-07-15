@@ -1,10 +1,5 @@
 import groovy.json.JsonSlurperClassic
-
-def globalLib = library('global-shared-lib').com.test
-def Utilities = globalLib.Utilities
-def Packaging = globalLib.Packaging
-def Modules = globalLib.Modules
-def Settings = globalLib.Settings
+import jobs.scripts.*
 
 def SETTINGS
 
@@ -61,7 +56,7 @@ pipeline
                     configFileProvider([configFile(fileId: 'delivery_settings', variable: 'SETTINGS_FILE')]) {
                         settingsFileContent = readFile(SETTINGS_FILE)
                     }
-                    SETTINGS = Settings.new(settingsFileContent)
+                    SETTINGS = new Settings(settingsFileContent)
                     def regionChoices = SETTINGS.getProjects().join("\n")
                     def buildOrder = Utilities.getNextBuildOrder(this)
                     def userInputRegion = input message: "Select Region", parameters: [

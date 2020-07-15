@@ -1,7 +1,4 @@
-def Modules
-def Packaging
-def Utilities
-def GithubRelease
+import jobs.scripts.*
 
 def call(body) {
 	// evaluate the body block, and collect configuration into the object
@@ -15,11 +12,6 @@ def call(body) {
     node {
         properties([disableConcurrentBuilds()])
 
-        def globalLib = library('global-shared-lib').com.test
-		Utilities = globalLib.Utilities
-		Packaging = globalLib.Packaging
-		Modules = globalLib.Modules
-        GithubRelease = globalLib.GithubRelease
 
         def escapedBranch = env.BRANCH_NAME.replaceAll('/', '_')
         def repoName = Utilities.getRepoName(this)
@@ -43,7 +35,7 @@ def call(body) {
             configFileProvider([configFile(fileId: 'shared_lib_settings', variable: 'SETTINGS_FILE')]) {
                 settingsFileContent = readFile(SETTINGS_FILE)
             }
-            SETTINGS = globalLib.Settings.new(settingsFileContent)
+            SETTINGS = new Settings(settingsFileContent)
             SETTINGS.setProject('platform-core')
             SETTINGS.setBranch(env.BRANCH_NAME)
             Utilities.notifyBuildStatus(this, SETTINGS['of365hook'], '', 'STARTED')
@@ -89,35 +81,36 @@ def call(body) {
                 stage('Build'){
                     if(Utilities.isPullRequest(this))
                     {
-                        withSonarQubeEnv('VC Sonar Server'){
+                        // withSonarQubeEnv('VC Sonar Server'){
                             withEnv(["BRANCH_NAME=${env.CHANGE_BRANCH}"])
                             {
-                                powershell "vc-build SonarQubeStart -SonarUrl ${env.SONAR_HOST_URL} -SonarAuthToken \"${env.SONAR_AUTH_TOKEN}\" -PullRequest -GitHubToken ${env.GITHUB_TOKEN} -skip Restore+Compile"
+                        //         powershell "vc-build SonarQubeStart -SonarUrl ${env.SONAR_HOST_URL} -SonarAuthToken \"${env.SONAR_AUTH_TOKEN}\" -PullRequest -GitHubToken ${env.GITHUB_TOKEN} -skip Restore+Compile"
                                 powershell "vc-build Compile"
                             }
-                        }
+                        // }
                     }
                     else
                     {
-                        withSonarQubeEnv('VC Sonar Server'){
-                            powershell "vc-build SonarQubeStart -SonarUrl ${env.SONAR_HOST_URL} -SonarAuthToken \"${env.SONAR_AUTH_TOKEN}\" -skip Restore+Compile"
-                        }
+                        // withSonarQubeEnv('VC Sonar Server'){
+                        //     powershell "vc-build SonarQubeStart -SonarUrl ${env.SONAR_HOST_URL} -SonarAuthToken \"${env.SONAR_AUTH_TOKEN}\" -skip Restore+Compile"
+                        // }
                         powershell "vc-build Compile ${versionSuffixArg}"
                     }
                     
                 }
                 
-                stage('Unit Tests'){
-                    powershell "vc-build Test -skip Restore+Compile"
+                stage('Unit Tests')
+                {
+                    powershell "vc-build Test -skip"
                 } 
 
-                stage('Quality Gate'){
-                    // Packaging.endAnalyzer(this)
-                    withSonarQubeEnv('VC Sonar Server'){
-                        powershell "vc-build SonarQubeEnd -SonarUrl ${env.SONAR_HOST_URL} -SonarAuthToken ${env.SONAR_AUTH_TOKEN} -skip Restore+Compile+SonarQubeStart"
-                    }
-                    Packaging.checkAnalyzerGate(this)
-                }  
+                // stage('Quality Gate'){
+                //     // Packaging.endAnalyzer(this)
+                //     withSonarQubeEnv('VC Sonar Server'){
+                //         powershell "vc-build SonarQubeEnd -SonarUrl ${env.SONAR_HOST_URL} -SonarAuthToken ${env.SONAR_AUTH_TOKEN} -skip Restore+Compile+SonarQubeStart"
+                //     }
+                //     Packaging.checkAnalyzerGate(this)
+                // }  
 
                 // stage('Swagger')
                 // {
@@ -265,7 +258,8 @@ def call(body) {
                             def orgName = Utilities.getOrgName(this)
                             def releaseNotesFile = new File(releaseNotesPath)
                             def releaseNotesArg = releaseNotesFile.exists() ? "-ReleaseNotes ${releaseNotesFile}" : ""
-                            def releaseResult = powershell script: "vc-build Release -GitHubUser ${orgName} -GitHubToken ${env.GITHUB_TOKEN} ${releaseNotesArg} -skip Clean+Restore+Compile+Test", returnStatus: true
+                            def releaseBranchArg = "-ReleaseBranch ${Utilities.getReleaseBranch(this)}"
+                            def releaseResult = powershell script: "vc-build Release -GitHubUser ${orgName} -GitHubToken ${env.GITHUB_TOKEN} ${releaseBranchArg} ${releaseNotesArg} -skip Clean+Restore+Compile+Test", returnStatus: true
                             if(releaseResult == 422){
                                 UNSTABLE_CAUSES.add("Release already exists on github")
                             } else if(releaseResult !=0 ) {

@@ -1,4 +1,5 @@
 #!groovy
+import jobs.scripts.*
 
 // module script
 def call(body) {
@@ -17,11 +18,6 @@ def call(body) {
 		def hmacSecret = env.HMAC_SECRET
 		def solution = config.solution
 		projectType = 'NETCORE2'
-
-		def globalLib = library('global-shared-lib').com.test
-		def Utilities = globalLib.Utilities
-		def Packaging = globalLib.Packaging
-		def Docker = globalLib.Docker
 
         def workspace = env.WORKSPACE.replaceAll('%2F', '_')
 		dir(workspace)
@@ -71,7 +67,7 @@ def call(body) {
 			configFileProvider([configFile(fileId: 'shared_lib_settings', variable: 'SETTINGS_FILE')]) {
 				settingsFileContent = readFile(SETTINGS_FILE)
 			}
-			SETTINGS = globalLib.Settings.new(settingsFileContent)
+			SETTINGS = new Settings(settingsFileContent)
 			SETTINGS.setBranch(env.BRANCH_NAME)
 			
 
@@ -132,24 +128,30 @@ def call(body) {
 					return true
 				}
 
-				stage('Build') {		
-					timestamps { 						
+				stage('Build') 
+				{		
+					timestamps 
+					{
 						if(Utilities.isPullRequest(this))
 						{
-							withSonarQubeEnv('VC Sonar Server'){
-								withEnv(["BRANCH_NAME=${env.CHANGE_BRANCH}"])
+							withEnv(["BRANCH_NAME=${env.CHANGE_BRANCH}"])
+							{
+								//powershell "vc-build SonarQubeStart -SonarUrl ${env.SONAR_HOST_URL} -SonarAuthToken \"${env.SONAR_AUTH_TOKEN}\" -PullRequest -GitHubToken ${env.GITHUB_TOKEN} -skip Restore+Compile"
+								if(env.BRANCH_NAME.startsWith('support/2.x') || (Utilities.isPullRequest(this) && env.CHANGE_TARGET?.startsWith('support/2.x')))
 								{
-									powershell "vc-build SonarQubeStart -SonarUrl ${env.SONAR_HOST_URL} -SonarAuthToken \"${env.SONAR_AUTH_TOKEN}\" -PullRequest -GitHubToken ${env.GITHUB_TOKEN} -skip Restore+Compile"
-									powershell "vc-build Compile ${versionSuffixArg}"
+									Packaging.startAnalyzer(this, true)
 								}
+								powershell "vc-build Compile ${versionSuffixArg}"
 							}
 						}
 						else
 						{
-							withSonarQubeEnv('VC Sonar Server'){
-								powershell "vc-build SonarQubeStart -SonarUrl ${env.SONAR_HOST_URL} -SonarAuthToken \"${env.SONAR_AUTH_TOKEN}\" -skip Restore+Compile"
+							//powershell "vc-build SonarQubeStart -SonarUrl ${env.SONAR_HOST_URL} -SonarAuthToken \"${env.SONAR_AUTH_TOKEN}\" -skip Restore+Compile"
+							if(env.BRANCH_NAME.startsWith('support/2.x'))
+							{
+								Packaging.startAnalyzer(this, true)
 							}
-							powershell "vc-build Compile"
+							powershell "vc-build Compile ${versionSuffixArg}"
 						}
 					}
 				}
@@ -165,17 +167,20 @@ def call(body) {
 					}
 					else
 					{
-                    	powershell "vc-build Test -TestsFilter \"Category=Unit|Category=CI\" -skip Restore+Compile"
+                    	powershell "vc-build Test -TestsFilter \"Category=Unit|Category=CI\" -skip"
 					}
                 } 
 
-                stage('Quality Gate'){
-                    // Packaging.endAnalyzer(this)
-                    withSonarQubeEnv('VC Sonar Server'){
-                        powershell "vc-build SonarQubeEnd -SonarUrl ${env.SONAR_HOST_URL} -SonarAuthToken ${env.SONAR_AUTH_TOKEN} -skip Restore+Compile+SonarQubeStart"
-                    }
-                    Packaging.checkAnalyzerGate(this)
-                }  
+				if(env.BRANCH_NAME.startsWith('support/2.x') || (Utilities.isPullRequest(this) && env.CHANGE_TARGET?.startsWith('support/2.x')))
+				{
+					stage('Quality Gate'){
+						// withSonarQubeEnv('VC Sonar Server'){
+						// 	powershell "vc-build SonarQubeEnd -SonarUrl ${env.SONAR_HOST_URL} -SonarAuthToken ${env.SONAR_AUTH_TOKEN} -skip Restore+Compile+SonarQubeStart"
+						// }
+						Packaging.endAnalyzer(this)
+						Packaging.checkAnalyzerGate(this)
+					} 
+				} 
 			
 				def version = Utilities.getAssemblyVersion(this, webProject)
 				def dockerImage
@@ -325,7 +330,8 @@ def call(body) {
 								def orgName = Utilities.getOrgName(this)
 								def releaseNotesFile = new File(releaseNotesPath)
 								def releaseNotesArg = releaseNotesFile.exists() ? "-ReleaseNotes ${releaseNotesFile}" : ""
-								def releaseResult = powershell script: "vc-build Release -GitHubUser ${orgName} -GitHubToken ${env.GITHUB_TOKEN} ${releaseNotesArg} -skip Clean+Restore+Compile+Test", returnStatus: true
+								def releaseBranchArg = "-ReleaseBranch ${Utilities.getReleaseBranch(this)}"
+								def releaseResult = powershell script: "vc-build Release -GitHubUser ${orgName} -GitHubToken ${env.GITHUB_TOKEN} ${releaseBranchArg} ${releaseNotesArg} -skip Clean+Restore+Compile+Test", returnStatus: true
 								if(releaseResult == 422){
 									UNSTABLE_CAUSES.add("Release already exists on github")
 								} else if(releaseResult !=0 ) {

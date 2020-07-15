@@ -3,11 +3,6 @@ import jobs.scripts.*
 // module script
 def call(body) {
 
-	
-	def globalLib = library('global-shared-lib').com.test
-	def Utilities = globalLib.Utilities
-	def Packaging = globalLib.Packaging
-
 	// evaluate the body block, and collect configuration into the object
 	def config = [:]
 	body.resolveStrategy = Closure.DELEGATE_FIRST
@@ -27,7 +22,7 @@ def call(body) {
 		configFileProvider([configFile(fileId: 'shared_lib_settings', variable: 'SETTINGS_FILE')]) {
 			settingsFileContent = readFile(SETTINGS_FILE)
 		}
-		SETTINGS = globalLib.Settings.new(settingsFileContent)
+		SETTINGS = new Settings(settingsFileContent)
 		SETTINGS.setBranch(env.BRANCH_NAME)
 		SETTINGS.setProject('theme')
 
