@@ -54,7 +54,19 @@ pipeline
                     powershell script: "Remove-Item -Path ${csRoot}\\* -Recurse -Force -ErrorAction Continue", label: "Clean Workspace"
                     dir(csRoot)
                     {
-                        pwsh "${psfolder}\\vc_docs_get_sources.ps1"
+                        try
+                        {
+                            pwsh "${psfolder}\\vc_docs_get_sources.ps1"
+                            def docStatus = "Docs build success"
+                        }
+                        catch(any)
+                        {
+                            docStatus = "Docs build failed"
+                        }
+                        finally
+                        {
+                            echo "${docStatus}"
+                        }
                     }
                     dir(platformRoot)
                     {
