@@ -662,20 +662,19 @@ class Utilities {
             switch(project.toLowerCase())
             {
                 case 'dev-vc':
-                    Utilities.runSharedPS(context, "vc-CreateInfrastructureDEV-VC.ps1")
+                    context.pwsh script: "vc-CreateInfrastructureDEV-VC.ps1 -ErrorAction Stop", label: project
                     break
                 case 'dev-demovc':
-                    Utilities.runSharedPS(context, "vc-CreateInfrastructureDEV-demoVC.ps1")
+                    context.pwsh script: "vc-CreateInfrastructureDEV-demoVC.ps1 -ErrorAction Stop", label: project
                     break
                 case 'qa-demovc':
-                    Utilities.runSharedPS(context, "vc-CreateInfrastructureQA-demoVC.ps1")
+                    context.pwsh script: "vc-CreateInfrastructureQA-demoVC.ps1 -ErrorAction Stop", label: project
                     break
                 case 'dev-demovc-3':
-                    Utilities.runSharedPS(context, "vc-CreateInfrastructureDEV-demoVC-3.ps1")
+                    context.pwsh script: "vc-CreateInfrastructureDEV-demoVC-3.ps1 -ErrorAction Stop", label: project
                     break
                 case 'qa-demovc-3':
-                    context.echo "We are ready."
-                    Utilities.runSharedPS(context, "vc-CreateInfrastructureQA-demoVC-3.ps1")
+                    context.pwsh script: "vc-CreateInfrastructureQA-demoVC-3.ps1 -ErrorAction Stop", label: project
                     break
                 default:
                     context.echo "No matches found"

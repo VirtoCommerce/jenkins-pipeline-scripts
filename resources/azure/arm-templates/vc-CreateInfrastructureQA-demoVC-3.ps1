@@ -11,7 +11,7 @@ Select-AzureRmSubscription -SubscriptionId $SubscriptionID
 
 $DestResourceGroupName = "QA-demoVC-3"
 
-$TemplateFolder = "resources\azure"
+$TemplateFolder = "resources\azure\arm-templates"
 $TemplateFile = "${env:WORKSPACE}\$TemplateFolder\azuredeployQA-demoVC-3.json"
 $TemplateParametersFile = "${env:WORKSPACE}\$TemplateFolder\azuredeployQA-demoVC-3_parameters.json"
 
