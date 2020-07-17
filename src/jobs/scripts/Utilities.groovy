@@ -674,7 +674,7 @@ class Utilities {
                     context.pwsh script: "vc-CreateInfrastructureDEV-demoVC-3.ps1 -ErrorAction Stop", label: project
                     break
                 case 'qa-demovc-3':
-                    context.pwsh script: "vc-CreateInfrastructureQA-demoVC-3.ps1 -ErrorAction Stop", label: project
+                    context.pwsh script: "vc-CreateInfrastructureQA-demoVC-3.ps1 -Verbose -ErrorAction Stop", label: project
                     break
                 default:
                     context.echo "No matches found"
