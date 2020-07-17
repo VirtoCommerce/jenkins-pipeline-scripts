@@ -280,36 +280,36 @@ pipeline {
             }
         }
 
-        stage("Update Solution"){
-            when {
-                expression {
-                    UPDATE_CS
-                }
-            }
-            steps {
-                script{
-                    def csRoot = "${env.WORKSPACE}\\CS"
-                    def webAppName = SETTINGS['webAppName'].join(',')
-                    def webAppPublicName = SETTINGS['webAppPublicName']
-                    def resourceGroupName = SETTINGS['resourceGroupName']
-                    def subscriptionID = SETTINGS['subscriptionID']
-                    def blobToken = SETTINGS['blobToken']
-                    def themeSrcDir = "${csRoot}\\theme"
-                    def themeBlobPath = ""
-                    def themeBlobPathParam = ""
-                    // if(SETTINGS['themeName'] != null)
-                    // {
-                    //     themeBlobPath = "Themes/${SETTINGS['themeName']}"
-                    //     themeSrcDir = "${themeSrcDir}\\${SETTINGS['themeName']}"
-                    //     themeBlobPathParam = "-ThemeBlobPath ${themeBlobPath}"
-                    // }
-                    withEnv(["AzureBlobToken=${blobToken}"]){
-                        Utilities.runSharedPS(this, 'delivery/upload-CS.ps1', 
-                            "-PlatformDir ${csRoot}\\platform -ModulesDir ${csRoot}\\modules -StorefrontDir ${csRoot}\\storefront -ThemeDir ${themeSrcDir} -WebAppName ${webAppName} -WebAppPublicName ${webAppPublicName} -ResourceGroupName ${resourceGroupName} -SubscriptionID ${subscriptionID} -StorageAccount ${SETTINGS['storageAccount']} -BlobContainerName ${SETTINGS['blobContainerName']} ${themeBlobPathParam}")
-                    }
-                }
-            }
-        }
+        // stage("Update Solution"){
+        //     when {
+        //         expression {
+        //             UPDATE_CS
+        //         }
+        //     }
+        //     steps {
+        //         script{
+        //             def csRoot = "${env.WORKSPACE}\\CS"
+        //             def webAppName = SETTINGS['webAppName'].join(',')
+        //             def webAppPublicName = SETTINGS['webAppPublicName']
+        //             def resourceGroupName = SETTINGS['resourceGroupName']
+        //             def subscriptionID = SETTINGS['subscriptionID']
+        //             def blobToken = SETTINGS['blobToken']
+        //             def themeSrcDir = "${csRoot}\\theme"
+        //             def themeBlobPath = ""
+        //             def themeBlobPathParam = ""
+        //             // if(SETTINGS['themeName'] != null)
+        //             // {
+        //             //     themeBlobPath = "Themes/${SETTINGS['themeName']}"
+        //             //     themeSrcDir = "${themeSrcDir}\\${SETTINGS['themeName']}"
+        //             //     themeBlobPathParam = "-ThemeBlobPath ${themeBlobPath}"
+        //             // }
+        //             withEnv(["AzureBlobToken=${blobToken}"]){
+        //                 Utilities.runSharedPS(this, 'delivery/upload-CS.ps1', 
+        //                     "-PlatformDir ${csRoot}\\platform -ModulesDir ${csRoot}\\modules -StorefrontDir ${csRoot}\\storefront -ThemeDir ${themeSrcDir} -WebAppName ${webAppName} -WebAppPublicName ${webAppPublicName} -ResourceGroupName ${resourceGroupName} -SubscriptionID ${subscriptionID} -StorageAccount ${SETTINGS['storageAccount']} -BlobContainerName ${SETTINGS['blobContainerName']} ${themeBlobPathParam}")
+        //             }
+        //         }
+        //     }
+        // }
     }
     post{
         always{
