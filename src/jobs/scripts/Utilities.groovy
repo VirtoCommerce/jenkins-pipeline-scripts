@@ -659,24 +659,21 @@ class Utilities {
         def AzureTempDir = "${context.env.WORKSPACE}\\resources\\azure\\arm-templates" // Azure Resource Manager templates path
         context.dir(AzureTempDir)
         {
-            context.echo "Path: ${AzureTempDir}" 
-            context.echo "We are ready."
-            context.echo "project: ${project}"
-            switch(project)
+            switch(project.toLowerCase())
             {
-                case 'DEV-VC':
+                case 'dev-vc':
                     Utilities.runSharedPS(context, "vc-CreateInfrastructureDEV-VC.ps1")
                     break
-                case 'DEV-demoVC':
+                case 'dev-demovc':
                     Utilities.runSharedPS(context, "vc-CreateInfrastructureDEV-demoVC.ps1")
                     break
-                case 'QA-demoVC':
+                case 'qa-demovc':
                     Utilities.runSharedPS(context, "vc-CreateInfrastructureQA-demoVC.ps1")
                     break
-                case 'DEV-demoVC-3':
+                case 'dev-demovc-3':
                     Utilities.runSharedPS(context, "vc-CreateInfrastructureDEV-demoVC-3.ps1")
                     break
-                case 'QA-demoVC-3':
+                case 'qa-demovc-3':
                     context.echo "We are ready."
                     Utilities.runSharedPS(context, "vc-CreateInfrastructureQA-demoVC-3.ps1")
                     break

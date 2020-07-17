@@ -274,7 +274,7 @@ pipeline {
                     def resourceGroupName = SETTINGS['resourceGroupName']
                     if(CREATE_AZURE_ENV)
                     {
-                        Utilities.createInfrastructure(this, "${resourceGroupName}")    
+                        Utilities.createInfrastructure(this, "${resourceGroupName}")
                     }                    
                 }
             }
