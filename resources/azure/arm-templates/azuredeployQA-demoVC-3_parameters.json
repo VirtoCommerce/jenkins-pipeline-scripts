@@ -2,6 +2,31 @@
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
+    "currentStack": {
+      "value": "dotnetcore"
+    },
+    "redisCacheName": {
+      "value": "qa-demovc3"
+    },
+    "redisCacheKey": {
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/973d0b8c-44bf-438d-a4b7-1c4162d3ccba/resourceGroups/QA-demoVC-3/providers/Microsoft.KeyVault/vaults/qa-demovc3"
+        },
+        "secretName": "redisCacheKey-qa"
+      }
+    },
+    "signalRName": {
+      "value": "qa-demovc3"
+    },
+    "signalRKey": {
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/973d0b8c-44bf-438d-a4b7-1c4162d3ccba/resourceGroups/QA-demoVC-3/providers/Microsoft.KeyVault/vaults/qa-demovc3"
+        },
+        "secretName": "signalRKey-qa"
+      }
+    },
     "sqlServerName": {
       "value": "qa-demovc3-srv"
     },
@@ -13,7 +38,7 @@
         "keyVault": {
           "id": "/subscriptions/973d0b8c-44bf-438d-a4b7-1c4162d3ccba/resourceGroups/QA-demoVC-3/providers/Microsoft.KeyVault/vaults/qa-demovc3"
         },
-        "secretName": "sqlAdministratorLoginPassword-prod"
+        "secretName": "sqlAdministratorLoginPassword-qa"
       }
     },
     "sqlDatabaseName": {
@@ -21,6 +46,14 @@
     },
     "storageAccountName": {
       "value": "qademovc3"
+    },
+    "storageAccountKey": {
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/973d0b8c-44bf-438d-a4b7-1c4162d3ccba/resourceGroups/QA-demoVC-3/providers/Microsoft.KeyVault/vaults/qa-demovc3"
+        },
+        "secretName": "storageAccountKey-qa"
+      }
     },
     "platformAppServicePlanName": {
       "value": "qa-demovc3-admin"
@@ -37,39 +70,179 @@
     "platformWebAppName": {
       "value": "qa-demovc3-admin"
     },
-    "frontWebAppName": {
-      "value": "qa-demovc3-store"
-    },
-    "platformVirtoCommerce": {
-      "reference": {
-        "keyVault": {
-          "id": "/subscriptions/973d0b8c-44bf-438d-a4b7-1c4162d3ccba/resourceGroups/QA-demoVC-3/providers/Microsoft.KeyVault/vaults/qa-demovc3"
-        },
-        "secretName": "platformVirtoCommerce-prod"
-      }
+    "platformSecondWebAppName": {
+      "value": "qa-demovc3-admin-second"
     },
     "platformAppinsightsInstrumentationKey": {
       "reference": {
         "keyVault": {
           "id": "/subscriptions/973d0b8c-44bf-438d-a4b7-1c4162d3ccba/resourceGroups/QA-demoVC-3/providers/Microsoft.KeyVault/vaults/qa-demovc3"
         },
-        "secretName": "platformAppinsightsInstrumentationKey-prod"
+        "secretName": "platformAppinsightsInstrumentationKey-qa"
       }
     },
-    "frontVirtoCommerceEndpointUrl": {
-      "reference": {
-        "keyVault": {
-          "id": "/subscriptions/973d0b8c-44bf-438d-a4b7-1c4162d3ccba/resourceGroups/QA-demoVC-3/providers/Microsoft.KeyVault/vaults/qa-demovc3"
-        },
-        "secretName": "frontVirtoCommerceEndpointUrl-prod"
-      }
+    "frontWebAppName": {
+      "value": "qa-demovc3-store"
     },
     "frontAppinsightsInstrumentationKey": {
       "reference": {
         "keyVault": {
           "id": "/subscriptions/973d0b8c-44bf-438d-a4b7-1c4162d3ccba/resourceGroups/QA-demoVC-3/providers/Microsoft.KeyVault/vaults/qa-demovc3"
         },
-        "secretName": "frontAppinsightsInstrumentationKey-prod"
+        "secretName": "frontAppinsightsInstrumentationKey-qa"
+      }
+    },
+    "authenticationFacebookClientId": {
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/973d0b8c-44bf-438d-a4b7-1c4162d3ccba/resourceGroups/QA-demoVC-3/providers/Microsoft.KeyVault/vaults/qa-demovc3"
+        },
+        "secretName": "authenticationFacebookClientId-qa"
+      }
+    },
+    "authenticationFacebookClientSecret": {
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/973d0b8c-44bf-438d-a4b7-1c4162d3ccba/resourceGroups/QA-demoVC-3/providers/Microsoft.KeyVault/vaults/qa-demovc3"
+        },
+        "secretName": "authenticationFacebookClientSecret-qa"
+      }
+    },
+    "authenticationGoogleClientId": {
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/973d0b8c-44bf-438d-a4b7-1c4162d3ccba/resourceGroups/QA-demoVC-3/providers/Microsoft.KeyVault/vaults/qa-demovc3"
+        },
+        "secretName": "authenticationGoogleClientId-qa"
+      }
+    },
+    "authenticationGoogleClientSecret": {
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/973d0b8c-44bf-438d-a4b7-1c4162d3ccba/resourceGroups/QA-demoVC-3/providers/Microsoft.KeyVault/vaults/qa-demovc3"
+        },
+        "secretName": "authenticationGoogleClientSecret-qa"
+      }
+    },
+    "virtoCommerceEndpointUserName": {
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/973d0b8c-44bf-438d-a4b7-1c4162d3ccba/resourceGroups/QA-demoVC-3/providers/Microsoft.KeyVault/vaults/qa-demovc3"
+        },
+        "secretName": "virtoCommerceEndpointUserName-qa"
+      }
+    },
+    "virtoCommerceEndpointPassword": {
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/973d0b8c-44bf-438d-a4b7-1c4162d3ccba/resourceGroups/QA-demoVC-3/providers/Microsoft.KeyVault/vaults/qa-demovc3"
+        },
+        "secretName": "virtoCommerceEndpointPassword-qa"
+      }
+    },
+    "diagnosticsAgentLaunchSecret": {
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/973d0b8c-44bf-438d-a4b7-1c4162d3ccba/resourceGroups/QA-demoVC-3/providers/Microsoft.KeyVault/vaults/qa-demovc3"
+        },
+        "secretName": "diagnosticsAgentLaunchSecret-qa"
+      }
+    },
+    "searchScope": {
+      "value": "qademo3"
+    },
+    "pushNotificationsHubUrl": {
+      "value": "dev-demovc3-admin"
+    },
+    "azureSearchServiceName": {
+      "value": "qa-demovc-3-search"
+    },
+    "notificationsDefaultSender": {
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/973d0b8c-44bf-438d-a4b7-1c4162d3ccba/resourceGroups/QA-demoVC-3/providers/Microsoft.KeyVault/vaults/qa-demovc3"
+        },
+        "secretName": "notificationsDefaultSender-qa"
+      }
+    },
+    "notificationsSendGridApiKey": {
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/973d0b8c-44bf-438d-a4b7-1c4162d3ccba/resourceGroups/QA-demoVC-3/providers/Microsoft.KeyVault/vaults/qa-demovc3"
+        },
+        "secretName": "notificationsSendGridApiKey-qa"
+      }
+    },
+    "notificationsSmtpPassword": {
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/973d0b8c-44bf-438d-a4b7-1c4162d3ccba/resourceGroups/QA-demoVC-3/providers/Microsoft.KeyVault/vaults/qa-demovc3"
+        },
+        "secretName": "notificationsSmtpPassword-qa"
+      }
+    },
+    "paymentsAuthorizeNetApiLogin": {
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/973d0b8c-44bf-438d-a4b7-1c4162d3ccba/resourceGroups/QA-demoVC-3/providers/Microsoft.KeyVault/vaults/qa-demovc3"
+        },
+        "secretName": "paymentsAuthorizeNetApiLogin-qa"
+      }
+    },
+    "paymentsAuthorizeNetSHA2Hash": {
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/973d0b8c-44bf-438d-a4b7-1c4162d3ccba/resourceGroups/QA-demoVC-3/providers/Microsoft.KeyVault/vaults/qa-demovc3"
+        },
+        "secretName": "paymentsAuthorizeNetSHA2Hash-qa"
+      }
+    },
+    "paymentsAuthorizeNetTxnKey": {
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/973d0b8c-44bf-438d-a4b7-1c4162d3ccba/resourceGroups/QA-demoVC-3/providers/Microsoft.KeyVault/vaults/qa-demovc3"
+        },
+        "secretName": "paymentsAuthorizeNetTxnKey-qa"
+      }
+    },
+    "searchAzureSearchKey": {
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/973d0b8c-44bf-438d-a4b7-1c4162d3ccba/resourceGroups/QA-demoVC-3/providers/Microsoft.KeyVault/vaults/qa-demovc3"
+        },
+        "secretName": "searchAzureSearchKey-qa"
+      }
+    },
+    "searchElasticSearchKey": {
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/973d0b8c-44bf-438d-a4b7-1c4162d3ccba/resourceGroups/QA-demoVC-3/providers/Microsoft.KeyVault/vaults/qa-demovc3"
+        },
+        "secretName": "searchElasticSearchKey-qa"
+      }
+    },
+    "searchElasticSearchServer": {
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/973d0b8c-44bf-438d-a4b7-1c4162d3ccba/resourceGroups/QA-demoVC-3/providers/Microsoft.KeyVault/vaults/qa-demovc3"
+        },
+        "secretName": "searchElasticSearchServer-qa"
+      }
+    },
+    "taxAvalaraAccountNumber": {
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/973d0b8c-44bf-438d-a4b7-1c4162d3ccba/resourceGroups/QA-demoVC-3/providers/Microsoft.KeyVault/vaults/qa-demovc3"
+        },
+        "secretName": "taxAvalaraAccountNumber-qa"
+      }
+    },
+    "taxAvalaraLicenseKey": {
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/973d0b8c-44bf-438d-a4b7-1c4162d3ccba/resourceGroups/QA-demoVC-3/providers/Microsoft.KeyVault/vaults/qa-demovc3"
+        },
+        "secretName": "taxAvalaraLicenseKey-qa"
       }
     }
   }
