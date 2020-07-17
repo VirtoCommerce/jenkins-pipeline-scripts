@@ -656,26 +656,26 @@ class Utilities {
     }
     def static createInfrastructure(context, project = 'blank')
     {
-        //def AzureTempDir = Utilities.getAzureTemplateDir(context)
-        def AzureTempDir = "..\\workspace@libs\\virto-shared-library\\resources\\azure\\arm-templates" // Azure Resource Manager templates path
+        def AzureTempDir = "${context.env.WORKSPACE}\\resources\\azure\\arm-templates" // Azure Resource Manager templates path
         context.dir(AzureTempDir)
         {
             switch(project)
             {
                 case 'DEV-VC':
-                    Utilities.runSharedPS(context, "arm-templates//vc-CreateInfrastructureDEV-VC.ps1")
+                    Utilities.runSharedPS(context, "vc-CreateInfrastructureDEV-VC.ps1")
                     break
                 case 'DEV-demoVC':
-                    Utilities.runSharedPS(context, "arm-templates//vc-CreateInfrastructureDEV-demoVC.ps1")
+                    Utilities.runSharedPS(context, "vc-CreateInfrastructureDEV-demoVC.ps1")
                     break
                 case 'QA-demoVC':
-                    Utilities.runSharedPS(context, "arm-templates//vc-CreateInfrastructureQA-demoVC.ps1")
+                    Utilities.runSharedPS(context, "vc-CreateInfrastructureQA-demoVC.ps1")
                     break
                 case 'DEV-demoVC-3':
-                    Utilities.runSharedPS(context, "arm-templates//vc-CreateInfrastructureDEV-demoVC-3.ps1")
+                    Utilities.runSharedPS(context, "vc-CreateInfrastructureDEV-demoVC-3.ps1")
                     break
                 case 'QA-demoVC-3':
-                    Utilities.runSharedPS(context, "arm-templates//vc-CreateInfrastructureQA-demoVC-3.ps1")
+                    context.echo "We are ready."
+                    Utilities.runSharedPS(context, "vc-CreateInfrastructureQA-demoVC-3.ps1")
                     break
                 default:
                     context.echo "No matches found"
