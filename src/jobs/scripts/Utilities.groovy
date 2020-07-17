@@ -659,6 +659,9 @@ class Utilities {
         def AzureTempDir = "${context.env.WORKSPACE}\\resources\\azure\\arm-templates" // Azure Resource Manager templates path
         context.dir(AzureTempDir)
         {
+            context.echo "Path: ${AzureTempDir}" 
+            context.echo "We are ready."
+            context.echo "project: ${project}"
             switch(project)
             {
                 case 'DEV-VC':

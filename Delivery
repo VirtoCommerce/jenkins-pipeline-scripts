@@ -274,7 +274,6 @@ pipeline {
                     def resourceGroupName = SETTINGS['resourceGroupName']
                     if(CREATE_AZURE_ENV)
                     {
-                        echo "We are in."
                         Utilities.createInfrastructure(this, "${resourceGroupName}")    
                     }                    
                 }
