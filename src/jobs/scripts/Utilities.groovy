@@ -663,19 +663,19 @@ class Utilities {
             switch(project.toLowerCase())
             {
                 case 'dev-vc':
-                    context.pwsh script: "vc-CreateInfrastructureDEV-VC.ps1 -ErrorAction Stop", label: project
+                    context.pwsh script: "./vc-CreateInfrastructureDEV-VC.ps1 -ErrorAction Stop", label: project
                     break
                 case 'dev-demovc':
-                    context.pwsh script: "vc-CreateInfrastructureDEV-demoVC.ps1 -ErrorAction Stop", label: project
+                    context.pwsh script: "./vc-CreateInfrastructureDEV-demoVC.ps1 -ErrorAction Stop", label: project
                     break
                 case 'qa-demovc':
-                    context.pwsh script: "vc-CreateInfrastructureQA-demoVC.ps1 -ErrorAction Stop", label: project
+                    context.pwsh script: "./vc-CreateInfrastructureQA-demoVC.ps1 -ErrorAction Stop", label: project
                     break
                 case 'dev-demovc-3':
-                    context.pwsh script: "vc-CreateInfrastructureDEV-demoVC-3.ps1 -ErrorAction Stop", label: project
+                    context.pwsh script: "./vc-CreateInfrastructureDEV-demoVC-3.ps1 -ErrorAction Stop", label: project
                     break
                 case 'qa-demovc-3':
-                    context.powershell script: "vc-CreateInfrastructureQA-demoVC-3.ps1", label: project
+                    context.powershell script: "./vc-CreateInfrastructureQA-demoVC-3.ps1", label: project
                     break
                 default:
                     context.echo "No matches found"
