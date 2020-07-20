@@ -141,7 +141,7 @@ def call(body) {
 								{
 									Packaging.startAnalyzer(this, true)
 								}
-								powershell "vc-build Compile ${versionSuffixArg}"
+								powershell "vc-build Compile"
 							}
 						}
 						else
@@ -151,7 +151,11 @@ def call(body) {
 							{
 								Packaging.startAnalyzer(this, true)
 							}
-							powershell "vc-build Compile ${versionSuffixArg}"
+							if(versionSuffixArg != "")
+							{
+								pwsh "vc-build ChangeVersion ${versionSuffixArg}"
+							}
+							powershell "vc-build Compile"
 						}
 					}
 				}

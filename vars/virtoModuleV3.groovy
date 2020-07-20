@@ -54,23 +54,28 @@ def call(body) {
                 }
 
                 stage('Build'){
-                    if(Utilities.isPullRequest(this))
+                    if(versionSuffixArg != "")
                     {
-                        // withSonarQubeEnv('VC Sonar Server'){
-                            withEnv(["BRANCH_NAME=${env.CHANGE_BRANCH}"])
-                            {
-                                // powershell "vc-build SonarQubeStart -SonarUrl ${env.SONAR_HOST_URL} -SonarAuthToken \"${env.SONAR_AUTH_TOKEN}\" -PullRequest -GitHubToken ${env.GITHUB_TOKEN} -skip Restore+Compile"
-                                powershell "vc-build Compile"
-                            }
-                        // }
+                        pwsh "vc-build ChangeVersion ${versionSuffixArg}"
                     }
-                    else
-                    {
-                        // withSonarQubeEnv('VC Sonar Server'){
-                        //     powershell "vc-build SonarQubeStart -SonarUrl ${env.SONAR_HOST_URL} -SonarAuthToken \"${env.SONAR_AUTH_TOKEN}\" -skip Restore+Compile"
-                        // }
-                        powershell "vc-build Compile ${versionSuffixArg}"
-                    }
+                    pwsh "vc-build Compile"
+                    // if(Utilities.isPullRequest(this))
+                    // {
+                    //     // withSonarQubeEnv('VC Sonar Server'){
+                    //         withEnv(["BRANCH_NAME=${env.CHANGE_BRANCH}"])
+                    //         {
+                    //             // powershell "vc-build SonarQubeStart -SonarUrl ${env.SONAR_HOST_URL} -SonarAuthToken \"${env.SONAR_AUTH_TOKEN}\" -PullRequest -GitHubToken ${env.GITHUB_TOKEN} -skip Restore+Compile"
+                    //             powershell "vc-build Compile"
+                    //         }
+                    //     // }
+                    // }
+                    // else
+                    // {
+                    //     // withSonarQubeEnv('VC Sonar Server'){
+                    //     //     powershell "vc-build SonarQubeStart -SonarUrl ${env.SONAR_HOST_URL} -SonarAuthToken \"${env.SONAR_AUTH_TOKEN}\" -skip Restore+Compile"
+                    //     // }
+                    //     powershell "vc-build Compile ${versionSuffixArg}"
+                    // }
                 }
 
                 stage('Unit Tests'){
