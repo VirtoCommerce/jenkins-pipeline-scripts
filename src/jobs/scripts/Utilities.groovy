@@ -726,4 +726,9 @@ class Utilities {
     {
         return context.env.BRANCH_NAME
     }
+
+    def static getCommitMessage(context)
+    {
+        return (context.pwsh script: "${context.tool 'Git'} log --format=\"%s\" -1", returnStdout: true).trim()
+    }
 }
