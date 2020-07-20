@@ -729,6 +729,6 @@ class Utilities {
 
     def static getCommitMessage(context)
     {
-        return (context.pwsh script: "${context.tool 'Git'} log --format=\"%s\" -1", returnStdout: true).trim()
+        return context.pwsh(script: "${context.tool 'Git'} log --format=\"%s\" -1", returnStdout: true).trim()
     }
 }
