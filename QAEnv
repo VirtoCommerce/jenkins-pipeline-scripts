@@ -14,6 +14,8 @@ def DOCKER_STOREFRONT_PORT
 def PLATFORM_DOCKER_TAG
 def STOREFRONT_DOCKER_TAG
 
+def STOREFRONT_BRANCH
+
 def STOREFRONT_INSTALL
 
 def UNSTABLE_CAUSES = []
@@ -79,11 +81,12 @@ pipeline
                             booleanParam(defaultValue: true, name: 'Disable docker'),
                             choice(name:'Source Branch', choices:srcBranches.join("\n")),
                             choice(name:'Target Branch', choices:targetBranches),
-                            
+                            string(name: 'Storefront Branch', defaultValue:SETTINGS['storefrontBranch'])
                         ]
                     DELIVERY_AZURE = userInputBranch['Disable docker']
                     SRC_BRANCH = userInputBranch['Source Branch']
-                    TRG_BRANCH = userInputBranch['Target Branch']                    
+                    TRG_BRANCH = userInputBranch['Target Branch'] 
+                    STOREFRONT_BRANCH = userInputBranch['Storefront Branch']                   
                     echo "Vars: REGION - ${REGION}, DELIVERY_AZURE - ${DELIVERY_AZURE}, ENV_NAME - ${ENV_NAME}, SRC_BRANCH - ${SRC_BRANCH}, TRG_BRANCH - ${TRG_BRANCH}"
                 }
             }
@@ -118,7 +121,7 @@ pipeline
                         powershell script: "New-Item -Path ${themeDst} -ItemType Directory -Force"
                         powershell script: "Copy-Item -Path ${themeSrc}\\* ${themeIncludeParam} -Destination ${themeDst} -Recurse -Force", label: "Copy Theme to Workspace"
                         //storefront
-                        def storefrontSrc = "${solutionRoot}\\${SETTINGS['storefrontBranch']}"
+                        def storefrontSrc = "${solutionRoot}\\${STOREFRONT_BRANCH}"
                         powershell script: "Copy-Item -Path ${storefrontSrc}\\* -Destination ${env.WORKSPACE}\\CS -Include storefront -Recurse -Force", label: "Copy Storefron to Workspace"
                     } 
                     else {
