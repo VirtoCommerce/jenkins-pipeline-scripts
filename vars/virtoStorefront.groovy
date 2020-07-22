@@ -300,7 +300,7 @@ def call(body) {
 							Packaging.pushDockerImage(this, dockerImage, dockerTag)
 							if(env.BRANCH_NAME == 'master')
                             {
-                                Packaging.pushDockerImage(this, dockerWinImage, "${storefrontVersion}-${commitHash}-win")
+                                Packaging.pushDockerImage(this, dockerImage, "${storefrontVersion}-${commitHash}-win")
                             }
 							if(Utilities.isNetCore(projectType) && dockerImageLinux != null)
 							{
