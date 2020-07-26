@@ -141,7 +141,7 @@ def call(body) {
 								{
 									Packaging.startAnalyzer(this, true)
 								}
-								powershell "vc-build Compile ${versionSuffixArg}"
+								powershell "vc-build Compile"
 							}
 						}
 						else
@@ -151,7 +151,11 @@ def call(body) {
 							{
 								Packaging.startAnalyzer(this, true)
 							}
-							powershell "vc-build Compile ${versionSuffixArg}"
+							if(versionSuffixArg != "")
+							{
+								pwsh "vc-build ChangeVersion ${versionSuffixArg}"
+							}
+							powershell "vc-build Compile"
 						}
 					}
 				}
@@ -296,7 +300,7 @@ def call(body) {
 							Packaging.pushDockerImage(this, dockerImage, dockerTag)
 							if(env.BRANCH_NAME == 'master')
                             {
-                                Packaging.pushDockerImage(this, dockerWinImage, "${storefrontVersion}-${commitHash}-win")
+                                Packaging.pushDockerImage(this, dockerImage, "${storefrontVersion}-${commitHash}-win")
                             }
 							if(Utilities.isNetCore(projectType) && dockerImageLinux != null)
 							{
