@@ -2,6 +2,21 @@
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
+    "currentStack": {
+      "type": "String"
+    },
+    "redisCacheName": {
+      "type": "String"
+    },
+    "redisCacheKey": {
+      "type": "String"
+    },
+    "signalRName": {
+      "type": "String"
+    },
+    "signalRKey": {
+      "type": "String"
+    },
     "sqlServerName": {
       "type": "String"
     },
@@ -15,6 +30,9 @@
       "type": "String"
     },
     "storageAccountName": {
+      "type": "String"
+    },
+    "storageAccountKey": {
       "type": "String"
     },
     "platformAppServicePlanName": {
@@ -32,19 +50,52 @@
     "platformWebAppName": {
       "type": "String"
     },
-    "frontWebAppName": {
-      "type": "String"
-    },
-    "platformVirtoCommerce": {
+    "platformSecondWebAppName": {
       "type": "String"
     },
     "platformAppinsightsInstrumentationKey": {
       "type": "String"
     },
-    "frontVirtoCommerceEndpointUrl": {
+    "frontWebAppName": {
       "type": "String"
     },
     "frontAppinsightsInstrumentationKey": {
+      "type": "String"
+    },
+    "virtoCommerceEndpointUserName": {
+      "type": "String"
+    },
+    "virtoCommerceEndpointPassword": {
+      "type": "String"
+    },
+    "searchScope": {
+      "type": "String"
+    },
+    "pushNotificationsHubUrl": {
+      "type": "String"
+    },
+    "notificationsDefaultSender": {
+      "type": "String"
+    },
+    "notificationsSendGridApiKey": {
+      "type": "String"
+    },
+    "notificationsSmtpPassword": {
+      "type": "String"
+    },
+    "paymentsAuthorizeNetApiLogin": {
+      "type": "String"
+    },
+    "paymentsAuthorizeNetSHA2Hash": {
+      "type": "String"
+    },
+    "paymentsAuthorizeNetTxnKey": {
+      "type": "String"
+    },
+    "searchElasticSearchKey": {
+      "type": "String"
+    },
+    "searchElasticSearchServer": {
       "type": "String"
     }
   },
@@ -52,9 +103,62 @@
     "sqlDatabaseCollation": "SQL_Latin1_General_CP1_CI_AS",
     "sqlDatabasePlan": "Basic",
     "storageAccountType": "Standard_LRS",
-    "webAppSize": "B1"
+    "webAppsSize": "B2"
   },
   "resources": [
+    {
+      "name": "[parameters('signalRName')]",
+      "type": "Microsoft.SignalRService/SignalR",
+      "apiVersion": "2020-05-01",
+      "location": "[resourceGroup().location]",
+      "sku": {
+        "name": "Free_F1",
+        "tier": "Free",
+        "size": "F1",
+        "capacity": 1
+      },
+      "kind": "SignalR",
+      "properties": {
+        "hostNamePrefix": "[parameters('signalRName')]",
+        "features": [
+          {
+            "flag": "ServiceMode",
+            "value": "Default",
+            "properties": {}
+          },
+          {
+            "flag": "EnableConnectivityLogs",
+            "value": "True",
+            "properties": {}
+          },
+          {
+            "flag": "EnableMessagingLogs",
+            "value": "False",
+            "properties": {}
+          }
+        ],
+        "cors": {
+          "allowedOrigins": [
+            "*"
+          ]
+        },
+        "upstream": {},
+        "networkACLs": {
+          "defaultAction": "Deny",
+          "publicNetwork": {
+            "allow": [
+              "ServerConnection",
+              "ClientConnection",
+              "RESTAPI"
+            ]
+          },
+          "privateEndpoints": []
+        }
+      },
+      "tags": {
+        "displayName": "signalR"
+      }
+    },
     {
       "name": "[parameters('sqlServerName')]",
       "type": "Microsoft.Sql/servers",
@@ -62,7 +166,7 @@
       "tags": {
         "displayName": "sqlServer"
       },
-      "apiVersion": "2014-04-01",
+      "apiVersion": "2019-06-01-preview",
       "properties": {
         "administratorLogin": "[parameters('sqlAdministratorLogin')]",
         "administratorLoginPassword": "[parameters('sqlAdministratorLoginPassword')]",
@@ -72,7 +176,7 @@
         {
           "name": "[concat(parameters('sqlserverName'), '/', parameters('sqlDatabaseName'))]",
           "type": "Microsoft.Sql/servers/databases",
-          "apiVersion": "2017-10-01-preview",
+          "apiVersion": "2019-06-01-preview",
           "location": "[resourceGroup().location]",
           "sku": {
             "name": "[variables('sqlDatabasePlan')]"
@@ -92,7 +196,7 @@
     {
       "name": "[parameters('storageAccountName')]",
       "type": "Microsoft.Storage/storageAccounts",
-      "apiVersion": "2018-11-01",
+      "apiVersion": "2019-06-01",
       "location": "[resourceGroup().location]",
       "sku": {
         "name": "[variables('storageAccountType')]"
@@ -123,7 +227,8 @@
       "kind": "app",
       "location": "[resourceGroup().location]",
       "sku": {
-        "name": "[variables('webAppSize')]"
+        "name": "[variables('webAppsSize')]",
+        "capacity": 2
       },
       "tags": {
         "displayName": "platformServicePlan"
@@ -166,28 +271,20 @@
           "requestTracingEnabled": true,
           "requestTracingExpirationTime": "9999-12-31T23:59:00Z",
           "httpLoggingEnabled": true,
-          "logsDirectorySizeLimit": 100,
+          "logsDirectorySizeLimit": 35,
           "detailedErrorLoggingEnabled": true,
-          "clientAffinityEnabled": true,
+          "clientAffinityEnabled": false,
           "use32BitWorkerProcess": false,
           "webSocketsEnabled": false,
           "alwaysOn": false,
-          "httpsOnly": false,
-          "http20Enabled": false,
+          "httpsOnly": true,
+          "http20Enabled": true,
           "minTlsVersion": "1.2",
-          "ftpsState": "AllAllowed",
+          "ftpsState": "Disabled",
           "appSettings": [
             {
               "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
               "value": "[parameters('platformAppinsightsInstrumentationKey')]"
-            },
-			{
-              "name": "ASPNETCORE_ENVIRONMENT",
-              "value": "Production"
-            },
-            {
-              "name": "InstrumentationEngine_EXTENSION_VERSION",
-              "value": "~1"
             },
             {
               "name": "APPINSIGHTS_PROFILERFEATURE_VERSION",
@@ -198,66 +295,163 @@
               "value": "1.0.0"
             },
             {
-              "name": "DiagnosticServices_EXTENSION_VERSION",
-              "value": "~3"
+              "name": "ApplicationInsightsAgent_EXTENSION_VERSION",
+              "value": "~2"
             },
             {
-              "name": "Content:AzureBlobStorage:RootPath",
-              "value": "cms"
+              "name": "Assets:AzureBlobStorage:ConnectionString",
+              "value": "[concat('DefaultEndpointsProtocol=https;AccountName=',parameters('storageAccountName'),';AccountKey=',parameters('storageAccountKey'),';EndpointSuffix=core.windows.net')]"
             },
             {
               "name": "Assets:Provider",
               "value": "AzureBlobStorage"
             },
             {
-              "name": "Assets:AzureBlobStorage:ConnectionString",
-              "value": "[concat('provider=AzureBlobStorage;rootPath=assets;DefaultEndpointsProtocol=https;AccountName=',parameters('storageAccountName'),';AccountKey=',concat(listKeys(parameters('storageAccountName'),'2015-05-01-preview').key1))]"
+              "name": "Content:AzureBlobStorage:ConnectionString",
+              "value": "[concat('DefaultEndpointsProtocol=https;AccountName=',parameters('storageAccountName'),';AccountKey=',parameters('storageAccountKey'),';EndpointSuffix=core.windows.net')]"
+            },
+            {
+              "name": "Content:AzureBlobStorage:RootPath",
+              "value": "cms"
             },
             {
               "name": "Content:Provider",
               "value": "AzureBlobStorage"
             },
             {
-              "name": "Content:AzureBlobStorage:ConnectionString",
-              "value": "[concat('provider=AzureBlobStorage;rootPath=assets;DefaultEndpointsProtocol=https;AccountName=',parameters('storageAccountName'),';AccountKey=',concat(listKeys(parameters('storageAccountName'),'2015-05-01-preview').key1))]"
+              "name": "DiagnosticServices_EXTENSION_VERSION",
+              "value": "~3"
+            },
+            {
+              "name": "IdentityOptions:User:RequireUniqueEmail",
+              "value": "true"
+            },
+            {
+              "name": "ExternalModules:IncludePrerelease",
+              "value": "true"
+            },
+            {
+              "name": "InstrumentationEngine_EXTENSION_VERSION",
+              "value": "~1"
+            },
+            {
+              "name": "Notifications:DefaultSender",
+              "value": "[parameters('notificationsDefaultSender')]"
+            },
+            {
+              "name": "Notifications:Gateway",
+              "value": "SendGrid"
+            },
+            {
+              "name": "Notifications:SendGrid:ApiKey",
+              "value": "[parameters('notificationsSendGridApiKey')]"
+            },
+            {
+              "name": "Notifications:Smtp:EnableSsl",
+              "value": "False"
+            },
+            {
+              "name": "Notifications:Smtp:Host",
+              "value": "smtp.sendgrid.net"
+            },
+            {
+              "name": "Notifications:Smtp:Login",
+              "value": "apikey"
+            },
+            {
+              "name": "Notifications:Smtp:Password",
+              "value": "[parameters('notificationsSmtpPassword')]"
+            },
+            {
+              "name": "Notifications:Smtp:Port",
+              "value": "587"
+            },
+            {
+              "name": "Payments:AuthorizeNet:ApiLogin",
+              "value": "[parameters('paymentsAuthorizeNetApiLogin')]"
+            },
+            {
+              "name": "Payments:AuthorizeNet:SHA2Hash",
+              "value": "[parameters('paymentsAuthorizeNetSHA2Hash')]"
+            },
+            {
+              "name": "Payments:AuthorizeNet:TxnKey",
+              "value": "[parameters('paymentsAuthorizeNetTxnKey')]"
+            },
+            {
+              "name": "PushNotifications:AzureSignalRService:ConnectionString",
+              "value": "[concat('Endpoint=https://',parameters('signalRName'),'.service.signalr.net;AccessKey=',parameters('signalRKey'),';Version=1.0;')]"
+            },
+            {
+              "name": "PushNotifications:HubUrl",
+              "value": "[concat('https://',parameters('pushNotificationsHubUrl'),'.azurewebsites.net/pushNotificationHub')]"
+            },
+            {
+              "name": "PushNotifications:ScalabilityMode",
+              "value": "RedisBackplane"
+            },
+            {
+              "name": "Search:ElasticSearch:EnableHttpCompression",
+              "value": "true"
+            },
+            {
+              "name": "Search:ElasticSearch:Key",
+              "value": "[parameters('searchElasticSearchKey')]"
+            },
+            {
+              "name": "Search:ElasticSearch:Server",
+              "value": "[parameters('searchElasticSearchServer')]"
+            },
+            {
+              "name": "Search:ElasticSearch:User",
+              "value": "elastic"
             },
             {
               "name": "Search:Provider",
-              "value": "Lucene"
+              "value": "ElasticSearch"
             },
             {
-              "name": "Search:Lucene:Path",
-              "value": "D:\\home\\site\\wwwroot\\Lucene"
+              "name": "Search:Scope",
+              "value": "[parameters('searchScope')]"
+            },
+            {
+              "name": "SnapshotDebugger_EXTENSION_VERSION",
+              "value": "~2"
             },
             {
               "name": "VirtoCommerce:DiscoveryPath",
               "value": "../modules"
             },
             {
-              "name": "SnapshotDebugger_EXTENSION_VERSION",
-              "value": "~1"
+              "name": "VirtoCommerce:Hangfire:JobStorageType",
+              "value": "SqlServer"
             },
             {
-              "name": "XDT_MicrosoftApplicationInsights_Mode",
-              "value": "recommended"
+              "name": "VirtoCommerce:Hangfire:UseHangfireServer",
+              "value": "false"
+            },
+            {
+              "name": "WEBSITE_HTTPLOGGING_RETENTION_DAYS",
+              "value": "3"
             },
             {
               "name": "XDT_MicrosoftApplicationInsights_BaseExtensions",
               "value": "~1"
             },
             {
-              "name": "VirtoCommerce:AutoInstallModuleBundles",
-              "value": ""
-            },
-            {
-              "name": "VirtoCommerce:SampleDataUrl",
-              "value": "http://virtocommerce.blob.core.windows.net/sample-data"
+              "name": "XDT_MicrosoftApplicationInsights_Mode",
+              "value": "recommended"
             }
           ],
           "connectionStrings": [
             {
+              "name": "RedisConnectionString",
+              "connectionString": "[concat(parameters('redisCacheName'),'.redis.cache.windows.net:6380,password=',parameters('redisCacheKey'),',ssl=true,abortConnect=False')]",
+              "type": "Custom"
+            },
+            {
               "name": "VirtoCommerce",
-              "connectionString": "[parameters('platformVirtoCommerce')]",
+              "connectionString": "[concat('Data Source=tcp:',parameters('sqlServerName'),'.database.windows.net,1433;Initial Catalog=',parameters('sqlDatabaseName'),';Persist Security Info=False;User Id=',parameters('sqlAdministratorLogin'),'@',parameters('sqlServerName'),'.database.windows.net;Password=',parameters('sqlAdministratorLoginPassword'),';MultipleActiveResultSets=True;Encrypt=True;TrustServerCertificate=False;Connection Timeout=300;')]",
               "type": "SQLAzure"
             }
           ],
@@ -265,7 +459,7 @@
             {
               "virtualPath": "/",
               "physicalPath": "site\\wwwroot\\platform",
-              "preloadEnabled": false,
+              "preloadEnabled": true,
               "virtualDirectories": [
                 {
                   "virtualPath": "/modules",
@@ -277,12 +471,248 @@
                 }
               ]
             }
+          ],
+          "metadata": [
+            {
+              "name": "CURRENT_STACK",
+              "value": "[parameters('currentStack')]"
+            }
           ]
         }
       },
-      "resources": [
-
-      ]
+      "resources": []
+    },
+    {
+      "name": "[parameters('platformSecondWebAppName')]",
+      "type": "Microsoft.Web/sites",
+      "apiVersion": "2018-11-01",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "displayName": "platformSecondWebApp"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/serverfarms', parameters('platformAppServicePlanName'))]",
+        "[resourceId('Microsoft.Sql/servers/', parameters('sqlserverName'))]",
+        "[resourceId('Microsoft.Storage/storageAccounts/', parameters('storageAccountName'))]",
+        "[resourceId('Microsoft.Insights/components/', parameters('platformAppInsights'))]"
+      ],
+      "properties": {
+        "enabled": true,
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('platformAppServicePlanName'))]",
+        "siteConfig": {
+          "requestTracingEnabled": true,
+          "requestTracingExpirationTime": "9999-12-31T23:59:00Z",
+          "httpLoggingEnabled": true,
+          "logsDirectorySizeLimit": 35,
+          "detailedErrorLoggingEnabled": true,
+          "clientAffinityEnabled": false,
+          "use32BitWorkerProcess": false,
+          "webSocketsEnabled": false,
+          "alwaysOn": false,
+          "httpsOnly": true,
+          "http20Enabled": true,
+          "minTlsVersion": "1.2",
+          "ftpsState": "Disabled",
+          "appSettings": [
+            {
+              "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+              "value": "[parameters('platformAppinsightsInstrumentationKey')]"
+            },
+            {
+              "name": "APPINSIGHTS_PROFILERFEATURE_VERSION",
+              "value": "1.0.0"
+            },
+            {
+              "name": "APPINSIGHTS_SNAPSHOTFEATURE_VERSION",
+              "value": "1.0.0"
+            },
+            {
+              "name": "ApplicationInsightsAgent_EXTENSION_VERSION",
+              "value": "~2"
+            },
+            {
+              "name": "Assets:AzureBlobStorage:ConnectionString",
+              "value": "[concat('DefaultEndpointsProtocol=https;AccountName=',parameters('storageAccountName'),';AccountKey=',parameters('storageAccountKey'),';EndpointSuffix=core.windows.net')]"
+            },
+            {
+              "name": "Assets:Provider",
+              "value": "AzureBlobStorage"
+            },
+            {
+              "name": "Content:AzureBlobStorage:ConnectionString",
+              "value": "[concat('DefaultEndpointsProtocol=https;AccountName=',parameters('storageAccountName'),';AccountKey=',parameters('storageAccountKey'),';EndpointSuffix=core.windows.net')]"
+            },
+            {
+              "name": "Content:AzureBlobStorage:RootPath",
+              "value": "cms"
+            },
+            {
+              "name": "Content:Provider",
+              "value": "AzureBlobStorage"
+            },
+            {
+              "name": "DiagnosticServices_EXTENSION_VERSION",
+              "value": "~3"
+            },
+            {
+              "name": "IdentityOptions:User:RequireUniqueEmail",
+              "value": "true"
+            },
+            {
+              "name": "ExternalModules:IncludePrerelease",
+              "value": "true"
+            },
+            {
+              "name": "InstrumentationEngine_EXTENSION_VERSION",
+              "value": "~1"
+            },
+            {
+              "name": "Notifications:DefaultSender",
+              "value": "[parameters('notificationsDefaultSender')]"
+            },
+            {
+              "name": "Notifications:Gateway",
+              "value": "SendGrid"
+            },
+            {
+              "name": "Notifications:SendGrid:ApiKey",
+              "value": "[parameters('notificationsSendGridApiKey')]"
+            },
+            {
+              "name": "Notifications:Smtp:EnableSsl",
+              "value": "False"
+            },
+            {
+              "name": "Notifications:Smtp:Host",
+              "value": "smtp.sendgrid.net"
+            },
+            {
+              "name": "Notifications:Smtp:Login",
+              "value": "apikey"
+            },
+            {
+              "name": "Notifications:Smtp:Password",
+              "value": "[parameters('notificationsSmtpPassword')]"
+            },
+            {
+              "name": "Notifications:Smtp:Port",
+              "value": "587"
+            },
+            {
+              "name": "Payments:AuthorizeNet:ApiLogin",
+              "value": "[parameters('paymentsAuthorizeNetApiLogin')]"
+            },
+            {
+              "name": "Payments:AuthorizeNet:SHA2Hash",
+              "value": "[parameters('paymentsAuthorizeNetSHA2Hash')]"
+            },
+            {
+              "name": "Payments:AuthorizeNet:TxnKey",
+              "value": "[parameters('paymentsAuthorizeNetTxnKey')]"
+            },
+            {
+              "name": "PushNotifications:AzureSignalRService:ConnectionString",
+              "value": "[concat('Endpoint=https://',parameters('signalRName'),'.service.signalr.net;AccessKey=',parameters('signalRKey'),';Version=1.0;')]"
+            },
+            {
+              "name": "PushNotifications:HubUrl",
+              "value": "[concat('https://',parameters('pushNotificationsHubUrl'),'.azurewebsites.net/pushNotificationHub')]"
+            },
+            {
+              "name": "PushNotifications:ScalabilityMode",
+              "value": "RedisBackplane"
+            },
+            {
+              "name": "Search:ElasticSearch:EnableHttpCompression",
+              "value": "true"
+            },
+            {
+              "name": "Search:ElasticSearch:Key",
+              "value": "[parameters('searchElasticSearchKey')]"
+            },
+            {
+              "name": "Search:ElasticSearch:Server",
+              "value": "[parameters('searchElasticSearchServer')]"
+            },
+            {
+              "name": "Search:ElasticSearch:User",
+              "value": "elastic"
+            },
+            {
+              "name": "Search:Provider",
+              "value": "ElasticSearch"
+            },
+            {
+              "name": "Search:Scope",
+              "value": "[parameters('searchScope')]"
+            },
+            {
+              "name": "SnapshotDebugger_EXTENSION_VERSION",
+              "value": "~2"
+            },
+            {
+              "name": "VirtoCommerce:DiscoveryPath",
+              "value": "../modules"
+            },
+            {
+              "name": "VirtoCommerce:Hangfire:JobStorageType",
+              "value": "SqlServer"
+            },
+            {
+              "name": "VirtoCommerce:Hangfire:UseHangfireServer",
+              "value": "true"
+            },
+            {
+              "name": "WEBSITE_HTTPLOGGING_RETENTION_DAYS",
+              "value": "3"
+            },
+            {
+              "name": "XDT_MicrosoftApplicationInsights_BaseExtensions",
+              "value": "~1"
+            },
+            {
+              "name": "XDT_MicrosoftApplicationInsights_Mode",
+              "value": "recommended"
+            }
+          ],
+          "connectionStrings": [
+            {
+              "name": "RedisConnectionString",
+              "connectionString": "[concat(parameters('redisCacheName'),'.redis.cache.windows.net:6380,password=',parameters('redisCacheKey'),',ssl=true,abortConnect=False')]",
+              "type": "Custom"
+            },
+            {
+              "name": "VirtoCommerce",
+              "connectionString": "[concat('Data Source=tcp:',parameters('sqlServerName'),'.database.windows.net,1433;Initial Catalog=',parameters('sqlDatabaseName'),';Persist Security Info=False;User Id=',parameters('sqlAdministratorLogin'),'@',parameters('sqlServerName'),'.database.windows.net;Password=',parameters('sqlAdministratorLoginPassword'),';MultipleActiveResultSets=True;Encrypt=True;TrustServerCertificate=False;Connection Timeout=300;')]",
+              "type": "SQLAzure"
+            }
+          ],
+          "virtualApplications": [
+            {
+              "virtualPath": "/",
+              "physicalPath": "site\\wwwroot\\platform",
+              "preloadEnabled": true,
+              "virtualDirectories": [
+                {
+                  "virtualPath": "/modules",
+                  "physicalPath": "site\\wwwroot\\modules"
+                },
+                {
+                  "virtualPath": "/Lucene",
+                  "physicalPath": "site\\wwwroot\\Lucene"
+                }
+              ]
+            }
+          ],
+          "metadata": [
+            {
+              "name": "CURRENT_STACK",
+              "value": "[parameters('currentStack')]"
+            }
+          ]
+        }
+      },
+      "resources": []
     },
     {
       "name": "[parameters('frontAppServicePlanName')]",
@@ -291,7 +721,8 @@
       "kind": "app",
       "location": "[resourceGroup().location]",
       "sku": {
-        "name": "[variables('webAppSize')]"
+        "name": "[variables('webAppsSize')]",
+        "capacity": 2
       },
       "tags": {
         "displayName": "frontServicePlan"
@@ -333,16 +764,20 @@
           "requestTracingEnabled": true,
           "requestTracingExpirationTime": "9999-12-31T23:59:00Z",
           "httpLoggingEnabled": true,
-          "logsDirectorySizeLimit": 100,
+          "logsDirectorySizeLimit": 35,
           "detailedErrorLoggingEnabled": true,
           "clientAffinityEnabled": true,
           "use32BitWorkerProcess": false,
-          "alwaysOn": false,
-          "httpsOnly": false,
-          "http20Enabled": false,
+          "alwaysOn": true,
+          "httpsOnly": true,
+          "http20Enabled": true,
           "minTlsVersion": "1.2",
-          "ftpsState": "AllAllowed",
+          "ftpsState": "Disabled",
           "appSettings": [
+            {
+              "name": "ANCM_ADDITIONAL_ERROR_PAGE_LINK",
+              "value": "[concat('https://',parameters('frontWebAppName'),'.scm.azurewebsites.net/detectors?type=tools&name=eventviewer')]"
+            },
             {
               "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
               "value": "[parameters('frontAppinsightsInstrumentationKey')]"
@@ -372,8 +807,16 @@
               "value": "disabled"
             },
             {
+              "name": "VirtoCommerce:Endpoint:Password",
+              "value": "[parameters('virtoCommerceEndpointPassword')]"
+            },
+            {
               "name": "VirtoCommerce:Endpoint:Url",
-              "value": "[parameters('frontVirtoCommerceEndpointUrl')]"
+              "value": "[concat('https://',parameters('platformSecondWebAppName'), '.azurewebsites.net')]"
+            },
+            {
+              "name": "VirtoCommerce:Endpoint:UserName",
+              "value": "[parameters('virtoCommerceEndpointUserName')]"
             },
             {
               "name": "XDT_MicrosoftApplicationInsights_BaseExtensions",
@@ -387,7 +830,12 @@
           "connectionStrings": [
             {
               "name": "ContentConnectionString",
-              "connectionString": "[concat('provider=AzureBlobStorage;rootPath=assets;DefaultEndpointsProtocol=https;AccountName=',parameters('storageAccountName'),';AccountKey=',concat(listKeys(parameters('storageAccountName'),'2015-05-01-preview').key1))]",
+              "connectionString": "[concat('provider=AzureBlobStorage;rootPath=cms;DefaultEndpointsProtocol=https;AccountName=',parameters('storageAccountName'),';AccountKey=',parameters('storageAccountKey'),';EndpointSuffix=core.windows.net')]",
+              "type": "Custom"
+            },
+            {
+              "name": "RedisConnectionString",
+              "connectionString": "[concat(parameters('redisCacheName'),'.redis.cache.windows.net:6380,password=',parameters('redisCacheKey'),',ssl=true,abortConnect=False')]",
               "type": "Custom"
             }
           ],
@@ -395,7 +843,13 @@
             {
               "virtualPath": "/",
               "physicalPath": "site\\wwwroot",
-              "preloadEnabled": false
+              "preloadEnabled": true
+            }
+          ],
+          "metadata": [
+            {
+              "name": "CURRENT_STACK",
+              "value": "[parameters('currentStack')]"
             }
           ]
         }
