@@ -229,7 +229,7 @@ pipeline {
                                 def e2eDir = "${env.WORKSPACE}\\e2e"
                                 dir(e2eDir)
                                 {
-                                    git changelog: false, credentialsId: '38b768a3-7d9c-4203-9389-d6c6d8d6aff4', poll: false, url: 'https://github.com/VirtoCommerce/vc-quality-gate-katalon.git'
+                                    // git changelog: false, credentialsId: '38b768a3-7d9c-4203-9389-d6c6d8d6aff4', poll: false, url: 'https://github.com/VirtoCommerce/vc-quality-gate-katalon.git'
                                     def e2eStatus = 'success'
                                     // try{
                                     //     powershell "${env.KATALON_DIR}\\katalonc.exe -projectPath=\"${e2eDir}\\platform_storefront.prj\" -testSuitePath=\"Test Suites/StorefrontPlatform\" -apiKey=\"${env.KATALON_API_KEY}\" -browserType=\"Chrome (headless)\" -g_StoreURL=\"http://localhost:${Utilities.getStorefrontPort(this)}\" -executionProfile=\"default\""
