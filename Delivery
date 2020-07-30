@@ -231,17 +231,17 @@ pipeline {
                                 {
                                     git changelog: false, credentialsId: '38b768a3-7d9c-4203-9389-d6c6d8d6aff4', poll: false, url: 'https://github.com/VirtoCommerce/vc-quality-gate-katalon.git'
                                     def e2eStatus = 'success'
-                                    try{
-                                        powershell "${env.KATALON_DIR}\\katalonc.exe -projectPath=\"${e2eDir}\\platform_storefront.prj\" -testSuitePath=\"Test Suites/StorefrontPlatform\" -apiKey=\"${env.KATALON_API_KEY}\" -browserType=\"Chrome (headless)\" -g_StoreURL=\"http://localhost:${Utilities.getStorefrontPort(this)}\" -executionProfile=\"default\""
-                                    }
-                                    catch(any)
-                                    {
-                                        echo any.getMessage()
-                                        e2eStatus = 'failed'
-                                    }
+                                    // try{
+                                    //     powershell "${env.KATALON_DIR}\\katalonc.exe -projectPath=\"${e2eDir}\\platform_storefront.prj\" -testSuitePath=\"Test Suites/StorefrontPlatform\" -apiKey=\"${env.KATALON_API_KEY}\" -browserType=\"Chrome (headless)\" -g_StoreURL=\"http://localhost:${Utilities.getStorefrontPort(this)}\" -executionProfile=\"default\""
+                                    // }
+                                    // catch(any)
+                                    // {
+                                    //     echo any.getMessage()
+                                    //     e2eStatus = 'failed'
+                                    // }
                                     def platformPort = (Utilities.getPlatformPort(this) as int) - 1000
                                     def storefrontPort = (Utilities.getStorefrontPort(this) as int) - 1000
-                                    def msg = "E2E ${e2eStatus}\nStorefront:\nhttps://docker.virtocommerce.com:${storefrontPort}\nPlatform:\nhttps://docker.virtocommerce.com:${platformPort}"
+                                    def msg = "Storefront:\nhttps://docker.virtocommerce.com:${storefrontPort}\nPlatform:\nhttps://docker.virtocommerce.com:${platformPort}" //E2E ${e2eStatus}\n
                                     input message: msg
                                 }
                             }
