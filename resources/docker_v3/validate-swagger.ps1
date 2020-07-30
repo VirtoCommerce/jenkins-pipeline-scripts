@@ -3,7 +3,7 @@ Param(
     $ApiUrl,
     [parameter(Mandatory = $true)]
     $OutFile,
-    $SwaggerValidatorUrl = "http://validator.swagger.io/validator/debug"
+    $SwaggerValidatorUrl = "https://validator.swagger.io/validator/debug"
 )
 
 $swaggerApi = "$ApiUrl/docs/PlatformUI/swagger.json"
