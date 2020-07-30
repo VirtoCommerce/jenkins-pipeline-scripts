@@ -276,11 +276,12 @@ class Packaging {
         context.echo "Stop SonarScanner for MSBuild"
         def sqScannerMsBuildHome = context.tool 'Scanner for MSBuild'
         def fullJobName = Utilities.getRepoName(context)
-        def scannerPath = "\"${sqScannerMsBuildHome}\\SonarScanner.MSBuild.exe\""
-        if(dotnet)
-        {
-            scannerPath = "dotnet sonarscanner"
-        }
+        // def scannerPath = "\"${sqScannerMsBuildHome}\\SonarScanner.MSBuild.exe\""
+        // if(dotnet)
+        // {
+        //     scannerPath = "dotnet sonarscanner"
+        // }
+        def scannerPath = "dotnet sonarscanner"
         context.withSonarQubeEnv('SonarCloud') {
             context.bat "${scannerPath} end /d:sonar.login=%SONAR_AUTH_TOKEN%"
         }
