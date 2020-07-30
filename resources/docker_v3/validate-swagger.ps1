@@ -16,13 +16,14 @@ $headers = @{}
 $headers.Add("accept", "application/json")
 $schemaContent = Get-Content -Path $swaggerSchemaPath
 $result = Invoke-RestMethod -Uri $SwaggerValidatorUrl -Headers $headers -Body $schemaContent -ContentType "application/json" -Method Post -Debug -Verbose
+Write-Output $result
 $errors = $false
 foreach ($validation in $result.schemaValidationMessages)
 {
     Write-Output $validation
     if($validation.level -eq "error")
     {
-        $errors = $false
+        $errors = $true
     }
 }
 if($errors)
