@@ -231,11 +231,12 @@ class Packaging {
         def fullJobName = "VirtoCommerce_${Utilities.getRepoName(context)}"
         def coverageFolder = Utilities.getCoverageFolder(context)
         def coverageReportType = 'opencover'
-        def scannerPath = "\"${sqScannerMsBuildHome}\\SonarScanner.MSBuild.exe\""
-        if(dotnet)
-        {
-            scannerPath = "dotnet sonarscanner"
-        }
+        // def scannerPath = "\"${sqScannerMsBuildHome}\\SonarScanner.MSBuild.exe\""
+        // if(dotnet)
+        // {
+        //     scannerPath = "dotnet sonarscanner"
+        // }
+        def scannerPath = "dotnet sonarscanner"
         context.withSonarQubeEnv('SonarCloud') {
             def repoName = Utilities.getRepoName(context)
             def prNumber = Utilities.getPullRequestNumber(context)
