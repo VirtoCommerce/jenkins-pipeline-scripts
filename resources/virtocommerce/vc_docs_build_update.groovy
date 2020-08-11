@@ -14,6 +14,7 @@ def UPDATE_CS = false
 def SRC_BRANCH
 
 def UNSTABLE_CAUSES = []
+def docStatus = "Docs build success"
 
 pipeline
 {
@@ -57,7 +58,6 @@ pipeline
                         try
                         {
                             pwsh "${psfolder}\\vc_docs_get_sources.ps1"
-                            def docStatus = "Docs build success"
                         }
                         catch(any)
                         {
