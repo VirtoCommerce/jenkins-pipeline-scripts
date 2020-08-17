@@ -9,6 +9,7 @@ def call(body) {
 	body.resolveStrategy = Closure.DELEGATE_FIRST
 	body.delegate = config
 	body()
+	def UNSTABLE_CAUSES = []
     
 	node
 	{
@@ -372,6 +373,12 @@ def call(body) {
 					parsingRulesPath: env.LOG_PARSER_RULES,
 					useProjectRule: false])
 				bat "docker image prune --force"
+				if(currentBuild.resultIsBetterOrEqualTo('SUCCESS') && UNSTABLE_CAUSES.size()>0){
+                    currentBuild.result = 'UNSTABLE'
+                    for(cause in UNSTABLE_CAUSES){
+                        echo cause
+                    }
+                }
 				// if(currentBuild.result != 'FAILURE') {
 				// 	step([$class: 'Mailer', notifyEveryUnstableBuild: true, recipients: emailextrecipients([[$class: 'CulpritsRecipientProvider'], [$class: 'RequesterRecipientProvider']])])
 				// }
