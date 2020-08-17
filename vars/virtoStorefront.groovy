@@ -284,7 +284,7 @@ def call(body) {
                     {
                         artifacts = findFiles(glob: 'artifacts\\*.zip')
 
-                        if(env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'feature/migrate-to-vc30' || env.BRANCH_NAME.startsWith("feature/") || env.BRANCH_NAME.startsWith("bug/") || env.BRANCH_NAME.startsWith("meds/") || env.BRANCH_NAME.startsWith("support/2.x"))
+                        if(env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'feature/migrate-to-vc30' || env.BRANCH_NAME.startsWith("feature/") || env.BRANCH_NAME.startsWith("bug/") || env.BRANCH_NAME.startsWith("meds/") || env.BRANCH_NAME.startsWith("odt/") || env.BRANCH_NAME.startsWith("support/2.x"))
                         {
                             Packaging.saveArtifact(this, 'vc', Utilities.getProjectType(this), '', artifacts[0].path)
                         }
