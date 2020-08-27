@@ -124,7 +124,15 @@ pipeline {
                         //storefront
                         def storefrontSrc = "${solutionRoot}\\${SETTINGS['storefrontBranch']}"
                         echo "storefrontSrc: ${storefrontSrc}"
-                        powershell script: "Copy-Item -Path ${storefrontSrc}\\* -Destination ${env.WORKSPACE}\\CS -Include storefront -Recurse -Force", label: "Copy Storefron to Workspace"
+                            if(${SETTINGS['storefrontRepo']} == null)
+                            {
+                                powershell script: "Copy-Item -Path ${storefrontSrc}\\* -Destination ${env.WORKSPACE}\\CS -Include storefront -Recurse -Force", label: "Copy Storefron to Workspace"
+                            }
+                            else
+                            {
+                                powershell script: "New-Item -ItemType Directory -Path ${env.WORKSPACE}\\CS\\storefront -Force", label: "md Storefront dir in Workspace"
+                                powershell script: "Copy-Item -Path ${storefrontSrc}\\* -Destination ${env.WORKSPACE}\\CS\\storefront -Recurse -Force", label: "Copy Storefront to Workspace"
+                            }
                         powershell script: "Copy-Item -Path ${csSrc}\\* -Destination ${env.WORKSPACE}\\CS -Recurse -Exclude storefront,theme -Force", label: "Copy Solution to Workspace"
                     } 
                     else if(BRANCH_NAME == 'feature_migrate-to-vc30')
