@@ -124,7 +124,7 @@ pipeline {
                         //storefront
                         def storefrontSrc = "${solutionRoot}\\${SETTINGS['storefrontBranch']}"
                         echo "storefrontSrc: ${storefrontSrc}"
-                            if(${SETTINGS['storefrontRepo']} == null)
+                            if(SETTINGS['storefrontRepo'] == null)
                             {
                                 powershell script: "Copy-Item -Path ${storefrontSrc}\\* -Destination ${env.WORKSPACE}\\CS -Include storefront -Recurse -Force", label: "Copy Storefron to Workspace"
                             }
