@@ -123,15 +123,15 @@ pipeline {
                         powershell script: "Copy-Item -Path ${themeSrc}\\* ${themeIncludeParam} -Destination ${themeDst} -Recurse -Force", label: "Copy Theme to Workspace"
                         //storefront
                         def storefrontSrc = "${solutionRoot}\\${SETTINGS['storefrontBranch']}"
-                        if(SETTINGS['storefrontRepo'] == null)
-                        {
-                            powershell script: "Copy-Item -Path ${storefrontSrc}\\* -Destination ${env.WORKSPACE}\\CS -Include storefront -Recurse -Force", label: "Copy Storefron to Workspace"
-                        }
-                        else
+                        if(SETTINGS['storefrontRepo'])
                         {
                             storefrontSrc = "${solutionRoot}\\${BRANCH_NAME}\\${SETTINGS['storefrontBranch']}"
                             powershell script: "New-Item -ItemType Directory -Path ${env.WORKSPACE}\\CS\\storefront -Force", label: "md Storefront dir in Workspace"
                             powershell script: "Copy-Item -Path ${storefrontSrc}\\* -Destination ${env.WORKSPACE}\\CS\\storefront -Recurse -Force", label: "Copy Storefront to Workspace"
+                        }
+                        else
+                        {
+                            powershell script: "Copy-Item -Path ${storefrontSrc}\\* -Destination ${env.WORKSPACE}\\CS -Include storefront -Recurse -Force", label: "Copy Storefron to Workspace"
                         }
                         echo "storefrontSrc: ${storefrontSrc}"
                         powershell script: "Copy-Item -Path ${csSrc}\\* -Destination ${env.WORKSPACE}\\CS -Recurse -Exclude storefront,theme -Force", label: "Copy Solution to Workspace"
