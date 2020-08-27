@@ -130,6 +130,7 @@ pipeline {
                             }
                             else
                             {
+                                storefrontSrc = "${solutionRoot}\\${BRANCH_NAME}\\${SETTINGS['storefrontBranch']}"
                                 powershell script: "New-Item -ItemType Directory -Path ${env.WORKSPACE}\\CS\\storefront -Force", label: "md Storefront dir in Workspace"
                                 powershell script: "Copy-Item -Path ${storefrontSrc}\\* -Destination ${env.WORKSPACE}\\CS\\storefront -Recurse -Force", label: "Copy Storefront to Workspace"
                             }
