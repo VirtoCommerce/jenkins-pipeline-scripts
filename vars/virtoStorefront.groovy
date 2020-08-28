@@ -62,9 +62,10 @@ def call(body) {
 				break
 			}
 
+			echo "repoName: ${repoName}"
 			switch(repoName)
 			{
-				case 'odt':
+				case 'vc-odt-storefront':
 					dockerTag = "5.0-odt"
 					dockerTagLinux = '5.0-odt-linux'
 					runtimeImage = "mcr.microsoft.com/dotnet/core/aspnet:3.1"
@@ -211,7 +212,7 @@ def call(body) {
 							powershell script: "Copy-Item ${workspace}\\artifacts\\publish\\* ${websitePath}\\VirtoCommerce.Storefront -Recurse -Force"
 							dir(env.BRANCH_NAME == 'support/2.x-dev' || env.BRANCH_NAME == 'support/2.x' ? env.WORKSPACE : workspace)
 							{
-								dockerImage = Packaging.createDockerImage(this, zipArtifact.replaceAll('\\.','/'), websitePath, "VirtoCommerce.Storefront", dockerTag, runtimeImage)	
+								dockerImage = Packaging.createDockerImage(this, zipArtifact.replaceAll('\\.','/'), websitePath, "VirtoCommerce.Storefront", dockerTag, runtimeImage)
 							}	
 							if(Utilities.isNetCore(projectType) && (env.BRANCH_NAME == 'dev' || env.BRANCH_NAME =='master'))
 							{
