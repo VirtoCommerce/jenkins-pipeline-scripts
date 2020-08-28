@@ -19,7 +19,8 @@ def call(body) {
 		def hmacSecret = env.HMAC_SECRET
 		def solution = config.solution
 		projectType = 'NETCORE2'
-
+		
+		def repoName = Utilities.getRepoName(this)
         def workspace = env.WORKSPACE.replaceAll('%2F', '_')
 		dir(workspace)
 		{
@@ -34,9 +35,7 @@ def call(body) {
 			def buildOrder = Utilities.getNextBuildOrder(this)
 			def themeBranch
         	def releaseNotesPath = "${workspace}\\release_notes.txt"
-			if (env.BRANCH_NAME == 'support/2.x') {
-				
-			}
+
 			switch(env.BRANCH_NAME)
 			{
 				case 'support/2.x':
@@ -60,6 +59,16 @@ def call(body) {
 					dockerTagLinux = 'latest'
 					runtimeImage = "mcr.microsoft.com/dotnet/core/aspnet:3.1"
 					themeBranch = 'master'
+				break
+			}
+
+			switch(repoName)
+			{
+				case 'odt':
+					dockerTag = "5.0-odt"
+					dockerTagLinux = '5.0-odt-linux'
+					runtimeImage = "mcr.microsoft.com/dotnet/core/aspnet:3.1"
+					themeBranch = 'dev'
 				break
 			}
 
@@ -110,7 +119,7 @@ def call(body) {
 
 						try
 						{
-							def release = GithubRelease.getLatestGithubReleaseV3(this, Utilities.getOrgName(this), Utilities.getRepoName(this))
+							def release = GithubRelease.getLatestGithubReleaseV3(this, Utilities.getOrgName(this), repoName)
 							echo release.published_at
 							def releaseNotes = Utilities.getReleaseNotesFromCommits(this, release.published_at)
 							echo releaseNotes
