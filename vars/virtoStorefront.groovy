@@ -62,7 +62,6 @@ def call(body) {
 				break
 			}
 
-			echo "repoName: ${repoName}"
 			switch(repoName)
 			{
 				case 'vc-odt-storefront':
