@@ -177,22 +177,22 @@ def call(body) {
                         def releaseNotesFile = new File(releaseNotesPath)
                         def releaseNotesArg = releaseNotesFile.exists() ? "-ReleaseNotes ${releaseNotesFile}" : ""
                         def releaseBranchArg = "-ReleaseBranch ${Utilities.getReleaseBranch(this)}"
-                        def releaseResult = powershell script: "vc-build Release -GitHubUser ${orgName} -GitHubToken ${env.GITHUB_TOKEN} ${releaseBranchArg} ${releaseNotesArg} -skip Clean+Restore+Compile+Test", returnStatus: true
-                        if(releaseResult == 422){
-                            UNSTABLE_CAUSES.add("Release already exists on github")
-                        } else if(releaseResult !=0 ) {
-                            throw new Exception("Github release error")
-                        }
+                        // def releaseResult = powershell script: "vc-build Release -GitHubUser ${orgName} -GitHubToken ${env.GITHUB_TOKEN} ${releaseBranchArg} ${releaseNotesArg} -skip Clean+Restore+Compile+Test", returnStatus: true
+                        // if(releaseResult == 422){
+                        //     UNSTABLE_CAUSES.add("Release already exists on github")
+                        // } else if(releaseResult !=0 ) {
+                        //     throw new Exception("Github release error")
+                        // }
 
-                        def manifestResult = powershell script: "vc-build PublishModuleManifest", returnStatus: true
-                        if(manifestResult == 423)
-                        {
-                            UNSTABLE_CAUSES.add("Module Manifest: nothing to commit, working tree clean")
-                        }
-                        else if(manifestResult != 0)
-                        {
-                            throw new Exception("Module Manifest: returned nonzero exit code")
-                        }
+                        // def manifestResult = powershell script: "vc-build PublishModuleManifest", returnStatus: true
+                        // if(manifestResult == 423)
+                        // {
+                        //     UNSTABLE_CAUSES.add("Module Manifest: nothing to commit, working tree clean")
+                        // }
+                        // else if(manifestResult != 0)
+                        // {
+                        //     throw new Exception("Module Manifest: returned nonzero exit code")
+                        // }
                     }
 
                     // stage('Deploy'){
