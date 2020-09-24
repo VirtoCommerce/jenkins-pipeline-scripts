@@ -216,7 +216,7 @@ def call(body) {
 
                 //     //     //Utilities.runSharedPS(this, "v3\\Restart-WebApp.ps1", "-WebAppName ${SETTINGS['webAppName']} -ResourceGroupName ${SETTINGS['resourceGroupName']} -SubscriptionID ${SETTINGS['subscriptionID']}")
                 //     // }
-                // }
+                }
             }
             catch (any) {
                 currentBuild.result = 'FAILURE'
