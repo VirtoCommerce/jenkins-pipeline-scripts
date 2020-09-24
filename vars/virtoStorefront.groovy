@@ -320,29 +320,29 @@ def call(body) {
 								def notes = Utilities.getReleaseNotes(this, webProject)
 								Packaging.publishRelease(this, version, notes)
 							}
-							else if (env.BRANCH_NAME == 'master')
-							{
-								def ghReleaseResult = powershell script: "vc-build PublishPackages -ApiKey ${env.NUGET_KEY} -skip Clean+Restore+Compile+Test", returnStatus: true
-								if(ghReleaseResult == 409)
-								{
-									UNSTABLE_CAUSES.add("Nuget package already exists.")
-								} 
-								else if(ghReleaseResult != 0)
-								{
-									throw new Exception("ERROR: script returned ${ghReleaseResult}")
-								}
+							// else if (env.BRANCH_NAME == 'master')
+							// {
+							// 	def ghReleaseResult = powershell script: "vc-build PublishPackages -ApiKey ${env.NUGET_KEY} -skip Clean+Restore+Compile+Test", returnStatus: true
+							// 	if(ghReleaseResult == 409)
+							// 	{
+							// 		UNSTABLE_CAUSES.add("Nuget package already exists.")
+							// 	} 
+							// 	else if(ghReleaseResult != 0)
+							// 	{
+							// 		throw new Exception("ERROR: script returned ${ghReleaseResult}")
+							// 	}
 
-								def orgName = Utilities.getOrgName(this)
-								def releaseNotesFile = new File(releaseNotesPath)
-								def releaseNotesArg = releaseNotesFile.exists() ? "-ReleaseNotes ${releaseNotesFile}" : ""
-								def releaseBranchArg = "-ReleaseBranch ${Utilities.getReleaseBranch(this)}"
-								def releaseResult = powershell script: "vc-build Release -GitHubUser ${orgName} -GitHubToken ${env.GITHUB_TOKEN} ${releaseBranchArg} ${releaseNotesArg} -skip Clean+Restore+Compile+Test", returnStatus: true
-								if(releaseResult == 422){
-									UNSTABLE_CAUSES.add("Release already exists on github")
-								} else if(releaseResult !=0 ) {
-									throw new Exception("Github release error")
-								}
-							}
+							// 	def orgName = Utilities.getOrgName(this)
+							// 	def releaseNotesFile = new File(releaseNotesPath)
+							// 	def releaseNotesArg = releaseNotesFile.exists() ? "-ReleaseNotes ${releaseNotesFile}" : ""
+							// 	def releaseBranchArg = "-ReleaseBranch ${Utilities.getReleaseBranch(this)}"
+							// 	def releaseResult = powershell script: "vc-build Release -GitHubUser ${orgName} -GitHubToken ${env.GITHUB_TOKEN} ${releaseBranchArg} ${releaseNotesArg} -skip Clean+Restore+Compile+Test", returnStatus: true
+							// 	if(releaseResult == 422){
+							// 		UNSTABLE_CAUSES.add("Release already exists on github")
+							// 	} else if(releaseResult !=0 ) {
+							// 		throw new Exception("Github release error")
+							// 	}
+							// }
 
 							// if((solution == 'VirtoCommerce.Platform.sln' || projectType == 'NETCORE2') && env.BRANCH_NAME == 'dev')
 							// {

@@ -25,7 +25,7 @@ def call(body) {
             // SETTINGS = globalLib.Settings.new(settingsFileContent)
             // SETTINGS.setProject('platform-core')
             // SETTINGS.setBranch(env.BRANCH_NAME)
-            def commitHash
+            // def commitHash
             def commitNumber
             def versionSuffixArg
             try {
@@ -33,24 +33,24 @@ def call(body) {
                     deleteDir()
                     checkout scm
 
-                    commitHash = Utilities.getCommitHash(this)
+                    // commitHash = Utilities.getCommitHash(this)
                     commitNumber = Utilities.getCommitNumber(this)
                     versionSuffixArg = env.BRANCH_NAME == 'dev' ? "-CustomVersionSuffix \"alpha.${commitNumber}\"" : ""
                     echo versionSuffixArg
 
-                    try
-                    {
-                        def release = GithubRelease.getLatestGithubReleaseV3(this, Utilities.getOrgName(this), Utilities.getRepoName(this), env.BRANCH_NAME == 'master' ? false : true)
-                        echo release.published_at
-                        def releaseNotes = Utilities.getReleaseNotesFromCommits(this, release.published_at)
-                        echo releaseNotes
-                        writeFile file: releaseNotesPath, text: releaseNotes
-                    }
-                    catch(any)
-                    {
-                        echo "exception:"
-                        echo any.getMessage()
-                    }
+                    // try
+                    // {
+                    //     def release = GithubRelease.getLatestGithubReleaseV3(this, Utilities.getOrgName(this), Utilities.getRepoName(this), env.BRANCH_NAME == 'master' ? false : true)
+                    //     echo release.published_at
+                    //     def releaseNotes = Utilities.getReleaseNotesFromCommits(this, release.published_at)
+                    //     echo releaseNotes
+                    //     writeFile file: releaseNotesPath, text: releaseNotes
+                    // }
+                    // catch(any)
+                    // {
+                    //     echo "exception:"
+                    //     echo any.getMessage()
+                    // }
                 }
 
                 stage('Build'){
@@ -115,108 +115,108 @@ def call(body) {
                     }
                 }
 
-                if(env.BRANCH_NAME == 'dev')
-                {
-                    stage('Publish')
-                    {
-                        // def gitversionOutput = powershell (script: "dotnet gitversion", returnStdout: true, label: 'Gitversion', encoding: 'UTF-8').trim()
-                        // def gitversionJson = new groovy.json.JsonSlurperClassic().parseText(gitversionOutput)
-                        // def commitNumber = gitversionJson['CommitsSinceVersionSource']
-                        // def moduleArtifactName = "${moduleId}_3.0.0-build.${commitNumber}"
-                        // echo "artifact version: ${moduleArtifactName}"
-                        def artifactPath = artifacts[0].path
-                        powershell script: "${env.Utils}\\AzCopy10\\AzCopy.exe copy \"${artifactPath}\" \"https://vc3prerelease.blob.core.windows.net/packages${env.ARTIFACTS_BLOB_TOKEN}\"", label: "AzCopy"
-                        def blobDownloadUrl = "https://vc3prerelease.blob.core.windows.net/packages/${artifactFileName}"
-                        def ghReleaseResult = powershell script: "vc-build PublishPackages -ApiKey ${env.NUGET_KEY} -skip Clean+Restore+Compile+Test", returnStatus: true
-                        if(ghReleaseResult == 409)
-                        {
-                            UNSTABLE_CAUSES.add("Nuget package already exists.")
-                        } 
-                        else if(ghReleaseResult != 0)
-                        {
-                            throw new Exception("ERROR: script returned ${ghReleaseResult}")
-                        }
+                // if(env.BRANCH_NAME == 'dev')
+                // {
+                //     stage('Publish')
+                //     {
+                //         // def gitversionOutput = powershell (script: "dotnet gitversion", returnStdout: true, label: 'Gitversion', encoding: 'UTF-8').trim()
+                //         // def gitversionJson = new groovy.json.JsonSlurperClassic().parseText(gitversionOutput)
+                //         // def commitNumber = gitversionJson['CommitsSinceVersionSource']
+                //         // def moduleArtifactName = "${moduleId}_3.0.0-build.${commitNumber}"
+                //         // echo "artifact version: ${moduleArtifactName}"
+                //         // def artifactPath = artifacts[0].path
+                //         // powershell script: "${env.Utils}\\AzCopy10\\AzCopy.exe copy \"${artifactPath}\" \"https://vc3prerelease.blob.core.windows.net/packages${env.ARTIFACTS_BLOB_TOKEN}\"", label: "AzCopy"
+                //         // def blobDownloadUrl = "https://vc3prerelease.blob.core.windows.net/packages/${artifactFileName}"
+                //         // def ghReleaseResult = powershell script: "vc-build PublishPackages -ApiKey ${env.NUGET_KEY} -skip Clean+Restore+Compile+Test", returnStatus: true
+                //         // if(ghReleaseResult == 409)
+                //         // {
+                //         //     UNSTABLE_CAUSES.add("Nuget package already exists.")
+                //         // } 
+                //         // else if(ghReleaseResult != 0)
+                //         // {
+                //         //     throw new Exception("ERROR: script returned ${ghReleaseResult}")
+                //         // }
 
-                        // def orgName = Utilities.getOrgName(this)
-                        // def releaseNotesFile = new File(releaseNotesPath)
-                        // def releaseNotesArg = releaseNotesFile.exists() ? "-ReleaseNotes ${releaseNotesFile}" : ""
-                        // def releaseResult = powershell script: "vc-build Release -GitHubUser ${orgName} -GitHubToken ${env.GITHUB_TOKEN} ${releaseNotesArg} -PreRelease -skip Clean+Restore+Compile+Test", returnStatus: true
-                        // if(releaseResult == 422){
-                        //     UNSTABLE_CAUSES.add("Release already exists on github")
-                        // } else if(releaseResult !=0 ) {
-                        //     throw new Exception("Github release error")
-                        // }
+                //         // def orgName = Utilities.getOrgName(this)
+                //         // def releaseNotesFile = new File(releaseNotesPath)
+                //         // def releaseNotesArg = releaseNotesFile.exists() ? "-ReleaseNotes ${releaseNotesFile}" : ""
+                //         // def releaseResult = powershell script: "vc-build Release -GitHubUser ${orgName} -GitHubToken ${env.GITHUB_TOKEN} ${releaseNotesArg} -PreRelease -skip Clean+Restore+Compile+Test", returnStatus: true
+                //         // if(releaseResult == 422){
+                //         //     UNSTABLE_CAUSES.add("Release already exists on github")
+                //         // } else if(releaseResult !=0 ) {
+                //         //     throw new Exception("Github release error")
+                //         // }
                         
-                        def manifestResult = powershell script: "vc-build PublishModuleManifest -CustomModulePackageUri \"${blobDownloadUrl}\"", returnStatus: true
-                        if(manifestResult == 423)
-                        {
-                            UNSTABLE_CAUSES.add("Module Manifest: nothing to commit, working tree clean")
-                        }
-                        else if(manifestResult != 0)
-                        {
-                            throw new Exception("Module Manifest: returned nonzero exit code")
-                        }
-                    }
-                }
+                //         // def manifestResult = powershell script: "vc-build PublishModuleManifest -CustomModulePackageUri \"${blobDownloadUrl}\"", returnStatus: true
+                //         // if(manifestResult == 423)
+                //         // {
+                //         //     UNSTABLE_CAUSES.add("Module Manifest: nothing to commit, working tree clean")
+                //         // }
+                //         // else if(manifestResult != 0)
+                //         // {
+                //         //     throw new Exception("Module Manifest: returned nonzero exit code")
+                //         // }
+                //     }
+                // }
 
-                if(env.BRANCH_NAME == 'master')
-                {
-                    stage('Publish')
-                    {
-                        def ghReleaseResult = powershell script: "vc-build PublishPackages -ApiKey ${env.NUGET_KEY} -skip Clean+Restore+Compile+Test", returnStatus: true
-                        if(ghReleaseResult == 409)
-                        {
-                            UNSTABLE_CAUSES.add("Nuget package already exists.")
-                        } 
-                        else if(ghReleaseResult != 0)
-                        {
-                            throw new Exception("ERROR: script returned ${ghReleaseResult}")
-                        }
+                // if(env.BRANCH_NAME == 'master')
+                // {
+                //     stage('Publish')
+                //     {
+                //         // def ghReleaseResult = powershell script: "vc-build PublishPackages -ApiKey ${env.NUGET_KEY} -skip Clean+Restore+Compile+Test", returnStatus: true
+                //         // if(ghReleaseResult == 409)
+                //         // {
+                //         //     UNSTABLE_CAUSES.add("Nuget package already exists.")
+                //         // } 
+                //         // else if(ghReleaseResult != 0)
+                //         // {
+                //         //     throw new Exception("ERROR: script returned ${ghReleaseResult}")
+                //         // }
                         
-                        def orgName = Utilities.getOrgName(this)
-                        def releaseNotesFile = new File(releaseNotesPath)
-                        def releaseNotesArg = releaseNotesFile.exists() ? "-ReleaseNotes ${releaseNotesFile}" : ""
-                        def releaseBranchArg = "-ReleaseBranch ${Utilities.getReleaseBranch(this)}"
-                        // def releaseResult = powershell script: "vc-build Release -GitHubUser ${orgName} -GitHubToken ${env.GITHUB_TOKEN} ${releaseBranchArg} ${releaseNotesArg} -skip Clean+Restore+Compile+Test", returnStatus: true
-                        // if(releaseResult == 422){
-                        //     UNSTABLE_CAUSES.add("Release already exists on github")
-                        // } else if(releaseResult !=0 ) {
-                        //     throw new Exception("Github release error")
-                        // }
+                //         // def orgName = Utilities.getOrgName(this)
+                //         // def releaseNotesFile = new File(releaseNotesPath)
+                //         // def releaseNotesArg = releaseNotesFile.exists() ? "-ReleaseNotes ${releaseNotesFile}" : ""
+                //         // def releaseBranchArg = "-ReleaseBranch ${Utilities.getReleaseBranch(this)}"
+                //         // def releaseResult = powershell script: "vc-build Release -GitHubUser ${orgName} -GitHubToken ${env.GITHUB_TOKEN} ${releaseBranchArg} ${releaseNotesArg} -skip Clean+Restore+Compile+Test", returnStatus: true
+                //         // if(releaseResult == 422){
+                //         //     UNSTABLE_CAUSES.add("Release already exists on github")
+                //         // } else if(releaseResult !=0 ) {
+                //         //     throw new Exception("Github release error")
+                //         // }
 
-                        // def manifestResult = powershell script: "vc-build PublishModuleManifest", returnStatus: true
-                        // if(manifestResult == 423)
-                        // {
-                        //     UNSTABLE_CAUSES.add("Module Manifest: nothing to commit, working tree clean")
-                        // }
-                        // else if(manifestResult != 0)
-                        // {
-                        //     throw new Exception("Module Manifest: returned nonzero exit code")
-                        // }
-                    }
+                //         // def manifestResult = powershell script: "vc-build PublishModuleManifest", returnStatus: true
+                //         // if(manifestResult == 423)
+                //         // {
+                //         //     UNSTABLE_CAUSES.add("Module Manifest: nothing to commit, working tree clean")
+                //         // }
+                //         // else if(manifestResult != 0)
+                //         // {
+                //         //     throw new Exception("Module Manifest: returned nonzero exit code")
+                //         // }
+                //     }
 
-                    // stage('Deploy'){
-                    //     def moduleId = Modules.getModuleId(this)
-                    //     def artifacts = findFiles(glob: "artifacts/*.zip")
-                    //     def artifactPath = artifacts[0].path
-                    //     def dstContentPath = "modules\\${moduleId}"
-                    //     Utilities.runSharedPS(this, "v3\\DeployTo-Azure.ps1", "-ZipFile \"${artifactPath}\" -WebAppName ${SETTINGS['webAppName']} -ResourceGroupName ${SETTINGS['resourceGroupName']} -SubscriptionID ${SETTINGS['subscriptionID']} -DestContentPath \"${dstContentPath}\"")
+                //     // stage('Deploy'){
+                //     //     def moduleId = Modules.getModuleId(this)
+                //     //     def artifacts = findFiles(glob: "artifacts/*.zip")
+                //     //     def artifactPath = artifacts[0].path
+                //     //     def dstContentPath = "modules\\${moduleId}"
+                //     //     Utilities.runSharedPS(this, "v3\\DeployTo-Azure.ps1", "-ZipFile \"${artifactPath}\" -WebAppName ${SETTINGS['webAppName']} -ResourceGroupName ${SETTINGS['resourceGroupName']} -SubscriptionID ${SETTINGS['subscriptionID']} -DestContentPath \"${dstContentPath}\"")
 
-                    //     SETTINGS.setRegion('platform-core')
-                    //     SETTINGS.setEnvironment('odtDev')
-                    //     Utilities.runSharedPS(this, "v3\\DeployTo-Azure.ps1", "-ZipFile \"${artifactPath}\" -WebAppName ${SETTINGS['webAppName']} -ResourceGroupName ${SETTINGS['resourceGroupName']} -SubscriptionID ${SETTINGS['subscriptionID']} -DestContentPath \"${dstContentPath}\"")
+                //     //     SETTINGS.setRegion('platform-core')
+                //     //     SETTINGS.setEnvironment('odtDev')
+                //     //     Utilities.runSharedPS(this, "v3\\DeployTo-Azure.ps1", "-ZipFile \"${artifactPath}\" -WebAppName ${SETTINGS['webAppName']} -ResourceGroupName ${SETTINGS['resourceGroupName']} -SubscriptionID ${SETTINGS['subscriptionID']} -DestContentPath \"${dstContentPath}\"")
 
-                    //     SETTINGS.setRegion('platform-core')
-                    //     SETTINGS.setEnvironment('odtQa')
-                    //     Utilities.runSharedPS(this, "v3\\DeployTo-Azure.ps1", "-ZipFile \"${artifactPath}\" -WebAppName ${SETTINGS['webAppName']} -ResourceGroupName ${SETTINGS['resourceGroupName']} -SubscriptionID ${SETTINGS['subscriptionID']} -DestContentPath \"${dstContentPath}\"")
+                //     //     SETTINGS.setRegion('platform-core')
+                //     //     SETTINGS.setEnvironment('odtQa')
+                //     //     Utilities.runSharedPS(this, "v3\\DeployTo-Azure.ps1", "-ZipFile \"${artifactPath}\" -WebAppName ${SETTINGS['webAppName']} -ResourceGroupName ${SETTINGS['resourceGroupName']} -SubscriptionID ${SETTINGS['subscriptionID']} -DestContentPath \"${dstContentPath}\"")
 
-                    //     SETTINGS.setRegion('platform-core')
-                    //     SETTINGS.setEnvironment('odtDemo')
-                    //     Utilities.runSharedPS(this, "v3\\DeployTo-Azure.ps1", "-ZipFile \"${artifactPath}\" -WebAppName ${SETTINGS['webAppName']} -ResourceGroupName ${SETTINGS['resourceGroupName']} -SubscriptionID ${SETTINGS['subscriptionID']} -DestContentPath \"${dstContentPath}\"")
+                //     //     SETTINGS.setRegion('platform-core')
+                //     //     SETTINGS.setEnvironment('odtDemo')
+                //     //     Utilities.runSharedPS(this, "v3\\DeployTo-Azure.ps1", "-ZipFile \"${artifactPath}\" -WebAppName ${SETTINGS['webAppName']} -ResourceGroupName ${SETTINGS['resourceGroupName']} -SubscriptionID ${SETTINGS['subscriptionID']} -DestContentPath \"${dstContentPath}\"")
 
-                    //     //Utilities.runSharedPS(this, "v3\\Restart-WebApp.ps1", "-WebAppName ${SETTINGS['webAppName']} -ResourceGroupName ${SETTINGS['resourceGroupName']} -SubscriptionID ${SETTINGS['subscriptionID']}")
-                    // }
-                }
+                //     //     //Utilities.runSharedPS(this, "v3\\Restart-WebApp.ps1", "-WebAppName ${SETTINGS['webAppName']} -ResourceGroupName ${SETTINGS['resourceGroupName']} -SubscriptionID ${SETTINGS['subscriptionID']}")
+                //     // }
+                // }
             }
             catch (any) {
                 currentBuild.result = 'FAILURE'

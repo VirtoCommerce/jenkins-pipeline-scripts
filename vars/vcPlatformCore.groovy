@@ -57,19 +57,19 @@ def call(body) {
                     commitNumber = Utilities.getCommitNumber(this)
                     versionSuffixArg = env.BRANCH_NAME == 'dev' ? "-CustomVersionSuffix \"alpha.${commitNumber}\"" : ""
 
-                    try
-                    {
-                        def release = GithubRelease.getLatestGithubReleaseV3(this, Utilities.getOrgName(this), Utilities.getRepoName(this), env.BRANCH_NAME == 'master' ? false : true)
-                        echo release.published_at
-                        def releaseNotes = Utilities.getReleaseNotesFromCommits(this, release.published_at)
-                        echo releaseNotes
-                        writeFile file: releaseNotesPath, text: releaseNotes
-                    }
-                    catch(any)
-                    {
-                        echo "exception:"
-                        echo any.getMessage()
-                    }
+                    // try
+                    // {
+                    //     def release = GithubRelease.getLatestGithubReleaseV3(this, Utilities.getOrgName(this), Utilities.getRepoName(this), env.BRANCH_NAME == 'master' ? false : true)
+                    //     echo release.published_at
+                    //     def releaseNotes = Utilities.getReleaseNotesFromCommits(this, release.published_at)
+                    //     echo releaseNotes
+                    //     writeFile file: releaseNotesPath, text: releaseNotes
+                    // }
+                    // catch(any)
+                    // {
+                    //     echo "exception:"
+                    //     echo any.getMessage()
+                    // }
                 }
 
                 if(!Utilities.areThereCodeChanges(this))
@@ -167,86 +167,86 @@ def call(body) {
 
                 if(env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'dev')
                 {
-                    stage('Create Test Environment')
-                    {
-                        timestamps
-                        {
-                            dir(Utilities.getComposeFolderV3(this))
-                            {
-                                def platformPort = Utilities.getPlatformPort(this)
-                                def storefrontPort = Utilities.getStorefrontPort(this)
-                                def sqlPort = Utilities.getSqlPort(this)
-                                withEnv(["PLATFORM_DOCKER_TAG=${platformDockerTag}", "STOREFRONT_DOCKER_TAG=${storefrontDockerTag}", "DOCKER_PLATFORM_PORT=${platformPort}", "DOCKER_STOREFRONT_PORT=${storefrontPort}", "DOCKER_SQL_PORT=${sqlPort}", "COMPOSE_PROJECT_NAME=${env.BUILD_TAG}"]) {
-                                    bat "docker-compose up -d"
-                                }
-                            }
-                        }
-                    }
-                    stage('Install Modules')
-                    {
-                        timestamps
-                        {
-                            def platformHost = Utilities.getPlatformCoreHost(this)
-                            def platformContainerId = Utilities.getPlatformContainer(this)
-                            echo "Platform Host: ${platformHost}"
-                            sleep 90
-                            Utilities.runPS(this, "docker_v3/vc-setup-modules.ps1", "-ApiUrl ${platformHost} -NeedRestart -ContainerId ${platformContainerId} -Verbose -Debug")
-                            sleep 90
-                            Utilities.runPS(this, "docker_v3/vc-check-installed-modules.ps1", "-ApiUrl ${platformHost} -Verbose -Debug")
-                        }
-                    }
-                    stage('Install Sample Data')
-                    {
-                        timestamps
-                        {
-                            Utilities.runPS(this, "docker_v3/vc-setup-sampledata.ps1", "-ApiUrl ${Utilities.getPlatformCoreHost(this)} -Verbose -Debug")
-                        }
-                    }
-                    stage("Swagger Schema Validation")
-                    {
-                        timestamps
-                        {
-                            def swaggerSchemaPath = "${workspace}\\swaggerSchema${env.BUILD_NUMBER}.json"
-                            Utilities.runPS(this, "docker_v3/vc-get-swagger.ps1", "-ApiUrl ${Utilities.getPlatformCoreHost(this)} -OutFile ${swaggerSchemaPath} -Verbose -Debug")
-                            def swaggerResult = powershell script: "vc-build ValidateSwaggerSchema -SwaggerSchemaPath ${swaggerSchemaPath}", returnStatus: true
-                            if(swaggerResult != 0)
-                            {
-                                UNSTABLE_CAUSES.add("Swagger Schema contains error")
-                            }
-                        }
-                    }
+                    // stage('Create Test Environment')
+                    // {
+                    //     timestamps
+                    //     {
+                    //         dir(Utilities.getComposeFolderV3(this))
+                    //         {
+                    //             def platformPort = Utilities.getPlatformPort(this)
+                    //             def storefrontPort = Utilities.getStorefrontPort(this)
+                    //             def sqlPort = Utilities.getSqlPort(this)
+                    //             withEnv(["PLATFORM_DOCKER_TAG=${platformDockerTag}", "STOREFRONT_DOCKER_TAG=${storefrontDockerTag}", "DOCKER_PLATFORM_PORT=${platformPort}", "DOCKER_STOREFRONT_PORT=${storefrontPort}", "DOCKER_SQL_PORT=${sqlPort}", "COMPOSE_PROJECT_NAME=${env.BUILD_TAG}"]) {
+                    //                 bat "docker-compose up -d"
+                    //             }
+                    //         }
+                    //     }
+                    // }
+                    // stage('Install Modules')
+                    // {
+                    //     timestamps
+                    //     {
+                    //         def platformHost = Utilities.getPlatformCoreHost(this)
+                    //         def platformContainerId = Utilities.getPlatformContainer(this)
+                    //         echo "Platform Host: ${platformHost}"
+                    //         sleep 90
+                    //         Utilities.runPS(this, "docker_v3/vc-setup-modules.ps1", "-ApiUrl ${platformHost} -NeedRestart -ContainerId ${platformContainerId} -Verbose -Debug")
+                    //         sleep 90
+                    //         Utilities.runPS(this, "docker_v3/vc-check-installed-modules.ps1", "-ApiUrl ${platformHost} -Verbose -Debug")
+                    //     }
+                    // }
+                    // stage('Install Sample Data')
+                    // {
+                    //     timestamps
+                    //     {
+                    //         Utilities.runPS(this, "docker_v3/vc-setup-sampledata.ps1", "-ApiUrl ${Utilities.getPlatformCoreHost(this)} -Verbose -Debug")
+                    //     }
+                    // }
+                    // stage("Swagger Schema Validation")
+                    // {
+                    //     timestamps
+                    //     {
+                    //         def swaggerSchemaPath = "${workspace}\\swaggerSchema${env.BUILD_NUMBER}.json"
+                    //         Utilities.runPS(this, "docker_v3/vc-get-swagger.ps1", "-ApiUrl ${Utilities.getPlatformCoreHost(this)} -OutFile ${swaggerSchemaPath} -Verbose -Debug")
+                    //         def swaggerResult = powershell script: "vc-build ValidateSwaggerSchema -SwaggerSchemaPath ${swaggerSchemaPath}", returnStatus: true
+                    //         if(swaggerResult != 0)
+                    //         {
+                    //             UNSTABLE_CAUSES.add("Swagger Schema contains error")
+                    //         }
+                    //     }
+                    // }
 
                     if(env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'master')
                     {
                         stage('Publish')
                         {
-                            def ghReleaseResult = powershell script: "vc-build PublishPackages -ApiKey ${env.NUGET_KEY} -skip Clean+Restore+Compile+Test", returnStatus: true
-                            if(ghReleaseResult == 409)
-                            {
-                                UNSTABLE_CAUSES.add("Nuget package already exists.")
-                            } 
-                            else if(ghReleaseResult != 0)
-                            {
-                                throw new Exception("ERROR: script returned ${ghReleaseResult}")
-                            }
+                            // def ghReleaseResult = powershell script: "vc-build PublishPackages -ApiKey ${env.NUGET_KEY} -skip Clean+Restore+Compile+Test", returnStatus: true
+                            // if(ghReleaseResult == 409)
+                            // {
+                            //     UNSTABLE_CAUSES.add("Nuget package already exists.")
+                            // } 
+                            // else if(ghReleaseResult != 0)
+                            // {
+                            //     throw new Exception("ERROR: script returned ${ghReleaseResult}")
+                            // }
 
-                            if(env.BRANCH_NAME == 'dev')
-                            {
-                                def artifactPath = artifacts[0].path
-                                def artifactFileName = artifacts[0].name
-                                powershell script: "${env.Utils}\\AzCopy10\\AzCopy.exe copy \"${artifactPath}\" \"https://vc3prerelease.blob.core.windows.net/packages${env.ARTIFACTS_BLOB_TOKEN}\"", label: "AzCopy"
-                                // def orgName = Utilities.getOrgName(this)
-                                // def releaseNotesFile = new File(releaseNotesPath)
-                                // def releaseNotesArg = releaseNotesFile.exists() ? "-ReleaseNotes ${releaseNotesFile}" : ""
-                                // def releaseResult = powershell script: "vc-build Release -GitHubUser ${orgName} -GitHubToken ${env.GITHUB_TOKEN} ${releaseNotesArg} -PreRelease -skip Clean+Restore+Compile+Test", returnStatus: true
-                                // if(releaseResult == 422){
-                                //     UNSTABLE_CAUSES.add("Release already exists on github")
-                                // } else if(releaseResult !=0 ) {
-                                //     throw new Exception("Github release error")
-                                // }
+                            // if(env.BRANCH_NAME == 'dev')
+                            // {
+                            //     def artifactPath = artifacts[0].path
+                            //     def artifactFileName = artifacts[0].name
+                            //     powershell script: "${env.Utils}\\AzCopy10\\AzCopy.exe copy \"${artifactPath}\" \"https://vc3prerelease.blob.core.windows.net/packages${env.ARTIFACTS_BLOB_TOKEN}\"", label: "AzCopy"
+                            //     // def orgName = Utilities.getOrgName(this)
+                            //     // def releaseNotesFile = new File(releaseNotesPath)
+                            //     // def releaseNotesArg = releaseNotesFile.exists() ? "-ReleaseNotes ${releaseNotesFile}" : ""
+                            //     // def releaseResult = powershell script: "vc-build Release -GitHubUser ${orgName} -GitHubToken ${env.GITHUB_TOKEN} ${releaseNotesArg} -PreRelease -skip Clean+Restore+Compile+Test", returnStatus: true
+                            //     // if(releaseResult == 422){
+                            //     //     UNSTABLE_CAUSES.add("Release already exists on github")
+                            //     // } else if(releaseResult !=0 ) {
+                            //     //     throw new Exception("Github release error")
+                            //     // }
 
-                                return 0
-                            }
+                            //     return 0
+                            // }
                             
                             Packaging.pushDockerImage(this, dockerWinImage, platformDockerTag)
                             if(env.BRANCH_NAME == 'master')
@@ -262,16 +262,16 @@ def call(body) {
                                 }
                             }
                             
-                            def orgName = Utilities.getOrgName(this)
-                            def releaseNotesFile = new File(releaseNotesPath)
-                            def releaseNotesArg = releaseNotesFile.exists() ? "-ReleaseNotes ${releaseNotesFile}" : ""
-                            def releaseBranchArg = "-ReleaseBranch ${Utilities.getReleaseBranch(this)}"
-                            def releaseResult = powershell script: "vc-build Release -GitHubUser ${orgName} -GitHubToken ${env.GITHUB_TOKEN} ${releaseBranchArg} ${releaseNotesArg} -skip Clean+Restore+Compile+Test", returnStatus: true
-                            if(releaseResult == 422){
-                                UNSTABLE_CAUSES.add("Release already exists on github")
-                            } else if(releaseResult !=0 ) {
-                                throw new Exception("Github release error")
-                            }
+                            // def orgName = Utilities.getOrgName(this)
+                            // def releaseNotesFile = new File(releaseNotesPath)
+                            // def releaseNotesArg = releaseNotesFile.exists() ? "-ReleaseNotes ${releaseNotesFile}" : ""
+                            // def releaseBranchArg = "-ReleaseBranch ${Utilities.getReleaseBranch(this)}"
+                            // def releaseResult = powershell script: "vc-build Release -GitHubUser ${orgName} -GitHubToken ${env.GITHUB_TOKEN} ${releaseBranchArg} ${releaseNotesArg} -skip Clean+Restore+Compile+Test", returnStatus: true
+                            // if(releaseResult == 422){
+                            //     UNSTABLE_CAUSES.add("Release already exists on github")
+                            // } else if(releaseResult !=0 ) {
+                            //     throw new Exception("Github release error")
+                            // }
 
                         //     def orgName = Utilities.getOrgName(this)
                         //     powershell "vc-build Release -GitHubUser ${orgName} -GitHubToken ${env.GITHUB_TOKEN} -PreRelease -skip Clean+Restore+Compile+Test"
@@ -295,18 +295,18 @@ def call(body) {
                 throw any
             }
             finally {
-                if(env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'dev')
-                {
-                    dir(Utilities.getComposeFolderV3(this))
-                    {
-                        def platformPort = Utilities.getPlatformPort(this)
-                        def storefrontPort = Utilities.getStorefrontPort(this)
-                        def sqlPort = Utilities.getSqlPort(this)
-                        withEnv(["PLATFORM_DOCKER_TAG=${platformDockerTag}", "STOREFRONT_DOCKER_TAG=${storefrontDockerTag}", "DOCKER_PLATFORM_PORT=${platformPort}", "DOCKER_STOREFRONT_PORT=${storefrontPort}", "DOCKER_SQL_PORT=${sqlPort}", "COMPOSE_PROJECT_NAME=${env.BUILD_TAG}"]) {
-                            bat "docker-compose down -v"
-                        }
-                    }
-                }
+                // if(env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'dev')
+                // {
+                //     dir(Utilities.getComposeFolderV3(this))
+                //     {
+                //         def platformPort = Utilities.getPlatformPort(this)
+                //         def storefrontPort = Utilities.getStorefrontPort(this)
+                //         def sqlPort = Utilities.getSqlPort(this)
+                //         withEnv(["PLATFORM_DOCKER_TAG=${platformDockerTag}", "STOREFRONT_DOCKER_TAG=${storefrontDockerTag}", "DOCKER_PLATFORM_PORT=${platformPort}", "DOCKER_STOREFRONT_PORT=${storefrontPort}", "DOCKER_SQL_PORT=${sqlPort}", "COMPOSE_PROJECT_NAME=${env.BUILD_TAG}"]) {
+                //             bat "docker-compose down -v"
+                //         }
+                //     }
+                // }
                 if(currentBuild.resultIsBetterOrEqualTo('SUCCESS') && UNSTABLE_CAUSES.size()>0){
                     currentBuild.result = 'UNSTABLE'
                     for(cause in UNSTABLE_CAUSES){
@@ -314,12 +314,12 @@ def call(body) {
                     }
                 }
 			    Utilities.notifyBuildStatus(this, SETTINGS['of365hook'], "Build finished", currentBuild.currentResult)
-                dir(Utilities.getComposeFolderV3(this))
-                {
-                    withEnv(["DOCKER_TAG=dev-branch", "COMPOSE_PROJECT_NAME=${env.BUILD_TAG}"]) {
-                        bat "docker-compose down -v"
-                    }
-                }
+                // dir(Utilities.getComposeFolderV3(this))
+                // {
+                //     withEnv(["DOCKER_TAG=dev-branch", "COMPOSE_PROJECT_NAME=${env.BUILD_TAG}"]) {
+                //         bat "docker-compose down -v"
+                //     }
+                // }
                 Utilities.cleanPRFolder(this)
             }
         }
