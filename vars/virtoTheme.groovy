@@ -37,11 +37,11 @@ def call(body) {
 				}
 			}
 
-			stage('Code Analysis'){
-				timestamps{
-					Packaging.startSonarJS(this)
-				}
-			}
+			// stage('Code Analysis'){
+			// 	timestamps{
+			// 		Packaging.startSonarJS(this)
+			// 	}
+			// }
 
 			stage('Build') {
 				timestamps { 
@@ -49,11 +49,11 @@ def call(body) {
 				}
 			}
 
-			stage('Quality Gate'){
-                timestamps{
-                    Packaging.checkAnalyzerGate(this)
-                }
-            }
+			// stage('Quality Gate'){
+            //     timestamps{
+            //         Packaging.checkAnalyzerGate(this)
+            //     }
+            // }
 
 			def artifacts = findFiles(glob: 'artifacts/*.zip')
 			if(params.themeResultZip != null){
@@ -72,19 +72,19 @@ def call(body) {
 						{
 							Packaging.saveArtifact(this, 'vc', 'theme', config.sampleStore, artifacts[0].path)
 						}
-						if (Packaging.getShouldPublish(this)) {
-							Packaging.publishRelease(this, version, "")
-						}
-						if (env.BRANCH_NAME == 'dev') {
-							def stagingName = Utilities.getStagingNameFromBranchName(this)
-							echo "${SETTINGS.getProjects()}"
-							Utilities.runSharedPS(this, "VC-Theme2Azure.ps1", "-StagingName ${stagingName} -StoreName ${storeName} -AzureBlobName ${SETTINGS['azureBlobName']} -AzureBlobKey ${SETTINGS['azureBlobKey']}")
-							SETTINGS.setProject('theme-core')
-							SETTINGS.setBranch('release/3.0.0')
-							Utilities.runSharedPS(this, "VC-Theme2Azure.ps1", "-StagingName ${stagingName} -StoreName ${storeName} -AzureBlobName ${SETTINGS['azureBlobName']} -AzureBlobKey ${SETTINGS['azureBlobKey']}")
-							SETTINGS.setProject('theme')
-							SETTINGS.setBranch(env.BRANCH_NAME)
-						}
+						// if (Packaging.getShouldPublish(this)) {
+						// 	Packaging.publishRelease(this, version, "")
+						// }
+						// if (env.BRANCH_NAME == 'dev') {
+						// 	def stagingName = Utilities.getStagingNameFromBranchName(this)
+						// 	echo "${SETTINGS.getProjects()}"
+						// 	Utilities.runSharedPS(this, "VC-Theme2Azure.ps1", "-StagingName ${stagingName} -StoreName ${storeName} -AzureBlobName ${SETTINGS['azureBlobName']} -AzureBlobKey ${SETTINGS['azureBlobKey']}")
+						// 	SETTINGS.setProject('theme-core')
+						// 	SETTINGS.setBranch('release/3.0.0')
+						// 	Utilities.runSharedPS(this, "VC-Theme2Azure.ps1", "-StagingName ${stagingName} -StoreName ${storeName} -AzureBlobName ${SETTINGS['azureBlobName']} -AzureBlobKey ${SETTINGS['azureBlobKey']}")
+						// 	SETTINGS.setProject('theme')
+						// 	SETTINGS.setBranch(env.BRANCH_NAME)
+						// }
 					}
 				}
 			}
