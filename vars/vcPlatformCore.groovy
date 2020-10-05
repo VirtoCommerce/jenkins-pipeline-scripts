@@ -141,13 +141,13 @@ def call(body) {
                             dockerWinImage = docker.build("${dockerImageName}:${platformDockerTag}")
                             stash includes: 'VirtoCommerce.Platform/**', name: 'artifact'
                         }
-                        node('linux')
-                        {
-                            unstash 'artifact'
-                            def dockerfileContent = libraryResource 'docker.core/linux/platform/Dockerfile'
-                            writeFile file: "${env.WORKSPACE}/Dockerfile", text: dockerfileContent
-                            dockerLinImage = docker.build("${dockerImageName}:${platformLinuxDockerTag}")
-                        }
+                        // node('linux')
+                        // {
+                        //     unstash 'artifact'
+                        //     def dockerfileContent = libraryResource 'docker.core/linux/platform/Dockerfile'
+                        //     writeFile file: "${env.WORKSPACE}/Dockerfile", text: dockerfileContent
+                        //     dockerLinImage = docker.build("${dockerImageName}:${platformLinuxDockerTag}")
+                        // }
                     }
                 }
 
@@ -253,14 +253,14 @@ def call(body) {
                             {
                                 Packaging.pushDockerImage(this, dockerWinImage, "${platformVersion}-${commitHash}-win")
                             }
-                            node('linux')
-                            {
-                                Packaging.pushDockerImage(this, dockerLinImage, platformLinuxDockerTag)
-                                if(env.BRANCH_NAME == 'master')
-                                {
-                                    Packaging.pushDockerImage(this, dockerLinImage, "${platformVersion}-${commitHash}")
-                                }
-                            }
+                            // node('linux')
+                            // {
+                            //     Packaging.pushDockerImage(this, dockerLinImage, platformLinuxDockerTag)
+                            //     if(env.BRANCH_NAME == 'master')
+                            //     {
+                            //         Packaging.pushDockerImage(this, dockerLinImage, "${platformVersion}-${commitHash}")
+                            //     }
+                            // }
                             
                             // def orgName = Utilities.getOrgName(this)
                             // def releaseNotesFile = new File(releaseNotesPath)

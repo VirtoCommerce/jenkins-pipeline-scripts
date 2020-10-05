@@ -207,13 +207,13 @@ def call(body) {
 							if(solution == 'VirtoCommerce.Platform.sln' || projectType == 'NETCORE2')
 							{
 								Packaging.pushDockerImage(this, dockerImage, dockerTag)
-								if(Utilities.isNetCore(projectType))
-								{
-									node('linux')
-									{
-										Packaging.pushDockerImage(this, dockerImageLinux, dockerTagLinux)
-									}
-								}
+								// if(Utilities.isNetCore(projectType))
+								// {
+								// 	node('linux')
+								// 	{
+								// 		Packaging.pushDockerImage(this, dockerImageLinux, dockerTagLinux)
+								// 	}
+								// }
 							}
 							if (env.BRANCH_NAME == 'support/2.x') {
 								Packaging.createNugetPackages(this)

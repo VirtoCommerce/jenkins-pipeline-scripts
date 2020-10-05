@@ -204,17 +204,17 @@ def call(body) {
 							{
 								dockerImage = Packaging.createDockerImage(this, zipArtifact.replaceAll('\\.','/'), websitePath, "VirtoCommerce.Storefront", dockerTag, runtimeImage)	
 							}	
-							if(Utilities.isNetCore(projectType) && (env.BRANCH_NAME == 'dev' || env.BRANCH_NAME =='master'))
-							{
-								stash includes: 'artifacts/**', name: 'artifact'
-								node('linux')
-								{
-									unstash 'artifact'
-									def dockerfileContent = libraryResource 'docker.core/linux/storefront/Dockerfile'
-									writeFile file: "${env.WORKSPACE}/Dockerfile", text: dockerfileContent
-									dockerImageLinux = docker.build("${storefrontImageName}:${dockerTagLinux}", "--build-arg SOURCE=./artifacts/publish .")
-								}
-							}	
+							// if(Utilities.isNetCore(projectType) && (env.BRANCH_NAME == 'dev' || env.BRANCH_NAME =='master'))
+							// {
+							// 	stash includes: 'artifacts/**', name: 'artifact'
+							// 	node('linux')
+							// 	{
+							// 		unstash 'artifact'
+							// 		def dockerfileContent = libraryResource 'docker.core/linux/storefront/Dockerfile'
+							// 		writeFile file: "${env.WORKSPACE}/Dockerfile", text: dockerfileContent
+							// 		dockerImageLinux = docker.build("${storefrontImageName}:${dockerTagLinux}", "--build-arg SOURCE=./artifacts/publish .")
+							// 	}
+							// }	
 						}
 					}
 				}
@@ -303,17 +303,17 @@ def call(body) {
                             {
                                 Packaging.pushDockerImage(this, dockerImage, "${storefrontVersion}-${commitHash}-win")
                             }
-							if(Utilities.isNetCore(projectType) && dockerImageLinux != null)
-							{
-								node('linux')
-								{
-									Packaging.pushDockerImage(this, dockerImageLinux, dockerTagLinux)
-									if(env.BRANCH_NAME == 'master')
-									{
-										Packaging.pushDockerImage(this, dockerImageLinux, "${storefrontVersion}-${commitHash}")
-									}
-								}
-							}
+							// if(Utilities.isNetCore(projectType) && dockerImageLinux != null)
+							// {
+							// 	node('linux')
+							// 	{
+							// 		Packaging.pushDockerImage(this, dockerImageLinux, dockerTagLinux)
+							// 		if(env.BRANCH_NAME == 'master')
+							// 		{
+							// 			Packaging.pushDockerImage(this, dockerImageLinux, "${storefrontVersion}-${commitHash}")
+							// 		}
+							// 	}
+							// }
 							if (env.BRANCH_NAME == 'support/2.x' ) 
 							{
 								Packaging.createNugetPackages(this)
