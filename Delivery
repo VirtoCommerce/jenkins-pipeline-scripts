@@ -186,7 +186,7 @@ pipeline {
                                         storefrontTagLinux = 'latest'
                                         break
                                     }
-                                    build job: 'DockerEnvLinux', propagate: false, wait: false, parameters:[string(name:'SolutionRoot', value:"${env.WORKSPACE}/CS"), string(name:'PlatformTag', value:platformTagLinux), string(name:'StorefrontTag', value:storefrontTagLinux)]
+                                    //build job: 'DockerEnvLinux', propagate: false, wait: false, parameters:[string(name:'SolutionRoot', value:"${env.WORKSPACE}/CS"), string(name:'PlatformTag', value:platformTagLinux), string(name:'StorefrontTag', value:storefrontTagLinux)]
                                     def platformPort = Utilities.getPlatformPort(this)
                                     def storefrontPort = Utilities.getStorefrontPort(this)
                                     def sqlPort = Utilities.getSqlPort(this)
