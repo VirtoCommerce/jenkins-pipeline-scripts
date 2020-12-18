@@ -501,6 +501,13 @@ class Packaging {
                 context.deleteDir()
             }
         }
-        context.powershell "Expand-Archive -Path ${artifact} -DestinationPath ${destinationFolderPath} -Force"
+        if(artifact.contains("PageBuilderSaaS"))
+        {
+            context.echo "Module incompatible with docker other set"
+        }
+        else
+        {
+            context.powershell "Expand-Archive -Path ${artifact} -DestinationPath ${destinationFolderPath} -Force"
+        }
     }
 }
