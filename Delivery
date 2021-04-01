@@ -228,7 +228,7 @@ pipeline {
                             timestamps
                             {
                                 def swaggerSchemaPath = "${workspace}\\swaggerSchema${env.BUILD_NUMBER}.json"
-                                Utilities.runPS(this, "docker_v3/validate-swagger.ps1", "-ApiUrl ${Utilities.getPlatformCoreHost(this)} -OutFile ${swaggerSchemaPath} -Verbose -Debug")
+                                // Utilities.runPS(this, "docker_v3/validate-swagger.ps1", "-ApiUrl ${Utilities.getPlatformCoreHost(this)} -OutFile ${swaggerSchemaPath} -Verbose -Debug")
                             }
                         }
                         stage("E2E")
