@@ -52,7 +52,7 @@
     "sqlDatabaseCollation": "SQL_Latin1_General_CP1_CI_AS",
     "sqlDatabasePlan": "Basic",
     "storageAccountType": "Standard_LRS",
-    "webAppSize": "B1"
+    "webAppSize": "B2"
   },
   "resources": [
     {
