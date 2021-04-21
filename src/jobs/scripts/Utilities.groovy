@@ -656,15 +656,13 @@ class Utilities {
     }
     def static createInfrastructure(context, project = 'blank')
     {
-        //def AzureTempDir = Utilities.getAzureTemplateDir(context)
-        // S:\Builds\DbgDelivery\workspace\resources\azure\arm-templates
         def AzureTempDir = "..\\workspace@libs\\virto-shared-library\\resources\\azure\\arm-templates" // Azure Resource Manager templates path
         context.dir(AzureTempDir)
         {
             switch(project)
             {
                 case 'dev-demoVC-3':
-                    Utilities.runSharedPS(context, "arm-templates//vc-CreateInfrastructureDev-demoVC-3.ps1")
+                    Utilities.runSharedPS(context, "vc-CreateInfrastructureDev-demoVC-3.ps1")
                     break
             }
         }
