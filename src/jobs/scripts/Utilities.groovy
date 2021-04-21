@@ -657,6 +657,7 @@ class Utilities {
     def static createInfrastructure(context, project = 'blank')
     {
         //def AzureTempDir = Utilities.getAzureTemplateDir(context)
+        // S:\Builds\DbgDelivery\workspace\resources\azure\arm-templates
         def AzureTempDir = "..\\workspace@libs\\virto-shared-library\\resources\\azure\\arm-templates" // Azure Resource Manager templates path
         context.dir(AzureTempDir)
         {
