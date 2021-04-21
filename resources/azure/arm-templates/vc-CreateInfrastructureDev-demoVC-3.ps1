@@ -9,9 +9,9 @@ Write-Host "Infrastructure Check and Deploy Started"
 Add-AzureRmAccount -Credential $psCred -TenantId $TenantID -ServicePrincipal
 Select-AzureRmSubscription -SubscriptionId $SubscriptionID
 
-$DestResourceGroupName = "dev-demoVC-3"
+$DestResourceGroupName = "DEV-demoVC-3"
 
-$TemplateFolder = "resources\azure"
+$TemplateFolder = "resources\azure\arm-templates"
 $TemplateFile = "${env:WORKSPACE}\$TemplateFolder\azuredeployDEV-demoVC-3.json"
 $TemplateParametersFile = "${env:WORKSPACE}\$TemplateFolder\azuredeployDEV-demoVC-3_parameters.json"
 

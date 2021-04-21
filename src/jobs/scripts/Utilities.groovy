@@ -662,7 +662,7 @@ class Utilities {
             switch(project)
             {
                 case 'dev-demoVC-3':
-                    Utilities.runSharedPS(context, "vc-CreateInfrastructureDev-demoVC-3.ps1")
+                    Utilities.runSharedPS(context, "arm-templates//vc-CreateInfrastructureDev-demoVC-3.ps1")
                     break
             }
         }
