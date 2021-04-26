@@ -26,6 +26,12 @@
         "description": "The name of the endpoint url"
       }
     },
+    "virtoCommerceEndpointPassword": {
+      "type": "string",
+      "metadata": {
+        "description": "The name of the endpoint url"
+      }
+    },
     "virtoCommerceEnvironment": {
       "type": "string",
       "metadata": {
@@ -256,6 +262,10 @@
             {
               "name": "VirtoCommerce:Endpoint:Url",
               "value": "[parameters('virtoCommerceEndpointURL')]"
+            },
+            {
+              "name": "VirtoCommerce:Endpoint:Password",
+              "value": "[parameters('virtoCommerceEndpointPassword')]"
             },
             {
               "name": "VirtoCommerce:Endpoint:UserName",

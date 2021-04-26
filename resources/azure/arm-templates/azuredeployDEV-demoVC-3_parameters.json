@@ -14,6 +14,14 @@
     "virtoCommerceEndpointURL": {
       "value": "https://dev-demovc3-admin.azurewebsites.net"
     },
+    "virtoCommerceEndpointPassword": {
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/973d0b8c-44bf-438d-a4b7-1c4162d3ccba/resourceGroups/DEV-demoVC-3/providers/Microsoft.KeyVault/vaults/dev-demovc3"
+        },
+        "secretName": "virtoCommerceEndpointPassword-dev"
+      }
+    },
     "virtoCommerceEnvironment": {
       "value": "DEV"
     },
