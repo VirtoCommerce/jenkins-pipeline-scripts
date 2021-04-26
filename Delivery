@@ -158,7 +158,7 @@ pipeline {
             {
                 script
                 {
-                    if(UPDATE_CS && isDockerRegion(REGION, BRANCH_NAME))
+                    if(UPDATE_CS && isDockerRegion(REGION, BRANCH_NAME, ENV_NAME))
                     {
                         stage('Create Test Environment')
                         {
@@ -269,19 +269,19 @@ pipeline {
             }
         }
 
-        // stage("Create / Update Environment"){
-        //     when {
-        //         expression {
-        //             UPDATE_CS
-        //         }
-        //     }
-        //     steps {
-        //         script{
-        //             def resourceGroupName = SETTINGS['resourceGroupName']
-        //             Utilities.createInfrastructure(this, "${resourceGroupName}")
-        //         }
-        //     }
-        // }
+        stage("Create / Update Environment"){
+            when {
+                expression {
+                    UPDATE_CS
+                }
+            }
+            steps {
+                script{
+                    def resourceGroupName = SETTINGS['resourceGroupName']
+                    Utilities.createInfrastructure(this, "${resourceGroupName}")
+                }
+            }
+        }
 
         stage("Update Solution"){
             when {
@@ -342,8 +342,8 @@ pipeline {
         }
     }
 }
-def isDockerRegion(REGION, BRANCH_NAME){
-    if(REGION == 'demo3' && BRANCH_NAME == 'dev'){
+def isDockerRegion(REGION, BRANCH_NAME, ENV_NAME){
+    if(REGION == 'demo3' && BRANCH_NAME == 'dev' && ENV_NAME == 'QA'){
         return true
     }
     return false
