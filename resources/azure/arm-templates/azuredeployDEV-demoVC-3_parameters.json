@@ -1,20 +1,39 @@
 {
-  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "$schema": "https://schema.management.azure.com/schemas/2019-08-01/deploymentParameters.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "sqlServerName": {
-      "value": "dev-demovc3-srv"
+    "appServicePlanName_StoreFront": {
+      "value": "#{Azure.AppServicePlan.SF.Name}"
+    },
+    "appInsights_StoreFront": {
+      "value": "#{Azure.AppInsights.SF.Name}"
+    },
+    "webAppName_StoreFront": {
+      "value": "#{Azure.WebApp.SF.Name}"
+    },
+    "virtoCommerceDistributorHomePage": {
+      "value": "/distributor/catalog"
+    },
+    "virtoCommerceEndpointPassword": {
+      "value": "#{Backend.Endpoint.Password}"
+    },
+    "virtoCommerceEndpointURL": {
+      "value": "#{Backend.Endpoint}"
+    },
+    "virtoCommerceEnvironment": {
+      "value": "DEV"
+    },
+    "virtoCommerceImpersonateApiKey": {
+      "value": "#{OfflineOrder.SMS.ApiKey}"
+    },
+    "sqlserverName": {
+      "value": "#{Azure.Sqlserver.Name}"
     },
     "sqlAdministratorLogin": {
       "value": "vc-admin"
     },
     "sqlAdministratorLoginPassword": {
-      "reference": {
-        "keyVault": {
-          "id": "/subscriptions/973d0b8c-44bf-438d-a4b7-1c4162d3ccba/resourceGroups/DEV-demoVC-3/providers/Microsoft.KeyVault/vaults/dev-demovc3"
-        },
-        "secretName": "sqlAdministratorLoginPassword-dev"
-      }
+      "value": "h0l+9N4o-1eD"
     },
     "sqlDatabaseName": {
       "value": "dev-demovc3-db"
@@ -22,55 +41,50 @@
     "storageAccountName": {
       "value": "devdemovc3"
     },
-    "platformAppServicePlanName": {
-      "value": "dev-demovc3-admin"
+    "searchServiceName": {
+      "value": "#{Azure.SearchService.Name}"
     },
-    "frontAppServicePlanName": {
-      "value": "dev-demovc3-store"
+    "searchServiceScope": {
+      "value": "Dev-v3"
     },
-    "platformAppInsights": {
-      "value": "dev-demovc3-admin"
+    "cacheName": {
+      "value": "#{Azure.Cache.Name}"
     },
-    "frontAppInsights": {
-      "value": "dev-demovc3-store"
+    "cacheRedisChannelName_Backend": {
+      "value": "Dev-v3"
     },
-    "platformWebAppName": {
-      "value": "dev-demovc3-admin"
+    "cdnProfileName": {
+      "value": "#{Azure.CdnProfile.Name}"
     },
-    "frontWebAppName": {
-      "value": "dev-demovc3-store"
+    "cdnEndpointName": {
+      "value": "#{Azure.Backend.cdnEndpoint.Name}"
     },
-    "platformVirtoCommerce": {
-      "reference": {
-        "keyVault": {
-          "id": "/subscriptions/973d0b8c-44bf-438d-a4b7-1c4162d3ccba/resourceGroups/DEV-demoVC-3/providers/Microsoft.KeyVault/vaults/dev-demovc3"
-        },
-        "secretName": "platformVirtoCommerce-dev"
-      }
+    "appServicePlanName_Backend": {
+      "value": "#{Azure.AppServicePlan.BE.Name}"
     },
-    "platformAppinsightsInstrumentationKey": {
-      "reference": {
-        "keyVault": {
-          "id": "/subscriptions/973d0b8c-44bf-438d-a4b7-1c4162d3ccba/resourceGroups/DEV-demoVC-3/providers/Microsoft.KeyVault/vaults/dev-demovc3"
-        },
-        "secretName": "platformAppinsightsInstrumentationKey-dev"
-      }
+    "appInsights_Backend": {
+      "value": "#{Azure.AppInsights.BE.Name}"
     },
-    "frontVirtoCommerceEndpointUrl": {
-      "reference": {
-        "keyVault": {
-          "id": "/subscriptions/973d0b8c-44bf-438d-a4b7-1c4162d3ccba/resourceGroups/DEV-demoVC-3/providers/Microsoft.KeyVault/vaults/dev-demovc3"
-        },
-        "secretName": "frontVirtoCommerceEndpointUrl-dev"
-      }
+    "webAppName_Backend": {
+      "value": "#{Azure.WebApp.BE.Name}"
     },
-    "frontAppinsightsInstrumentationKey": {
-      "reference": {
-        "keyVault": {
-          "id": "/subscriptions/973d0b8c-44bf-438d-a4b7-1c4162d3ccba/resourceGroups/DEV-demoVC-3/providers/Microsoft.KeyVault/vaults/dev-demovc3"
-        },
-        "secretName": "frontAppinsightsInstrumentationKey-dev"
-      }
+    "storefrontEndpoint": {
+      "value": "#{Storefront.Endpoint}"
+    },
+    "azureADApplicationId": {
+      "value": "#{AzureAD.ApplicationId}"
+    },
+    "azureADTenantId": {
+      "value": "#{AzureAD.TenantId}"
+    },
+    "notificationEmailSender": {
+      "value": "#{Notification.EmailSender}"
+    },
+    "notificationSendgridApiKey": {
+      "value": "#{Notification.SendGrid.ApiKey}"
+    },
+    "CountryCode": {
+      "value": "#{Backend.CountryCode}"
     }
   }
 }
