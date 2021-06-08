@@ -58,7 +58,7 @@ def call(body) {
                     versionSuffixArg = env.BRANCH_NAME == 'dev' ? "-CustomVersionSuffix \"alpha.${commitNumber}\"" : ""
 		    if(env.BRANCH_NAME == 'feature/V')
 		    {
-			    powershell script: "Copy-Item C:\\tmp\\global.json ${env.WORKSPACE}\\"
+			    powershell script: "Copy-Item C:\\tmp\\global.json ${env.WORKSPACE}\\global.json"
 		    }
                     // try
                     // {
