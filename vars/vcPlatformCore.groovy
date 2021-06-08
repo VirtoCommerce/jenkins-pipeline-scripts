@@ -56,7 +56,10 @@ def call(body) {
                     commitHash = Utilities.getCommitHash(this)
                     commitNumber = Utilities.getCommitNumber(this)
                     versionSuffixArg = env.BRANCH_NAME == 'dev' ? "-CustomVersionSuffix \"alpha.${commitNumber}\"" : ""
-
+		    if(env.BRANCH_NAME == 'feature/V')
+		    {
+			    powershell script: "Copy-Item C:\\tmp\\global.json ${env.WORKSPACE}\\"
+		    }
                     // try
                     // {
                     //     def release = GithubRelease.getLatestGithubReleaseV3(this, Utilities.getOrgName(this), Utilities.getRepoName(this), env.BRANCH_NAME == 'master' ? false : true)
