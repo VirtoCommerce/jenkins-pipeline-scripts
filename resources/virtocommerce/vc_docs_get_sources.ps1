@@ -4,7 +4,7 @@ $ErrorActionPreference = 'Continue'
 git clone https://github.com/VirtoCommerce/vc-platform.git --branch master --single-branch
 if(-Not (Test-Path -Path "vc-platform/docs/CLI-tools")){
 	git clone https://github.com/VirtoCommerce/vc-build.git --branch main --single-branch
-	Copy-Item -Path "vc-build\docs\CLI-tools" -Destination "vc-platform\docs\CLI-tools" -Recurse -Force
+	Copy-Item -Path "vc-build\docs\CLI-tools\*" -Destination "vc-platform\docs\CLI-tools" -Recurse -Force
 }
 # Get all modules from master branch
 $modulesv3=Invoke-RestMethod https://raw.githubusercontent.com/VirtoCommerce/vc-modules/master/modules_v3.json
