@@ -1,9 +1,9 @@
 $ErrorActionPreference = 'Continue'
 
 #Get platform src
-git clone https://github.com/VirtoCommerce/vc-platform.git --branch master --single-branch
+git clone https://github.com/VirtoCommerce/vc-platform.git --branch dev --single-branch
 
-git clone https://github.com/VirtoCommerce/vc-build.git --branch main --single-branch
+git clone https://github.com/VirtoCommerce/vc-build.git --branch dev --single-branch
 Copy-Item -Path "vc-build\docs\CLI-tools\*" -Destination "vc-platform\docs\CLI-tools" -Recurse -Force
 
 # Get all modules from master branch
@@ -20,7 +20,7 @@ foreach ($module in $modulesv3) {
         Write-Output "$moduleFullName already exists."
 	}
 	else{
-		git clone https://github.com/VirtoCommerce/vc-module-$moduleName.git --branch master --single-branch
+		git clone https://github.com/VirtoCommerce/vc-module-$moduleName.git --branch dev --single-branch
 	}
 	if(Test-Path -Path "$moduleFullName\docs"){
 		Set-Location vc-module-$moduleName
