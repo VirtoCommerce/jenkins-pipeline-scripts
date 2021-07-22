@@ -13,7 +13,7 @@ $ErrorActionPreference = "Stop"
 
 Copy-Item .\pages .\artifacts\Pages\vccom -Recurse -Force
 Copy-Item .\theme .\artifacts\Themes\vccom\default -Recurse -Force
-Compress-Archive -Path .\artifacts\Themes -DestinationPath .\artifacts\themewithpath.zip -Force
+Compress-Archive -Path .\artifacts\Themes\vccom -DestinationPath .\artifacts\themewithpath.zip -Force
 
 # $SourceDir = "${env:WORKSPACE}\artifacts"
 
