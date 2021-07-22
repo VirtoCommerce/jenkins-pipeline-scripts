@@ -107,7 +107,7 @@ import jobs.scripts.*
 						bat "copy /Y \"${artifact.path}\" \"${params.themeResultZip}\""
 					}
 				}
-					Packaging.saveArtifact(this, 'vccom', 'theme', 'Themes', artifacts[0].path)
+					Packaging.saveArtifact(this, 'vccom', 'theme', 'vccom', artifacts[0].path)
 				}
 			}
 

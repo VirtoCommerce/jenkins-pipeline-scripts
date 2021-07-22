@@ -18,7 +18,7 @@ if($StagingName -eq "deploy")
 
     Copy-Item .\pages .\artifacts\Pages\vccom-staging -Recurse -Force
     Copy-Item .\theme .\artifacts\Themes\vccom-staging\default -Recurse -Force
-    Compress-Archive -Path .\artifacts\Themes\vccom -DestinationPath .\artifacts\themewithpath.zip -Force
+    Compress-Archive -Path .\artifacts\Themes\vccom\default -DestinationPath .\artifacts\themewithpath.zip -Force
 }
 
 # $SourceDir = "${env:WORKSPACE}\artifacts"
