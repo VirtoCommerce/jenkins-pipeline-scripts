@@ -97,32 +97,46 @@ import jobs.scripts.*
 				}
 			}
 
-			if(env.BRANCH_NAME == 'master')
+			stage('Save Artifact')
 			{
-				stage('Deploy to PROD')
+				if(!Utilities.isPullRequest(this))
 				{
-					timeout(time: "${SETTINGS['timeoutMinutes']}", unit: 'MINUTES')
-					{
-						def releaseApprovers = SETTINGS['releaseApprovers']
-						echo "releaseApprovers: ${releaseApprovers}"
-						input(message: "Stage looks fine?", submitter: "${releaseApprovers}")
-						timestamps
-						{
-							def stagingName = "prod"
-							def storeName = "cms-content"
-							def azureBlobName = SETTINGS['azureBlobNameProd']
-							def azureBlobKey = SETTINGS['azureBlobKeyProd']
-							def webAppName = SETTINGS['webAppNameProd']
-							def resourceGroupName = SETTINGS['resourceGroupName']
-							def subscriptionID = SETTINGS['subscriptionID']
-							def blobToken = SETTINGS['tokenSasProd']
-							withEnv(["AzureBlobToken=${blobToken}"]){
-								Utilities.runSharedPS(this, "${deployScript}", "-StagingName ${stagingName} -StoreName ${storeName} -AzureBlobName ${azureBlobName} -AzureBlobKey ${azureBlobKey} -WebAppName ${webAppName} -ResourceGroupName ${resourceGroupName} -SubscriptionID ${subscriptionID} -ExcludePattern ${azureCopyExcludePattern}")
-							}
-						}
+				def artifacts = findFiles(glob: 'artifacts/*.zip')
+				if(params.themeResultZip != null){
+					for(artifact in artifacts){
+						bat "copy /Y \"${artifact.path}\" \"${params.themeResultZip}\""
 					}
 				}
+					Packaging.saveArtifact(this, 'vccom', 'theme', config.sampleStore, artifacts[0].path)
+				}
 			}
+
+			// if(env.BRANCH_NAME == 'master')
+			// {
+			// 	stage('Deploy to PROD')
+			// 	{
+			// 		timeout(time: "${SETTINGS['timeoutMinutes']}", unit: 'MINUTES')
+			// 		{
+			// 			def releaseApprovers = SETTINGS['releaseApprovers']
+			// 			echo "releaseApprovers: ${releaseApprovers}"
+			// 			input(message: "Stage looks fine?", submitter: "${releaseApprovers}")
+			// 			timestamps
+			// 			{
+			// 				def stagingName = "prod"
+			// 				def storeName = "cms-content"
+			// 				def azureBlobName = SETTINGS['azureBlobNameProd']
+			// 				def azureBlobKey = SETTINGS['azureBlobKeyProd']
+			// 				def webAppName = SETTINGS['webAppNameProd']
+			// 				def resourceGroupName = SETTINGS['resourceGroupName']
+			// 				def subscriptionID = SETTINGS['subscriptionID']
+			// 				def blobToken = SETTINGS['tokenSasProd']
+			// 				withEnv(["AzureBlobToken=${blobToken}"]){
+			// 					Utilities.runSharedPS(this, "${deployScript}", "-StagingName ${stagingName} -StoreName ${storeName} -AzureBlobName ${azureBlobName} -AzureBlobKey ${azureBlobKey} -WebAppName ${webAppName} -ResourceGroupName ${resourceGroupName} -SubscriptionID ${subscriptionID} -ExcludePattern ${azureCopyExcludePattern}")
+			// 				}
+			// 			}
+			// 		}
+			// 	}
+			// }
 
 			stage('Cleanup')
 			{
