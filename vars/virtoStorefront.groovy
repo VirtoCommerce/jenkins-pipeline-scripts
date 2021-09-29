@@ -138,20 +138,12 @@ def call(body) {
 							withEnv(["BRANCH_NAME=${env.CHANGE_BRANCH}"])
 							{
 								//powershell "vc-build SonarQubeStart -SonarUrl ${env.SONAR_HOST_URL} -SonarAuthToken \"${env.SONAR_AUTH_TOKEN}\" -PullRequest -GitHubToken ${env.GITHUB_TOKEN} -skip Restore+Compile"
-								if(env.CHANGE_TARGET.startsWith('support/2.x'))
-								{
-									Packaging.startAnalyzer(this, true)
-								}
 								powershell "vc-build Compile"
 							}
 						}
 						else
 						{
 							//powershell "vc-build SonarQubeStart -SonarUrl ${env.SONAR_HOST_URL} -SonarAuthToken \"${env.SONAR_AUTH_TOKEN}\" -skip Restore+Compile"
-							if(env.BRANCH_NAME.startsWith('support/2.x'))
-							{
-								Packaging.startAnalyzer(this, true)
-							}
 							if(versionSuffixArg != "")
 							{
 								pwsh "vc-build ChangeVersion ${versionSuffixArg}"
@@ -174,19 +166,8 @@ def call(body) {
 					{
                     	powershell "vc-build Test -TestsFilter \"Category=Unit|Category=CI\" -skip"
 					}
-                } 
+                }
 
-				if(env.BRANCH_NAME.startsWith('support/2.x') || (Utilities.isPullRequest(this) && env.CHANGE_TARGET?.startsWith('support/2.x')))
-				{
-					stage('Quality Gate'){
-						// withSonarQubeEnv('VC Sonar Server'){
-						// 	powershell "vc-build SonarQubeEnd -SonarUrl ${env.SONAR_HOST_URL} -SonarAuthToken ${env.SONAR_AUTH_TOKEN} -skip Restore+Compile+SonarQubeStart"
-						// }
-						Packaging.endAnalyzer(this)
-						Packaging.checkAnalyzerGate(this)
-					} 
-				} 
-			
 				def version = Utilities.getAssemblyVersion(this, webProject)
 				def dockerImage
 				def dockerImageLinux
@@ -285,9 +266,9 @@ def call(body) {
                     {
                         artifacts = findFiles(glob: 'artifacts\\*.zip')
 
-                        if(env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'feature/migrate-to-vc30' || env.BRANCH_NAME.startsWith("feature/") || env.BRANCH_NAME.startsWith("bug/") || env.BRANCH_NAME.startsWith("meds/") || env.BRANCH_NAME.startsWith("odt/") || env.BRANCH_NAME.startsWith("support/2.x"))
+                        if(env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'master' || env.BRANCH_NAME.startsWith("feature/") || env.BRANCH_NAME.startsWith("bug/") || env.BRANCH_NAME.startsWith("support/2.x") || env.BRANCH_NAME.startsWith("support/2.x-dev"))
                         {
-                            Packaging.saveArtifact(this, 'vc', Utilities.getProjectType(this), '', artifacts[0].path)
+                            Packaging.saveArtifact(this, 'vccom', Utilities.getProjectType(this), '', artifacts[0].path)
                         }
                     }
                 }
