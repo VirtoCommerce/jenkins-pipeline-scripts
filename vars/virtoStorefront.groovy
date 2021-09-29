@@ -178,10 +178,10 @@ def call(body) {
 
 						storefrontVersion = pwsh (script: "(Get-Item artifacts\\publish\\VirtoCommerce.Storefront.dll).VersionInfo.ProductVersion", returnStdout: true, label: "Get storefront version").trim()
 
-						if (env.BRANCH_NAME == 'support/2.x-dev' || env.BRANCH_NAME == 'support/2.x' || env.BRANCH_NAME == 'dev' || env.BRANCH_NAME =='master') {
+						if (env.BRANCH_NAME == 'support/2.x' || env.BRANCH_NAME == 'dev' || env.BRANCH_NAME =='master') {
 							def websitePath = Utilities.getWebPublishFolder(this, websiteDir)
 							powershell script: "Copy-Item ${workspace}\\artifacts\\publish\\* ${websitePath}\\VirtoCommerce.Storefront -Recurse -Force"
-							dir(env.BRANCH_NAME == 'support/2.x-dev' || env.BRANCH_NAME == 'support/2.x' ? env.WORKSPACE : workspace)
+							dir(env.BRANCH_NAME == 'support/2.x' ? env.WORKSPACE : workspace)
 							{
 								dockerImage = Packaging.createDockerImage(this, zipArtifact.replaceAll('\\.','/'), websitePath, "VirtoCommerce.Storefront", dockerTag, runtimeImage)	
 							}	
@@ -241,21 +241,7 @@ def call(body) {
 									Utilities.validateSwagger(this, schemaPath)
 								}
 							}
-						}
-
-						// stage('E2E') {
-						// 	timestamps {
-						// 		Utilities.runE2E(this)
-						// 	}
-						// }
-						
-						if (env.BRANCH_NAME == 'support/2.x-dev') {
-							stage('Infrastructure Check and Deploy'){
-								timestamps{
-									Utilities.createInfrastructure(this)
-								}
-							}
-						}
+						}						
 					}
 				}
 
@@ -273,7 +259,7 @@ def call(body) {
                     }
                 }
 
-				if (env.BRANCH_NAME == 'support/2.x-dev' || env.BRANCH_NAME == 'support/2.x' || env.BRANCH_NAME == 'dev' || env.BRANCH_NAME =='master') 
+				if (env.BRANCH_NAME == 'support/2.x' || env.BRANCH_NAME == 'dev' || env.BRANCH_NAME =='master') 
 				{
 					stage('Publish')
 					{
