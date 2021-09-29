@@ -252,10 +252,19 @@ def call(body) {
                     {
                         artifacts = findFiles(glob: 'artifacts\\*.zip')
 
-                        if(env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'master' || env.BRANCH_NAME.startsWith("feature/") || env.BRANCH_NAME.startsWith("bug/") || env.BRANCH_NAME.startsWith("support/2.x") || env.BRANCH_NAME.startsWith("support/2.x-dev"))
-                        {
-                            Packaging.saveArtifact(this, 'vccom', Utilities.getProjectType(this), '', artifacts[0].path)
-                        }
+						switch(env.BRANCH_NAME)
+						{
+							case 'dev':
+							case 'master':
+							case 'feature/':
+							case 'bug/':
+							case 'support/2.x':
+								Packaging.saveArtifact(this, 'vc', Utilities.getProjectType(this), '', artifacts[0].path)
+								break
+							case 'support/2.x-dev':
+								Packaging.saveArtifact(this, 'vccom', Utilities.getProjectType(this), '', artifacts[0].path)
+								break
+						}
                     }
                 }
 
