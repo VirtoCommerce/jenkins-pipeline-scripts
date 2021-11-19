@@ -1,5 +1,5 @@
 # escape=`
-ARG RUNTIME_IMAGE=microsoft/dotnet:2.2-aspnetcore-runtime
+ARG RUNTIME_IMAGE=mcr.microsoft.com/dotnet/core/aspnet:3.1
 
 FROM $RUNTIME_IMAGE
 
